@@ -1,0 +1,20 @@
+{
+  "hosting": {
+    "site": "theassembly",
+    "public": "public",
+    "ignore": [
+      "firebase.json",
+      "**/.*",
+      "**/node_modules/**"
+    ],
+    "rewrites": [
+      {
+        "source": "**",
+        "run": {
+          "serviceId": "the-assembly",
+          "region": "us-west1"
+        }
+      }
+    ]
+  }
+}

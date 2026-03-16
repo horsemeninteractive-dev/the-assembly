@@ -1,0 +1,13 @@
+.gcloudignore
+.git
+.gitignore
+.firebase
+node_modules
+dist
+deploy.ps1
+.env
+*.json
+!package.json
+!firebase.json
+!lock.json
+!tsconfig.json
