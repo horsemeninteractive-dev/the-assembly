@@ -89,15 +89,13 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
     <div className="shrink-0 bg-elevated border-t border-subtle flex flex-col">
       {/* Phase status */}
       <div className="px-[2vw] py-[1.5vh] bg-white/5 border-b border-subtle flex justify-between items-center">
-        <div className="min-w-0 flex-1 mr-2">
+        <div className="min-w-0 flex-1 mr-2 flex flex-col justify-center">
           <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono mb-1">Current Phase</div>
-          <div className="text-responsive-sm font-serif italic text-primary">{phaseLabel()}</div>
-          {/* Phase hints — shown for players with fewer than 5 games */}
-          {user && (user.stats?.gamesPlayed ?? 0) < 5 && phaseHint() && (
-            <div className="text-responsive-xs text-faint font-mono mt-1 leading-tight truncate">
-              {phaseHint()}
-            </div>
-          )}
+          <div className="text-responsive-sm font-serif italic text-primary min-h-[1.5em]">{phaseLabel() || '\u00A0'}</div>
+          {/* Phase hints — always render the block to maintain 3-line height */}
+          <div className="text-responsive-xs text-faint font-mono mt-1 leading-tight truncate min-h-[1.25em]">
+            {(user && (user.stats?.gamesPlayed ?? 0) < 5 && phaseHint()) || '\u00A0'}
+          </div>
         </div>
         <div className="flex gap-2">
           <Tooltip content={isVoiceActive ? "Mute Mic" : "Unmute Mic"}>

@@ -12,7 +12,7 @@ import { GameEngine } from "./server/gameEngine.ts";
 import { registerRoutes } from "./server/apiRoutes.ts";
 import { getUserById, sendFriendRequest, acceptFriendRequest, getFriends } from "./server/supabaseService.ts";
 
-const PORT = 3000;
+const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
 async function startServer() {
   const app = express();
@@ -21,11 +21,11 @@ async function startServer() {
   app.use(express.json());
 
   const httpServer = createServer(app);
-  const io = new Server(httpServer, { 
-    cors: { 
+  const io = new Server(httpServer, {
+    cors: {
       origin: "*",
       methods: ["GET", "POST"]
-    } 
+    }
   });
 
   const engine = new GameEngine({ io });
@@ -37,9 +37,9 @@ async function startServer() {
   app.use((req, res, next) => {
     // Explicitly allow microphone, camera, and display-capture for Discord Activity
     res.setHeader("Permissions-Policy", "microphone=*, camera=*, display-capture=*, speaker-selection=*, autoplay=*, text-to-speech=*, screen-wake-lock=*");
-    
+
     // Comprehensive CSP for Discord Activity environment
-    res.setHeader("Content-Security-Policy", 
+    res.setHeader("Content-Security-Policy",
       "default-src 'self' https://*.discord.com https://*.discordapp.io; " +
       "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.discord.com; " +
       "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
@@ -53,7 +53,7 @@ async function startServer() {
     // Headers for cross-origin isolation (needed for some media features)
     res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
     res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
-    
+
     next();
   });
 
@@ -61,9 +61,9 @@ async function startServer() {
   app.get("/proxy", async (req, res) => {
     const url = req.query.url as string;
     if (!url) return res.status(400).send("URL is required");
-    
+
     console.log(`[Proxy] Requesting: ${url}`);
-    
+
     try {
       // Basic validation to prevent abuse
       const allowedDomains = [
@@ -80,7 +80,7 @@ async function startServer() {
         'fonts.googleapis.com',
         'fonts.gstatic.com'
       ];
-      
+
       const parsedUrl = new URL(url);
       if (!allowedDomains.some(domain => parsedUrl.hostname.endsWith(domain))) {
         return res.status(403).send("Domain not allowed");
@@ -91,7 +91,7 @@ async function startServer() {
           'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
         }
       });
-      
+
       if (!response.ok) {
         console.error(`[Proxy] Fetch failed for ${url}: ${response.status} ${response.statusText}`);
         return res.status(response.status).send(response.statusText);
@@ -99,14 +99,14 @@ async function startServer() {
 
       const contentType = response.headers.get("content-type");
       if (contentType) res.setHeader("Content-Type", contentType);
-      
+
       // Add CORP header to allow proxied assets in cross-origin isolated environments
       res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
       res.setHeader("Access-Control-Allow-Origin", "*");
-      
+
       // Set cache headers for better performance
       res.setHeader("Cache-Control", "public, max-age=31536000");
-      
+
       const arrayBuffer = await response.arrayBuffer();
       let body = Buffer.from(arrayBuffer);
 
@@ -119,7 +119,7 @@ async function startServer() {
         });
         body = Buffer.from(css);
       }
-      
+
       res.send(body);
     } catch (error: any) {
       console.error(`[Proxy] Error fetching ${url}:`, error.message);
@@ -316,7 +316,7 @@ async function startServer() {
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state || state.phase !== "Lobby") return;
-      
+
       state.lobbyTimer = 30;
       state.isTimerActive = true;
       engine.broadcastState(roomId);
