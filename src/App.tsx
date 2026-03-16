@@ -14,7 +14,7 @@ import { MUSIC_TRACKS, SOUND_PACKS } from './lib/audio';
 import { discordSdk, setupDiscordSdk } from './lib/discord';
 import { cn, getProxiedUrl } from './lib/utils';
 
-const CLIENT_VERSION = 'v0.9.6';
+const CLIENT_VERSION = 'v0.9.7';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -251,6 +251,9 @@ export default function App() {
       // Server moved us from spectator queue into the player list — we're now a player
       // The next gameStateUpdate will reflect this; just ensure we stay in the room
     });
+    socket.on('kicked', () => {
+      handleLeaveRoom();
+    });
     socket.on('friendRequestReceived', async (data: { fromUserId: string }) => {
       try {
         const res = await fetch(`/api/user/${data.fromUserId}`, {
@@ -273,6 +276,7 @@ export default function App() {
       socket.off('friendInvite');
       socket.off('friendRequestReceived');
       socket.off('queueDrained');
+      socket.off('kicked');
     };
   }, []);
 
@@ -328,13 +332,13 @@ export default function App() {
     setGameState(null);
   };
 
-  const handleJoinRoom = (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked', isSpectator?: boolean) => {
+  const handleJoinRoom = (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked', isSpectator?: boolean, privacy?: string, inviteCode?: string) => {
     if (user) {
       socket.emit('joinRoom', {
         roomId, name: user.username, userId: user.id,
         activeFrame: user.activeFrame, activePolicyStyle: user.activePolicyStyle,
         activeVotingStyle: user.activeVotingStyle,
-        maxPlayers, actionTimer, mode, isSpectator,
+        maxPlayers, actionTimer, mode, isSpectator, privacy, inviteCode,
       });
       setJoined(true);
     }

@@ -1,6 +1,6 @@
 import React, { useRef, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Users, Eye, Check } from 'lucide-react';
+import { Users, Eye, Check, ShieldOff } from 'lucide-react';
 import { socket } from '../../socket';
 import { GameState, Player } from '../../types';
 import { getFrameStyles, getVoteStyles } from '../../lib/cosmetics';
@@ -28,6 +28,7 @@ interface PlayerGridProps {
   remoteStreams: Record<string, MediaStream>;
   isVideoActive: boolean;
   isSpectator?: boolean;
+  isHost?: boolean;
 }
 
 const ROLE_LABELS: Record<string, { label: string; color: string; bg: string }> = {
@@ -36,7 +37,7 @@ const ROLE_LABELS: Record<string, { label: string; color: string; bg: string }> 
   'Overseer': { label: 'O', color: 'text-red-200',   bg: 'bg-red-800/90' },
 };
 
-export const PlayerGrid = ({ gameState, me, speakingPlayers, playSound, token, selectedPlayerId, setSelectedPlayerId, localStream, remoteStreams, isVideoActive, isSpectator }: PlayerGridProps) => {
+export const PlayerGrid = ({ gameState, me, speakingPlayers, playSound, token, selectedPlayerId, setSelectedPlayerId, localStream, remoteStreams, isVideoActive, isSpectator, isHost }: PlayerGridProps) => {
   const isPresidentialCandidate = me?.isPresidentialCandidate;
   const isPresident = me?.isPresident;
   const isManyPlayers = gameState.players.length > 6;
@@ -287,6 +288,16 @@ export const PlayerGrid = ({ gameState, me, speakingPlayers, playSound, token, s
                   className="absolute inset-0 bg-red-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
                 >
                   {gameState.currentExecutiveAction}
+                </button>
+              )}
+
+              {/* Host kick overlay — lobby only, not self */}
+              {isHost && gameState.phase === 'Lobby' && p.id !== socket.id && !p.isAI && (
+                <button
+                  onClick={(e) => { e.stopPropagation(); playSound('click'); socket.emit('kickPlayer', p.id); }}
+                  className="absolute top-1 left-1 z-30 p-1 rounded-lg bg-red-900/80 border border-red-700/50 text-red-300 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-900"
+                >
+                  <ShieldOff className="w-[1.5vh] h-[1.5vh]" />
                 </button>
               )}
             </motion.div>

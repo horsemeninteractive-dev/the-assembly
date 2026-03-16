@@ -148,6 +148,8 @@ export interface UserInternal extends User {
   discordId?: string;
 }
 
+export type RoomPrivacy = 'public' | 'friends' | 'private';
+
 export interface RoomInfo {
   id: string;
   name: string;
@@ -157,6 +159,9 @@ export interface RoomInfo {
   actionTimer: number;
   playerAvatars: string[];
   mode: GameMode;
+  averageElo?: number;
+  privacy: RoomPrivacy;
+  isLocked?: boolean;
 }
 
 export type AIPersonality = 'Honest' | 'Deceptive' | 'Chaotic' | 'Strategic' | 'Aggressive';
@@ -203,6 +208,10 @@ export interface GameState {
   spectators: { id: string; name: string; avatarUrl?: string }[];
   spectatorQueue: { id: string; name: string; userId?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string }[];
   spectatorRoles?: { [playerId: string]: { role: string; titleRole?: string; agendaName?: string } };
+  privacy: RoomPrivacy;
+  inviteCode?: string;      // only set when privacy === 'private'
+  hostUserId?: string;      // userId of the room creator
+  isLocked?: boolean;       // host has locked the room — no new joins
   mode: GameMode;
   phase: GamePhase;
   civilDirectives: number;

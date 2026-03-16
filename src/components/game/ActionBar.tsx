@@ -1,5 +1,5 @@
 import React from 'react';
-import { Scroll, Scale, Eye, Mic, Video, VideoOff, MicOff } from 'lucide-react';
+import { Scroll, Scale, Eye, Mic, Video, VideoOff, MicOff, Lock, Unlock, Play, ShieldAlert } from 'lucide-react';
 import { Tooltip } from '../Tooltip';
 import { socket } from '../../socket';
 import { GameState, Player, User } from '../../types';
@@ -203,21 +203,70 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
         )}
 
         {/* Lobby ready */}
-        {gameState.phase === 'Lobby' && (
-          <div className="flex flex-col gap-[1vh] w-full max-w-xs h-full justify-center">
-            <button
-              onClick={() => { playSound('click'); socket.emit('toggleReady'); }}
-              className={cn('py-[1.5vh] font-thematic text-responsive-xl rounded-lg shadow-xl transition-all active:scale-95', me?.isReady ? 'bg-emerald-500 text-white shadow-emerald-500/10' : 'btn-primary shadow-white/5')}
-            >
-              {me?.isReady ? 'Ready!' : 'Ready Up'}
-            </button>
-            <div className="text-center">
-              <span className="text-responsive-xs uppercase tracking-widest text-muted">
-                {gameState.players.filter(p => !p.isAI && p.isReady).length} / {gameState.players.filter(p => !p.isAI).length} Players Ready
-              </span>
+        {gameState.phase === 'Lobby' && (() => {
+          const isHost = !!(user?.id && gameState.hostUserId === user.id);
+          const readyCount = gameState.players.filter(p => !p.isAI && p.isReady).length;
+          const totalHuman = gameState.players.filter(p => !p.isAI).length;
+          const canForceStart = totalHuman >= 1 && (gameState.mode !== 'Ranked' || totalHuman >= 5);
+
+          return (
+            <div className="flex gap-[1.5vh] w-full h-full items-center justify-center px-[1vw]">
+              {/* Ready Up */}
+              <div className="flex flex-col gap-[0.5vh] items-center flex-1 max-w-[18vh]">
+                <button
+                  onClick={() => { playSound('click'); socket.emit('toggleReady'); }}
+                  className={cn('w-full py-[1.5vh] font-thematic text-responsive-xl rounded-lg shadow-xl transition-all active:scale-95', me?.isReady ? 'bg-emerald-500 text-white shadow-emerald-500/10' : 'btn-primary shadow-white/5')}
+                >
+                  {me?.isReady ? 'Ready!' : 'Ready Up'}
+                </button>
+                <span className="text-responsive-xs uppercase tracking-widest text-muted">
+                  {readyCount} / {totalHuman} Ready
+                </span>
+              </div>
+
+              {/* Host controls */}
+              {isHost && (
+                <div className="flex flex-col gap-[0.5vh] shrink-0">
+                  <div className="flex gap-[1vh]">
+                    {/* Lock / Unlock */}
+                    <Tooltip content={gameState.isLocked ? 'Unlock Room' : 'Lock Room'}>
+                      <button
+                        onClick={() => { playSound('click'); socket.emit('toggleLock'); }}
+                        className={cn(
+                          'p-[1.2vh] rounded-lg border transition-all active:scale-95',
+                          gameState.isLocked
+                            ? 'bg-red-900/30 border-red-700/50 text-red-400 hover:bg-red-900/40'
+                            : 'bg-card border-subtle text-muted hover:border-default hover:text-primary'
+                        )}
+                      >
+                        {gameState.isLocked
+                          ? <Lock className="w-[2vh] h-[2vh]" />
+                          : <Unlock className="w-[2vh] h-[2vh]" />}
+                      </button>
+                    </Tooltip>
+
+                    {/* Force Start */}
+                    <Tooltip content={canForceStart ? 'Force Start Game' : gameState.mode === 'Ranked' ? 'Need 5+ players for Ranked' : 'No players'}>
+                      <button
+                        onClick={() => { if (canForceStart) { playSound('click'); socket.emit('hostStartGame'); } }}
+                        disabled={!canForceStart}
+                        className={cn(
+                          'p-[1.2vh] rounded-lg border transition-all active:scale-95',
+                          canForceStart
+                            ? 'bg-emerald-900/20 border-emerald-700/40 text-emerald-400 hover:bg-emerald-900/30'
+                            : 'bg-card border-subtle text-ghost cursor-not-allowed opacity-50'
+                        )}
+                      >
+                        <Play className="w-[2vh] h-[2vh]" />
+                      </button>
+                    </Tooltip>
+                  </div>
+                  <span className="text-[8px] font-mono text-faint uppercase tracking-widest text-center">Host</span>
+                </div>
+              )}
             </div>
-          </div>
-        )}
+          );
+        })()}
       </div>
 
       {/* Log bar */}

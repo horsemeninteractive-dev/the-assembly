@@ -341,17 +341,36 @@ export function registerRoutes(
 
   // ── Rooms ─────────────────────────────────────────────────────────────────
 
-  app.get("/api/rooms", (_req: Request, res: Response) => {
-    const roomList: RoomInfo[] = Array.from(engine.rooms.entries()).map(([id, state]) => ({
-      id,
-      name:          state.roomId,
-      playerCount:   state.players.length,
-      maxPlayers:    state.maxPlayers,
-      phase:         state.phase,
-      actionTimer:   state.actionTimer,
-      playerAvatars: state.players.map(p => p.avatarUrl || "").filter(Boolean),
-      mode:          state.mode,
-    }));
+  app.get("/api/rooms", async (_req: Request, res: Response) => {
+    const roomList = await Promise.all(
+      Array.from(engine.rooms.entries()).map(async ([id, state]) => {
+        // Compute average ELO of human players in room
+        let averageElo: number | undefined;
+        const humanPlayers = state.players.filter(p => !p.isAI && p.userId);
+        if (humanPlayers.length > 0) {
+          const elos = await Promise.all(
+            humanPlayers.map(async p => {
+              const u = await getUserById(p.userId!);
+              return u?.stats?.elo ?? 1000;
+            })
+          );
+          averageElo = Math.round(elos.reduce((a, b) => a + b, 0) / elos.length);
+        }
+        return {
+          id,
+          name:          state.roomId,
+          playerCount:   state.players.length,
+          maxPlayers:    state.maxPlayers,
+          phase:         state.phase,
+          actionTimer:   state.actionTimer,
+          playerAvatars: state.players.map(p => p.avatarUrl || "").filter(Boolean),
+          mode:          state.mode,
+          averageElo,
+          privacy:       state.privacy ?? 'public',
+          isLocked:      state.isLocked ?? false,
+        } as RoomInfo;
+      })
+    );
     res.json(roomList);
   });
 

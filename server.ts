@@ -10,7 +10,7 @@ import { GameState, Player } from "./src/types.ts";
 import { createDeck } from "./server/utils.ts";
 import { GameEngine } from "./server/gameEngine.ts";
 import { registerRoutes } from "./server/apiRoutes.ts";
-import { getUserById, sendFriendRequest, acceptFriendRequest, getFriends } from "./server/supabaseService.ts";
+import { getUserById, sendFriendRequest, acceptFriendRequest, getFriends, isFriend } from "./server/supabaseService.ts";
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
@@ -157,16 +157,23 @@ async function startServer() {
 
     socket.on("joinRoom", async ({
       roomId, name, userId, activeFrame, activePolicyStyle, activeVotingStyle,
-      maxPlayers, actionTimer, mode, isSpectator,
+      maxPlayers, actionTimer, mode, isSpectator, privacy, inviteCode, hostUserId,
     }) => {
       let state = engine.rooms.get(roomId);
 
       if (!state) {
+        // Generating a 4-char invite code if private
+        const code = privacy === 'private'
+          ? Math.random().toString(36).substring(2, 6).toUpperCase()
+          : undefined;
         state = {
           roomId,
           players: [],
           spectators: [],
           spectatorQueue: [],
+          privacy: privacy || 'public',
+          inviteCode: code,
+          hostUserId: userId,
           mode: mode || "Ranked",
           phase: "Lobby",
           civilDirectives: 0,
@@ -189,6 +196,22 @@ async function startServer() {
           declarations: [],
         };
         engine.rooms.set(roomId, state);
+      } else {
+        // Room exists — enforce privacy
+        if (state.privacy === 'private') {
+          if (state.inviteCode && inviteCode?.toUpperCase() !== state.inviteCode) {
+            socket.emit("error", "Invalid invite code.");
+            return;
+          }
+        } else if (state.privacy === 'friends') {
+          if (state.hostUserId && userId && state.hostUserId !== userId) {
+            const areFriends = await isFriend(state.hostUserId, userId);
+            if (!areFriends) {
+              socket.emit("error", "This room is friends only.");
+              return;
+            }
+          }
+        }
       }
 
       if (isSpectator) {
@@ -221,6 +244,11 @@ async function startServer() {
           return;
         }
         socket.emit("error", "Game already in progress.");
+        return;
+      }
+
+      if (state.isLocked && userId !== state.hostUserId) {
+        socket.emit("error", "This room is locked.");
         return;
       }
 
@@ -710,6 +738,64 @@ async function startServer() {
       const state = engine.rooms.get(roomId);
       if (!state) return;
       state.spectatorQueue = state.spectatorQueue.filter(q => q.id !== socket.id);
+      engine.broadcastState(roomId);
+    });
+
+    // ── Host Controls ─────────────────────────────────────────────────────
+
+    socket.on("kickPlayer", (targetSocketId: string) => {
+      const roomId = getRoom();
+      if (!roomId) return;
+      const state = engine.rooms.get(roomId);
+      if (!state) return;
+      // Only host can kick
+      const host = state.players.find(p => p.userId === state.hostUserId);
+      if (!host || host.id !== socket.id) return;
+      // Can't kick yourself
+      if (targetSocketId === socket.id) return;
+      const target = state.players.find(p => p.id === targetSocketId);
+      if (!target) return;
+      // Remove from room
+      state.players = state.players.filter(p => p.id !== targetSocketId);
+      state.log.push(`${target.name} was removed by the host.`);
+      io.to(targetSocketId).emit("kicked");
+      engine.broadcastState(roomId);
+    });
+
+    socket.on("toggleLock", () => {
+      const roomId = getRoom();
+      if (!roomId) return;
+      const state = engine.rooms.get(roomId);
+      if (!state || state.phase !== "Lobby") return;
+      const host = state.players.find(p => p.userId === state.hostUserId);
+      if (!host || host.id !== socket.id) return;
+      state.isLocked = !state.isLocked;
+      state.log.push(`Room ${state.isLocked ? "locked" : "unlocked"} by host.`);
+      engine.broadcastState(roomId);
+    });
+
+    socket.on("hostStartGame", () => {
+      const roomId = getRoom();
+      if (!roomId) return;
+      const state = engine.rooms.get(roomId);
+      if (!state || state.phase !== "Lobby") return;
+      const host = state.players.find(p => p.userId === state.hostUserId);
+      if (!host || host.id !== socket.id) return;
+      const humanPlayers = state.players.filter(p => !p.isAI);
+      if (state.mode === 'Ranked' && humanPlayers.length < 5) {
+        socket.emit("error", "Need at least 5 players to start a ranked game.");
+        return;
+      }
+      if (humanPlayers.length < 1) {
+        socket.emit("error", "Need at least 1 player to start.");
+        return;
+      }
+      state.log.push("Host started the game.");
+      if (state.mode === 'Ranked') {
+        engine.startGame(roomId);
+      } else {
+        engine.fillWithAI(roomId);
+      }
       engine.broadcastState(roomId);
     });
 

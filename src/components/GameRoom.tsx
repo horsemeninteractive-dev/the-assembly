@@ -580,6 +580,7 @@ export const GameRoom = ({
             remoteStreams={remoteStreams}
             isVideoActive={isVideoActive}
             isSpectator={isSpectator}
+            isHost={!!(user?.id && gameState.hostUserId === user.id)}
           />
 
           {isSpectator ? (

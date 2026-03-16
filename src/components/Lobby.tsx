@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Users, MessageSquare, LogOut, User as UserIcon, Trophy, Coins, Settings, Zap, BookOpen, Bell } from 'lucide-react';
+import { Plus, Users, MessageSquare, LogOut, User as UserIcon, Trophy, Coins, Settings, Zap, BookOpen, Bell, SlidersHorizontal, Shuffle, Lock, Users2, Globe } from 'lucide-react';
 import { Tooltip } from './Tooltip';
-import { User, RoomInfo } from '../types';
+import { User, RoomInfo, RoomPrivacy } from '../types';
 import { cn, getProxiedUrl } from '../lib/utils';
 import { getFrameStyles } from '../lib/cosmetics';
 import { LeaderboardModal } from './game/modals/LeaderboardModal';
@@ -10,7 +10,7 @@ import { HowToPlayModal } from './HowToPlayModal';
 
 interface LobbyProps {
   user: User;
-  onJoinRoom: (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked', isSpectator?: boolean) => void;
+  onJoinRoom: (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked', isSpectator?: boolean, privacy?: string, inviteCode?: string) => void;
   onLogout: () => void;
   onOpenProfile: () => void;
   playSound: (soundKey: string) => void;
@@ -31,7 +31,44 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
   const [maxPlayers, setMaxPlayers] = useState(5);
   const [actionTimer, setActionTimer] = useState(60);
   const [mode, setMode] = useState<'Casual' | 'Ranked'>('Ranked');
+  const [privacy, setPrivacy] = useState<RoomPrivacy>('public');
   const [isLoading, setIsLoading] = useState(true);
+  const [invitePrompt, setInvitePrompt] = useState<{ roomId: string; roomName: string } | null>(null);
+  const [inviteCodeInput, setInviteCodeInput] = useState('');
+  const [filterCasual, setFilterCasual] = useState(true);
+  const [filterRanked, setFilterRanked] = useState(true);
+  const [filterJoinable, setFilterJoinable] = useState(false);
+  const [filterInProgress, setFilterInProgress] = useState(true);
+  const [sortBy, setSortBy] = useState<'players' | 'newest'>('newest');
+  const [quickJoinStatus, setQuickJoinStatus] = useState<'idle' | 'searching' | 'found' | 'none'>('idle');
+
+  const handleQuickJoin = () => {
+    playSound('click');
+    setQuickJoinStatus('searching');
+    // Find joinable rooms (Lobby phase, has open slot)
+    const joinable = rooms.filter(r => r.phase === 'Lobby' && r.playerCount < r.maxPlayers);
+    if (joinable.length === 0) {
+      setQuickJoinStatus('none');
+      setTimeout(() => setQuickJoinStatus('idle'), 3000);
+      return;
+    }
+    // Score by ELO proximity (prefer ranked rooms closer to user's ELO)
+    const myElo = user.stats?.elo ?? 1000;
+    const scored = joinable.map(r => {
+      const eloGap = r.averageElo !== undefined ? Math.abs(r.averageElo - myElo) : 500;
+      // Prefer ranked if user has played ranked, prefer rooms with more players (less waiting)
+      const modePref = r.mode === 'Ranked' ? 0 : 200;
+      const fillBonus = (r.playerCount / r.maxPlayers) * 100;
+      return { room: r, score: eloGap + modePref - fillBonus };
+    });
+    scored.sort((a, b) => a.score - b.score);
+    const best = scored[0].room;
+    setQuickJoinStatus('found');
+    setTimeout(() => {
+      setQuickJoinStatus('idle');
+      onJoinRoom(best.id);
+    }, 600);
+  };
 
   const fetchRooms = async () => {
     try {
@@ -86,9 +123,24 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
   const handleCreateRoom = (e: React.FormEvent) => {
     e.preventDefault();
     if (newRoomName.trim()) {
-      onJoinRoom(newRoomName.trim(), maxPlayers, actionTimer, mode);
+      onJoinRoom(newRoomName.trim(), maxPlayers, actionTimer, mode, false, privacy);
+      setIsCreating(false);
     }
   };
+
+  // Derived filtered + sorted room list
+  const visibleRooms = rooms
+    .filter(room => {
+      if (!filterCasual  && room.mode === 'Casual')    return false;
+      if (!filterRanked  && room.mode === 'Ranked')    return false;
+      if (filterJoinable && room.phase !== 'Lobby')    return false;
+      if (!filterInProgress && room.phase !== 'Lobby') return false;
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === 'players') return b.playerCount - a.playerCount;
+      return 0; // 'newest' — server returns newest first by default
+    });
 
   return (
     <div 
@@ -106,7 +158,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
           <div className="min-w-0">
             <div className="flex items-baseline gap-2">
               <h1 className="text-responsive-sm sm:text-responsive-xl font-thematic text-primary tracking-wide leading-none truncate">The Assembly</h1>
-              <span className="text-[8px] font-mono text-red-500/60 border border-red-900/40 rounded px-1 py-0.5 leading-none shrink-0">v0.9.6</span>
+              <span className="text-[8px] font-mono text-red-500/60 border border-red-900/40 rounded px-1 py-0.5 leading-none shrink-0">v0.9.7</span>
             </div>
             <p className="text-responsive-xs uppercase tracking-widest text-muted font-mono mt-0.5">Assembly Lobby</p>
           </div>
@@ -225,17 +277,39 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
           </div>
         </div>
 
-        {/* Start New Assembly Button */}
-        <button 
-          onClick={() => {
-            playSound('click');
-            setIsCreating(true);
-          }}
-          className="w-full flex items-center justify-center gap-2 btn-primary px-[4vw] py-[1.5vh] rounded-2xl font-thematic text-responsive-xl hover:bg-subtle transition-all shadow-xl shadow-white/5"
-        >
-          <Plus className="w-[2vh] h-[2vh]" />
-          Start New Assembly
-        </button>
+        {/* Action Buttons */}
+        <div className="flex gap-3">
+          {/* Quick Join */}
+          <button
+            onClick={handleQuickJoin}
+            disabled={quickJoinStatus === 'searching' || quickJoinStatus === 'found'}
+            className={cn(
+              'flex items-center justify-center gap-2 px-[4vw] py-[1.5vh] rounded-2xl font-thematic text-responsive-xl transition-all shadow-xl border',
+              quickJoinStatus === 'none'
+                ? 'bg-red-900/20 border-red-900/50 text-red-400 cursor-default'
+                : quickJoinStatus === 'found'
+                  ? 'bg-emerald-900/20 border-emerald-700/50 text-emerald-400 cursor-default'
+                  : quickJoinStatus === 'searching'
+                    ? 'bg-card border-subtle text-muted cursor-default'
+                    : 'bg-card border-subtle text-primary hover:border-default hover:bg-hover'
+            )}
+          >
+            <Shuffle className={cn('w-[2vh] h-[2vh]', quickJoinStatus === 'searching' && 'animate-spin')} />
+            {quickJoinStatus === 'searching' ? 'Searching…'
+              : quickJoinStatus === 'found'    ? 'Joining!'
+              : quickJoinStatus === 'none'     ? 'No Rooms'
+              : 'Quick Join'}
+          </button>
+
+          {/* Start New Assembly */}
+          <button
+            onClick={() => { playSound('click'); setIsCreating(true); }}
+            className="flex-1 flex items-center justify-center gap-2 btn-primary px-[4vw] py-[1.5vh] rounded-2xl font-thematic text-responsive-xl hover:bg-subtle transition-all shadow-xl shadow-white/5"
+          >
+            <Plus className="w-[2vh] h-[2vh]" />
+            Start New Assembly
+          </button>
+        </div>
 
         {/* Rejoin Banner */}
         <AnimatePresence>
@@ -265,25 +339,107 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
           )}
         </AnimatePresence>
 
+        {/* Filter & Sort Bar */}
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-1.5 text-[10px] font-mono text-muted uppercase tracking-widest shrink-0">
+            <SlidersHorizontal className="w-3 h-3" />
+            Filter
+          </div>
+
+          {/* Mode filters */}
+          {([
+            { label: 'Casual', active: filterCasual, toggle: () => setFilterCasual(v => !v), color: 'border-blue-500/60 text-blue-400 bg-blue-900/20' },
+            { label: 'Ranked', active: filterRanked, toggle: () => setFilterRanked(v => !v), color: 'border-yellow-500/60 text-yellow-400 bg-yellow-900/20' },
+          ] as const).map(f => (
+            <button
+              key={f.label}
+              onClick={() => { playSound('click'); f.toggle(); }}
+              className={cn(
+                'flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-mono uppercase tracking-widest transition-all',
+                f.active ? f.color : 'border-subtle text-ghost bg-elevated'
+              )}
+            >
+              <div className={cn('w-2 h-2 rounded-sm border', f.active ? 'bg-current border-current' : 'border-ghost')} />
+              {f.label}
+            </button>
+          ))}
+
+          <div className="w-px h-4 bg-subtle" />
+
+          {/* Phase filters */}
+          {([
+            { label: 'Joinable', active: filterJoinable, toggle: () => { setFilterJoinable(v => !v); if (!filterJoinable) setFilterInProgress(false); }, color: 'border-emerald-500/60 text-emerald-400 bg-emerald-900/20' },
+            { label: 'In Progress', active: filterInProgress, toggle: () => { setFilterInProgress(v => !v); if (!filterInProgress) setFilterJoinable(false); }, color: 'border-red-500/60 text-red-400 bg-red-900/20' },
+          ] as const).map(f => (
+            <button
+              key={f.label}
+              onClick={() => { playSound('click'); f.toggle(); }}
+              className={cn(
+                'flex items-center gap-1.5 px-2.5 py-1 rounded-lg border text-[10px] font-mono uppercase tracking-widest transition-all',
+                f.active ? f.color : 'border-subtle text-ghost bg-elevated'
+              )}
+            >
+              <div className={cn('w-2 h-2 rounded-sm border', f.active ? 'bg-current border-current' : 'border-ghost')} />
+              {f.label}
+            </button>
+          ))}
+
+          <div className="flex-1" />
+
+          {/* Sort */}
+          <div className="flex items-center gap-1.5 text-[10px] font-mono text-muted uppercase tracking-widest shrink-0">Sort</div>
+          {([
+            { label: 'Newest', value: 'newest' as const },
+            { label: 'Players', value: 'players' as const },
+          ]).map(s => (
+            <button
+              key={s.value}
+              onClick={() => { playSound('click'); setSortBy(s.value); }}
+              className={cn(
+                'px-2.5 py-1 rounded-lg border text-[10px] font-mono uppercase tracking-widest transition-all',
+                sortBy === s.value ? 'border-subtle bg-card text-primary' : 'border-transparent text-ghost hover:text-muted'
+              )}
+            >
+              {s.label}
+            </button>
+          ))}
+
+          {/* Live count */}
+          <span className="text-[10px] font-mono text-faint ml-1">
+            {visibleRooms.length}/{rooms.length}
+          </span>
+        </div>
+
         {/* Room Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[2vh]">
           {isLoading ? (
             Array.from({ length: 6 }).map((_, i) => (
               <div key={i} className="h-[20vh] bg-surface border border-subtle rounded-3xl animate-pulse" />
             ))
-          ) : rooms.length === 0 ? (
+          ) : visibleRooms.length === 0 ? (
             <div className="col-span-full py-[10vh] flex flex-col items-center justify-center text-center bg-surface border border-dashed border-subtle rounded-3xl">
               <MessageSquare className="w-[6vh] h-[6vh] text-whisper mb-4" />
-              <p className="text-responsive-sm text-muted font-serif italic">No active rooms found.</p>
-              <button 
-                onClick={() => setIsCreating(true)}
-                className="mt-4 text-responsive-xs text-red-500 font-mono uppercase tracking-widest hover:underline"
-              >
-                Be the first to create one
-              </button>
+              <p className="text-responsive-sm text-muted font-serif italic">
+                {rooms.length === 0 ? 'No active rooms found.' : 'No rooms match your filters.'}
+              </p>
+              {rooms.length === 0 ? (
+                <button
+                  onClick={() => setIsCreating(true)}
+                  className="mt-4 text-responsive-xs text-red-500 font-mono uppercase tracking-widest hover:underline"
+                >
+                  Be the first to create one
+                </button>
+              ) : (
+                <button
+                  onClick={() => { setFilterCasual(true); setFilterRanked(true); setFilterJoinable(false); setFilterInProgress(true); }}
+                  className="mt-4 text-responsive-xs text-red-500 font-mono uppercase tracking-widest hover:underline"
+                >
+                  Clear filters
+                </button>
+              )}
             </div>
           ) : (
-            rooms.map((room) => (
+            visibleRooms.map((room) => (
               <motion.div
                 key={room.id}
                 initial={{ opacity: 0, scale: 0.95 }}
@@ -291,7 +447,11 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                 whileHover={{ y: -4 }}
                 onClick={() => {
                   playSound('click');
-                  onJoinRoom(room.id);
+                  if (room.privacy === 'private') {
+                    setInvitePrompt({ roomId: room.id, roomName: room.name });
+                  } else {
+                    onJoinRoom(room.id);
+                  }
                 }}
                 className="group relative bg-surface border border-subtle rounded-3xl p-[2vh] text-left transition-all hover:border-red-900/50 hover:shadow-2xl hover:shadow-red-900/5 cursor-pointer"
               >
@@ -312,6 +472,18 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                     )}>
                       {room.mode}
                     </div>
+                    {room.privacy && room.privacy !== 'public' && (
+                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[7px] font-mono uppercase tracking-widest border bg-card border-subtle text-ghost">
+                        {room.privacy === 'private' ? <Lock className="w-2.5 h-2.5" /> : <Users2 className="w-2.5 h-2.5" />}
+                        {room.privacy === 'private' ? 'Private' : 'Friends'}
+                      </div>
+                    )}
+                    {room.isLocked && (
+                      <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[7px] font-mono uppercase tracking-widest border bg-red-900/20 border-red-900/40 text-red-400">
+                        <Lock className="w-2.5 h-2.5" />
+                        Locked
+                      </div>
+                    )}
                   </div>
                 </div>
 
@@ -341,14 +513,30 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                 </div>
 
                 <div className="mt-[2vh] flex gap-2 transition-opacity">
-                  <button 
+                  <button
+                    disabled={!!room.isLocked && room.phase === 'Lobby'}
                     onClick={(e) => {
                       e.stopPropagation();
-                      onJoinRoom(room.id);
+                      if (room.isLocked && room.phase === 'Lobby') return;
+                      playSound('click');
+                      if (room.privacy === 'private') {
+                        setInvitePrompt({ roomId: room.id, roomName: room.name });
+                      } else {
+                        onJoinRoom(room.id);
+                      }
                     }}
-                    className="flex-1 py-[1vh] btn-primary text-responsive-xs font-mono uppercase tracking-widest rounded-lg hover:bg-subtle transition-colors"
+                    className={cn(
+                      'flex-1 py-[1vh] text-responsive-xs font-mono uppercase tracking-widest rounded-lg transition-colors',
+                      room.isLocked && room.phase === 'Lobby'
+                        ? 'bg-card border border-subtle text-ghost cursor-not-allowed opacity-50'
+                        : 'btn-primary hover:bg-subtle'
+                    )}
                   >
-                    Join
+                    {room.isLocked && room.phase === 'Lobby'
+                      ? <><Lock className="w-3 h-3 inline mr-1" />Locked</>
+                      : room.privacy === 'private'
+                        ? <><Lock className="w-3 h-3 inline mr-1" />Join</>
+                        : 'Join'}
                   </button>
                   <button 
                     onClick={(e) => {
@@ -370,6 +558,76 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
         )}
         <HowToPlayModal isOpen={isHowToPlayOpen} onClose={() => setIsHowToPlayOpen(false)} />
       </main>
+
+      {/* Invite Code Prompt Modal */}
+      <AnimatePresence>
+        {invitePrompt && (
+          <div className="fixed inset-0 z-[110] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+              onClick={() => { setInvitePrompt(null); setInviteCodeInput(''); }}
+              className="absolute inset-0 bg-backdrop backdrop-blur-sm"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.9, y: 20 }}
+              className="relative w-full max-w-xs bg-surface border border-subtle rounded-3xl p-6 shadow-2xl"
+            >
+              <div className="flex flex-col items-center gap-4 text-center">
+                <div className="w-12 h-12 bg-card rounded-2xl flex items-center justify-center border border-default">
+                  <Lock className="w-6 h-6 text-muted" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-thematic text-primary uppercase tracking-wide">Private Room</h3>
+                  <p className="text-xs text-muted font-mono mt-1">{invitePrompt.roomName}</p>
+                  <p className="text-xs text-faint mt-1">Enter the invite code to join.</p>
+                </div>
+                <input
+                  autoFocus
+                  type="text"
+                  value={inviteCodeInput}
+                  onChange={e => setInviteCodeInput(e.target.value.toUpperCase().slice(0, 4))}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && inviteCodeInput.length === 4) {
+                      onJoinRoom(invitePrompt.roomId, undefined, undefined, undefined, false, undefined, inviteCodeInput);
+                      setInvitePrompt(null);
+                      setInviteCodeInput('');
+                    }
+                  }}
+                  placeholder="XXXX"
+                  maxLength={4}
+                  className="w-32 text-center text-xl font-mono tracking-[0.5em] bg-elevated border border-subtle rounded-xl py-3 text-primary focus:outline-none focus:border-red-500/50 uppercase transition-colors"
+                />
+                <div className="flex gap-3 w-full">
+                  <button
+                    onClick={() => { setInvitePrompt(null); setInviteCodeInput(''); }}
+                    className="flex-1 py-2 border border-subtle text-muted text-xs font-mono uppercase tracking-widest rounded-xl hover:bg-card transition-colors"
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    disabled={inviteCodeInput.length !== 4}
+                    onClick={() => {
+                      onJoinRoom(invitePrompt.roomId, undefined, undefined, undefined, false, undefined, inviteCodeInput);
+                      setInvitePrompt(null);
+                      setInviteCodeInput('');
+                    }}
+                    className={cn(
+                      'flex-1 py-2 text-xs font-mono uppercase tracking-widest rounded-xl transition-colors',
+                      inviteCodeInput.length === 4
+                        ? 'btn-primary hover:bg-subtle'
+                        : 'bg-card text-ghost border border-subtle cursor-not-allowed'
+                    )}
+                  >
+                    Join
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Create Room Modal */}
       <AnimatePresence>
@@ -466,6 +724,37 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                   <p className="text-[8px] text-ghost italic ml-1">
                     {mode === 'Ranked' ? 'ELO and full points awarded.' : 'No ELO changes, reduced points.'}
                   </p>
+                </div>
+
+                {/* Privacy */}
+                <div className="space-y-2">
+                  <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono ml-1">Privacy</label>
+                  <div className="grid grid-cols-3 gap-2">
+                    {([
+                      { value: 'public'  as const, label: 'Public',       icon: <Globe className="w-3.5 h-3.5" />,  desc: 'Anyone can join' },
+                      { value: 'friends' as const, label: 'Friends Only', icon: <Users2 className="w-3.5 h-3.5" />, desc: 'Your friends only' },
+                      { value: 'private' as const, label: 'Private',      icon: <Lock className="w-3.5 h-3.5" />,   desc: 'Invite code' },
+                    ]).map(opt => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => setPrivacy(opt.value)}
+                        className={cn(
+                          'flex flex-col items-center gap-1 py-2 px-1 rounded-xl border text-center transition-all',
+                          privacy === opt.value
+                            ? 'border-red-500/50 bg-red-900/10 text-red-400'
+                            : 'border-subtle bg-elevated text-ghost hover:border-default hover:text-muted'
+                        )}
+                      >
+                        {opt.icon}
+                        <span className="text-[9px] font-mono uppercase tracking-widest leading-none">{opt.label}</span>
+                        <span className="text-[8px] text-faint leading-none">{opt.desc}</span>
+                      </button>
+                    ))}
+                  </div>
+                  {privacy === 'private' && (
+                    <p className="text-[9px] text-faint font-mono ml-1 italic">An invite code will be generated when the room is created.</p>
+                  )}
                 </div>
                 <div className="flex gap-3">
                   <button 
