@@ -1,0 +1,8 @@
+{
+  "name": "The Assembly",
+  "description": "A social deduction game of intrigue and politics for 5-10 players.",
+  "requestFramePermissions": [
+    "microphone",
+    "camera"
+  ]
+}

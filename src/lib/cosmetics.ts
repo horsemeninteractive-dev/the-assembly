@@ -1,0 +1,108 @@
+import { Policy } from '../types';
+
+export const getFrameStyles = (id: string) => {
+  switch(id) {
+    case 'frame-red': return "shadow-[inset_0_0_10px_rgba(239,68,68,0.5)]";
+    case 'frame-gold': return "shadow-[inset_0_0_10px_rgba(234,179,8,0.5)]";
+    case 'frame-blue': return "shadow-[inset_0_0_10px_rgba(59,130,246,0.5)]";
+    case 'frame-rainbow': return "shadow-[inset_0_0_10px_rgba(168,85,247,0.5)] animate-pulse";
+    case 'frame-neon': return "shadow-[inset_0_0_10px_rgba(16,185,129,0.5)]";
+    case 'frame-shadow': return "shadow-[inset_0_0_10px_rgba(107,114,128,0.5)]";
+    case 'frame-thorns': return "shadow-[0_0_15px_rgba(127,29,29,0.4)] after:content-[''] after:absolute after:inset-[-4px] after:border-2 after:border-red-900/30 after:rounded-3xl after:rotate-45";
+    case 'frame-cyber': return "shadow-[0_0_15px_rgba(168,85,247,0.4)] before:content-[''] before:absolute before:top-0 before:left-0 before:w-2 before:h-2 before:bg-purple-400 before:rounded-full";
+    case 'frame-inferno': return "shadow-[0_0_20px_rgba(234,88,12,0.6)] animate-pulse";
+    case 'frame-glitch': return "shadow-[2px_2px_0_rgba(236,72,153,0.5),-2px_-2px_0_rgba(6,182,212,0.5)]";
+    case 'frame-royal': return "shadow-[0_0_15px_rgba(129,140,248,0.4)] before:content-[''] before:absolute before:top-[-8px] before:left-1/2 before:-translate-x-1/2 before:w-4 before:h-4 before:bg-indigo-400 before:rotate-45";
+    case 'frame-pass-0': return "shadow-[0_0_20px_rgba(168,85,247,0.6)] animate-spin-slow animate-pulse";
+    case 'frame-common-basic': return "border-2 border-gray-400";
+    case 'frame-uncommon-bronze': return "shadow-[inset_0_0_10px_rgba(202,138,4,0.5)] border-2 border-amber-700";
+    case 'frame-rare-silver': return "isolate overflow-hidden shadow-[inset_0_0_10px_rgba(156,163,175,0.5)] border-2 border-gray-300 after:content-[''] after:absolute after:inset-0 after:w-full after:h-full after:bg-gradient-to-r after:from-transparent after:via-white/60 after:to-transparent after:animate-shine";
+    case 'frame-epic-violet': return "shadow-[inset_0_0_15px_rgba(147,51,234,0.6)] border-2 border-purple-600";
+    case 'frame-legendary-cosmic': return "shadow-[0_0_20px_rgba(168,85,247,0.6),0_0_20px_rgba(139,92,246,0.6)] before:content-[''] before:absolute before:inset-[-2px] before:border-2 before:border-purple-500 before:rounded-[30%_70%] before:animate-[spin_4s_linear_infinite] before:opacity-70 after:content-[''] after:absolute after:inset-[-2px] after:border-2 after:border-violet-500 after:rounded-[70%_30%] after:animate-[spin-reverse_5s_linear_infinite] after:opacity-70";
+    default: return "";
+  }
+};
+
+export const getPolicyStyles = (styleId: string | undefined, type: Policy) => {
+  const isCivil = type === 'Civil';
+  switch(styleId) {
+    case 'policy-vintage':
+      return isCivil ? "bg-[#f5e6d3] border-[#8b4513] text-[#8b4513] shadow-md" : "bg-[#f5e6d3] border-[#4a0404] text-[#4a0404] shadow-md";
+    case 'policy-modern':
+      return isCivil ? "bg-white border-blue-600 text-blue-600" : "bg-white border-red-600 text-red-600";
+    case 'policy-blueprint':
+      return isCivil ? "bg-blue-800 border-white/50 text-white font-mono" : "bg-blue-900 border-white/30 text-white/80 font-mono";
+    case 'policy-blood':
+      return isCivil ? "bg-gray-800 border-red-900 text-red-500" : "bg-black border-red-600 text-red-600 shadow-[0_0_10px_rgba(220,38,38,0.3)]";
+    case 'policy-gold':
+      return isCivil ? "bg-[#fcf3cf] border-[#b8860b] text-[#b8860b] shadow-[0_0_15px_rgba(218,165,32,0.4)]" : "bg-[#fef9e7] border-[#9c640c] text-[#9c640c] shadow-[0_0_15px_rgba(184,134,11,0.5)]";
+    case 'policy-neon':
+      return isCivil ? "bg-cyan-900/40 border-cyan-400 text-cyan-300 shadow-[0_0_20px_rgba(34,211,238,0.5)]" : "bg-pink-900/40 border-pink-400 text-pink-300 shadow-[0_0_20px_rgba(244,114,182,0.5)]";
+    case 'policy-animated':
+      return isCivil ? "bg-indigo-900/60 border-indigo-400 text-indigo-200 shadow-[0_0_25px_rgba(129,140,248,0.6)] animate-pulse" : "bg-purple-900/60 border-purple-400 text-purple-200 shadow-[0_0_25px_rgba(168,85,247,0.6)] animate-pulse";
+    default:
+      return isCivil ? "bg-blue-900 border-blue-500/50 text-blue-400" : "bg-red-900 border-red-500/50 text-red-500";
+  }
+};
+
+export const getVoteStyles = (styleId: string | undefined, type: 'Aye' | 'Nay') => {
+  const isAye = type === 'Aye';
+  switch(styleId) {
+    case 'vote-wax':
+      return isAye ? "bg-[#8b0000] border-[#5a0000] text-white shadow-[0_4px_0_#5a0000]" : "bg-surface border-default text-muted";
+    case 'vote-digital':
+      return isAye ? "bg-cyan-900/20 border-cyan-500 text-cyan-400 shadow-[0_0_15px_rgba(6,182,212,0.4)]" : "bg-pink-900/20 border-pink-500 text-pink-400 shadow-[0_0_15px_rgba(236,72,153,0.4)]";
+    case 'vote-ancient':
+      return isAye ? "bg-[#d2b48c] border-[#8b4513] text-[#4a2c1d] font-serif" : "bg-[#c0c0c0] border-[#696969] text-[#2f4f4f] font-serif";
+    case 'vote-neon':
+      return isAye ? "bg-emerald-900/40 border-emerald-400 text-emerald-300 shadow-[0_0_20px_rgba(52,211,153,0.6)] animate-pulse" : "bg-red-900/40 border-red-400 text-red-300 shadow-[0_0_20px_rgba(248,113,113,0.6)] animate-pulse";
+    case 'vote-royal':
+      return isAye ? "bg-[#fef9e7] border-[#b8860b] text-[#b8860b] shadow-[0_0_15px_rgba(218,165,32,0.5)]" : "bg-surface border-[#b8860b] text-[#b8860b]";
+    case 'vote-cyber':
+      return isAye ? "bg-blue-900/30 border-blue-400 text-blue-300 shadow-[0_0_10px_rgba(96,165,250,0.4)]" : "bg-gray-900/30 border-gray-400 text-gray-300 shadow-[0_0_10px_rgba(156,163,175,0.4)]";
+    case 'vote-pass-0':
+      return isAye ? "bg-purple-900/40 border-purple-500 text-purple-300 shadow-[0_0_15px_rgba(168,85,247,0.4)] animate-pulse" : "bg-gray-900/40 border-gray-500 text-gray-400 shadow-[0_0_15px_rgba(107,114,128,0.4)]";
+    default:
+      return isAye ? "bg-white border-white text-black" : "bg-black border-default text-white";
+  }
+};
+
+export const getBackgroundTexture = (id: string | undefined, isLightMode?: boolean) => {
+  // If not passed explicitly, read from localStorage (avoids prop drilling)
+  const lightMode = isLightMode ?? localStorage.getItem('isLightMode') === 'true';
+
+  const dark: Record<string, string> = {
+    'bg-leather':  'https://www.transparenttextures.com/patterns/dark-leather.png',
+    'bg-brushed':  'https://www.transparenttextures.com/patterns/brushed-alum.png',
+    'bg-diamonds': 'https://www.transparenttextures.com/patterns/diagmonds-light.png',
+    'bg-wood':     'https://www.transparenttextures.com/patterns/dark-wood.png',
+    'bg-paper':    'https://www.transparenttextures.com/patterns/old-mathematics.png',
+    'bg-concrete': 'https://www.transparenttextures.com/patterns/concrete-wall.png',
+    'bg-pass-0':   'https://www.transparenttextures.com/patterns/gplay.png',
+    'default':     'https://www.transparenttextures.com/patterns/carbon-fibre.png',
+  };
+
+  // TODO: replace placeholder values with your actual inverted image URLs
+  // once uploaded. Each key matches the dark entry above.
+  const light: Record<string, string> = {
+    'bg-leather':  'https://storage.googleapis.com/secretchancellor/dark-leather%20(1).png',
+    'bg-brushed':  'https://storage.googleapis.com/secretchancellor/brushed-alum%20(1).png',
+    'bg-diamonds': 'https://storage.googleapis.com/secretchancellor/diagmonds-light%20(1).png',
+    'bg-wood':     'https://storage.googleapis.com/secretchancellor/dark-wood%20(1).png',
+    'bg-paper':    'https://storage.googleapis.com/secretchancellor/old-mathematics%20(1).png',
+    'bg-concrete': 'https://storage.googleapis.com/secretchancellor/concrete-wall%20(1).png',
+    'bg-pass-0':   'https://storage.googleapis.com/secretchancellor/gplay%20(1).png',
+    'default':     'https://storage.googleapis.com/secretchancellor/carbon-fibre%20(1).png',
+  };
+
+  const map = lightMode ? light : dark;
+  return map[id ?? 'default'] ?? map['default'];
+};
+
+export const getRarity = (price: number) => {
+  if (price === 0) return { name: 'Common', color: 'text-gray-500' };
+  if (price < 1000) return { name: 'Uncommon', color: 'text-emerald-500' };
+  if (price < 2000) return { name: 'Rare', color: 'text-blue-500' };
+  if (price < 3500) return { name: 'Epic', color: 'text-purple-500' };
+  return { name: 'Legendary', color: 'text-yellow-500' };
+};
