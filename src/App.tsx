@@ -39,7 +39,7 @@ export default function App() {
       setIsDiscord(!!discordSdk?.instanceId);
       setIsMobile(discordSdk?.platform === 'mobile' || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
       console.log("Discord SDK initialized, instanceId:", discordSdk?.instanceId, "platform:", discordSdk?.platform);
-      
+
       // Attempt auto-login if in Discord
       if (discordSdk?.instanceId) {
         try {
@@ -58,7 +58,7 @@ export default function App() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ code }),
           });
-          
+
           if (response.ok) {
             console.log("Auto-login successful");
             const data = await response.json();
@@ -123,7 +123,7 @@ export default function App() {
         const audio = await generateGeminiSpeech({ text, voice: 'Zephyr' });
         if (audio) {
           audio.volume = soundVolume / 100;
-          audio.play().catch(() => {});
+          audio.play().catch(() => { });
         }
       } else {
         const utterance = new SpeechSynthesisUtterance(text);
@@ -148,17 +148,17 @@ export default function App() {
     }
     const trackKey = user?.activeMusic || 'music-ambient';
     const url = getProxiedUrl(MUSIC_TRACKS[trackKey] || MUSIC_TRACKS['music-ambient']);
-    
+
     if (!musicAudioRef.current) {
       musicAudioRef.current = new Audio(url);
       musicAudioRef.current.loop = true;
     } else if (musicAudioRef.current.src !== url) {
       musicAudioRef.current.src = url;
     }
-    
+
     musicAudioRef.current.volume = musicVolume / 100;
-    musicAudioRef.current.play().catch(() => {});
-    
+    musicAudioRef.current.play().catch(() => { });
+
     return () => {
       musicAudioRef.current?.pause();
     };
@@ -171,14 +171,14 @@ export default function App() {
     if (!url) return;
     const audio = new Audio(url);
     audio.volume = soundVolume / 100;
-    audio.play().catch(() => {});
+    audio.play().catch(() => { });
   };
 
   const playMusic = (trackKey: string) => {
     if (!musicAudioRef.current) return;
     const url = getProxiedUrl(MUSIC_TRACKS[trackKey] || MUSIC_TRACKS['music-ambient']);
     musicAudioRef.current.src = url;
-    musicAudioRef.current.play().catch(() => {});
+    musicAudioRef.current.play().catch(() => { });
   };
 
   const stopMusic = () => {
@@ -296,7 +296,7 @@ export default function App() {
 
   const handleEnterAssembly = () => {
     setIsInteracted(true);
-    try { document.documentElement.requestFullscreen?.().catch(() => {}); } catch { /* ignore */ }
+    try { document.documentElement.requestFullscreen?.().catch(() => { }); } catch { /* ignore */ }
   };
 
   // Trigger tutorial once the player has entered the assembly for the first time
@@ -349,21 +349,21 @@ export default function App() {
     setJoined(false);
     setGameState(null);
     setPrivateInfo(null);
-    
+
     const safeOnComplete = typeof onComplete === 'function' ? onComplete : undefined;
 
     if (token) {
       fetch('/api/me', { headers: { Authorization: `Bearer ${token}` } })
         .then(res => res.json())
-        .then(data => { 
-          if (data.user) setUser(data.user); 
-          if (safeOnComplete) safeOnComplete(); 
+        .then(data => {
+          if (data.user) setUser(data.user);
+          if (safeOnComplete) safeOnComplete();
         })
-        .catch(() => { 
-          if (safeOnComplete) safeOnComplete(); 
+        .catch(() => {
+          if (safeOnComplete) safeOnComplete();
         });
     } else {
-        if (safeOnComplete) safeOnComplete();
+      if (safeOnComplete) safeOnComplete();
     }
   };
 
@@ -421,10 +421,10 @@ export default function App() {
             token={token}
           />
           {isProfileOpen && (
-            <Profile 
-              user={user} 
-              token={token!} 
-              onClose={() => setIsProfileOpen(false)} 
+            <Profile
+              user={user}
+              token={token!}
+              onClose={() => setIsProfileOpen(false)}
               onUpdateUser={setUser}
               playSound={playSound}
               playMusic={playMusic}
@@ -476,10 +476,10 @@ export default function App() {
             uiScaleSetting={uiScaleSetting}
           />
           {isProfileOpen && (
-            <Profile 
-              user={user} 
-              token={token!} 
-              onClose={() => setIsProfileOpen(false)} 
+            <Profile
+              user={user}
+              token={token!}
+              onClose={() => setIsProfileOpen(false)}
               onUpdateUser={setUser}
               playSound={playSound}
               playMusic={playMusic}

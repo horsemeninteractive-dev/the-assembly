@@ -32,9 +32,9 @@ interface PlayerGridProps {
 }
 
 const ROLE_LABELS: Record<string, { label: string; color: string; bg: string }> = {
-  'Civil':    { label: 'C', color: 'text-blue-300',  bg: 'bg-blue-900/80' },
-  'State':    { label: 'S', color: 'text-red-300',   bg: 'bg-red-900/80' },
-  'Overseer': { label: 'O', color: 'text-red-200',   bg: 'bg-red-800/90' },
+  'Civil': { label: 'C', color: 'text-blue-300', bg: 'bg-blue-900/80' },
+  'State': { label: 'S', color: 'text-red-300', bg: 'bg-red-900/80' },
+  'Overseer': { label: 'O', color: 'text-red-200', bg: 'bg-red-800/90' },
 };
 
 export const PlayerGrid = ({ gameState, me, speakingPlayers, playSound, token, selectedPlayerId, setSelectedPlayerId, localStream, remoteStreams, isVideoActive, isSpectator, isHost }: PlayerGridProps) => {
@@ -47,7 +47,7 @@ export const PlayerGrid = ({ gameState, me, speakingPlayers, playSound, token, s
       <div className={cn(
         'grid gap-[1vh] sm:gap-[1.5vh] h-full grid-cols-2',
         gameState.players.length <= 6 ? 'grid-rows-3' :
-        gameState.players.length <= 8 ? 'grid-rows-4' : 'grid-rows-5',
+          gameState.players.length <= 8 ? 'grid-rows-4' : 'grid-rows-5',
         'sm:grid-cols-5 sm:grid-rows-2'
       )}>
         {gameState.players.map((p, index) => {
@@ -63,9 +63,9 @@ export const PlayerGrid = ({ gameState, me, speakingPlayers, playSound, token, s
               key={p.id}
               animate={{ scale: speakingPlayers[p.id] ? 1.05 : 1 }}
               transition={{ duration: 0.2 }}
-              onClick={(e) => { 
+              onClick={(e) => {
                 e.stopPropagation();
-                playSound('click'); 
+                playSound('click');
                 if (p.userId) {
                   setSelectedPlayerId(p.userId);
                 }
@@ -104,23 +104,23 @@ export const PlayerGrid = ({ gameState, me, speakingPlayers, playSound, token, s
 
               <motion.div
                 animate={{ rotateY: prevVote ? 180 : 0 }}
-                transition={{ 
-                  duration: 0.6, 
-                  type: 'spring', 
-                  stiffness: 260, 
+                transition={{
+                  duration: 0.6,
+                  type: 'spring',
+                  stiffness: 260,
                   damping: 20,
-                  delay: gameState.phase === 'Voting_Reveal' ? index * 0.2 : 0 
+                  delay: gameState.phase === 'Voting_Reveal' ? index * 0.2 : 0
                 }}
                 className="w-full h-full relative preserve-3d"
               >
                 {/* Front: Player info */}
                 <div className="absolute inset-0 flex flex-col items-center justify-center backface-hidden">
                   {stream && isVideoActive && <VideoPlayer stream={stream} isMe={isMe} />}
-                  
+
                   <div className={cn(
                     'flex min-h-0 overflow-hidden z-10 w-full h-full',
-                    stream && isVideoActive 
-                      ? 'flex-row justify-between items-end p-2' 
+                    stream && isVideoActive
+                      ? 'flex-row justify-between items-end p-2'
                       : 'flex-col items-center justify-center text-center'
                   )}>
                     <div className={cn(

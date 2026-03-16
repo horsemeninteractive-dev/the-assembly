@@ -75,7 +75,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
       const response = await fetch('/api/rooms');
       const data = await response.json();
       setRooms(data);
-      
+
       // Check for rejoin info
       const rejoinResponse = await fetch(`/api/rejoin-info?userId=${user.id}`);
       const rejoinData = await rejoinResponse.json();
@@ -111,7 +111,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
       fetch('/api/friends/pending', { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.json())
         .then(data => { if (data.pending) setPendingRequestCount(data.pending.length); })
-        .catch(() => {});
+        .catch(() => { });
     }
     const interval = setInterval(() => {
       fetchRooms();
@@ -131,9 +131,9 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
   // Derived filtered + sorted room list
   const visibleRooms = rooms
     .filter(room => {
-      if (!filterCasual  && room.mode === 'Casual')    return false;
-      if (!filterRanked  && room.mode === 'Ranked')    return false;
-      if (filterJoinable && room.phase !== 'Lobby')    return false;
+      if (!filterCasual && room.mode === 'Casual') return false;
+      if (!filterRanked && room.mode === 'Ranked') return false;
+      if (filterJoinable && room.phase !== 'Lobby') return false;
       if (!filterInProgress && room.phase !== 'Lobby') return false;
       return true;
     })
@@ -143,9 +143,9 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
     });
 
   return (
-    <div 
+    <div
       className="flex-1 w-full bg-texture text-primary font-sans flex flex-col"
-      style={{ 
+      style={{
         backgroundImage: `url("${getProxiedUrl(getBackgroundTexture(user.activeBackground))}")`
       }}
     >
@@ -184,7 +184,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
 
         <div className="flex items-center gap-[2vw] sm:gap-[3vw] flex-1 justify-end">
           <Tooltip content="My Profile">
-            <button 
+            <button
               onClick={() => {
                 playSound('click');
                 onOpenProfile();
@@ -214,7 +214,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
           </Tooltip>
 
           <Tooltip content="Leaderboard">
-            <button 
+            <button
               onClick={() => {
                 playSound('click');
                 setIsLeaderboardOpen(true);
@@ -226,7 +226,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
           </Tooltip>
 
           <Tooltip content="How to Play">
-            <button 
+            <button
               onClick={() => {
                 playSound('click');
                 setIsHowToPlayOpen(true);
@@ -238,7 +238,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
           </Tooltip>
 
           <Tooltip content="Logout">
-            <button 
+            <button
               onClick={() => {
                 playSound('click');
                 onLogout();
@@ -261,19 +261,19 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
 
           {/* Swing Meter */}
           <div className="flex-1 bg-surface border border-subtle rounded-3xl p-[2vh] flex flex-col justify-center">
-              <div className="flex items-center justify-between text-responsive-xs font-mono uppercase tracking-widest mb-2">
-                  <span className="text-blue-500">Civil</span>
-                  <span className="font-thematic text-responsive-xl">
-                      <span className="text-blue-500">{globalStats.civilWins}</span>
-                      <span className="text-primary mx-2">v</span>
-                      <span className="text-red-500">{globalStats.stateWins}</span>
-                  </span>
-                  <span className="text-red-500">State</span>
-              </div>
-              <div className="w-full h-3 bg-elevated rounded-full overflow-hidden flex">
-                  <div className="bg-blue-600 h-full" style={{ width: `${(globalStats.civilWins / (globalStats.civilWins + globalStats.stateWins || 1)) * 100}%` }}></div>
-                  <div className="bg-red-600 h-full" style={{ width: `${(globalStats.stateWins / (globalStats.civilWins + globalStats.stateWins || 1)) * 100}%` }}></div>
-              </div>
+            <div className="flex items-center justify-between text-responsive-xs font-mono uppercase tracking-widest mb-2">
+              <span className="text-blue-500">Civil</span>
+              <span className="font-thematic text-responsive-xl">
+                <span className="text-blue-500">{globalStats.civilWins}</span>
+                <span className="text-primary mx-2">v</span>
+                <span className="text-red-500">{globalStats.stateWins}</span>
+              </span>
+              <span className="text-red-500">State</span>
+            </div>
+            <div className="w-full h-3 bg-elevated rounded-full overflow-hidden flex">
+              <div className="bg-blue-600 h-full" style={{ width: `${(globalStats.civilWins / (globalStats.civilWins + globalStats.stateWins || 1)) * 100}%` }}></div>
+              <div className="bg-red-600 h-full" style={{ width: `${(globalStats.stateWins / (globalStats.civilWins + globalStats.stateWins || 1)) * 100}%` }}></div>
+            </div>
           </div>
         </div>
 
@@ -296,9 +296,9 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
           >
             <Shuffle className={cn('w-[2vh] h-[2vh]', quickJoinStatus === 'searching' && 'animate-spin')} />
             {quickJoinStatus === 'searching' ? 'Searching…'
-              : quickJoinStatus === 'found'    ? 'Joining!'
-              : quickJoinStatus === 'none'     ? 'No Rooms'
-              : 'Quick Join'}
+              : quickJoinStatus === 'found' ? 'Joining!'
+                : quickJoinStatus === 'none' ? 'No Rooms'
+                  : 'Quick Join'}
           </button>
 
           {/* Start New Assembly */}
@@ -314,7 +314,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
         {/* Rejoin Banner */}
         <AnimatePresence>
           {rejoinInfo?.canRejoin && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, y: -20 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -20 }}
@@ -329,7 +329,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                   <p className="text-responsive-xs text-red-500/70 font-mono uppercase tracking-widest">You disconnected from: {rejoinInfo.roomName}</p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={() => onJoinRoom(rejoinInfo.roomId!)}
                 className="w-full sm:w-auto bg-red-600 text-white px-[4vw] py-[1.2vh] rounded-xl font-thematic text-responsive-sm hover:bg-red-500 transition-all shadow-lg shadow-red-900/20"
               >
@@ -488,7 +488,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                 </div>
 
                 <h3 className="text-responsive-sm font-serif italic mb-1 group-hover:text-white transition-colors">{room.name}</h3>
-                
+
                 {/* Player Avatars */}
                 <div className="flex -space-x-2 mb-[2vh] overflow-hidden">
                   {room.playerAvatars.slice(0, 5).map((avatar, idx) => (
@@ -538,7 +538,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                         ? <><Lock className="w-3 h-3 inline mr-1" />Join</>
                         : 'Join'}
                   </button>
-                  <button 
+                  <button
                     onClick={(e) => {
                       e.stopPropagation();
                       onJoinRoom(room.id, undefined, undefined, undefined, true);
@@ -633,14 +633,14 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
       <AnimatePresence>
         {isCreating && (
           <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setIsCreating(false)}
               className="absolute inset-0 bg-backdrop backdrop-blur-sm"
             />
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.9, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.9, y: 20 }}
@@ -650,7 +650,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
               <form onSubmit={handleCreateRoom} className="space-y-[2vh]">
                 <div className="space-y-2">
                   <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono ml-1">Room Name</label>
-                  <input 
+                  <input
                     autoFocus
                     type="text"
                     value={newRoomName}
@@ -665,7 +665,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                     <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono">Max Players</label>
                     <span className="text-responsive-sm font-mono text-red-500">{maxPlayers}</span>
                   </div>
-                  <input 
+                  <input
                     type="range"
                     min="5"
                     max="10"
@@ -683,7 +683,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                     <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono">Action Timer</label>
                     <span className="text-responsive-sm font-mono text-red-500">{actionTimer === 0 ? 'OFF' : `${actionTimer}s`}</span>
                   </div>
-                  <input 
+                  <input
                     type="range"
                     min="0"
                     max="120"
@@ -700,7 +700,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                 <div className="space-y-2">
                   <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono ml-1">Game Mode</label>
                   <div className="flex gap-2">
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setMode('Ranked')}
                       className={cn(
@@ -710,7 +710,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                     >
                       Ranked
                     </button>
-                    <button 
+                    <button
                       type="button"
                       onClick={() => setMode('Casual')}
                       className={cn(
@@ -731,9 +731,9 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                   <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono ml-1">Privacy</label>
                   <div className="grid grid-cols-3 gap-2">
                     {([
-                      { value: 'public'  as const, label: 'Public',       icon: <Globe className="w-3.5 h-3.5" />,  desc: 'Anyone can join' },
+                      { value: 'public' as const, label: 'Public', icon: <Globe className="w-3.5 h-3.5" />, desc: 'Anyone can join' },
                       { value: 'friends' as const, label: 'Friends Only', icon: <Users2 className="w-3.5 h-3.5" />, desc: 'Your friends only' },
-                      { value: 'private' as const, label: 'Private',      icon: <Lock className="w-3.5 h-3.5" />,   desc: 'Invite code' },
+                      { value: 'private' as const, label: 'Private', icon: <Lock className="w-3.5 h-3.5" />, desc: 'Invite code' },
                     ]).map(opt => (
                       <button
                         key={opt.value}
@@ -757,7 +757,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                   )}
                 </div>
                 <div className="flex gap-3">
-                  <button 
+                  <button
                     type="button"
                     onClick={() => {
                       playSound('click');
@@ -767,7 +767,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                   >
                     Cancel
                   </button>
-                  <button 
+                  <button
                     type="submit"
                     className="flex-1 py-[1.2vh] btn-primary text-responsive-xs font-serif italic rounded-xl hover:bg-subtle transition-colors"
                   >
