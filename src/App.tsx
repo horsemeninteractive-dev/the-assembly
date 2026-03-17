@@ -38,7 +38,7 @@ export default function App() {
       try {
         setLoading(true);
         await setupDiscordSdk();
-        
+
         let currentUser: User | null = null;
         let currentToken: string | null = localStorage.getItem('token');
 
@@ -92,7 +92,7 @@ export default function App() {
         if (currentUser && currentToken) {
           setUser(currentUser);
           setToken(currentToken);
-          
+
           // Emit userConnected immediately so server knows who we are
           socket.emit('userConnected', currentUser.id);
 
