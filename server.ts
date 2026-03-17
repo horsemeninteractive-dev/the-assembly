@@ -197,7 +197,28 @@ async function startServer() {
         };
         engine.rooms.set(roomId, state);
       } else {
-        // Room exists — enforce privacy
+        // Room exists — check reconnect FIRST before any privacy gate
+        // (disconnected player rejoining should never be blocked by privacy)
+        if (!isSpectator && state.phase !== "Lobby") {
+          const disconnected = state.players.find(p => p.userId === userId && p.isDisconnected);
+          if (disconnected) {
+            const oldId = disconnected.id;
+            disconnected.id = socket.id;
+            disconnected.isDisconnected = false;
+            if (state.presidentId === oldId) state.presidentId = socket.id;
+            if (state.chancellorId === oldId) state.chancellorId = socket.id;
+            state.isPaused = false;
+            state.disconnectedPlayerId = undefined;
+            state.pauseReason = undefined;
+            state.pauseTimer = undefined;
+            state.log.push(`${disconnected.name} reconnected.`);
+            socket.join(roomId);
+            engine.broadcastState(roomId);
+            return;
+          }
+        }
+
+        // Enforce privacy — applies to both players and spectators
         if (state.privacy === 'private') {
           if (state.inviteCode && inviteCode?.toUpperCase() !== state.inviteCode) {
             socket.emit("error", "Invalid invite code.");
@@ -207,7 +228,7 @@ async function startServer() {
           if (state.hostUserId && userId && state.hostUserId !== userId) {
             const areFriends = await isFriend(state.hostUserId, userId);
             if (!areFriends) {
-              socket.emit("error", "This room is friends only.");
+              socket.emit("error", isSpectator ? "You must be friends with the host to spectate this room." : "This room is friends only.");
               return;
             }
           }
@@ -227,22 +248,7 @@ async function startServer() {
       }
 
       if (state.phase !== "Lobby") {
-        const disconnected = state.players.find(p => p.userId === userId && p.isDisconnected);
-        if (disconnected) {
-          const oldId = disconnected.id;
-          disconnected.id = socket.id;
-          disconnected.isDisconnected = false;
-          if (state.presidentId === oldId) state.presidentId = socket.id;
-          if (state.chancellorId === oldId) state.chancellorId = socket.id;
-          state.isPaused = false;
-          state.disconnectedPlayerId = undefined;
-          state.pauseReason = undefined;
-          state.pauseTimer = undefined;
-          state.log.push(`${disconnected.name} reconnected.`);
-          socket.join(roomId);
-          engine.broadcastState(roomId);
-          return;
-        }
+        // Non-disconnected player trying to join an in-progress game
         socket.emit("error", "Game already in progress.");
         return;
       }
