@@ -32,7 +32,7 @@ export const initVoices = () => {
   };
   
   loadVoices();
-  if (window.speechSynthesis.onvoiceschanged !== undefined) {
+  if (window.speechSynthesis && window.speechSynthesis.onvoiceschanged !== undefined) {
     window.speechSynthesis.onvoiceschanged = loadVoices;
   }
   

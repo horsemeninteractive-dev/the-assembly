@@ -322,11 +322,12 @@ export interface ServerToClientEvents {
   powerUsed: (data: { role: string }) => void;
   queueDrained: () => void;
   postMatchResult: (result: PostMatchResult) => void;
+  kicked: (reason?: string) => void;
 }
 
 export interface ClientToServerEvents {
   userConnected: (userId: string) => void;
-  joinRoom: (data: { roomId: string; name: string; userId?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string; maxPlayers?: number; actionTimer?: number; mode?: GameMode; isSpectator?: boolean }) => void;
+  joinRoom: (data: { roomId: string; name: string; userId?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string; maxPlayers?: number; actionTimer?: number; mode?: GameMode; isSpectator?: boolean; privacy?: RoomPrivacy; inviteCode?: string }) => void;
   leaveRoom: () => void;
   playAgain: () => void;
   startGame: () => void;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { socket } from './socket';
-import { GameState, Role, User, PrivateInfo } from './types';
+import { GameState, Role, User, PrivateInfo, RoomPrivacy } from './types';
 import { motion } from 'motion/react';
 import { Auth } from './components/Auth';
 import { Lobby } from './components/Lobby';
@@ -35,49 +35,96 @@ export default function App() {
 
   useEffect(() => {
     const init = async () => {
-      await setupDiscordSdk();
-      setIsDiscord(!!discordSdk?.instanceId);
-      setIsMobile(discordSdk?.platform === 'mobile' || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
-      console.log("Discord SDK initialized, instanceId:", discordSdk?.instanceId, "platform:", discordSdk?.platform);
+      try {
+        setLoading(true);
+        await setupDiscordSdk();
+        
+        let currentUser: User | null = null;
+        let currentToken: string | null = localStorage.getItem('token');
 
-      // Attempt auto-login if in Discord
-      if (discordSdk?.instanceId) {
-        try {
-          console.log("Attempting auto-login...");
-          const { code } = await discordSdk.commands.authorize({
-            client_id: (import.meta as any).env?.VITE_DISCORD_CLIENT_ID || "",
-            response_type: "code",
-            state: "",
-            prompt: "none",
-            scope: ["identify", "guilds"],
-          });
-          console.log("Auto-login code received");
-
-          const response = await fetch('/api/auth/discord/callback', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ code }),
-          });
-
-          if (response.ok) {
-            console.log("Auto-login successful");
-            const data = await response.json();
-            setUser(data.user);
-            setToken(data.token);
-            localStorage.setItem('token', data.token);
-          } else {
-            const data = await response.json();
-            console.error("Auto-login server error:", data);
+        // 1. Try Discord Auto-Login first if we have an instanceId
+        if (discordSdk?.instanceId) {
+          setIsDiscord(true);
+          console.log("Discord instance detected, attempting auto-login...");
+          try {
+            const { code } = await discordSdk.commands.authorize({
+              client_id: (import.meta as any).env?.VITE_DISCORD_CLIENT_ID || "",
+              response_type: "code",
+              state: "",
+              prompt: "none",
+              scope: ["identify", "guilds"],
+            });
+            const response = await fetch('/api/auth/discord/callback', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ code }),
+            });
+            if (response.ok) {
+              const data = await response.json();
+              currentUser = data.user;
+              currentToken = data.token;
+              localStorage.setItem('token', data.token);
+              console.log("Discord auto-login success");
+            }
+          } catch (err) {
+            console.error("Discord auto-login failed, falling back to session restore", err);
           }
-        } catch (err) {
-          console.error("Auto-login failed", err);
         }
-      } else {
-        console.log("Auto-login skipped: not in Discord");
+
+        // 2. Fallback: Restore session from token
+        if (!currentUser && currentToken) {
+          console.log("Restoring session from token...");
+          try {
+            const res = await fetch('/api/me', { headers: { Authorization: `Bearer ${currentToken}` } });
+            const data = await res.json();
+            if (data.user) {
+              currentUser = data.user;
+            } else {
+              currentToken = null;
+              localStorage.removeItem('token');
+            }
+          } catch (err) {
+            console.error("Session restore failed", err);
+          }
+        }
+
+        // 3. Finalize state
+        if (currentUser && currentToken) {
+          setUser(currentUser);
+          setToken(currentToken);
+          
+          // Emit userConnected immediately so server knows who we are
+          socket.emit('userConnected', currentUser.id);
+
+          // If in Discord, auto-join room and bypass "Enter" screen
+          if (discordSdk?.instanceId) {
+            setIsInteracted(true);
+            const instanceRoomId = discordSdk.instanceId.slice(0, 8);
+            console.log("Discord auto-joining room:", instanceRoomId);
+            socket.emit('joinRoom', {
+              roomId: instanceRoomId,
+              name: currentUser.username,
+              userId: currentUser.id,
+              activeFrame: currentUser.activeFrame,
+              activePolicyStyle: currentUser.activePolicyStyle,
+              activeVotingStyle: currentUser.activeVotingStyle,
+              maxPlayers: 10,
+              actionTimer: 60,
+              mode: 'Casual',
+              privacy: 'public'
+            });
+          }
+        }
+
+        setIsMobile(discordSdk?.platform === 'mobile' || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+      } catch (err) {
+        console.error("Initialization error:", err);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
-    init().catch(console.error);
+
+    init();
   }, []);
 
   // Audio & Settings State
@@ -202,21 +249,6 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  // Restore session
-  useEffect(() => {
-    if (token) {
-      fetch('/api/me', { headers: { Authorization: `Bearer ${token}` } })
-        .then(res => res.json())
-        .then(data => { if (data.user) setUser(data.user); else setToken(null); })
-        .catch(() => setToken(null));
-    }
-  }, [token]);
-
-  useEffect(() => {
-    if (user) {
-      socket.emit('userConnected', user.id);
-    }
-  }, [user]);
 
   // OAuth redirect token
   useEffect(() => {
@@ -332,7 +364,7 @@ export default function App() {
     setGameState(null);
   };
 
-  const handleJoinRoom = (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked', isSpectator?: boolean, privacy?: string, inviteCode?: string) => {
+  const handleJoinRoom = (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked', isSpectator?: boolean, privacy?: RoomPrivacy, inviteCode?: string) => {
     if (user) {
       socket.emit('joinRoom', {
         roomId, name: user.username, userId: user.id,
@@ -369,7 +401,7 @@ export default function App() {
 
   return (
     <div
-      className={cn("h-[100dvh] bg-base flex flex-col bg-texture", isDiscord && isMobile ? "pt-12" : "")}
+      className={cn("h-[100dvh] bg-base flex flex-col bg-texture", isDiscord && isMobile ? "pt-16" : "")}
       data-theme={isLightMode ? "light" : "dark"}
     >
       <UpdateBanner visible={updateAvailable} />

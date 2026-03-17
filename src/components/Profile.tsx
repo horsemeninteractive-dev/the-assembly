@@ -59,6 +59,8 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
   const [justClaimed, setJustClaimed] = useState<string | null>(null);
 
   useEffect(() => {
+    if (typeof window === 'undefined' || !window.speechSynthesis) return;
+
     const loadVoices = () => {
       const v = window.speechSynthesis.getVoices();
       if (v.length > 0) {
