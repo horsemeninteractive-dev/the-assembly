@@ -18,6 +18,7 @@ interface LobbyProps {
 }
 
 import { getBackgroundTexture } from '../lib/cosmetics';
+import { getRankTier, getRankLabel } from '../lib/ranks';
 
 export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpenProfile, playSound, token }) => {
   const [rooms, setRooms] = useState<RoomInfo[]>([]);
@@ -162,23 +163,50 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
             </div>
             <p className="text-responsive-xs uppercase tracking-widest text-muted font-mono mt-0.5">Assembly Lobby</p>
           </div>
+
+          <div className="ml-2">
+            <Tooltip content="Leaderboard">
+              <button
+                onClick={() => {
+                  playSound('click');
+                  setIsLeaderboardOpen(true);
+                }}
+                className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] rounded-xl bg-card border border-default flex items-center justify-center hover:border-yellow-900/50 transition-colors"
+              >
+                <Trophy className="w-[2vh] h-[2vh] text-yellow-500" />
+              </button>
+            </Tooltip>
+          </div>
         </div>
 
         {/* Centered Stats */}
+        {/* Centered Stats */}
         <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-4 px-4 py-2 bg-elevated border border-subtle rounded-2xl">
           <div className="flex items-center gap-2">
-            <Trophy className="w-[1.8vh] h-[1.8vh] text-yellow-500" />
-            <span className="text-responsive-xs font-mono text-yellow-500">{user.stats.elo} ELO</span>
+            <Coins className="w-[1.8vh] h-[1.8vh] text-emerald-500" />
+            <span className="text-responsive-xs font-mono text-emerald-500">{user.stats.points} IP</span>
           </div>
           <div className="w-px h-4 bg-card" />
-          <div className="flex items-center gap-2">
-            <Coins className="w-[1.8vh] h-[1.8vh] text-emerald-500" />
-            <span className="text-responsive-xs font-mono text-emerald-500">{user.stats.points} PTS</span>
+          
+          {/* ELO Badge */}
+          <div className={cn(
+            'flex items-center gap-2 px-3 py-1 rounded-xl border transition-all',
+            getRankTier(user.stats.elo).bg,
+            getRankTier(user.stats.elo).border
+          )}>
+            <span className="text-responsive-xs">{getRankTier(user.stats.elo).icon}</span>
+            <div className="flex flex-col leading-none">
+              <span className={cn('text-[8px] font-mono font-bold uppercase tracking-tighter', getRankTier(user.stats.elo).color)}>
+                {getRankLabel(user.stats.elo)}
+              </span>
+              <span className="text-[10px] font-mono text-primary font-bold">{user.stats.elo} ELO</span>
+            </div>
           </div>
+
           <div className="w-px h-4 bg-card" />
           <div className="flex items-center gap-2">
             <Zap className="w-[1.8vh] h-[1.8vh] text-purple-500" />
-            <span className="text-responsive-xs font-mono text-purple-500">{user.cabinetPoints} CP</span>
+            <span className="text-responsive-xs font-mono text-purple-500">{user.cabinetPoints || 0} CP</span>
           </div>
         </div>
 
@@ -210,18 +238,6 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                   </span>
                 )}
               </div>
-            </button>
-          </Tooltip>
-
-          <Tooltip content="Leaderboard">
-            <button
-              onClick={() => {
-                playSound('click');
-                setIsLeaderboardOpen(true);
-              }}
-              className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] rounded-xl bg-card border border-default flex items-center justify-center hover:border-yellow-900/50 transition-colors"
-            >
-              <Trophy className="w-[2vh] h-[2vh] text-yellow-500" />
             </button>
           </Tooltip>
 
