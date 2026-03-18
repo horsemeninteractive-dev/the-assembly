@@ -201,6 +201,8 @@ export interface Player {
   alliances?: { [playerId: string]: number };
   difficulty?: 'Casual' | 'Normal' | 'Elite';
   isProvenNotOverseer?: boolean;
+  isMicOn?: boolean;
+  isCamOn?: boolean;
 }
 
 export interface GameState {
@@ -353,4 +355,5 @@ export interface ClientToServerEvents {
   kickPlayer: (playerId: string) => void;
   toggleLock: () => void;
   hostStartGame: () => void;
+  updateMediaState: (data: { isMicOn: boolean; isCamOn: boolean }) => void;
 }

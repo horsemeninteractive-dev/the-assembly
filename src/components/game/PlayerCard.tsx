@@ -8,14 +8,17 @@ import { cn, getProxiedUrl } from '../../lib/utils';
 
 const VideoPlayer = React.memo(({ stream, isMe, isVideoActive }: { stream: MediaStream, isMe: boolean, isVideoActive: boolean }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
+
   React.useEffect(() => {
-    if (videoRef.current) videoRef.current.srcObject = stream;
-  }, [stream]);
-  
-  const hasVideo = stream?.getVideoTracks().some(t => t.enabled) ?? false;
-  // If it's me, respect the local isVideoActive setting. 
-  // If it's someone else, show it if they are sending a video track.
-  const showVideo = isMe ? (isVideoActive && hasVideo) : hasVideo;
+    if (!videoRef.current) return;
+    if (isVideoActive) {
+      videoRef.current.srcObject = stream;
+    } else {
+      // Clear srcObject so the last frozen frame is fully gone from the canvas,
+      // not just hidden behind the avatar via opacity.
+      videoRef.current.srcObject = null;
+    }
+  }, [stream, isVideoActive]);
 
   return (
     <video 
@@ -25,7 +28,7 @@ const VideoPlayer = React.memo(({ stream, isMe, isVideoActive }: { stream: Media
       muted={isMe} 
       className={cn(
         "absolute inset-0 w-full h-full object-cover rounded-xl transition-opacity duration-300",
-        !showVideo && "opacity-0 pointer-events-none"
+        !isVideoActive && "opacity-0 pointer-events-none"
       )} 
     />
   );
@@ -81,7 +84,9 @@ export const PlayerCard = React.memo(({
   };
 
   const hasVideo = stream?.getVideoTracks().some(t => t.enabled) ?? false;
-  const showVideo = isMe ? (isVideoActive && hasVideo) : hasVideo;
+  // Use server-side state (p.isCamOn) as source of truth for visibility
+  // If it's me, allow local toggle to also hide it for preview
+  const showVideo = isMe ? (isVideoActive && p.isCamOn && hasVideo) : (p.isCamOn && hasVideo);
 
   return (
     <motion.div
@@ -138,7 +143,7 @@ export const PlayerCard = React.memo(({
       >
         {/* Front */}
         <div className="absolute inset-0 flex flex-col items-center justify-center backface-hidden">
-          {stream && <VideoPlayer stream={stream} isMe={isMe} isVideoActive={isVideoActive} />}
+          {stream && <VideoPlayer stream={stream} isMe={isMe} isVideoActive={showVideo} />}
 
           <div className={cn(
             'flex min-h-0 overflow-hidden z-10 w-full h-full',

@@ -562,6 +562,16 @@ export const GameRoom = ({
 
     socket.on('peerJoined', (peerId) => {
       console.log('Peer joined:', peerId);
+      // Always force-close old connection so a rejoin gets a clean handshake
+      if (peersRef.current[peerId]) {
+        peersRef.current[peerId].close();
+        delete peersRef.current[peerId];
+        setRemoteStreams(prev => {
+          const n = { ...prev };
+          delete n[peerId];
+          return n;
+        });
+      }
       createPeer(peerId, true);
     });
 
@@ -591,6 +601,8 @@ export const GameRoom = ({
   }, [localStream]);
 
   useEffect(() => {
+    socket.emit('updateMediaState', { isMicOn: isVoiceActive, isCamOn: isVideoActive });
+    
     if (isVoiceActive || isVideoActive) {
       navigator.mediaDevices.getUserMedia({ audio: isVoiceActive, video: isVideoActive })
         .then(async stream => {
@@ -620,13 +632,15 @@ export const GameRoom = ({
       if (localStream) {
         localStream.getTracks().forEach(track => track.stop());
         setLocalStream(null);
+        // Use replaceTrack(null) NOT removeTrack — keeping the sender alive
+        // is critical so that re-enabling can do replaceTrack without addTrack chaos.
         Object.keys(peersRef.current).forEach(peerId => {
           const pc = peersRef.current[peerId];
           pc.getSenders().forEach(sender => {
             try {
-              pc.removeTrack(sender);
+              sender.replaceTrack(null);
             } catch (e) {
-              console.warn('Error removing track:', e);
+              console.warn('Error nulling track:', e);
             }
           });
         });

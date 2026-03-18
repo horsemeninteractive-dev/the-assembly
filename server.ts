@@ -902,6 +902,17 @@ async function startServer() {
       }
     });
 
+    socket.on("updateMediaState", ({ isMicOn, isCamOn }) => {
+      engine.rooms.forEach((state, roomId) => {
+        const player = state.players.find(p => p.id === socket.id);
+        if (player) {
+          player.isMicOn = isMicOn;
+          player.isCamOn = isCamOn;
+          engine.broadcastState(roomId);
+        }
+      });
+    });
+
     socket.on("disconnect", async () => {
       if (socket.data.userId) {
         const userId = socket.data.userId;
