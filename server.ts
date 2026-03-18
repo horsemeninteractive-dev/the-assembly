@@ -930,8 +930,22 @@ async function startServer() {
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static("dist"));
+    // Serve static files from the dist directory
+    app.use(express.static("dist", {
+      setHeaders: (res, filePath) => {
+        // Set long-term cache for hashed assets in the assets/ directory
+        if (filePath.includes(path.join("dist", "assets"))) {
+          res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        } else if (filePath.endsWith("index.html") || filePath.endsWith("sw.js") || filePath.endsWith("manifest.json")) {
+          // Never cache the entry points or service worker to ensure immediate updates upon redeploy
+          res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
+        }
+      }
+    }));
+
     app.get("*", (_req, res) => {
+      // Set no-cache for index.html as well (fallback route)
+      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
       res.sendFile(path.resolve("dist", "index.html"));
     });
   }

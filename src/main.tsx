@@ -23,9 +23,31 @@ if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
     navigator.serviceWorker.register('/sw.js').then(registration => {
       console.log('SW registered: ', registration);
+      
+      // Check for updates periodically
+      registration.addEventListener('updatefound', () => {
+        const newWorker = registration.installing;
+        if (newWorker) {
+          newWorker.addEventListener('statechange', () => {
+            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+              // New content is available, but the user should probably be notified or just reload
+              console.log('New content is available; please refresh.');
+            }
+          });
+        }
+      });
     }).catch(registrationError => {
-      console.log('SW registration failed: ', registrationError);
+      console.error('SW registration failed: ', registrationError);
     });
+  });
+
+  // Handle controller change (e.g. after skipWaiting)
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      refreshing = true;
+      window.location.reload();
+    }
   });
 }
 
