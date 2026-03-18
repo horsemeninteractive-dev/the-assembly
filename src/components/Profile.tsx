@@ -264,12 +264,16 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
           <div className="flex-1 text-center sm:text-left">
             <h2 className="text-4xl font-thematic text-primary tracking-wide mb-2">{user.username}</h2>
             <div className="flex flex-col gap-2">
-              <div className="flex flex-wrap justify-center sm:justify-start gap-4">
+              {/* Row 1: Rank */}
+              <div className="flex justify-center sm:justify-start">
                 <div className={cn('flex items-center gap-2 px-3 py-1.5 rounded-xl border', getRankTier(user.stats.elo).bg, getRankTier(user.stats.elo).border)}>
                   <span className="text-sm">{getRankTier(user.stats.elo).icon}</span>
                   <span className={cn('text-sm font-mono font-bold', getRankTier(user.stats.elo).color)}>{getRankLabel(user.stats.elo)}</span>
                   <span className="text-xs font-mono text-faint">· {user.stats.elo}</span>
                 </div>
+              </div>
+              {/* Row 2: IP + CP */}
+              <div className="flex justify-center sm:justify-start gap-3">
                 <div className="flex items-center gap-2 px-3 py-1.5 bg-card rounded-xl border border-default">
                   <Coins className="w-4 h-4 text-emerald-500" />
                   <span className="text-sm font-mono text-emerald-500">{user.stats.points} IP</span>

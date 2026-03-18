@@ -200,13 +200,14 @@ export interface Player {
   personalAgenda?: PersonalAgendaId;
   alliances?: { [playerId: string]: number };
   difficulty?: 'Casual' | 'Normal' | 'Elite';
+  isProvenNotOverseer?: boolean;
 }
 
 export interface GameState {
   roomId: string;
   players: Player[];
   spectators: { id: string; name: string; avatarUrl?: string }[];
-  spectatorQueue: { id: string; name: string; userId?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string }[];
+  spectatorQueue: { id: string; name: string; userId?: string; avatarUrl?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string }[];
   spectatorRoles?: { [playerId: string]: { role: string; titleRole?: string; agendaName?: string } };
   privacy: RoomPrivacy;
   inviteCode?: string;      // only set when privacy === 'private'
@@ -347,6 +348,9 @@ export interface ClientToServerEvents {
   signal: (data: { to: string; signal: any; from: string }) => void;
   sendFriendRequest: (targetUserId: string) => void;
   acceptFriendRequest: (targetUserId: string) => void;
-  joinQueue: (data: { name: string; userId?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string }) => void;
+  joinQueue: (data: { name: string; userId?: string; avatarUrl?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string }) => void;
   leaveQueue: () => void;
+  kickPlayer: (playerId: string) => void;
+  toggleLock: () => void;
+  hostStartGame: () => void;
 }

@@ -4,6 +4,7 @@ import { Lock, User as UserIcon, Loader2, Chrome, MessageSquare } from 'lucide-r
 import { User } from '../types';
 import { cn, getProxiedUrl } from '../lib/utils';
 import { discordSdk } from '../lib/discord';
+import { DISCORD_CLIENT_ID } from "../constants";
 
 interface AuthProps {
   onAuthSuccess: (user: User, token: string) => void;
@@ -43,64 +44,80 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
   const handleDiscordLogin = async () => {
     setIsLoading(true);
     setError('');
+    const instanceId = discordSdk?.instanceId;
+    console.log("handleDiscordLogin triggered. SDK instanceId:", instanceId);
+    
     try {
-      console.log("Discord SDK instanceId:", discordSdk?.instanceId);
-      // Check if we are running in Discord
-      if (discordSdk?.instanceId) {
-        console.log("Attempting Discord Activity authorization...");
-        // Discord Activity authentication
+      if (instanceId) {
+        console.log("Environment: Discord Activity. Attempting SDK authorization...");
+        // Use hardcoded constant to avoid build-time env var issues
+        const clientId = DISCORD_CLIENT_ID;
+        console.log("DEBUG: DISCORD_CLIENT_ID:", clientId);
+        
+        if (!clientId) {
+          throw new Error("Configuration Error: Discord Client ID is missing from build. Please contact support.");
+        }
+        
         const { code } = await discordSdk.commands.authorize({
-          client_id: (import.meta as any).env?.VITE_DISCORD_CLIENT_ID || "",
+          client_id: DISCORD_CLIENT_ID,
           response_type: "code",
           state: "",
-          prompt: "none",
+          // Removed prompt: "none" for manual clicks to allow first-time consent
           scope: ["identify", "guilds"],
         });
-        console.log("Discord Activity authorization code received");
+        console.log("SDK authorize success. Exchanging code with server...");
 
-        // Send the code to the server to exchange for tokens
         const response = await fetch('/api/auth/discord/callback', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ code }),
+          body: JSON.stringify({ code, origin: window.location.origin }),
         });
         
         if (!response.ok) {
-          const data = await response.json();
-          throw new Error(data.error || 'Failed to authenticate with Discord Activity');
+          const data = await response.json().catch(() => ({}));
+          console.error("Server callback failed:", data);
+          throw new Error(data.error || 'The game server rejected the login attempt. Please try again.');
         }
+        
         const data = await response.json();
+        console.log("Server authentication success!");
         onAuthSuccess(data.user, data.token);
       } else {
-        console.log("Not in Discord Activity, using standard OAuth flow");
-        // Standard OAuth flow
+        console.log("Environment: Standard Web. Using OAuth flow.");
         const origin = window.location.origin;
         const response = await fetch(`/api/auth/discord/url?origin=${encodeURIComponent(origin)}`);
-        if (!response.ok) throw new Error('Failed to get auth URL');
+        if (!response.ok) throw new Error('Failed to get auth URL from server');
         const { url } = await response.json();
         
-        const isIframe = window.self !== window.top;
-        if (isIframe) {
-          window.open(url, 'oauth_popup', 'width=600,height=700');
+        // If we are in an Activity but instanceId is missing (unlikely but possible during init)
+        // or if we are in an iframe, try to use openExternalLink if available
+        if (discordSdk && (window.self !== window.top)) {
+          console.log("In iframe, using SDK openExternalLink:", url);
+          await discordSdk.commands.openExternalLink({ url });
         } else {
-          window.location.href = url;
+          console.log("Standard redirect/popup flow.");
+          const isIframe = window.self !== window.top;
+          if (isIframe) {
+            window.open(url, 'oauth_popup', 'width=600,height=700');
+          } else {
+            window.location.href = url;
+          }
         }
       }
     } catch (err: any) {
-      console.error("Discord login error:", err);
-      setError(err.message);
+      console.error("Discord login process failed:", err);
+      // Map common Discord SDK errors to user-friendly messages
+      let msg = err.message || 'Unknown error';
+      if (err.code === 4001) msg = "Login cancelled. You must authorize the app to play.";
+      setError(`Auth Failure: ${msg}`);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleSocialLogin = async (provider: 'google' | 'discord') => {
-    // Request fullscreen on user click to avoid permission error later
-    try {
-      if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen().catch(() => {});
-      }
-    } catch (e) {}
+    console.log(`handleSocialLogin clicked for: ${provider}`);
+    setError('');
 
     if (provider === 'discord') {
       await handleDiscordLogin();
@@ -109,25 +126,29 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
 
     try {
       const origin = window.location.origin;
-      console.log(`Attempting ${provider} login from ${origin}`);
       const response = await fetch(`/api/auth/${provider}/url?origin=${encodeURIComponent(origin)}`);
       if (!response.ok) {
-        const data = await response.json();
-        console.error(`${provider} auth URL error:`, data);
-        throw new Error(data.error || `Failed to get ${provider} auth URL`);
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.error || `Failed to reach auth server for ${provider}`);
       }
       const { url } = await response.json();
-      console.log(`${provider} auth URL received:`, url);
       
-      const isIframe = window.self !== window.top;
-      if (isIframe) {
-        window.open(url, 'oauth_popup', 'width=600,height=700');
+      // If we are in a Discord Activity, we MUST use openExternalLink for third-party OAuth
+      // because Google blocks OAuth in embedded webviews/iframes.
+      if (discordSdk && (discordSdk.instanceId || window.self !== window.top)) {
+        console.log(`In Discord, using commands.openExternalLink for ${provider}:`, url);
+        await discordSdk.commands.openExternalLink({ url });
       } else {
-        window.location.href = url;
+        const isIframe = window.self !== window.top;
+        if (isIframe) {
+          window.open(url, 'oauth_popup', 'width=600,height=700');
+        } else {
+          window.location.href = url;
+        }
       }
     } catch (err: any) {
-      console.error(`${provider} login error:`, err);
-      setError(err.message);
+      console.error(`${provider} login process failed:`, err);
+      setError(`${provider} Auth Error: ${err.message || 'Unknown error'}`);
     }
   };
 

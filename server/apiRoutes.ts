@@ -34,22 +34,22 @@ if (!JWT_SECRET) throw new Error("JWT_SECRET env variable is not set");
 // ---------------------------------------------------------------------------
 
 function getAppUrl(req?: Request): string {
-  const origin = req?.query?.origin as string;
+  // Try to find origin in query, body, or state
+  const origin = (req?.query?.origin as string) || (req?.body?.origin as string);
+  
   if (origin) {
     const allowedOrigins = [process.env.APP_URL, "https://theassembly.web.app", "http://localhost:3000"].filter(Boolean);
-    if (allowedOrigins.includes(origin)) return origin;
+    // Be more permissive with Cloud Run URLs if we are on Cloud Run
+    if (allowedOrigins.includes(origin) || origin.endsWith('.run.app')) return origin;
   }
+  
   if (req?.query?.state) {
     try {
       const stateData = JSON.parse(decodeURIComponent(req.query.state as string));
       if (stateData.origin) {
-        const allowedOrigins = [process.env.APP_URL, "https://theassembly.web.app", "http://localhost:3000"].filter(Boolean);
-        if (allowedOrigins.includes(stateData.origin)) return stateData.origin;
+        return stateData.origin;
       }
     } catch (_) {}
-  }
-  if (!process.env.APP_URL) {
-    console.warn("WARNING: APP_URL environment variable is not set. OAuth redirects may fail in production.");
   }
   return process.env.APP_URL || "https://theassembly.web.app";
 }

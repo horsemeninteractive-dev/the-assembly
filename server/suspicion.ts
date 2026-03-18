@@ -89,10 +89,10 @@ export function updateSuspicionFromPolicy(state: GameState, policy: Policy): voi
     // Government members are stronger signals than plain votes
     // Chancellor blame model: Chancellor gets more blame/credit than President
     if (presId && presId !== ai.id) {
-      nudge(ai, presId, policy === "State" ? 1.5 : 0.70);
+      nudge(ai, presId, policy === "State" ? 1.4 : 0.75);
     }
     if (chanId && chanId !== ai.id) {
-      nudge(ai, chanId, policy === "State" ? 3.5 : 0.40);
+      nudge(ai, chanId, policy === "State" ? 2.8 : 0.45);
       const chan = state.players.find(p => p.id === chanId);
       if (chan && policy === "State") {
         chan.stateEnactments = (chan.stateEnactments ?? 0) + 1;
@@ -109,10 +109,10 @@ export function updateSuspicionFromPolicyExpectation(state: GameState, policy: P
   const expectedStateProb = presDecl.drewSta / 3;
   const actualOutcome = policy === "State" ? 1 : 0;
   
-  // If President drew 3 Civil, playing State is highly suspicious
+  // If President drew 3 Civil, playing State is highly suspicious, but give benefit of doubt for noise
   if (presDecl.drewSta === 0 && policy === "State") {
     for (const ai of state.players.filter(p => p.isAI && p.role === "Civil")) {
-      if (presDecl.playerId !== ai.id) nudge(ai, presDecl.playerId, 5.0);
+      if (presDecl.playerId !== ai.id) nudge(ai, presDecl.playerId, 3.5);
     }
   }
 }
@@ -142,8 +142,8 @@ export function updateSuspicionFromDeclarations(state: GameState): void {
       state.log.push(`[Suspicion] Inconsistent declarations: ${presDecl.playerName} vs ${chanDecl.playerName}.`);
     } else {
       // Consistent — modest trust boost
-      if (presDecl.playerId !== ai.id) nudge(ai, presDecl.playerId, 0.82);
-      if (chanDecl.playerId !== ai.id) nudge(ai, chanDecl.playerId, 0.82);
+      if (presDecl.playerId !== ai.id) nudge(ai, presDecl.playerId, 0.88);
+      if (chanDecl.playerId !== ai.id) nudge(ai, chanDecl.playerId, 0.88);
     }
 
     // "All 3 were State" is a common State deflection

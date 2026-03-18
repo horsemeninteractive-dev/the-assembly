@@ -1,5 +1,7 @@
 import { CosmeticItem } from './types';
 
+export const DISCORD_CLIENT_ID = "1477796608883294269";
+
 export const DEFAULT_ITEMS: CosmeticItem[] = [
   // Defaults
   { id: 'frame-default', name: 'Default Frame', price: 0, type: 'frame', description: 'Standard Issue' },

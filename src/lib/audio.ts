@@ -13,6 +13,7 @@ export const MUSIC_TRACKS: Record<string, string> = {
   'music-fog':     'https://storage.googleapis.com/secretchancellor/Fog%20in%20the%20Alley.mp3',
   'music-tense':   'https://storage.googleapis.com/secretchancellor/Final%20Countdown.mp3',
   'music-victory': 'https://storage.googleapis.com/secretchancellor/Triumph%20of%20the%20New%20Age.mp3',
+  'music-pass-0':  'https://storage.googleapis.com/secretchancellor/Static%20Noise.mp3',
 };
 
 export const SOUND_PACKS: Record<string, Record<string, string>> = {

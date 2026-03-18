@@ -7,7 +7,14 @@ dist
 deploy.ps1
 .env
 *.json
+*.mjs
 !package.json
 !firebase.json
 !lock.json
 !tsconfig.json
+!metadata.json
+the-assembly.code-workspace
+.antigravity/
+.gemini/
+.agent/
+*.zip

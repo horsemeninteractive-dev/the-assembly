@@ -271,6 +271,12 @@ export class GameEngine {
     this.scheduleAITurns(s, roomId);
   }
 
+  /** Public entry point for server.ts to transition into Legislative_Chancellor
+   *  — ensures hasActed is reset for all players, same as any enterPhase call. */
+  public enterLegislativeChancellor(s: GameState, roomId: string): void {
+    this.enterPhase(s, roomId, "Legislative_Chancellor");
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════
   // AI Turn Scheduling — fires once per phase entry, never recursively
   // ═══════════════════════════════════════════════════════════════════════════
@@ -333,7 +339,17 @@ export class GameEngine {
       }
       case "Legislative_Chancellor": {
         const chancellor = s.players.find(p => p.isChancellor);
-        if (chancellor?.isAI) this.aiChancellorPlay(s, roomId);
+        if (chancellor?.isAI) {
+          if (s.chancellorPolicies.length > 0) {
+            this.aiChancellorPlay(s, roomId);
+          } else {
+            // Already played, but maybe hasn't declared.
+            this.autoDeclareMissing(s, roomId);
+          }
+        } else {
+          // President might be AI and need to declare even if Chancellor is human
+          this.autoDeclareMissing(s, roomId);
+        }
         break;
       }
       case "Executive_Action": {
@@ -679,10 +695,14 @@ export class GameEngine {
     }
 
     // Overseer wins by being elected chancellor after 3 State directives
-    if (s.stateDirectives >= 3 && chancellor.role === "Overseer") {
-      addLog(s, "The Overseer was elected Chancellor — State Supremacy!");
-      await this.endGame(s, roomId, "State", "THE OVERSEER HAS ASCENDED");
-      return;
+    if (s.stateDirectives >= 3) {
+      if (chancellor.role === "Overseer") {
+        addLog(s, "The Overseer was elected Chancellor — State Supremacy!");
+        await this.endGame(s, roomId, "State", "THE OVERSEER HAS ASCENDED");
+        return;
+      } else {
+        chancellor.isProvenNotOverseer = true;
+      }
     }
 
     this.resetPlayerActions(s);
@@ -789,12 +809,13 @@ export class GameEngine {
         }
       }
 
-      // Mark tracker as updated. Clients watch trackerReady directly to
-      // trigger the declaration prompt. Do NOT update timestamp here — the
-      // animation key is derived from it and would re-trigger the reveal.
+      // Mark tracker as updated and broadcast so clients see the directive
+      // added to the tracker and receive the trackerReady=true signal to
+      // trigger their declaration prompts.
       if (st.lastEnactedPolicy) {
         st.lastEnactedPolicy.trackerReady = true;
       }
+      this.broadcastState(roomId);
 
       updateSuspicionFromPolicy(st, policy);
       updateSuspicionFromPolicyExpectation(st, policy);
@@ -1605,6 +1626,11 @@ export class GameEngine {
       }
       if (state.presidentId  === oldId) state.presidentId  = player.id;
       if (state.chancellorId === oldId) state.chancellorId = player.id;
+      if (state.titlePrompt && state.titlePrompt.playerId === oldId) state.titlePrompt.playerId = player.id;
+      if (state.rejectedChancellorId === oldId) state.rejectedChancellorId = player.id;
+      if (state.detainedPlayerId === oldId) state.detainedPlayerId = player.id;
+      if (state.lastGovernmentPresidentId === oldId) state.lastGovernmentPresidentId = player.id;
+      if (state.lastGovernmentChancellorId === oldId) state.lastGovernmentChancellorId = player.id;
 
       addLog(state, `${player.name} (AI) took over the disconnected seat.`);
       state.isPaused = false;
@@ -1676,12 +1702,25 @@ export class GameEngine {
       const thr = Math.min(0.60, 0.45 + s.round * 0.015) * diff;
       const risk = ai.personality === "Strategic" ? 0.3 : ai.personality === "Chaotic" ? 0.7 : 0.5;
 
-      if ((ps * diff > thr || cs * diff > thr) && Math.random() > risk) {
+      // Agenda-based Noise: Certain agendas make Civils more "thorny" and prone to Naying
+      const agendasWithNoise: string[] = ["chaos_agent", "the_hawk", "stonewalled"];
+      const noise = (ai.personalAgenda && agendasWithNoise.includes(ai.personalAgenda)) ? 0.25 : 0;
+
+      if ((ps * diff > thr || cs * diff > thr) && Math.random() > (risk - noise)) {
         return s.electionTracker >= 2 ? "Aye" : "Nay";
       }
       if (s.stateDirectives >= 3 && chancellor?.role === "Overseer") return "Nay";
       if (s.electionTracker >= 2) return "Aye";
-      return Math.random() > 0.20 ? "Aye" : "Nay";
+
+      // Base noise: 20% of the time, vote randomly, influenced by noise-heavy agendas
+      if (Math.random() < (0.20 + noise)) return Math.random() > 0.5 ? "Aye" : "Nay";
+      return "Aye";
+    }
+
+    // State Aggression: If Civil team is near victory, State players block non-State governments desperately
+    if (s.civilDirectives >= 4) {
+      const isStateGov = (president.role !== "Civil" || chancellor?.role !== "Civil");
+      if (!isStateGov && s.electionTracker < 2) return "Nay";
     }
 
     if (s.stateDirectives >= 3 && chancellor?.role === "Overseer") return "Aye";
@@ -1712,12 +1751,24 @@ export class GameEngine {
 
   private choosePolicyToDiscard(player: Player, hand: Policy[], stateDir: number): number {
     let idx = -1;
+
+    // State Aggression: If Civil is winning, discard Civil at any cost of suspicion
+    if (player.role !== "Civil" && stateDir >= 4) {
+      const civIdx = hand.findIndex(p => p === "Civil");
+      if (civIdx !== -1) return civIdx;
+    }
+
     if (player.personality === "Aggressive" && player.role !== "Civil") {
       idx = hand.findIndex(p => p === "Civil");
     } else if (player.personality === "Strategic" && player.role !== "Civil") {
       idx = stateDir < 1 ? hand.findIndex(p => p === "State") : hand.findIndex(p => p === "Civil");
     } else if (player.personality === "Honest" || player.role === "Civil") {
-      idx = hand.findIndex(p => p === "State");
+      // Civil Noise: 5% chance to "accidentally" discard Civil or follow a weird agenda
+      if (Math.random() < 0.05) {
+        idx = hand.findIndex(p => p === "Civil");
+      } else {
+        idx = hand.findIndex(p => p === "State");
+      }
     }
     return idx === -1 ? 0 : idx;
   }

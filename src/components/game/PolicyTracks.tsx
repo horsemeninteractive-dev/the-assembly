@@ -33,12 +33,12 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
     <div className="p-[1.5vh] grid grid-cols-[1fr_auto_1fr] gap-[1.5vh] bg-surface-glass border-b border-subtle shrink-0 items-start">
       {/* Civil Track */}
       <div className="space-y-[0.5vh]">
-        <div className="flex items-center justify-between text-responsive-xs uppercase tracking-widest font-mono text-blue-400/70">
-          <div className="flex items-center gap-1">
-            <Scale className="w-[1.5vh] h-[1.5vh]" />
+        <div className="flex items-center justify-between uppercase tracking-widest font-mono text-blue-400/70">
+          <div className="flex items-center gap-1 text-responsive-xs">
+            <Scale className="w-[1.4vh] h-[1.4vh]" />
             <span>Civil</span>
           </div>
-          <span>{gameState.civilDirectives}/5</span>
+          <span className="text-[1.2vh] font-bold text-blue-400">{gameState.civilDirectives}</span>
         </div>
         <div className="flex gap-1">
           {[...Array(5)].map((_, i) => (
@@ -60,7 +60,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
         <div className="flex flex-col items-center gap-0.5 group relative">
           <Layers className="w-[1.2vh] h-[1.2vh] text-muted" />
           <span className="text-[9px] font-mono text-primary leading-none">{gameState.deck.length}</span>
-          <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1 px-2 py-1 bg-black text-[8px] font-mono text-white rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
+          <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 bg-black text-[8px] font-mono text-white rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 shadow-xl">
             DECK
           </div>
         </div>
@@ -76,12 +76,12 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
 
       {/* State Track */}
       <div className="space-y-[0.5vh]">
-        <div className="flex items-center justify-between text-responsive-xs uppercase tracking-widest font-mono text-red-500/70">
-          <div className="flex items-center gap-1">
-            <Eye className="w-[1.5vh] h-[1.5vh]" />
+        <div className="flex items-center justify-between uppercase tracking-widest font-mono text-red-500/70">
+          <span className="text-[1.2vh] font-bold text-red-500">{gameState.stateDirectives}</span>
+          <div className="flex items-center gap-1 text-responsive-xs">
             <span>State</span>
+            <Eye className="w-[1.4vh] h-[1.4vh]" />
           </div>
-          <span>{gameState.stateDirectives}/6</span>
         </div>
         <div className="flex gap-1">
           {[...Array(6)].map((_, i) => {

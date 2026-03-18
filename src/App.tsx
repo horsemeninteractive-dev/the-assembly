@@ -11,7 +11,9 @@ import { InviteModal } from './components/game/modals/InviteModal';
 import { FriendRequestModal } from './components/game/modals/FriendRequestModal';
 import { TutorialModal } from './components/TutorialModal';
 import { MUSIC_TRACKS, SOUND_PACKS } from './lib/audio';
+import { DiscordSDK } from "@discord/embedded-app-sdk";
 import { discordSdk, setupDiscordSdk } from './lib/discord';
+import { DISCORD_CLIENT_ID } from './constants';
 import { cn, getProxiedUrl } from './lib/utils';
 
 const CLIENT_VERSION = 'v0.9.7';
@@ -27,64 +29,99 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [updateAvailable, setUpdateAvailable] = useState(false);
   const [loading, setLoading] = useState(true);
-  const [isDiscord, setIsDiscord] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isDiscord, setIsDiscord] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    const params = new URLSearchParams(window.location.search);
+    return params.has('frame_id') || params.has('instance_id');
+  });
+  const [isMobile, setIsMobile] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+  });
   const [pendingInvite, setPendingInvite] = useState<{ fromUsername: string; roomId: string } | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
   const [pendingFriendRequest, setPendingFriendRequest] = useState<{ fromUserId: string; fromUsername: string } | null>(null);
+
+  const handleDiscordAutoJoin = (roomId: string, currentUser: User) => {
+    console.log("Auto-joining Discord instance room:", roomId);
+    socket.emit('joinRoom', {
+      roomId,
+      name: currentUser.username,
+      userId: currentUser.id,
+      activeFrame: currentUser.activeFrame,
+      activePolicyStyle: currentUser.activePolicyStyle,
+      activeVotingStyle: currentUser.activeVotingStyle,
+      maxPlayers: 10,
+      actionTimer: 60,
+      mode: 'Casual',
+      privacy: 'public'
+    });
+  };
 
   useEffect(() => {
     const init = async () => {
       try {
         setLoading(true);
+        console.log("App initialization started [v0.9.7]. Initial detection - isDiscord:", isDiscord, "isMobile:", isMobile);
+        
         await setupDiscordSdk();
+        const instanceId = discordSdk?.instanceId;
+        console.log("Discord SDK setup complete. instanceId:", instanceId);
 
         let currentUser: User | null = null;
         let currentToken: string | null = localStorage.getItem('token');
 
-        // 1. Try Discord Auto-Login first if we have an instanceId
-        if (discordSdk?.instanceId) {
+        // 1. Try Discord Auto-Login first if we are in Discord
+        if (instanceId) {
           setIsDiscord(true);
           console.log("Discord instance detected, attempting auto-login...");
           try {
             const { code } = await discordSdk.commands.authorize({
-              client_id: (import.meta as any).env?.VITE_DISCORD_CLIENT_ID || "",
+              client_id: DISCORD_CLIENT_ID,
               response_type: "code",
               state: "",
               prompt: "none",
               scope: ["identify", "guilds"],
             });
+            console.log("Discord authorize success, exchanging code...");
             const response = await fetch('/api/auth/discord/callback', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ code }),
+              body: JSON.stringify({ code, origin: window.location.origin }),
             });
             if (response.ok) {
               const data = await response.json();
               currentUser = data.user;
               currentToken = data.token;
               localStorage.setItem('token', data.token);
-              console.log("Discord auto-login success");
+              console.log("Discord auto-login success for user:", currentUser?.username);
+            } else {
+              const errData = await response.json().catch(() => ({ error: 'Unknown server error' }));
+              console.error("Discord callback failed:", errData);
             }
           } catch (err) {
-            console.error("Discord auto-login failed, falling back to session restore", err);
+            console.error("Discord auto-login access_denied usually means user needs to authorize manually.");
           }
         }
 
         // 2. Fallback: Restore session from token
         if (!currentUser && currentToken) {
-          console.log("Restoring session from token...");
+          console.log("Restoring session from local token...");
           try {
             const res = await fetch('/api/me', { headers: { Authorization: `Bearer ${currentToken}` } });
-            const data = await res.json();
-            if (data.user) {
-              currentUser = data.user;
+            if (res.ok) {
+              const data = await res.json();
+              if (data.user) {
+                currentUser = data.user;
+                console.log("Session restored for user:", currentUser.username);
+              }
             } else {
+              console.warn("Session token invalid or expired, clearing.");
               currentToken = null;
               localStorage.removeItem('token');
             }
           } catch (err) {
-            console.error("Session restore failed", err);
+            console.error("Session restore API failed:", err);
           }
         }
 
@@ -92,39 +129,59 @@ export default function App() {
         if (currentUser && currentToken) {
           setUser(currentUser);
           setToken(currentToken);
-
-          // Emit userConnected immediately so server knows who we are
           socket.emit('userConnected', currentUser.id);
 
           // If in Discord, auto-join room and bypass "Enter" screen
-          if (discordSdk?.instanceId) {
+          if (instanceId) {
+            console.log("Bypassing splash screen for Discord auto-join.");
             setIsInteracted(true);
-            const instanceRoomId = discordSdk.instanceId.slice(0, 8);
-            console.log("Discord auto-joining room:", instanceRoomId);
-            socket.emit('joinRoom', {
-              roomId: instanceRoomId,
-              name: currentUser.username,
-              userId: currentUser.id,
-              activeFrame: currentUser.activeFrame,
-              activePolicyStyle: currentUser.activePolicyStyle,
-              activeVotingStyle: currentUser.activeVotingStyle,
-              maxPlayers: 10,
-              actionTimer: 60,
-              mode: 'Casual',
-              privacy: 'public'
-            });
-          }
-        }
+            handleDiscordAutoJoin(instanceId.slice(0, 8), currentUser);
 
-        setIsMobile(discordSdk?.platform === 'mobile' || /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent));
+            // Handle activity exit — fires when user closes/minimises the panel
+            try {
+              discordSdk.subscribe('ACTIVITY_LAYOUT_MODE_UPDATE', (evt: any) => {
+                // layout_mode 0 = closed / picture-in-picture collapsed
+                if (evt?.layout_mode === 0) {
+                  socket.emit('leaveRoom');
+                  socket.disconnect();
+                }
+              });
+            } catch (err) {
+              console.warn('Could not subscribe to ACTIVITY_LAYOUT_MODE_UPDATE', err);
+            }
+          }
+        } else {
+          console.log("No user session found after initialization.");
+        }
       } catch (err) {
-        console.error("Initialization error:", err);
+        console.error("Critical initialization failure:", err);
       } finally {
         setLoading(false);
       }
     };
 
     init();
+  }, []);
+
+  // Discord activity — ensure socket disconnects when the iframe is hidden or unloaded.
+  // pagehide is more reliable than beforeunload inside an embedded iframe.
+  useEffect(() => {
+    const handleHide = () => {
+      socket.emit('leaveRoom');
+      socket.disconnect();
+    };
+    const handleVisibility = () => {
+      if (document.visibilityState === 'hidden') {
+        socket.emit('leaveRoom');
+        socket.disconnect();
+      }
+    };
+    window.addEventListener('pagehide', handleHide);
+    document.addEventListener('visibilitychange', handleVisibility);
+    return () => {
+      window.removeEventListener('pagehide', handleHide);
+      document.removeEventListener('visibilitychange', handleVisibility);
+    };
   }, []);
 
   // Audio & Settings State
@@ -329,6 +386,12 @@ export default function App() {
   const handleEnterAssembly = () => {
     setIsInteracted(true);
     try { document.documentElement.requestFullscreen?.().catch(() => { }); } catch { /* ignore */ }
+    
+    // Explicitly check for Discord instance to trigger room join if bypass didn't happen
+    const instanceId = discordSdk?.instanceId;
+    if (instanceId && user) {
+      handleDiscordAutoJoin(instanceId.slice(0, 8), user);
+    }
   };
 
   // Trigger tutorial once the player has entered the assembly for the first time
@@ -401,7 +464,7 @@ export default function App() {
 
   return (
     <div
-      className={cn("h-[100dvh] bg-base flex flex-col bg-texture", isDiscord && isMobile ? "pt-16" : "")}
+      className={cn("h-[100dvh] bg-base flex flex-col bg-texture", isDiscord && isMobile ? "pt-12" : "")}
       data-theme={isLightMode ? "light" : "dark"}
     >
       <UpdateBanner visible={updateAvailable} />

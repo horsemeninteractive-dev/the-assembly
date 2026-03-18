@@ -131,6 +131,47 @@ async function startServer() {
     const getRoom = (): string | undefined =>
       Array.from(socket.rooms).find(r => r !== socket.id);
 
+    const drainSpectatorQueue = (state: any, roomId: string) => {
+      if (!state.spectatorQueue) state.spectatorQueue = [];
+      const queue = state.spectatorQueue;
+      const drained: any[] = [];
+      
+      for (const queued of queue) {
+        if (state.players.length >= state.maxPlayers) break;
+        
+        // Move from spectators list to players list
+        state.spectators = state.spectators.filter((s: any) => s.id !== queued.id);
+        state.players.push({
+          id: queued.id,
+          name: queued.name,
+          userId: queued.userId,
+          avatarUrl: queued.avatarUrl,
+          activeFrame: queued.activeFrame,
+          activePolicyStyle: queued.activePolicyStyle,
+          activeVotingStyle: queued.activeVotingStyle,
+          isAlive: true,
+          isPresidentialCandidate: false,
+          isChancellorCandidate: false,
+          isPresident: false,
+          isChancellor: false,
+          wasPresident: false,
+          wasChancellor: false,
+          isReady: false,
+          hasActed: false,
+          stateEnactments: 0,
+          civilEnactments: 0,
+        });
+        drained.push(queued);
+        // Notify the queued player that they've joined
+        io.to(queued.id).emit("queueDrained");
+      }
+      
+      state.spectatorQueue = queue.filter((q: any) => !drained.find(d => d.id === q.id));
+      if (drained.length > 0) {
+        engine.broadcastState(roomId);
+      }
+    };
+
     socket.on("userConnected", async (userId) => {
       console.log(`User connected: ${userId}, socket: ${socket.id}`);
       socket.data.userId = userId;
@@ -473,10 +514,7 @@ async function startServer() {
       state.chancellorPolicies = [...state.drawnPolicies];
       state.chancellorSaw = [...state.chancellorPolicies];
       state.drawnPolicies = [];
-      state.phase = "Legislative_Chancellor";
-      engine.startActionTimer(roomId);
-      engine.broadcastState(roomId);
-      engine.processAITurns(roomId);
+      engine.enterLegislativeChancellor(state, roomId);
     });
 
     socket.on("chancellorPlay", (idx) => {
@@ -669,7 +707,7 @@ async function startServer() {
         previousVotes: undefined,
       });
 
-      state.players = state.players.filter(p => !p.isAI);
+      state.players = state.players.filter(p => !p.isAI && !p.isDisconnected);
       state.players.forEach(p => {
         p.role = undefined;
         p.titleRole = undefined;
@@ -686,45 +724,18 @@ async function startServer() {
         p.hasActed = false;
         p.suspicion = undefined;
         p.stateEnactments = 0;
+        p.civilEnactments = 0;
+        p.isProvenNotOverseer = false;
       });
 
       // Drain the spectator queue into the lobby as players (up to maxPlayers)
-      const queue = state.spectatorQueue ?? [];
-      const drained: typeof queue = [];
-      for (const queued of queue) {
-        if (state.players.length >= state.maxPlayers) break;
-        // Move from spectators list to players list
-        state.spectators = state.spectators.filter(s => s.id !== queued.id);
-        state.players.push({
-          id: queued.id,
-          name: queued.name,
-          userId: queued.userId,
-          activeFrame: queued.activeFrame,
-          activePolicyStyle: queued.activePolicyStyle,
-          activeVotingStyle: queued.activeVotingStyle,
-          isAlive: true,
-          isPresidentialCandidate: false,
-          isChancellorCandidate: false,
-          isPresident: false,
-          isChancellor: false,
-          wasPresident: false,
-          wasChancellor: false,
-          isReady: false,
-          hasActed: false,
-          stateEnactments: 0,
-          civilEnactments: 0,
-        });
-        drained.push(queued);
-        // Notify the queued player that they've joined
-        io.to(queued.id).emit("queueDrained");
-      }
-      state.spectatorQueue = queue.filter(q => !drained.find(d => d.id === q.id));
+      drainSpectatorQueue(state, roomId);
 
       engine.broadcastState(roomId);
     });
 
     // Spectator queue join
-    socket.on("joinQueue", (data: { name: string; userId?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string }) => {
+    socket.on("joinQueue", (data: { name: string; userId?: string; avatarUrl?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string }) => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -733,7 +744,21 @@ async function startServer() {
       if (!state.spectators.find(s => s.id === socket.id)) return;
       // Don't double-add
       if (state.spectatorQueue.find(q => q.id === socket.id)) return;
-      state.spectatorQueue.push({ id: socket.id, name: data.name, userId: data.userId, activeFrame: data.activeFrame, activePolicyStyle: data.activePolicyStyle, activeVotingStyle: data.activeVotingStyle });
+      state.spectatorQueue.push({ 
+        id: socket.id, 
+        name: data.name, 
+        userId: data.userId, 
+        avatarUrl: data.avatarUrl,
+        activeFrame: data.activeFrame, 
+        activePolicyStyle: data.activePolicyStyle, 
+        activeVotingStyle: data.activeVotingStyle 
+      });
+      
+      // If in lobby, try to drain immediately
+      if (state.phase === "Lobby") {
+        drainSpectatorQueue(state, roomId);
+      }
+      
       engine.broadcastState(roomId);
     });
 
@@ -808,7 +833,11 @@ async function startServer() {
     socket.on("leaveRoom", () => {
       const roomId = getRoom();
       if (!roomId) return;
+      const state = engine.rooms.get(roomId);
       engine.handleLeave(socket, roomId);
+      if (state && (state.phase === "Lobby" || state.phase === "GameOver")) {
+        drainSpectatorQueue(state, roomId);
+      }
     });
 
     socket.on("disconnect", async () => {

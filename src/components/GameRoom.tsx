@@ -196,7 +196,9 @@ export const GameRoom = ({
   const pendingDeclarationRef = useRef<'President' | 'Chancellor' | null>(null);
   const chancellorSinceRef = useRef<number>(0);
   const wasChancellorRef = useRef(false);
-  const prevLastEnactedTimestamp = useRef<string>('');
+  // Separate refs for each role's declaration prompt — avoids key collision bugs
+  const presidentPromptedForRef = useRef<string>('');   // policyKey we already prompted president for
+  const chancellorPromptedForRef = useRef<string>('');  // policyKey we already prompted chancellor for
 
   useEffect(() => { showPolicyAnimRef.current = showPolicyAnim; }, [showPolicyAnim]);
 
@@ -245,23 +247,31 @@ export const GameRoom = ({
     if (me.isChancellor && !wasChancellorRef.current) chancellorSinceRef.current = Date.now();
     wasChancellorRef.current = !!me.isChancellor;
 
-    // Only trigger declarations once trackerReady flips to true.
-    // Use the same policy identity key as the animation so we fire exactly once
-    // per policy — regardless of how many broadcasts arrive afterwards.
     const trackerReady = gameState.lastEnactedPolicy?.trackerReady === true;
-    const policyKey = gameState.lastEnactedPolicy
-      ? `${gameState.lastEnactedPolicy.type}-${gameState.lastEnactedPolicy.playerId ?? ''}-${Math.floor(gameState.lastEnactedPolicy.timestamp / 10000)}`
-      : '';
-    const policyIsNew = trackerReady && policyKey !== prevLastEnactedTimestamp.current;
-    if (policyIsNew) prevLastEnactedTimestamp.current = policyKey;
+    if (!trackerReady || !gameState.lastEnactedPolicy) return;
+
+    // Stable policy key — use timestamp rounded to nearest second, not 10s bucket,
+    // to avoid bucket-boundary mismatches between trackerReady=false and true broadcasts.
+    const policyKey = `${gameState.lastEnactedPolicy.type}-${gameState.lastEnactedPolicy.playerId ?? ''}-${Math.floor(gameState.lastEnactedPolicy.timestamp / 1000)}`;
 
     let needed: 'President' | 'Chancellor' | null = null;
-    if (policyIsNew && me.isPresident) needed = 'President';
-    const presidentDeclared = gameState.declarations.some(d => d.type === 'President');
-    if (presidentDeclared && me.isChancellor) {
-      const policyEnactedThisTerm = (gameState.lastEnactedPolicy?.timestamp ?? 0) > chancellorSinceRef.current;
-      if (policyEnactedThisTerm) needed = 'Chancellor';
+
+    // President: prompt once per policy
+    if (me.isPresident && presidentPromptedForRef.current !== policyKey) {
+      presidentPromptedForRef.current = policyKey;
+      needed = 'President';
     }
+
+    // Chancellor: prompt once per policy, but only after president has declared
+    const presidentDeclared = gameState.declarations.some(d => d.type === 'President');
+    if (me.isChancellor && presidentDeclared && chancellorPromptedForRef.current !== policyKey) {
+      const policyEnactedThisTerm = (gameState.lastEnactedPolicy?.timestamp ?? 0) > chancellorSinceRef.current;
+      if (policyEnactedThisTerm) {
+        chancellorPromptedForRef.current = policyKey;
+        needed = 'Chancellor';
+      }
+    }
+
     if (needed) {
       if (!showPolicyAnimRef.current) {
         pendingDeclarationRef.current = null;
@@ -625,6 +635,7 @@ export const GameRoom = ({
                       socket.emit('joinQueue', {
                         name: user?.username ?? 'Player',
                         userId: user?.id,
+                        avatarUrl: user?.avatarUrl,
                         activeFrame: user?.activeFrame,
                         activePolicyStyle: user?.activePolicyStyle,
                         activeVotingStyle: user?.activeVotingStyle,
