@@ -145,10 +145,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
 
   return (
     <div
-      className="flex-1 w-full bg-texture text-primary font-sans flex flex-col"
-      style={{
-        backgroundImage: `url("${getProxiedUrl(getBackgroundTexture(user.activeBackground))}")`
-      }}
+      className="flex-1 w-full text-primary font-sans flex flex-col"
     >
       {/* Header */}
       <header className="h-[8vh] sm:h-[10vh] border-b border-subtle bg-surface-glass px-[4vw] flex items-center justify-between sticky top-0 z-50">

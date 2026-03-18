@@ -92,42 +92,78 @@ export class GameEngine {
     const state = this.rooms.get(roomId);
     if (!state) return;
 
-    // Roles are hidden until game over — strip them from the shared broadcast
-    const publicState = {
-      ...state,
-      players: state.players.map(p => {
-        const { role, ...rest } = p;
-        return state.phase === "GameOver" ? { ...rest, role } : rest;
-      }),
-      // Build spectator role overlay: revealed regardless of game phase
-      spectatorRoles: Object.fromEntries(
-        state.players.map(p => [
-          p.id,
-          {
-            role: p.role ?? "Unknown",
-            titleRole: p.titleRole,
-            agendaName: p.personalAgenda
-              ? (AGENDA_MAP.get(p.personalAgenda)?.name ?? p.personalAgenda)
-              : undefined,
-          }
-        ])
-      ),
-    };
-    this.io.to(roomId).emit("gameStateUpdate", publicState);
+    // Cache socket references for this room
+    const roomSockets = this.io.sockets.adapter.rooms.get(roomId);
+    if (!roomSockets) return;
 
-    // Send each human player their own private role info
-    for (const p of state.players) {
-      if (p.isAI || !p.role) continue;
-      const stateAgents = state.players
-        .filter(pl => pl.role === "State" || pl.role === "Overseer")
-        .map(pl => ({ id: pl.id, name: pl.name, role: pl.role! }));
+    for (const socketId of roomSockets) {
+      const socket = this.io.sockets.sockets.get(socketId);
+      if (!socket) continue;
 
-      if (p.role === "State") {
-        this.io.to(p.id).emit("privateInfo", { role: p.role, stateAgents, titleRole: p.titleRole, personalAgenda: getPlayerAgenda(state, p.id) });
-      } else if (p.role === "Overseer" && state.players.length <= 6) {
-        this.io.to(p.id).emit("privateInfo", { role: p.role, stateAgents, titleRole: p.titleRole, personalAgenda: getPlayerAgenda(state, p.id) });
-      } else {
-        this.io.to(p.id).emit("privateInfo", { role: p.role, titleRole: p.titleRole, personalAgenda: getPlayerAgenda(state, p.id) });
+      const isSpectator = state.spectators.some(s => s.id === socketId);
+      const isGameOver = state.phase === "GameOver";
+
+      // Tailor the player list for this specific recipient
+      const tailoredPlayers = state.players.map(p => {
+        // Base info is always public
+        const { role, titleRole, personalAgenda, ...rest } = p;
+        
+        // At game over, everyone sees everything
+        if (isGameOver) return { ...rest, role, titleRole, personalAgenda };
+        
+        // Spectators see all roles
+        if (isSpectator) return { ...rest, role, titleRole, personalAgenda };
+        
+        // Active players see ONLY their own secret info
+        if (p.id === socketId) return { ...rest, role, titleRole, personalAgenda };
+        
+        // Otherwise, hide secret info
+        return rest;
+      });
+
+      // Tailor spectatorRoles: only sent to spectators or at game over
+      const tailoredSpectatorRoles = (isSpectator || isGameOver) 
+        ? Object.fromEntries(
+            state.players.map(p => [
+              p.id,
+              {
+                role: p.role ?? "Unknown",
+                titleRole: p.titleRole,
+                agendaName: p.personalAgenda
+                  ? (AGENDA_MAP.get(p.personalAgenda)?.name ?? p.personalAgenda)
+                  : undefined,
+              }
+            ])
+          )
+        : undefined;
+
+      socket.emit("gameStateUpdate", {
+        ...state,
+        players: tailoredPlayers,
+        spectatorRoles: tailoredSpectatorRoles,
+      });
+
+      // Special handling for privateInfo (State/Overseer agents list, etc.)
+      const p = state.players.find(pl => pl.id === socketId);
+      if (p && !p.isAI && p.role && !isGameOver) {
+        const stateAgents = state.players
+          .filter(pl => pl.role === "State" || pl.role === "Overseer")
+          .map(pl => ({ id: pl.id, name: pl.name, role: pl.role! }));
+
+        if (p.role === "State" || (p.role === "Overseer" && state.players.length <= 6)) {
+          socket.emit("privateInfo", { 
+            role: p.role, 
+            stateAgents, 
+            titleRole: p.titleRole, 
+            personalAgenda: getPlayerAgenda(state, p.id) 
+          });
+        } else {
+          socket.emit("privateInfo", { 
+            role: p.role, 
+            titleRole: p.titleRole, 
+            personalAgenda: getPlayerAgenda(state, p.id) 
+          });
+        }
       }
     }
   }
@@ -1354,6 +1390,8 @@ export class GameEngine {
       }
     } else {
       s.vetoRequested = false;
+      const vetoChancellor = s.players.find(p => p.isChancellor);
+      if (vetoChancellor) vetoChancellor.hasActed = false;
       addLog(s, `${player.name} (President) denied the Veto. Chancellor must enact a directive.`);
       this.broadcastState(roomId);
     }

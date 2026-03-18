@@ -180,7 +180,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
   };
 
   return (
-    <div className="flex-1 w-full bg-texture flex items-center justify-center p-4 font-sans">
+    <div className="flex-1 w-full flex items-center justify-center p-4 font-sans">
       <motion.div 
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

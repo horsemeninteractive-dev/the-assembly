@@ -34,9 +34,11 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
       case 'Interdictor_Action': return 'Interdictor is choosing a target.';
       case 'Next_President': return 'Preparing for the next round.';
       case 'Nominate_Chancellor': return `${gameState.players[gameState.presidentIdx]?.name} is nominating a Chancellor.`;
+      case 'Nomination_Review': return 'The Assembly is reviewing the nomination.';
       case 'Broker_Action': return 'Broker is reviewing the nomination.';
       case 'Voting':
       case 'Voting_Reveal': return 'The Assembly is voting.';
+      case 'Election': return 'The Assembly is waiting for the election results.';
       case 'Strategist_Action': return 'Strategist is looking at the deck.';
       case 'Legislative_President': return 'President is reviewing directives.';
       case 'Legislative_Chancellor': return 'Chancellor is enacting a directive.';
@@ -45,9 +47,17 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
       case 'Auditor_Action': return 'Auditor is inspecting the discard pile.';
       case 'Assassin_Action': return 'Assassin is choosing a target.';
       case 'Handler_Action': return 'Handler is using their power.';
+      case 'Executive_Action': 
+        switch (gameState.currentExecutiveAction) {
+          case 'Investigate': return 'President is investigating a player\'s loyalty.';
+          case 'SpecialElection': return 'President is calling a Special Election.';
+          case 'Execution': return 'President is executing a player.';
+          case 'PolicyPeek': return 'President is reviewing the top three policies.';
+          default: return 'President is deciding on an executive action.';
+        }
       case 'Round_End': return 'The round is ending.';
       case 'GameOver': return `${gameState.winner === 'Civil' ? 'Civil' : 'State'} faction victorious!`;
-      default: return '';
+      default: return 'The Assembly is in session.';
     }
   };
 
@@ -75,13 +85,20 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
       case 'Chancellor_Declaration':
         return 'Declarations tell the table what was drawn and passed. They may be lies.';
       case 'Executive_Action':
-        return isPresident
-          ? 'You must use your executive power before the next round begins.'
-          : 'The President must use their executive power.';
+        if (isPresident) {
+          switch (gameState.currentExecutiveAction) {
+            case 'Investigate': return 'Select a player to investigate their party loyalty.';
+            case 'SpecialElection': return 'Select a player to be the next President.';
+            case 'Execution': return 'Select a player to execute.';
+            case 'PolicyPeek': return 'Review the top 3 cards of the deck.';
+            default: return 'You must use your executive power.';
+          }
+        }
+        return 'The President must use their executive power.';
       case 'Lobby':
         return 'Press Ready Up when you\'re ready to start. The game begins when all players are ready.';
       default:
-        return null;
+        return '\u00A0';
     }
   };
 

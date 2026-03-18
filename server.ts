@@ -241,19 +241,79 @@ async function startServer() {
         // Room exists — check reconnect FIRST before any privacy gate
         // (disconnected player rejoining should never be blocked by privacy)
         if (!isSpectator && state.phase !== "Lobby") {
-          const disconnected = state.players.find(p => p.userId === userId && p.isDisconnected);
-          if (disconnected) {
-            const oldId = disconnected.id;
-            disconnected.id = socket.id;
-            disconnected.isDisconnected = false;
+          const existingPlayer = state.players.find(p => p.userId === userId && !p.isAI);
+          if (existingPlayer) {
+            const oldId = existingPlayer.id;
+            existingPlayer.id = socket.id;
+            existingPlayer.isDisconnected = false;
+
+            // Comprehensive ID re-mapping across all GameState fields
             if (state.presidentId === oldId) state.presidentId = socket.id;
             if (state.chancellorId === oldId) state.chancellorId = socket.id;
+            if (state.rejectedChancellorId === oldId) state.rejectedChancellorId = socket.id;
+            if (state.detainedPlayerId === oldId) state.detainedPlayerId = socket.id;
+            if (state.lastGovernmentPresidentId === oldId) state.lastGovernmentPresidentId = socket.id;
+            if (state.lastExecutiveActionStateCount === oldId as any) state.lastExecutiveActionStateCount = socket.id as any; // Edge case check
+            if (state.lastEnactedPolicy && state.lastEnactedPolicy.playerId === oldId) {
+              state.lastEnactedPolicy.playerId = socket.id;
+            }
+
+            if (state.presidentialOrder) {
+              state.presidentialOrder = state.presidentialOrder.map(id => id === oldId ? socket.id : id);
+            }
+
+            if (state.titlePrompt && state.titlePrompt.playerId === oldId) {
+              state.titlePrompt.playerId = socket.id;
+            }
+
+            if (state.previousVotes) {
+              if (state.previousVotes[oldId]) {
+                state.previousVotes[socket.id] = state.previousVotes[oldId];
+                delete state.previousVotes[oldId];
+              }
+            }
+
+            if (state.lastGovernmentVotes) {
+              if (state.lastGovernmentVotes[oldId]) {
+                state.lastGovernmentVotes[socket.id] = state.lastGovernmentVotes[oldId];
+                delete state.lastGovernmentVotes[oldId];
+              }
+            }
+
+            state.declarations.forEach(d => {
+              if (d.playerId === oldId) d.playerId = socket.id;
+            });
+
+            state.roundHistory?.forEach(rh => {
+              if (rh.presidentId === oldId) rh.presidentId = socket.id;
+              if (rh.chancellorId === oldId) rh.chancellorId = socket.id;
+              rh.votes.forEach(v => {
+                if (v.playerId === oldId) v.playerId = socket.id;
+              });
+            });
+
             state.isPaused = false;
-            state.disconnectedPlayerId = undefined;
             state.pauseReason = undefined;
             state.pauseTimer = undefined;
-            state.log.push(`${disconnected.name} reconnected.`);
+            state.log.push(`${existingPlayer.name} reconnected.`);
+            
+            // Join room BEFORE broadcast so the client receives the update
             socket.join(roomId);
+            engine.broadcastState(roomId);
+            return;
+          }
+        }
+
+        // Lobby-phase reconnect: player refreshed tab or briefly disconnected
+        // while in the waiting room. Update their socket ID so later events
+        // (toggleReady etc.) can find them by socket.id correctly.
+        if (!isSpectator && state.phase === "Lobby" && userId) {
+          const existingLobbyPlayer = state.players.find(p => p.userId === userId && !p.isAI);
+          if (existingLobbyPlayer) {
+            existingLobbyPlayer.id = socket.id;
+            existingLobbyPlayer.name = name; // refresh display name too
+            socket.join(roomId);
+            state.log.push(`${name} rejoined the lobby.`);
             engine.broadcastState(roomId);
             return;
           }

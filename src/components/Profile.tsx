@@ -48,6 +48,7 @@ interface ProfileProps {
 export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, token, playSound, playMusic, stopMusic, settings, roomId, onJoinRoom, mode }) => {
   const [activeTab, setActiveTab] = useState<'stats' | 'shop' | 'settings' | 'pass' | 'friends' | 'inventory' | 'history'>('stats');
   const [shopCategory, setShopCategory] = useState<'frame' | 'policy' | 'vote' | 'music' | 'sound' | 'background'>('frame');
+  const [settingsTab, setSettingsTab] = useState<'general' | 'audio' | 'voice'>('general');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [playingItemId, setPlayingItemId] = useState<string | null>(null);
@@ -239,56 +240,56 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
         className="relative w-full max-w-4xl bg-surface border border-subtle rounded-[2rem] overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
       >
         {/* Header */}
-        <div className="p-8 bg-elevated border-b border-subtle flex flex-col sm:flex-row items-center gap-8">
+        <div className="p-6 bg-elevated border-b border-subtle flex flex-col sm:flex-row items-center gap-6">
           <div className="relative">
-            <div className="w-28 h-28 rounded-3xl bg-card border border-default flex items-center justify-center relative">
-              <div className="w-24 h-24 rounded-3xl overflow-hidden">
+            <div className="w-20 h-20 rounded-2xl bg-card border border-default flex items-center justify-center relative">
+              <div className="w-16 h-16 rounded-2xl overflow-hidden">
                 {user.avatarUrl ? (
                   <img src={getProxiedUrl(user.avatarUrl)} alt={user.username} className="w-full h-full object-cover" />
                 ) : (
-                  <UserIcon className="w-12 h-12 text-ghost" />
+                  <UserIcon className="w-8 h-8 text-ghost" />
                 )}
               </div>
               {user.activeFrame && (
                 <div className={cn(
-                  "absolute inset-2 border-4 rounded-3xl pointer-events-none",
+                  "absolute inset-1.5 border-4 rounded-2xl pointer-events-none",
                   getFrameStyles(user.activeFrame)
                 )} />
               )}
             </div>
-            <div className="absolute -bottom-2 -right-2 bg-red-900 border border-red-500 text-white text-[10px] font-mono px-2 py-1 rounded-lg shadow-lg">
+            <div className="absolute -bottom-1.5 -right-1.5 bg-red-900 border border-red-500 text-white text-[9px] font-mono px-1.5 py-0.5 rounded-lg shadow-lg">
               LVL {getLevelFromXp(user.stats.xp)}
             </div>
           </div>
 
           <div className="flex-1 text-center sm:text-left">
-            <h2 className="text-4xl font-thematic text-primary tracking-wide mb-2">{user.username}</h2>
-            <div className="flex flex-col gap-2">
+            <h2 className="text-2xl font-thematic text-primary tracking-wide mb-1">{user.username}</h2>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               {/* Row 1: Rank */}
               <div className="flex justify-center sm:justify-start">
-                <div className={cn('flex items-center gap-2 px-3 py-1.5 rounded-xl border', getRankTier(user.stats.elo).bg, getRankTier(user.stats.elo).border)}>
-                  <span className="text-sm">{getRankTier(user.stats.elo).icon}</span>
-                  <span className={cn('text-sm font-mono font-bold', getRankTier(user.stats.elo).color)}>{getRankLabel(user.stats.elo)}</span>
-                  <span className="text-xs font-mono text-faint">· {user.stats.elo}</span>
+                <div className={cn('flex items-center gap-2 px-2 py-1 rounded-xl border', getRankTier(user.stats.elo).bg, getRankTier(user.stats.elo).border)}>
+                  <span className="text-xs">{getRankTier(user.stats.elo).icon}</span>
+                  <span className={cn('text-xs font-mono font-bold', getRankTier(user.stats.elo).color)}>{getRankLabel(user.stats.elo)}</span>
+                  <span className="text-[10px] font-mono text-faint">· {user.stats.elo}</span>
                 </div>
               </div>
               {/* Row 2: IP + CP */}
-              <div className="flex justify-center sm:justify-start gap-3">
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-card rounded-xl border border-default">
-                  <Coins className="w-4 h-4 text-emerald-500" />
-                  <span className="text-sm font-mono text-emerald-500">{user.stats.points} IP</span>
+              <div className="flex justify-center sm:justify-start gap-2">
+                <div className="flex items-center gap-2 px-2 py-1 bg-card rounded-xl border border-default">
+                  <Coins className="w-3.5 h-3.5 text-emerald-500" />
+                  <span className="text-xs font-mono text-emerald-500">{user.stats.points} IP</span>
                 </div>
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-card rounded-xl border border-default">
-                  <Zap className="w-4 h-4 text-purple-500" />
-                  <span className="text-sm font-mono text-purple-500">{(user.cabinetPoints ?? 0)} CP</span>
+                <div className="flex items-center gap-2 px-2 py-1 bg-card rounded-xl border border-default">
+                  <Zap className="w-3.5 h-3.5 text-purple-500" />
+                  <span className="text-xs font-mono text-purple-500">{(user.cabinetPoints ?? 0)} CP</span>
                 </div>
               </div>
-              <div className="w-full max-w-sm">
-                <div className="flex justify-between text-xs text-gray-400 mb-1">
+              <div className="flex-1 max-w-[200px] sm:ml-2">
+                <div className="flex justify-between text-[9px] text-gray-400 mb-0.5">
                   <span>XP</span>
                   <span>{getXpInCurrentLevel(user.stats.xp)} / {getXpForNextLevel(getLevelFromXp(user.stats.xp))}</span>
                 </div>
-                <div className="h-2 bg-card rounded-full overflow-hidden">
+                <div className="h-1.5 bg-card rounded-full overflow-hidden">
                   <div 
                     className="h-full bg-red-600" 
                     style={{ width: `${Math.min(100, (getXpInCurrentLevel(user.stats.xp) / getXpForNextLevel(getLevelFromXp(user.stats.xp))) * 100)}%` }} 
@@ -303,63 +304,35 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
               playSound('click');
               onClose();
             }}
-            className="absolute top-6 right-6 p-2 text-ghost hover:text-white transition-colors"
+            className="absolute top-4 right-4 p-2 text-ghost hover:text-white transition-colors"
           >
-            <X className="w-6 h-6" />
+            <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="grid grid-cols-3 border-b border-subtle">
-          <button 
-            onClick={() => { playSound('click'); setActiveTab('stats'); }}
-            className={cn("py-4 text-xs font-mono uppercase tracking-widest transition-all relative border-r border-b border-subtle", activeTab === 'stats' ? "text-primary" : "text-ghost hover:text-muted")}
-          >
-            Stats
-            {activeTab === 'stats' && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500" />}
-          </button>
-          <button 
-            onClick={() => { playSound('click'); setActiveTab('inventory'); }}
-            className={cn("py-4 text-xs font-mono uppercase tracking-widest transition-all relative border-r border-b border-subtle", activeTab === 'inventory' ? "text-primary" : "text-ghost hover:text-muted")}
-          >
-            Inventory
-            {activeTab === 'inventory' && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500" />}
-          </button>
-          <button 
-            onClick={() => { playSound('click'); setActiveTab('friends'); }}
-            className={cn("py-4 text-xs font-mono uppercase tracking-widest transition-all relative border-b border-subtle", activeTab === 'friends' ? "text-primary" : "text-ghost hover:text-muted")}
-          >
-            Friends
-            {activeTab === 'friends' && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500" />}
-          </button>
-          <button 
-            onClick={() => { playSound('click'); setActiveTab('pass'); }}
-            className={cn("py-4 text-xs font-mono uppercase tracking-widest transition-all relative border-r border-b border-subtle", activeTab === 'pass' ? "text-primary" : "text-ghost hover:text-muted")}
-          >
-            Pass
-            {activeTab === 'pass' && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500" />}
-          </button>
-          <button 
-            onClick={() => { playSound('click'); setActiveTab('shop'); }}
-            className={cn("py-4 text-xs font-mono uppercase tracking-widest transition-all relative border-r border-b border-subtle", activeTab === 'shop' ? "text-primary" : "text-ghost hover:text-muted")}
-          >
-            Shop
-            {activeTab === 'shop' && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500" />}
-          </button>
-          <button 
-            onClick={() => { playSound('click'); setActiveTab('settings'); }}
-            className={cn("py-4 text-xs font-mono uppercase tracking-widest transition-all relative border-b border-subtle", activeTab === 'settings' ? "text-primary" : "text-ghost hover:text-muted")}
-          >
-            Settings
-            {activeTab === 'settings' && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500" />}
-          </button>
-          <button 
-            onClick={() => { playSound('click'); setActiveTab('history'); }}
-            className={cn("py-4 text-xs font-mono uppercase tracking-widest transition-all relative col-span-3 border-b border-subtle", activeTab === 'history' ? "text-primary" : "text-ghost hover:text-muted")}
-          >
-            Match History
-            {activeTab === 'history' && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500" />}
-          </button>
+        <div className="flex flex-wrap border-b border-subtle">
+          {[
+            { id: 'stats', label: 'Stats' },
+            { id: 'inventory', label: 'Inventory' },
+            { id: 'shop', label: 'Shop' },
+            { id: 'pass', label: 'Pass' },
+            { id: 'friends', label: 'Friends' },
+            { id: 'history', label: 'History' },
+            { id: 'settings', label: 'Settings' }
+          ].map((tab) => (
+            <button 
+              key={tab.id}
+              onClick={() => { playSound('click'); setActiveTab(tab.id as any); }}
+              className={cn(
+                "flex-1 min-w-[80px] py-3 text-[10px] font-mono uppercase tracking-widest transition-all relative border-r border-subtle last:border-r-0", 
+                activeTab === tab.id ? "text-primary bg-elevated/50" : "text-ghost hover:text-muted"
+              )}
+            >
+              {tab.label}
+              {activeTab === tab.id && <motion.div layoutId="tab" className="absolute bottom-0 left-0 right-0 h-0.5 bg-red-500" />}
+            </button>
+          ))}
         </div>
 
         {/* Content */}
@@ -749,90 +722,121 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
               </div>
             </div>
           ) : activeTab === 'settings' ? (
-            <div className="space-y-6 max-w-md mx-auto">
-              <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
-                <div>
-                  <span className="text-sm font-mono text-primary">Light Mode</span>
-                  <p className="text-[10px] font-mono text-muted uppercase mt-0.5">Switches the app to a light colour scheme</p>
-                </div>
-                <button onClick={() => setIsLightMode(!isLightMode)} className={cn("w-12 h-6 rounded-full transition-all relative shrink-0", isLightMode ? "bg-yellow-500" : "bg-subtle")}>
-                  <div className={cn("absolute top-1 w-4 h-4 rounded-full bg-white transition-all", isLightMode ? "left-7" : "left-1")} />
-                </button>
+            <div className="space-y-6 max-w-lg mx-auto">
+              {/* Settings Sub-tabs */}
+              <div className="flex gap-1 p-1 bg-elevated rounded-2xl border border-subtle mb-6">
+                {[
+                  { id: 'general', label: 'General' },
+                  { id: 'audio', label: 'Audio' },
+                  { id: 'voice', label: 'Voice' }
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => { playSound('click'); setSettingsTab(tab.id as any); }}
+                    className={cn(
+                      "flex-1 px-4 py-2 rounded-xl text-[10px] font-mono uppercase tracking-widest transition-all",
+                      settingsTab === tab.id ? "bg-red-900 text-white shadow-lg" : "text-ghost hover:text-muted"
+                    )}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
-              <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
-                <span className="text-sm font-mono text-primary">AI Voice Chat</span>
-                <button onClick={() => setIsAiVoiceEnabled(!isAiVoiceEnabled)} className={cn("w-12 h-6 rounded-full transition-all relative", isAiVoiceEnabled ? "bg-emerald-900" : "bg-subtle")}>
-                  <div className={cn("absolute top-1 w-4 h-4 rounded-full bg-white transition-all", isAiVoiceEnabled ? "left-7" : "left-1")} />
-                </button>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
-                <span className="text-sm font-mono text-primary">Music</span>
-                <button onClick={() => setIsMusicOn(!isMusicOn)} className={cn("w-12 h-6 rounded-full transition-all relative", isMusicOn ? "bg-red-900" : "bg-subtle")}>
-                  <div className={cn("absolute top-1 w-4 h-4 rounded-full bg-white transition-all", isMusicOn ? "left-7" : "left-1")} />
-                </button>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
-                <span className="text-sm font-mono text-primary">Sound Effects</span>
-                <button onClick={() => setIsSoundOn(!isSoundOn)} className={cn("w-12 h-6 rounded-full transition-all relative", isSoundOn ? "bg-red-900" : "bg-subtle")}>
-                  <div className={cn("absolute top-1 w-4 h-4 rounded-full bg-white transition-all", isSoundOn ? "left-7" : "left-1")} />
-                </button>
-              </div>
-              <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
-                <span className="text-sm font-mono text-primary">Music Volume</span>
-                <input type="range" min="0" max="100" value={musicVolume} onChange={(e) => setMusicVolume(parseInt(e.target.value))} className="w-full accent-red-900" />
-              </div>
-              <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
-                <span className="text-sm font-mono text-primary">Sound Effects Volume</span>
-                <input type="range" min="0" max="100" value={soundVolume} onChange={(e) => setSoundVolume(parseInt(e.target.value))} className="w-full accent-red-900" />
-              </div>
-              <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
-                <span className="text-sm font-mono text-primary">TTS Engine</span>
-                <select 
-                  value={ttsEngine} 
-                  onChange={(e) => setTtsEngine(e.target.value)}
-                  className="w-full bg-card text-primary p-2 rounded-xl text-sm font-mono border border-default"
-                >
-                  <option value="browser">Browser (Free, Offline)</option>
-                  <option value="gemini">Gemini (High Quality, Free Tier)</option>
-                </select>
-                <p className="text-[10px] font-mono text-ghost uppercase">
-                  {ttsEngine === 'gemini' 
-                    ? 'Uses Gemini 2.5 Flash for professional voices. Requires internet.' 
-                    : 'Uses your device\'s built-in voices. Works offline.'}
-                </p>
-              </div>
-              <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
-                <span className="text-sm font-mono text-primary">TTS Voice</span>
-                <select 
-                  value={ttsVoice} 
-                  onChange={(e) => setTtsVoice(e.target.value)}
-                  className="w-full bg-card text-primary p-2 rounded-xl text-sm font-mono border border-default"
-                >
-                  <option value="">Default</option>
-                  {voices.map(v => <option key={v.name} value={v.name}>{v.name} ({v.lang})</option>)}
-                </select>
-              </div>
-              <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
-                <span className="text-sm font-mono text-primary">Fullscreen</span>
-                <button onClick={toggleFullscreen} className={cn("w-12 h-6 rounded-full transition-all relative", isFullscreen ? "bg-red-900" : "bg-subtle")}>
-                  <div className={cn("absolute top-1 w-4 h-4 rounded-full bg-white transition-all", isFullscreen ? "left-7" : "left-1")} />
-                </button>
-              </div>
-              <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
-                <div className="flex justify-between items-center">
-                  <span className="text-sm font-mono text-primary">UI Scale</span>
-                  <span className="text-xs font-mono text-muted">{Math.round(uiScaleSetting * 100)}%</span>
-                </div>
-                <input 
-                  type="range" 
-                  min="0.5" 
-                  max="1.5" 
-                  step="0.05"
-                  value={uiScaleSetting} 
-                  onChange={(e) => setUiScaleSetting(parseFloat(e.target.value))} 
-                  className="w-full accent-red-900" 
-                />
-                <p className="text-[10px] font-mono text-ghost uppercase">Adjusts the overall size of the interface</p>
+
+              <div className="space-y-4">
+                {settingsTab === 'general' && (
+                  <>
+                    <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
+                      <div>
+                        <span className="text-sm font-mono text-primary">Light Mode</span>
+                        <p className="text-[10px] font-mono text-muted uppercase mt-0.5">Switches to a light colour scheme</p>
+                      </div>
+                      <button onClick={() => setIsLightMode(!isLightMode)} className={cn("w-12 h-6 rounded-full transition-all relative shrink-0", isLightMode ? "bg-yellow-500" : "bg-subtle")}>
+                        <div className={cn("absolute top-1 w-4 h-4 rounded-full bg-white transition-all", isLightMode ? "left-7" : "left-1")} />
+                      </button>
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
+                      <span className="text-sm font-mono text-primary">Fullscreen</span>
+                      <button onClick={toggleFullscreen} className={cn("w-12 h-6 rounded-full transition-all relative", isFullscreen ? "bg-red-900" : "bg-subtle")}>
+                        <div className={cn("absolute top-1 w-4 h-4 rounded-full bg-white transition-all", isFullscreen ? "left-7" : "left-1")} />
+                      </button>
+                    </div>
+                    <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-mono text-primary">UI Scale</span>
+                        <span className="text-xs font-mono text-muted">{Math.round(uiScaleSetting * 100)}%</span>
+                      </div>
+                      <input 
+                        type="range" 
+                        min="0.5" 
+                        max="1.5" 
+                        step="0.05"
+                        value={uiScaleSetting} 
+                        onChange={(e) => setUiScaleSetting(parseFloat(e.target.value))} 
+                        className="w-full accent-red-900" 
+                      />
+                      <p className="text-[10px] font-mono text-ghost uppercase">Adjusts the overall interface size</p>
+                    </div>
+                  </>
+                )}
+
+                {settingsTab === 'audio' && (
+                  <>
+                    <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
+                      <span className="text-sm font-mono text-primary">Music</span>
+                      <button onClick={() => setIsMusicOn(!isMusicOn)} className={cn("w-12 h-6 rounded-full transition-all relative", isMusicOn ? "bg-red-900" : "bg-subtle")}>
+                        <div className={cn("absolute top-1 w-4 h-4 rounded-full bg-white transition-all", isMusicOn ? "left-7" : "left-1")} />
+                      </button>
+                    </div>
+                    <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
+                      <span className="text-sm font-mono text-primary">Music Volume</span>
+                      <input type="range" min="0" max="100" value={musicVolume} onChange={(e) => setMusicVolume(parseInt(e.target.value))} className="w-full accent-red-900" />
+                    </div>
+                    <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
+                      <span className="text-sm font-mono text-primary">Sound Effects</span>
+                      <button onClick={() => setIsSoundOn(!isSoundOn)} className={cn("w-12 h-6 rounded-full transition-all relative", isSoundOn ? "bg-red-900" : "bg-subtle")}>
+                        <div className={cn("absolute top-1 w-4 h-4 rounded-full bg-white transition-all", isSoundOn ? "left-7" : "left-1")} />
+                      </button>
+                    </div>
+                    <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
+                      <span className="text-sm font-mono text-primary">Sound Effects Volume</span>
+                      <input type="range" min="0" max="100" value={soundVolume} onChange={(e) => setSoundVolume(parseInt(e.target.value))} className="w-full accent-red-900" />
+                    </div>
+                  </>
+                )}
+
+                {settingsTab === 'voice' && (
+                  <>
+                    <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
+                      <span className="text-sm font-mono text-primary">AI Voice Chat</span>
+                      <button onClick={() => setIsAiVoiceEnabled(!isAiVoiceEnabled)} className={cn("w-12 h-6 rounded-full transition-all relative", isAiVoiceEnabled ? "bg-emerald-900" : "bg-subtle")}>
+                        <div className={cn("absolute top-1 w-4 h-4 rounded-full bg-white transition-all", isAiVoiceEnabled ? "left-7" : "left-1")} />
+                      </button>
+                    </div>
+                    <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
+                      <span className="text-sm font-mono text-primary">TTS Engine</span>
+                      <select 
+                        value={ttsEngine} 
+                        onChange={(e) => setTtsEngine(e.target.value)}
+                        className="w-full bg-card text-primary p-2 rounded-xl text-sm font-mono border border-default"
+                      >
+                        <option value="browser">Browser (Free, Offline)</option>
+                        <option value="gemini">Gemini (High Quality, Free Tier)</option>
+                      </select>
+                    </div>
+                    <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
+                      <span className="text-sm font-mono text-primary">TTS Voice</span>
+                      <select 
+                        value={ttsVoice} 
+                        onChange={(e) => setTtsVoice(e.target.value)}
+                        className="w-full bg-card text-primary p-2 rounded-xl text-sm font-mono border border-default"
+                      >
+                        <option value="">Default</option>
+                        {voices.map(v => <option key={v.name} value={v.name}>{v.name} ({v.lang})</option>)}
+                      </select>
+                    </div>
+                  </>
+                )}
               </div>
             </div>
           ) : activeTab === 'history' ? (

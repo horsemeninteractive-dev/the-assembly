@@ -115,6 +115,19 @@ export const GameRoom = ({
     if (isChatOpen) setLastSeenMessageCount(gameState.messages.length);
   }, [isChatOpen, gameState.messages.length]);
 
+  // Auto-open dossier at the start of the game (Round 1)
+  const hasAutoOpenedDossier = useRef(false);
+  useEffect(() => {
+    if (!isSpectator && gameState.round === 1 && gameState.phase !== 'Lobby' && gameState.phase !== 'GameOver' && !hasAutoOpenedDossier.current) {
+      setIsDossierOpen(true);
+      hasAutoOpenedDossier.current = true;
+    }
+    // Reset if we go back to Lobby (e.g. Play Again)
+    if (gameState.phase === 'Lobby') {
+      hasAutoOpenedDossier.current = false;
+    }
+  }, [gameState.phase, gameState.round, isSpectator]);
+
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [gameState.messages, isChatOpen]);
@@ -543,12 +556,9 @@ export const GameRoom = ({
     <div
       ref={containerRef}
       className={cn(
-        'flex-1 w-full bg-texture text-primary font-sans grid grid-rows-[auto_1fr] overflow-hidden transition-all duration-1000',
+        'flex-1 w-full text-primary font-sans grid grid-rows-[auto_1fr] overflow-hidden transition-all duration-1000',
         gameState.stateDirectives >= 3 && gameState.phase !== 'GameOver' && 'danger-zone-pulse'
       )}
-      style={{
-        backgroundImage: `url("${getProxiedUrl(getBackgroundTexture(user?.activeBackground))}")`
-      }}
     >
       <GameHeader
         gameState={gameState}

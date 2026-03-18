@@ -306,6 +306,17 @@
     background-image: none;
   }
 
+  /* ─── Radial Vignette ────────────────────────────────────────────── */
+  .bg-vignette {
+    /* Dark mode: dark edges */
+    background: radial-gradient(circle, transparent 15%, rgba(0, 0, 0, 0.8) 100%);
+  }
+
+  [data-theme="light"] .bg-vignette {
+    /* Light mode: light edges (white/washout effect) */
+    background: radial-gradient(circle, transparent 15%, rgba(255, 255, 255, 0.6) 100%);
+  }
+
   /* ─── Scrollbar ───────────────────────────────────────────────────── */
   .custom-scrollbar::-webkit-scrollbar {
     width: 4px;
