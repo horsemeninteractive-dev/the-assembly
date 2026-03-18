@@ -456,16 +456,50 @@ export const GameRoom = ({
     if (peersRef.current[peerId]) return peersRef.current[peerId];
     const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
     peersRef.current[peerId] = pc;
-    if (localStream) localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
+    if (localStreamRef.current) localStreamRef.current.getTracks().forEach(track => pc.addTrack(track, localStreamRef.current!));
     pc.onicecandidate = (event) => {
       if (event.candidate) socket.emit('signal', { to: peerId, from: socket.id!, signal: { candidate: event.candidate } });
     };
     pc.ontrack = (event) => {
-      const remoteStream = event.streams[0];
-      setRemoteStreams(prev => ({ ...prev, [peerId]: remoteStream }));
+      const incomingStream = event.streams[0];
+      setRemoteStreams(prev => {
+        const existingStream = prev[peerId];
+        if (existingStream) {
+          // Check if we actually need to add any new tracks
+          const newTracks = incomingStream.getTracks().filter(
+            incoming => !existingStream.getTracks().find(existing => existing.id === incoming.id)
+          );
+          
+          if (newTracks.length > 0) {
+            // Create a NEW stream object containing all tracks to trigger React re-renders properly
+            const mergedStream = new MediaStream([...existingStream.getTracks(), ...newTracks]);
+            return { ...prev, [peerId]: mergedStream };
+          }
+          return prev;
+        }
+        return { ...prev, [peerId]: incomingStream };
+      });
+
+      // Cleanup and re-render when a track is removed or ends
+      event.track.onended = () => {
+        setRemoteStreams(prev => {
+          const stream = prev[peerId];
+          if (stream) {
+            const activeTracks = stream.getTracks().filter(t => t.readyState !== 'ended');
+            if (activeTracks.length === 0) {
+              const newRemoteStreams = { ...prev };
+              delete newRemoteStreams[peerId];
+              return newRemoteStreams;
+            }
+            // Create new stream without the ended track
+            return { ...prev, [peerId]: new MediaStream(activeTracks) };
+          }
+          return prev;
+        });
+      };
       
-      if (remoteStream.getAudioTracks().length > 0) {
-        setupSpeakingDetection(remoteStream, peerId);
+      if (incomingStream.getAudioTracks().length > 0) {
+        setupSpeakingDetection(incomingStream, peerId);
       }
     };
     pc.onnegotiationneeded = async () => {
@@ -478,25 +512,64 @@ export const GameRoom = ({
     return pc;
   };
 
+  // Cleanup stale peer connections when players disconnect or leave
+  useEffect(() => {
+    Object.keys(peersRef.current).forEach(peerId => {
+      if (peerId === socket.id) return;
+      
+      const player = gameState.players.find(p => p.id === peerId);
+      if (!player || player.isDisconnected) {
+        console.log('Cleaning up peer connection for:', peerId);
+        const pc = peersRef.current[peerId];
+        if (pc) {
+          try {
+            pc.close();
+          } catch (e) {
+            console.error('Error closing peer connection:', e);
+          }
+          delete peersRef.current[peerId];
+          setRemoteStreams(prev => {
+            if (!prev[peerId]) return prev;
+            const next = { ...prev };
+            delete next[peerId];
+            return next;
+          });
+        }
+      }
+    });
+  }, [gameState.players, socket.id]);
+
   useEffect(() => {
     socket.on('signal', async ({ from, signal }) => {
       let pc = peersRef.current[from];
       if (!pc) pc = createPeer(from, false);
-      if (signal.sdp) {
-        await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
-        if (signal.sdp.type === 'offer') {
-          const answer = await pc.createAnswer();
-          await pc.setLocalDescription(answer);
-          socket.emit('signal', { to: from, from: socket.id!, signal: { sdp: answer } });
+      
+      try {
+        if (signal.sdp) {
+          await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+          if (signal.sdp.type === 'offer') {
+            const answer = await pc.createAnswer();
+            await pc.setLocalDescription(answer);
+            socket.emit('signal', { to: from, from: socket.id!, signal: { sdp: answer } });
+          }
+        } else if (signal.candidate) {
+          await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
         }
-      } else if (signal.candidate) {
-        try { await pc.addIceCandidate(new RTCIceCandidate(signal.candidate)); }
-        catch (e) { console.error('ICE candidate error', e); }
+      } catch (e) {
+        console.error('Signal handling error:', e);
       }
     });
-    socket.on('peerJoined', (peerId) => createPeer(peerId, true));
-    return () => { socket.off('signal'); socket.off('peerJoined'); };
-  }, [localStream]);
+
+    socket.on('peerJoined', (peerId) => {
+      console.log('Peer joined:', peerId);
+      createPeer(peerId, true);
+    });
+
+    return () => {
+      socket.off('signal');
+      socket.off('peerJoined');
+    };
+  }, []); // Remove localStream dependency to keep listeners stable
 
   useEffect(() => {
     if (me && !me.isAlive) {
@@ -506,7 +579,9 @@ export const GameRoom = ({
   }, [me?.isAlive]);
 
   useEffect(() => {
-    if ((isVoiceActive || isVideoActive) && socket.id && localStream) setupSpeakingDetection(localStream, socket.id);
+    if ((isVoiceActive || isVideoActive) && socket.id && localStream) {
+      setupSpeakingDetection(localStream, socket.id);
+    }
   }, [isVoiceActive, isVideoActive, localStream]);
 
   const localStreamRef = useRef<MediaStream | null>(null);
@@ -520,27 +595,43 @@ export const GameRoom = ({
       navigator.mediaDevices.getUserMedia({ audio: isVoiceActive, video: isVideoActive })
         .then(async stream => {
           setLocalStream(stream);
+          
+          // Update all active peer connections with new tracks
           Object.keys(peersRef.current).forEach(peerId => {
             const pc = peersRef.current[peerId];
-            stream.getTracks().forEach(track => pc.addTrack(track, stream));
+            const senders = pc.getSenders();
+            
+            stream.getTracks().forEach(track => {
+              const sender = senders.find(s => s.track?.kind === track.kind);
+              if (sender) {
+                sender.replaceTrack(track);
+              } else {
+                pc.addTrack(track, stream);
+              }
+            });
           });
         })
-        .catch(err => { console.error('Media error:', err); setIsVoiceActive(false); setIsVideoActive(false); });
+        .catch(err => { 
+          console.error('Media error:', err); 
+          setIsVoiceActive(false); 
+          setIsVideoActive(false); 
+        });
     } else {
       if (localStream) {
         localStream.getTracks().forEach(track => track.stop());
         setLocalStream(null);
         Object.keys(peersRef.current).forEach(peerId => {
           const pc = peersRef.current[peerId];
-          pc.getSenders().forEach(sender => pc.removeTrack(sender));
+          pc.getSenders().forEach(sender => {
+            try {
+              pc.removeTrack(sender);
+            } catch (e) {
+              console.warn('Error removing track:', e);
+            }
+          });
         });
       }
     }
-    return () => {
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-      }
-    };
   }, [isVoiceActive, isVideoActive]);
 
   useEffect(() => {

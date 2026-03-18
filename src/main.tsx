@@ -19,36 +19,43 @@ window.onerror = (message, source, lineno, colno, error) => {
   }
 };
 
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then(registration => {
-      console.log('SW registered: ', registration);
-      
-      // Check for updates periodically
-      registration.addEventListener('updatefound', () => {
-        const newWorker = registration.installing;
-        if (newWorker) {
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // New content is available, but the user should probably be notified or just reload
-              console.log('New content is available; please refresh.');
-            }
-          });
-        }
-      });
-    }).catch(registrationError => {
-      console.error('SW registration failed: ', registrationError);
-    });
-  });
+try {
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/sw.js').then(registration => {
+        console.log('SW registered:', registration);
 
-  // Handle controller change (e.g. after skipWaiting)
-  let refreshing = false;
-  navigator.serviceWorker.addEventListener('controllerchange', () => {
-    if (!refreshing) {
-      refreshing = true;
-      window.location.reload();
-    }
-  });
+        // Force an update check on every load
+        registration.update();
+
+        registration.onupdatefound = () => {
+          const newWorker = registration.installing;
+          if (newWorker) {
+            newWorker.onstatechange = () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                console.log('New SW version installed, reloading...');
+                window.location.reload();
+              }
+            };
+          }
+        };
+      }).catch(error => {
+        console.log('SW registration failed:', error);
+      });
+    });
+
+    // Handle the case where the new SW takes over
+    let refreshing = false;
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (!refreshing) {
+        refreshing = true;
+        console.log('Controller changed, reloading...');
+        window.location.reload();
+      }
+    });
+  }
+} catch (e) {
+  console.error('Service worker initialization error:', e);
 }
 
 createRoot(document.getElementById('root')!).render(

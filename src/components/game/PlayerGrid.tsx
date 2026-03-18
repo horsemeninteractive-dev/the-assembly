@@ -41,7 +41,7 @@ export const PlayerGrid = ({
         {gameState.players.map((p, index) => {
           if (!p) return null;
           const isMe   = p.id === socket.id;
-          const stream = isMe ? (isVideoActive ? localStream : null) : remoteStreams[p.id];
+          const stream = isMe ? localStream : remoteStreams[p.id];
           return (
             <PlayerCard
               key={p.id}

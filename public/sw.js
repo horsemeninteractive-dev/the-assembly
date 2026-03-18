@@ -34,28 +34,33 @@ self.addEventListener('activate', (event) => {
   );
 });
 
+const networkFirstPaths = [
+  '/manifest.json'
+];
+
+// NEVER cache the index.html or root to ensure we always get latest hashed assets
+const skipCachePaths = [
+  '/',
+  '/index.html'
+];
+
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
   
-  // Use Network-First strategy for HTML and manifest to ensure latest version
-  if (url.pathname === '/' || url.pathname === '/index.html' || url.pathname === '/manifest.json') {
+  if (skipCachePaths.includes(url.pathname)) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  if (networkFirstPaths.includes(url.pathname)) {
     event.respondWith(
       fetch(event.request)
         .then((response) => {
-          // Only cache valid responses
-          if (!response || response.status !== 200 || response.type !== 'basic') {
-            return response;
-          }
-          const responseToCache = response.clone();
-          caches.open(CACHE_NAME).then((cache) => {
-            cache.put(event.request, responseToCache);
-          });
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, copy));
           return response;
         })
-        .catch(() => {
-          // If network fails, serve from cache
-          return caches.match(event.request);
-        })
+        .catch(() => caches.match(event.request))
     );
     return;
   }

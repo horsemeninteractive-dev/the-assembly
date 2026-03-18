@@ -300,6 +300,7 @@ async function startServer() {
             // Join room BEFORE broadcast so the client receives the update
             socket.join(roomId);
             engine.broadcastState(roomId);
+            socket.to(roomId).emit("peerJoined", socket.id);
             return;
           }
         }
@@ -315,6 +316,7 @@ async function startServer() {
             socket.join(roomId);
             state.log.push(`${name} rejoined the lobby.`);
             engine.broadcastState(roomId);
+            socket.to(roomId).emit("peerJoined", socket.id);
             return;
           }
         }

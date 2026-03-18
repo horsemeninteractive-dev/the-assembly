@@ -6,12 +6,29 @@ import { GameState, Player } from '../../types';
 import { getFrameStyles, getVoteStyles } from '../../lib/cosmetics';
 import { cn, getProxiedUrl } from '../../lib/utils';
 
-const VideoPlayer = React.memo(({ stream, isMe }: { stream: MediaStream, isMe: boolean }) => {
+const VideoPlayer = React.memo(({ stream, isMe, isVideoActive }: { stream: MediaStream, isMe: boolean, isVideoActive: boolean }) => {
   const videoRef = useRef<HTMLVideoElement>(null);
   React.useEffect(() => {
     if (videoRef.current) videoRef.current.srcObject = stream;
   }, [stream]);
-  return <video ref={videoRef} autoPlay playsInline muted={isMe} className="absolute inset-0 w-full h-full object-cover rounded-xl" />;
+  
+  const hasVideo = stream?.getVideoTracks().some(t => t.enabled) ?? false;
+  // If it's me, respect the local isVideoActive setting. 
+  // If it's someone else, show it if they are sending a video track.
+  const showVideo = isMe ? (isVideoActive && hasVideo) : hasVideo;
+
+  return (
+    <video 
+      ref={videoRef} 
+      autoPlay 
+      playsInline 
+      muted={isMe} 
+      className={cn(
+        "absolute inset-0 w-full h-full object-cover rounded-xl transition-opacity duration-300",
+        !showVideo && "opacity-0 pointer-events-none"
+      )} 
+    />
+  );
 });
 
 const ROLE_LABELS: Record<string, { label: string; color: string; bg: string }> = {
@@ -62,6 +79,9 @@ export const PlayerCard = React.memo(({
   const handlePressEnd = () => {
     if (pressTimerRef.current) clearTimeout(pressTimerRef.current);
   };
+
+  const hasVideo = stream?.getVideoTracks().some(t => t.enabled) ?? false;
+  const showVideo = isMe ? (isVideoActive && hasVideo) : hasVideo;
 
   return (
     <motion.div
@@ -118,13 +138,13 @@ export const PlayerCard = React.memo(({
       >
         {/* Front */}
         <div className="absolute inset-0 flex flex-col items-center justify-center backface-hidden">
-          {stream && isVideoActive && <VideoPlayer stream={stream} isMe={isMe} />}
+          {stream && <VideoPlayer stream={stream} isMe={isMe} isVideoActive={isVideoActive} />}
 
           <div className={cn(
             'flex min-h-0 overflow-hidden z-10 w-full h-full',
-            stream && isVideoActive ? 'flex-row justify-between items-end p-2' : 'flex-col items-center justify-center text-center'
+            showVideo ? 'flex-row justify-between items-end p-2' : 'flex-col items-center justify-center text-center'
           )}>
-            <div className={cn('relative shrink-0 p-1', stream && isVideoActive && 'hidden')}>
+            <div className={cn('relative shrink-0 p-1', showVideo && 'hidden')}>
               <div className={cn(
                 'bg-card flex items-center justify-center relative',
                 !p.activeFrame && 'border border-default',
