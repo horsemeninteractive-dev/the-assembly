@@ -11,14 +11,12 @@ const VideoPlayer = React.memo(({ stream, isMe, isVideoActive }: { stream: Media
 
   React.useEffect(() => {
     if (!videoRef.current) return;
-    if (isVideoActive) {
-      videoRef.current.srcObject = stream;
-    } else {
-      // Clear srcObject so the last frozen frame is fully gone from the canvas,
-      // not just hidden behind the avatar via opacity.
-      videoRef.current.srcObject = null;
-    }
-  }, [stream, isVideoActive]);
+    // Always assign srcObject when we have a stream — never clear it based on
+    // isVideoActive, because that would freeze/blank the element and it won't
+    // recover when isVideoActive goes true again without a new stream reference.
+    // Visibility is handled purely by the opacity CSS class below.
+    videoRef.current.srcObject = stream;
+  }, [stream]);
 
   return (
     <video 

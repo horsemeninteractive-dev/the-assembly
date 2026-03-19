@@ -26,7 +26,7 @@ import { PlayerProfileModal } from './game/modals/PlayerProfileModal';
 import { TitleAbilityModal } from './game/modals/TitleAbilityModal';
 import { GameReferencePanel } from './game/GameReferencePanel';
 
-const CLIENT_VERSION = 'v0.8.10';
+const CLIENT_VERSION = 'v0.9.7';
 
 interface GameRoomProps {
   gameState: GameState;
@@ -452,129 +452,214 @@ export const GameRoom = ({
     }
   };
 
-  const createPeer = (peerId: string, initiator: boolean) => {
+  // ── WebRTC — Perfect Negotiation Pattern ────────────────────────────────
+  //
+  // Key principle: ONLY onnegotiationneeded sends offers. Nothing else ever
+  // calls createOffer directly. This eliminates all glare and race conditions.
+  //
+  // Each peer connection has a per-peer `makingOffer` flag and a `polite` flag.
+  // The polite peer (lex-larger socket ID) backs off if both sides offer at once.
+  // The impolite peer (lex-smaller socket ID) ignores incoming offers while making one.
+  //
+  // To trigger renegotiation from any side at any time, just call
+  // addTrack on the pc — onnegotiationneeded does the rest.
+  // We NEVER use replaceTrack(null) to "remove" a track — instead we just
+  // stop the track and let the remote side see it end. On re-enable we
+  // removeTrack the old sender and addTrack the new one so onnegotiationneeded fires.
+
+  // Must be declared before createPeer, which closes over it.
+  // Kept in sync synchronously (not via useEffect) to avoid one-render lag.
+  const localStreamRef = useRef<MediaStream | null>(null);
+
+  // Per-peer signaling metadata needed for perfect negotiation
+  const peerMetaRef = useRef<Record<string, { makingOffer: boolean; polite: boolean }>>({});
+
+  const destroyPeer = (peerId: string) => {
+    const pc = peersRef.current[peerId];
+    if (pc) {
+      try { pc.close(); } catch (e) { }
+      delete peersRef.current[peerId];
+    }
+    delete peerMetaRef.current[peerId];
+    setRemoteStreams(prev => {
+      const next = { ...prev }; delete next[peerId]; return next;
+    });
+  };
+
+  // Tracks the kind ('audio'|'video') for each RTCRtpSender we create,
+  // so we can identify null-tracked senders after removeTrack.
+  const senderKindMap = useRef(new WeakMap<RTCRtpSender, string>());
+
+  // Push a track into a peer connection.
+  // Removes any existing sender for this kind first — including null-tracked senders
+  // left by removeTrack — so we never accumulate stale transceivers.
+  const addTrackToPeer = (pc: RTCPeerConnection, track: MediaStreamTrack, stream: MediaStream) => {
+    console.log(`[WebRTC] addTrackToPeer kind=${track.kind} | senders=[${pc.getSenders().map(s => s.track?.kind ?? `null(was ${senderKindMap.current.get(s) ?? '?'})`).join(', ')}] | sigState=${pc.signalingState}`);
+    pc.getSenders().forEach(s => {
+      const kind = s.track?.kind ?? senderKindMap.current.get(s);
+      if (kind === track.kind) {
+        try { pc.removeTrack(s); } catch (e) { }
+      }
+    });
+    const sender = pc.addTrack(track, stream); // fires onnegotiationneeded
+    senderKindMap.current.set(sender, track.kind);
+  };
+
+  const createPeer = (peerId: string) => {
     if (peersRef.current[peerId]) return peersRef.current[peerId];
+
+    // Polite = lex-larger ID. The polite peer rolls back when there's a glare.
+    const polite = socket.id! > peerId;
+    peerMetaRef.current[peerId] = { makingOffer: false, polite };
+
     const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
     peersRef.current[peerId] = pc;
-    
-    // Pre-allocate transceivers for audio and video to avoid constant re-negotiation
-    if (pc.addTransceiver) {
-      pc.addTransceiver('audio', { direction: 'sendrecv' });
-      pc.addTransceiver('video', { direction: 'sendrecv' });
-    } else {
-      if (localStreamRef.current) {
-        localStreamRef.current.getTracks().forEach(track => pc.addTrack(track, localStreamRef.current!));
-      }
+
+    // Seed an empty stream so the video tile renders immediately
+    setRemoteStreams(prev => ({ ...prev, [peerId]: new MediaStream() }));
+
+    // Add whatever local tracks we already have. If we have none yet (camera
+    // not on), this is a no-op and onnegotiationneeded won't fire — that's
+    // fine; the remote side will offer when they add their tracks, and we'll
+    // answer. When we turn our camera on later, addTrack fires onnegotiationneeded.
+    if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach(track => addTrackToPeer(pc, track, localStreamRef.current!));
     }
-    pc.onicecandidate = (event) => {
-      if (event.candidate) socket.emit('signal', { to: peerId, from: socket.id!, signal: { candidate: event.candidate } });
+    pc.onicecandidate = ({ candidate }) => {
+      if (candidate) socket.emit('signal', { to: peerId, from: socket.id!, signal: { candidate } });
     };
-    pc.ontrack = (event) => {
-      const incomingStream = event.streams[0];
+
+    pc.ontrack = ({ track }) => {
+      console.log(`[WebRTC] ontrack peer=${peerId.slice(0,6)} kind=${track.kind} readyState=${track.readyState} muted=${track.muted}`);
       setRemoteStreams(prev => {
-        const existingStream = prev[peerId];
-        if (existingStream) {
-          // Check if we actually need to add any new tracks
-          const newTracks = incomingStream.getTracks().filter(
-            incoming => !existingStream.getTracks().find(existing => existing.id === incoming.id)
-          );
-          
-          if (newTracks.length > 0) {
-            // Create a NEW stream object containing all tracks to trigger React re-renders properly
-            const mergedStream = new MediaStream([...existingStream.getTracks(), ...newTracks]);
-            return { ...prev, [peerId]: mergedStream };
-          }
-          return prev;
-        }
-        return { ...prev, [peerId]: incomingStream };
+        const existing = prev[peerId] || new MediaStream();
+        // Replace any existing track of the same kind rather than accumulating.
+        // Accumulated stale tracks cause hasVideo to return true for ended tracks,
+        // and the video element gets confused about which track to render.
+        const otherTracks = existing.getTracks().filter(t => t.kind !== track.kind);
+        const next = new MediaStream([...otherTracks, track]);
+        return { ...prev, [peerId]: next };
       });
 
-      // Cleanup and re-render when a track is removed or ends
-      event.track.onended = () => {
+      track.onended = () => {
+        console.log(`[WebRTC] track ended peer=${peerId.slice(0,6)} kind=${track.kind}`);
         setRemoteStreams(prev => {
-          const stream = prev[peerId];
-          if (stream) {
-            const activeTracks = stream.getTracks().filter(t => t.readyState !== 'ended');
-            if (activeTracks.length === 0) {
-              const newRemoteStreams = { ...prev };
-              delete newRemoteStreams[peerId];
-              return newRemoteStreams;
-            }
-            // Create new stream without the ended track
-            return { ...prev, [peerId]: new MediaStream(activeTracks) };
-          }
-          return prev;
+          const st = prev[peerId];
+          if (!st) return prev;
+          const active = st.getTracks().filter(t => t !== track);
+          if (active.length === 0) { const n = { ...prev }; delete n[peerId]; return n; }
+          return { ...prev, [peerId]: new MediaStream(active) };
         });
       };
-      
-      if (incomingStream.getAudioTracks().length > 0) {
-        setupSpeakingDetection(incomingStream, peerId);
+
+      if (track.kind === 'audio') {
+        const audioStream = new MediaStream([track]);
+        const init = () => setupSpeakingDetection(audioStream, peerId);
+        track.onunmute = init;
+        if (!track.muted) init();
       }
     };
+
     pc.onnegotiationneeded = async () => {
+      const meta = peerMetaRef.current[peerId];
+      if (!meta) return;
+      console.log(`[WebRTC] onnegotiationneeded peer=${peerId.slice(0,6)} sigState=${pc.signalingState} makingOffer=${meta.makingOffer}`);
       try {
-        const offer = await pc.createOffer();
-        await pc.setLocalDescription(offer);
-        socket.emit('signal', { to: peerId, from: socket.id!, signal: { sdp: offer } });
-      } catch (err) { console.error('Negotiation error', err); }
+        meta.makingOffer = true;
+        await pc.setLocalDescription(); // browser auto-creates offer
+        console.log(`[WebRTC] offer sent to peer=${peerId.slice(0,6)}`);
+        socket.emit('signal', { to: peerId, from: socket.id!, signal: { sdp: pc.localDescription } });
+      } catch (err) {
+        console.error('onnegotiationneeded error', err);
+      } finally {
+        meta.makingOffer = false;
+      }
     };
+
+    pc.oniceconnectionstatechange = () => {
+      console.log(`[WebRTC] ICE state peer=${peerId.slice(0,6)} => ${pc.iceConnectionState}`);
+      if (pc.iceConnectionState === 'failed' || pc.iceConnectionState === 'closed') {
+        console.log(`[WebRTC] ICE ${pc.iceConnectionState} — destroying and recreating peer=${peerId.slice(0,6)}`);
+        destroyPeer(peerId);
+        createPeerRef.current(peerId);
+      }
+    };
+
     return pc;
   };
 
-  // Cleanup stale peer connections when players disconnect or leave
+  // Stable ref so the signal handler never captures a stale createPeer closure
+  const createPeerRef = useRef(createPeer);
+  createPeerRef.current = createPeer;
+
+  // ── Cleanup: destroy peers for players who left / disconnected / rejoined ──
   useEffect(() => {
+    if (!socket.id) return;
+    const activeIds = new Set(
+      gameState.players
+        .filter(p => p.id !== socket.id && !p.isDisconnected && !p.isAI)
+        .map(p => p.id)
+    );
     Object.keys(peersRef.current).forEach(peerId => {
-      if (peerId === socket.id) return;
-      const player = gameState.players.find(p => p.id === peerId);
-      if (!player || player.isDisconnected) {
-        const pc = peersRef.current[peerId];
-        if (pc) {
-          try { pc.close(); } catch (e) { }
-          delete peersRef.current[peerId];
-          setRemoteStreams(prev => {
-            const next = { ...prev }; delete next[peerId]; return next;
-          });
-        }
-      }
+      if (!activeIds.has(peerId)) destroyPeer(peerId);
     });
   }, [gameState.players, socket.id]);
 
-  // Deterministic Initiation Mesh
+  // ── Mesh: ensure a peer connection exists for every active player ──────────
   useEffect(() => {
     if (!socket.id) return;
     gameState.players.forEach(p => {
       if (p.id === socket.id || p.isDisconnected || p.isAI) return;
-      if (!peersRef.current[p.id]) {
-        // Deterministic: lexicographically smaller ID initiates
-        if (socket.id! < p.id) {
-          createPeer(p.id, true);
-        }
-      }
+      createPeerRef.current(p.id);
     });
   }, [gameState.players, socket.id]);
 
+  // ── Signal handler (perfect negotiation) ──────────────────────────────────
   useEffect(() => {
     const handleSignal = async ({ from, signal }: { from: string; signal: any }) => {
-      let pc = peersRef.current[from];
-      if (!pc) pc = createPeer(from, false);
+      const pc = peersRef.current[from] ?? createPeerRef.current(from);
+      const meta = peerMetaRef.current[from];
+      if (!meta) return;
+
       try {
         if (signal.sdp) {
+          console.log(`[WebRTC] signal sdp type=${signal.sdp.type} from=${from.slice(0,6)} | sigState=${pc.signalingState} makingOffer=${meta.makingOffer} polite=${meta.polite}`);
+          const offerCollision =
+            signal.sdp.type === 'offer' &&
+            (meta.makingOffer || pc.signalingState !== 'stable');
+
+          const ignoreOffer = !meta.polite && offerCollision;
+          if (ignoreOffer) { console.log(`[WebRTC] ignoring offer (impolite collision)`); return; }
+
+          if (offerCollision) {
+            console.log(`[WebRTC] rollback (polite collision)`);
+            await pc.setLocalDescription({ type: 'rollback' });
+          }
+
           await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
+
           if (signal.sdp.type === 'offer') {
-            const answer = await pc.createAnswer();
-            await pc.setLocalDescription(answer);
-            socket.emit('signal', { to: from, from: socket.id!, signal: { sdp: answer } });
+            await pc.setLocalDescription(); // auto-creates answer
+            console.log(`[WebRTC] answer sent to from=${from.slice(0,6)}`);
+            socket.emit('signal', { to: from, from: socket.id!, signal: { sdp: pc.localDescription } });
           }
         } else if (signal.candidate) {
-          await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
+          try {
+            await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
+          } catch (e) {
+            if (!meta.makingOffer) console.error('ICE error', e);
+          }
         }
-      } catch (e) { console.error('Signal error:', e); }
+      } catch (e) {
+        console.error('Signal error:', e);
+      }
     };
 
     socket.on('signal', handleSignal);
     return () => { socket.off('signal', handleSignal); };
   }, []);
 
+  // ── Media toggle ───────────────────────────────────────────────────────────
   useEffect(() => {
     if (me && !me.isAlive) {
       setIsVoiceActive(false);
@@ -588,54 +673,62 @@ export const GameRoom = ({
     }
   }, [isVoiceActive, isVideoActive, localStream]);
 
-  const localStreamRef = useRef<MediaStream | null>(null);
-
   useEffect(() => {
     localStreamRef.current = localStream;
   }, [localStream]);
 
   useEffect(() => {
     socket.emit('updateMediaState', { isMicOn: isVoiceActive, isCamOn: isVideoActive });
-    
+
     if (isVoiceActive || isVideoActive) {
+      console.log(`[WebRTC] getUserMedia audio=${isVoiceActive} video=${isVideoActive}`);
       navigator.mediaDevices.getUserMedia({ audio: isVoiceActive, video: isVideoActive })
-        .then(async stream => {
-          if (localStreamRef.current) {
-            localStreamRef.current.getTracks().forEach(t => t.stop());
-          }
+        .then(stream => {
+          const oldStream = localStreamRef.current;
+          console.log(`[WebRTC] got stream tracks=${stream.getTracks().map(t => t.kind).join(',')} | hadStream=${!!oldStream} | peers=${Object.keys(peersRef.current).length}`);
+
+          // Sync ref immediately before peer operations
+          localStreamRef.current = stream;
           setLocalStream(stream);
-          
-          Object.keys(peersRef.current).forEach(peerId => {
-            const pc = peersRef.current[peerId];
-            if (!pc) return;
-            
-            const transceivers = pc.getTransceivers();
-            const audioTrack = stream.getAudioTracks()[0];
-            const videoTrack = stream.getVideoTracks()[0];
 
-            // Update transceivers with new tracks (no negotiation needed if already sendrecv)
-            const audioTrans = transceivers.find(t => t.receiver.track.kind === 'audio');
-            if (audioTrans) audioTrans.sender.replaceTrack(audioTrack || null);
-
-            const videoTrans = transceivers.find(t => t.receiver.track.kind === 'video');
-            if (videoTrans) videoTrans.sender.replaceTrack(videoTrack || null);
+          Object.entries(peersRef.current).forEach(([peerId, pc]) => {
+            stream.getTracks().forEach(track => {
+              const existingSender = pc.getSenders().find(s => s.track?.kind === track.kind);
+              if (existingSender) {
+                // Sender already exists with a live track — just swap to the new track.
+                console.log(`[WebRTC] replaceTrack kind=${track.kind} peer=${peerId.slice(0,6)}`);
+                existingSender.replaceTrack(track);
+                senderKindMap.current.set(existingSender, track.kind);
+              } else {
+                // No sender for this kind — fresh addTrack fires onnegotiationneeded.
+                console.log(`[WebRTC] addTrack kind=${track.kind} peer=${peerId.slice(0,6)}`);
+                addTrackToPeer(pc, track, stream);
+              }
+            });
           });
+
+          // Stop old tracks AFTER new ones are in place
+          if (oldStream) oldStream.getTracks().forEach(t => t.stop());
         })
-        .catch(err => { 
-          console.error('Media error:', err); 
-          setIsVoiceActive(false); 
-          setIsVideoActive(false); 
+        .catch(err => {
+          console.error('Media error:', err);
+          setIsVoiceActive(false);
+          setIsVideoActive(false);
         });
     } else if (localStream) {
-      localStream.getTracks().forEach(track => track.stop());
+      console.log(`[WebRTC] turning off media — removing our senders, keeping peer connections alive | peers=${Object.keys(peersRef.current).length}`);
+      localStream.getTracks().forEach(t => t.stop());
+      localStreamRef.current = null;
       setLocalStream(null);
-      Object.keys(peersRef.current).forEach(peerId => {
-        const pc = peersRef.current[peerId];
-        if (pc) {
-          pc.getTransceivers().forEach(t => {
-            try { t.sender.replaceTrack(null); } catch (e) { }
-          });
-        }
+      // Only remove OUR senders from each PC — do NOT destroy the peer connection.
+      // Destroying the PC would wipe remoteStreams and we'd lose the other player's
+      // video feed. By just removing our senders, the inbound tracks (their video)
+      // stay intact. On re-enable, addTrackToPeer removes any stale null senders
+      // before calling addTrack, so the PC stays clean.
+      Object.values(peersRef.current).forEach(pc => {
+        pc.getSenders().forEach(s => {
+          try { pc.removeTrack(s); } catch (e) { }
+        });
       });
     }
   }, [isVoiceActive, isVideoActive]);
@@ -643,7 +736,7 @@ export const GameRoom = ({
   useEffect(() => {
     return () => {
       if (localStreamRef.current) {
-        localStreamRef.current.getTracks().forEach(track => track.stop());
+        localStreamRef.current.getTracks().forEach(t => t.stop());
       }
     };
   }, []);

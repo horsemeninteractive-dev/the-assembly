@@ -165,15 +165,16 @@ export default function App() {
   }, []);
 
   // Discord activity — ensure socket disconnects when the iframe is truly hidden or unloaded.
-  // We remove the focus-based visibilitychange listener as it causes immediate boots on mobile/desktop backgrounding.
+  // We remove the focus-based visibilitychange and pagehide listeners as they cause immediate boots on mobile/desktop backgrounding.
+  // Using beforeunload ensures we only disconnect when the user actually closes the tab or app.
   useEffect(() => {
     const handleUnload = () => {
       socket.emit('leaveRoom');
       socket.disconnect();
     };
-    window.addEventListener('pagehide', handleUnload);
+    window.addEventListener('beforeunload', handleUnload);
     return () => {
-      window.removeEventListener('pagehide', handleUnload);
+      window.removeEventListener('beforeunload', handleUnload);
     };
   }, []);
 

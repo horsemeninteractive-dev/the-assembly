@@ -22,6 +22,8 @@ async function startServer() {
 
   const httpServer = createServer(app);
   const io = new Server(httpServer, {
+    pingTimeout: 60000,
+    pingInterval: 25000,
     cors: {
       origin: "*",
       methods: ["GET", "POST"]
@@ -955,6 +957,10 @@ async function startServer() {
         }
       }
     }));
+
+    app.get('/version', (req, res) => {
+      res.json({ version: 'v0.9.7' });
+    });
 
     app.get("*", (_req, res) => {
       // Set no-cache for index.html as well (fallback route)

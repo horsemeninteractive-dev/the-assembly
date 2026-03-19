@@ -1647,7 +1647,7 @@ export class GameEngine {
       this.broadcastState(roomId);
     }
   }
-\n
+
   handlePauseTimeout(roomId: string): void {
     const state = this.rooms.get(roomId);
     if (!state || !state.isPaused) return;
