@@ -273,6 +273,7 @@ export interface GameState {
   isPaused?: boolean;
   pauseReason?: string;
   pauseTimer?: number;
+  lobbyPauseTimer?: number;
   disconnectedPlayerId?: string;
   titlePrompt?: {
     playerId: string;

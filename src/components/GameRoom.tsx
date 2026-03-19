@@ -456,7 +456,16 @@ export const GameRoom = ({
     if (peersRef.current[peerId]) return peersRef.current[peerId];
     const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
     peersRef.current[peerId] = pc;
-    if (localStreamRef.current) localStreamRef.current.getTracks().forEach(track => pc.addTrack(track, localStreamRef.current!));
+    
+    // Pre-allocate transceivers for audio and video to avoid constant re-negotiation
+    if (pc.addTransceiver) {
+      pc.addTransceiver('audio', { direction: 'sendrecv' });
+      pc.addTransceiver('video', { direction: 'sendrecv' });
+    } else {
+      if (localStreamRef.current) {
+        localStreamRef.current.getTracks().forEach(track => pc.addTrack(track, localStreamRef.current!));
+      }
+    }
     pc.onicecandidate = (event) => {
       if (event.candidate) socket.emit('signal', { to: peerId, from: socket.id!, signal: { candidate: event.candidate } });
     };
@@ -516,34 +525,38 @@ export const GameRoom = ({
   useEffect(() => {
     Object.keys(peersRef.current).forEach(peerId => {
       if (peerId === socket.id) return;
-      
       const player = gameState.players.find(p => p.id === peerId);
       if (!player || player.isDisconnected) {
-        console.log('Cleaning up peer connection for:', peerId);
         const pc = peersRef.current[peerId];
         if (pc) {
-          try {
-            pc.close();
-          } catch (e) {
-            console.error('Error closing peer connection:', e);
-          }
+          try { pc.close(); } catch (e) { }
           delete peersRef.current[peerId];
           setRemoteStreams(prev => {
-            if (!prev[peerId]) return prev;
-            const next = { ...prev };
-            delete next[peerId];
-            return next;
+            const next = { ...prev }; delete next[peerId]; return next;
           });
         }
       }
     });
   }, [gameState.players, socket.id]);
 
+  // Deterministic Initiation Mesh
   useEffect(() => {
-    socket.on('signal', async ({ from, signal }) => {
+    if (!socket.id) return;
+    gameState.players.forEach(p => {
+      if (p.id === socket.id || p.isDisconnected || p.isAI) return;
+      if (!peersRef.current[p.id]) {
+        // Deterministic: lexicographically smaller ID initiates
+        if (socket.id! < p.id) {
+          createPeer(p.id, true);
+        }
+      }
+    });
+  }, [gameState.players, socket.id]);
+
+  useEffect(() => {
+    const handleSignal = async ({ from, signal }: { from: string; signal: any }) => {
       let pc = peersRef.current[from];
       if (!pc) pc = createPeer(from, false);
-      
       try {
         if (signal.sdp) {
           await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
@@ -555,31 +568,12 @@ export const GameRoom = ({
         } else if (signal.candidate) {
           await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
         }
-      } catch (e) {
-        console.error('Signal handling error:', e);
-      }
-    });
-
-    socket.on('peerJoined', (peerId) => {
-      console.log('Peer joined:', peerId);
-      // Always force-close old connection so a rejoin gets a clean handshake
-      if (peersRef.current[peerId]) {
-        peersRef.current[peerId].close();
-        delete peersRef.current[peerId];
-        setRemoteStreams(prev => {
-          const n = { ...prev };
-          delete n[peerId];
-          return n;
-        });
-      }
-      createPeer(peerId, true);
-    });
-
-    return () => {
-      socket.off('signal');
-      socket.off('peerJoined');
+      } catch (e) { console.error('Signal error:', e); }
     };
-  }, []); // Remove localStream dependency to keep listeners stable
+
+    socket.on('signal', handleSignal);
+    return () => { socket.off('signal', handleSignal); };
+  }, []);
 
   useEffect(() => {
     if (me && !me.isAlive) {
@@ -606,21 +600,25 @@ export const GameRoom = ({
     if (isVoiceActive || isVideoActive) {
       navigator.mediaDevices.getUserMedia({ audio: isVoiceActive, video: isVideoActive })
         .then(async stream => {
+          if (localStreamRef.current) {
+            localStreamRef.current.getTracks().forEach(t => t.stop());
+          }
           setLocalStream(stream);
           
-          // Update all active peer connections with new tracks
           Object.keys(peersRef.current).forEach(peerId => {
             const pc = peersRef.current[peerId];
-            const senders = pc.getSenders();
+            if (!pc) return;
             
-            stream.getTracks().forEach(track => {
-              const sender = senders.find(s => s.track?.kind === track.kind);
-              if (sender) {
-                sender.replaceTrack(track);
-              } else {
-                pc.addTrack(track, stream);
-              }
-            });
+            const transceivers = pc.getTransceivers();
+            const audioTrack = stream.getAudioTracks()[0];
+            const videoTrack = stream.getVideoTracks()[0];
+
+            // Update transceivers with new tracks (no negotiation needed if already sendrecv)
+            const audioTrans = transceivers.find(t => t.receiver.track.kind === 'audio');
+            if (audioTrans) audioTrans.sender.replaceTrack(audioTrack || null);
+
+            const videoTrans = transceivers.find(t => t.receiver.track.kind === 'video');
+            if (videoTrans) videoTrans.sender.replaceTrack(videoTrack || null);
           });
         })
         .catch(err => { 
@@ -628,23 +626,17 @@ export const GameRoom = ({
           setIsVoiceActive(false); 
           setIsVideoActive(false); 
         });
-    } else {
-      if (localStream) {
-        localStream.getTracks().forEach(track => track.stop());
-        setLocalStream(null);
-        // Use replaceTrack(null) NOT removeTrack — keeping the sender alive
-        // is critical so that re-enabling can do replaceTrack without addTrack chaos.
-        Object.keys(peersRef.current).forEach(peerId => {
-          const pc = peersRef.current[peerId];
-          pc.getSenders().forEach(sender => {
-            try {
-              sender.replaceTrack(null);
-            } catch (e) {
-              console.warn('Error nulling track:', e);
-            }
+    } else if (localStream) {
+      localStream.getTracks().forEach(track => track.stop());
+      setLocalStream(null);
+      Object.keys(peersRef.current).forEach(peerId => {
+        const pc = peersRef.current[peerId];
+        if (pc) {
+          pc.getTransceivers().forEach(t => {
+            try { t.sender.replaceTrack(null); } catch (e) { }
           });
-        });
-      }
+        }
+      });
     }
   }, [isVoiceActive, isVideoActive]);
 

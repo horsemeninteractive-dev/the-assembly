@@ -164,24 +164,16 @@ export default function App() {
     init();
   }, []);
 
-  // Discord activity — ensure socket disconnects when the iframe is hidden or unloaded.
-  // pagehide is more reliable than beforeunload inside an embedded iframe.
+  // Discord activity — ensure socket disconnects when the iframe is truly hidden or unloaded.
+  // We remove the focus-based visibilitychange listener as it causes immediate boots on mobile/desktop backgrounding.
   useEffect(() => {
-    const handleHide = () => {
+    const handleUnload = () => {
       socket.emit('leaveRoom');
       socket.disconnect();
     };
-    const handleVisibility = () => {
-      if (document.visibilityState === 'hidden') {
-        socket.emit('leaveRoom');
-        socket.disconnect();
-      }
-    };
-    window.addEventListener('pagehide', handleHide);
-    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('pagehide', handleUnload);
     return () => {
-      window.removeEventListener('pagehide', handleHide);
-      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('pagehide', handleUnload);
     };
   }, []);
 
