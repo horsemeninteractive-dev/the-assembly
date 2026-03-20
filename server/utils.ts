@@ -1,4 +1,4 @@
-import { Policy } from "../src/types.ts";
+import { Policy } from "../src/types";
 
 export function shuffle<T>(array: T[]): T[] {
   for (let i = array.length - 1; i > 0; i--) {

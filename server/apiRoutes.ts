@@ -1,12 +1,12 @@
 import { Express, Request, Response } from "express";
 import { Server } from "socket.io";
 import { randomUUID } from "crypto";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
+import * as bcrypt from "bcryptjs";
+import * as jwt from "jsonwebtoken";
 import axios from "axios";
-import { GameEngine } from "./gameEngine.ts";
-import { GameState, RoomInfo } from "../src/types.ts";
-import { DEFAULT_ITEMS } from "../src/constants.ts";
+import { GameEngine } from "./gameEngine";
+import { GameState, RoomInfo } from "../src/types";
+import { DEFAULT_ITEMS } from "../src/constants";
 import {
   getUser,
   getUserById,
@@ -24,7 +24,7 @@ import {
   getMatchHistory,
   getPendingFriendRequests,
   searchUsers,
-} from "./supabaseService.ts";
+} from "./supabaseService";
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new Error("JWT_SECRET env variable is not set");
@@ -190,6 +190,35 @@ export function registerRoutes(
       user.claimedRewards.push(rewardId);
       await saveUser(user);
       const { password: _, ...safe } = user;
+      res.json({ user: safe });
+    } catch (_) {
+      res.status(401).json({ error: "Invalid token" });
+    }
+  });
+
+  // Pin/unpin achievements — body: { pinnedAchievements: string[] } (max 3 IDs)
+  app.post("/api/achievements/pin", async (req: Request, res: Response) => {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ error: "No token" });
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const user = await getUser(decoded.username);
+      if (!user) return res.status(404).json({ error: "User not found" });
+
+      const { pinnedAchievements } = req.body;
+      if (!Array.isArray(pinnedAchievements) || pinnedAchievements.length > 3) {
+        return res.status(400).json({ error: "pinnedAchievements must be an array of up to 3 IDs" });
+      }
+
+      // Verify each ID is actually earned by this user
+      const earned = new Set((user.earnedAchievements ?? []).map((a: any) =>
+        typeof a === "string" ? a : a.id
+      ));
+      const valid = pinnedAchievements.filter((id: string) => earned.has(id)).slice(0, 3);
+
+      user.pinnedAchievements = valid;
+      await saveUser(user);
+      const { password: _pw, ...safe } = user;
       res.json({ user: safe });
     } catch (_) {
       res.status(401).json({ error: "Invalid token" });

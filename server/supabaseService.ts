@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
-import { supabase, isSupabaseConfigured } from "../src/lib/supabase.ts";
-import { supabaseAdmin, isSupabaseAdminConfigured } from "./supabaseAdmin.ts";
-import { User, UserInternal } from "../src/types.ts";
+import { supabase, isSupabaseConfigured } from "../src/lib/supabase";
+import { supabaseAdmin, isSupabaseAdminConfigured } from "./supabaseAdmin";
+import { User, UserInternal } from "../src/types";
 
 // Use admin client if available, fallback to regular client
 const db = isSupabaseAdminConfigured ? supabaseAdmin : supabase;
@@ -46,6 +46,8 @@ function mapSupabaseToUser(data: any): UserInternal {
     activeBackground:  data.active_background,
     cabinetPoints:     data.cabinet_points,
     claimedRewards:    data.claimed_rewards || [],
+    earnedAchievements: data.earned_achievements || [],
+    pinnedAchievements: data.pinned_achievements || [],
     googleId:          data.google_id,
     discordId:         data.discord_id,
   };
@@ -65,7 +67,9 @@ function mapUserToSupabase(userData: UserInternal): any {
     active_sound:     userData.activeSoundPack,
     active_background:userData.activeBackground,
     cabinet_points:   userData.cabinetPoints,
-    claimed_rewards:  userData.claimedRewards,
+    claimed_rewards:        userData.claimedRewards,
+    earned_achievements:    userData.earnedAchievements || [],
+    pinned_achievements:    userData.pinnedAchievements || [],
     google_id:        userData.googleId,
     discord_id:       userData.discordId,
     stats:            userData.stats,
@@ -392,9 +396,14 @@ export function makeNewUser(overrides: Partial<any> = {}): any {
       points:       0,
       xp:           0,
       agendasCompleted: 0,
+      civilWins:    0,
+      stateWins:    0,
+      overseerWins: 0,
     },
     cabinetPoints: 0,
     claimedRewards: [],
+    earnedAchievements: [],
+    pinnedAchievements: [],
     ownedCosmetics: ['music-ambient'],
     ...overrides,
   };

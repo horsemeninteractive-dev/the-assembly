@@ -1,11 +1,12 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Scroll, Target, CheckCircle, XCircle, TrendingUp, TrendingDown, Minus, Trophy, Zap, Coins } from 'lucide-react';
+import { Scroll, Target, CheckCircle, XCircle, TrendingUp, TrendingDown, Minus, Trophy, Zap, Coins, Medal } from 'lucide-react';
 import { GameState, PrivateInfo, PostMatchResult } from '../../../types';
 import { cn, getProxiedUrl } from '../../../lib/utils';
 import { OverseerIcon } from '../../icons';
 import { getLevelFromXp, getXpForNextLevel, getXpInCurrentLevel } from '../../../lib/xp';
 import { getRankTier, getRankLabel } from '../../../lib/ranks';
+import { ACHIEVEMENT_MAP, AchievementDef } from '../../../lib/achievements';
 
 interface GameOverModalProps {
   gameState: GameState;
@@ -16,6 +17,12 @@ interface GameOverModalProps {
   onLeave: () => void;
   onOpenLog: () => void;
 }
+
+const TIER_COLOURS: Record<string, string> = {
+  Bronze: 'text-amber-600  border-amber-700/40  bg-amber-900/20',
+  Silver: 'text-slate-300  border-slate-500/40  bg-slate-800/30',
+  Gold:   'text-yellow-400 border-yellow-500/40 bg-yellow-900/20',
+};
 
 const EloChange = ({ change }: { change: number }) => {
   if (change === 0) return (
@@ -202,6 +209,41 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                   )}
                 </div>
               )}
+
+              {/* ── Newly unlocked achievements ─────────────────────── */}
+              {postMatchResult && postMatchResult.newAchievements.length > 0 && (() => {
+                const defs = postMatchResult.newAchievements
+                  .map(id => ACHIEVEMENT_MAP.get(id))
+                  .filter((d): d is AchievementDef => !!d);
+                return (
+                  <div className="rounded-xl border border-yellow-500/20 bg-yellow-900/10 p-[1.5vh] shrink-0">
+                    <div className="flex items-center gap-2 mb-2">
+                      <Medal className="w-[2vh] h-[2vh] text-yellow-400 shrink-0" />
+                      <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-yellow-400">
+                        Achievement{defs.length > 1 ? 's' : ''} Unlocked
+                      </span>
+                    </div>
+                    <div className="space-y-1.5">
+                      {defs.map(def => (
+                        <motion.div
+                          key={def.id}
+                          initial={{ opacity: 0, x: -8 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          className={cn(
+                            'flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg border text-[11px]',
+                            TIER_COLOURS[def.tier]
+                          )}
+                        >
+                          <span className="font-bold tracking-wide uppercase">{def.name}</span>
+                          <span className="text-faint ml-auto font-mono whitespace-nowrap">
+                            +{def.xpReward} XP · +{def.ipReward} IP
+                          </span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+                );
+              })()}
 
               {/* ── Identity reveal ─────────────────────────────────────── */}
               <div className="space-y-[2vh] flex-1 overflow-hidden flex flex-col">

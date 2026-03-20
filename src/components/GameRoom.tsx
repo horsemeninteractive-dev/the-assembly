@@ -691,7 +691,7 @@ export const GameRoom = ({
           localStreamRef.current = stream;
           setLocalStream(stream);
 
-          Object.entries(peersRef.current).forEach(([peerId, pc]) => {
+          (Object.entries(peersRef.current) as [string, RTCPeerConnection][]).forEach(([peerId, pc]) => {
             stream.getTracks().forEach(track => {
               const existingSender = pc.getSenders().find(s => s.track?.kind === track.kind);
               if (existingSender) {
@@ -725,7 +725,7 @@ export const GameRoom = ({
       // video feed. By just removing our senders, the inbound tracks (their video)
       // stay intact. On re-enable, addTrackToPeer removes any stale null senders
       // before calling addTrack, so the PC stays clean.
-      Object.values(peersRef.current).forEach(pc => {
+      (Object.values(peersRef.current) as RTCPeerConnection[]).forEach(pc => {
         pc.getSenders().forEach(s => {
           try { pc.removeTrack(s); } catch (e) { }
         });

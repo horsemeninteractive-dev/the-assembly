@@ -6,11 +6,11 @@ import { Server } from "socket.io";
 import { createServer as createViteServer } from "vite";
 import { randomUUID } from "crypto";
 
-import { GameState, Player } from "./src/types.ts";
-import { createDeck } from "./server/utils.ts";
-import { GameEngine } from "./server/gameEngine.ts";
-import { registerRoutes } from "./server/apiRoutes.ts";
-import { getUserById, sendFriendRequest, acceptFriendRequest, getFriends, isFriend } from "./server/supabaseService.ts";
+import { GameState, Player } from "./src/types";
+import { createDeck } from "./server/utils";
+import { GameEngine } from "./server/gameEngine";
+import { registerRoutes } from "./server/apiRoutes";
+import { getUserById, sendFriendRequest, acceptFriendRequest, getFriends, isFriend } from "./server/supabaseService";
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 

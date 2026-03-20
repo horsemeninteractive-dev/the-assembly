@@ -15,10 +15,10 @@ import { randomUUID } from "crypto";
 import { Server, Socket } from "socket.io";
 import {
   GameState, Player, Policy, ExecutiveAction, TitleRole, GamePhase,
-} from "../src/types.ts";
-import { shuffle, createDeck } from "./utils.ts";
-import { AI_BOTS, CHAT } from "./aiConstants.ts";
-import { getExecutiveAction, assignRoles } from "./gameRules.ts";
+} from "../src/types";
+import { shuffle, createDeck } from "./utils";
+import { AI_BOTS, CHAT } from "./aiConstants";
+import { getExecutiveAction, assignRoles } from "./gameRules";
 import {
   initializeSuspicion,
   getSuspicion,
@@ -29,15 +29,17 @@ import {
   updateSuspicionFromInvestigation,
   updateSuspicionFromNomination,
   updateSuspicionFromPolicyExpectation,
-} from "./suspicion.ts";
-import { getUserById, saveUser, saveMatchResult, incrementGlobalWin } from "./supabaseService.ts";
-import { calculateXpGain } from "../src/lib/xp.ts";
+} from "./suspicion";
+import { getUserById, saveUser, saveMatchResult, incrementGlobalWin } from "./supabaseService";
+import { calculateXpGain } from "../src/lib/xp";
+import { checkAchievements } from "./achievements";
+import { ACHIEVEMENT_MAP } from "../src/lib/achievements";
 import {
   assignPersonalAgendas,
   evaluateAllAgendas,
   getPlayerAgenda,
   AGENDA_MAP,
-} from "./personalAgendas.ts";
+} from "./personalAgendas";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -1449,6 +1451,13 @@ export class GameEngine {
       const won = (winningSide === "Civil" && p.role === "Civil") ||
                   (winningSide === "State"  && (p.role === "State" || p.role === "Overseer"));
 
+      // Track per-role wins (used by achievement evaluator)
+      if (won) {
+        if (p.role === "Civil")    user.stats.civilWins    = (user.stats.civilWins    ?? 0) + 1;
+        if (p.role === "State")    user.stats.stateWins    = (user.stats.stateWins    ?? 0) + 1;
+        if (p.role === "Overseer") user.stats.overseerWins = (user.stats.overseerWins ?? 0) + 1;
+      }
+
       const xpGain = calculateXpGain({ win: won, kills: p.role === "Overseer" ? p.stateEnactments || 0 : 0 });
       user.stats.xp += xpGain;
 
@@ -1476,6 +1485,26 @@ export class GameEngine {
         }
       }
 
+      // ── Achievements ────────────────────────────────────────────────────
+      const newAchievementIds = checkAchievements({ user, s, p, won, agendaCompleted });
+      let achievementXp = 0;
+      let achievementIp = 0;
+      if (newAchievementIds.length > 0) {
+        if (!user.earnedAchievements) user.earnedAchievements = [];
+        if (!user.pinnedAchievements) user.pinnedAchievements = [];
+        const now = new Date().toISOString();
+        for (const id of newAchievementIds) {
+          user.earnedAchievements.push({ id, earnedAt: now });
+          const def = ACHIEVEMENT_MAP.get(id);
+          if (def) {
+            achievementXp += def.xpReward;
+            achievementIp += def.ipReward;
+          }
+        }
+        user.stats.xp      += achievementXp;
+        user.cabinetPoints  = (user.cabinetPoints ?? 0) + achievementIp;
+      }
+
       const eloChange     = s.mode === "Ranked" ? (won ? 20 : -20) : 0;
       const eloAfter      = user.stats.elo;
       const eloBeforeCalc = eloAfter - eloChange;
@@ -1483,8 +1512,8 @@ export class GameEngine {
       const baseIp   = won
         ? (s.mode === "Ranked" ? 100 : 40)
         : (s.mode === "Ranked" ? 25  : 10);
-      const xpEarned = xpGain + (agendaCompleted ? 100 : 0);
-      const ipEarned = baseIp + (agendaCompleted ? (s.mode === "Ranked" ? 40 : 20) : 0);
+      const xpEarned = xpGain + (agendaCompleted ? 100 : 0) + achievementXp;
+      const ipEarned = baseIp + (agendaCompleted ? (s.mode === "Ranked" ? 40 : 20) : 0) + achievementIp;
 
       await saveUser(user);
       const { password: _, ...safe } = user;
@@ -1506,6 +1535,7 @@ export class GameEngine {
         rounds:           s.round,
         civilDirectives:  s.civilDirectives,
         stateDirectives:  s.stateDirectives,
+        newAchievements:  newAchievementIds,
       });
 
       // Save match history record

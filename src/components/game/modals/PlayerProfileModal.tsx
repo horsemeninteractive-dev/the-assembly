@@ -1,13 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import { motion } from 'motion/react';
-import { X, Trophy, User as UserIcon, UserPlus, UserMinus, Shield, Check, Zap } from 'lucide-react';
+import { X, Trophy, User as UserIcon, UserPlus, UserMinus, Shield, Check, Zap, Medal } from 'lucide-react';
 import { User } from '../../../types';
 import { cn, getProxiedUrl } from '../../../lib/utils';
 import { getFrameStyles } from '../../../lib/cosmetics';
 import { socket } from '../../../socket';
 import { getLevelFromXp } from '../../../lib/xp';
 import { getRankTier, getRankLabel } from '../../../lib/ranks';
+import { ACHIEVEMENT_MAP } from '../../../lib/achievements';
 
 interface PlayerProfileModalProps {
   userId: string;
@@ -154,6 +155,47 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ userId, 
             <StatCard label="Win Rate" value={`${winRate}%`} icon={<Check className="w-[1.5vh] h-[1.5vh]" />} />
             <StatCard label="Kills" icon={<Zap className="w-[1.5vh] h-[1.5vh] text-yellow-500" />} value={user.stats.kills} />
           </div>
+
+          {/* Pinned achievements — up to 3 slots */}
+          {(() => {
+            const TIER_COLOURS: Record<string, string> = {
+              Bronze: 'text-amber-600  border-amber-700/40  bg-amber-900/20',
+              Silver: 'text-slate-300  border-slate-500/40  bg-slate-800/30',
+              Gold:   'text-yellow-400 border-yellow-500/40 bg-yellow-900/20',
+            };
+            const pins = (user.pinnedAchievements ?? []).slice(0, 3);
+            const slots = [0, 1, 2];
+            return (
+              <div>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <Medal className="w-[1.5vh] h-[1.5vh] text-yellow-400" />
+                  <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-muted">Pinned Achievements</span>
+                </div>
+                <div className="space-y-1.5">
+                  {slots.map(i => {
+                    const id = pins[i];
+                    const def = id ? ACHIEVEMENT_MAP.get(id) : undefined;
+                    if (!def) {
+                      return (
+                        <div key={i} className="flex items-center gap-2 px-2.5 py-2 rounded-lg border border-dashed border-subtle text-faint text-[10px] font-mono">
+                          — empty slot —
+                        </div>
+                      );
+                    }
+                    return (
+                      <div
+                        key={id}
+                        className={cn('flex items-center gap-2 px-2.5 py-1.5 rounded-lg border text-[10px]', TIER_COLOURS[def.tier])}
+                      >
+                        <span className="font-bold tracking-wide uppercase flex-1">{def.name}</span>
+                        <span className="text-[9px] font-mono opacity-60 uppercase tracking-widest shrink-0">{def.tier}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })()}
 
           <button 
             onClick={toggleFriend}

@@ -63,6 +63,11 @@ export type GamePhase =
 export type ExecutiveAction = 'Investigate' | 'SpecialElection' | 'Execution' | 'PolicyPeek' | 'None';
 export type GameMode = 'Casual' | 'Ranked';
 
+export interface Achievement {
+  id: string;
+  earnedAt: string; // ISO timestamp
+}
+
 export interface UserStats {
   gamesPlayed: number;
   wins: number;
@@ -76,6 +81,9 @@ export interface UserStats {
   points: number;
   xp: number;
   agendasCompleted: number;
+  civilWins: number;
+  stateWins: number;
+  overseerWins: number;
 }
 
 export interface MatchSummary {
@@ -114,6 +122,7 @@ export interface PostMatchResult {
   rounds: number;
   civilDirectives: number;
   stateDirectives: number;
+  newAchievements: string[]; // IDs of achievements earned this game
 }
 
 export interface CosmeticItem {
@@ -140,6 +149,8 @@ export interface User {
   activeBackground?: string;
   cabinetPoints: number;
   claimedRewards: string[];
+  earnedAchievements: Achievement[];
+  pinnedAchievements: string[]; // up to 3 achievement IDs
 }
 
 export interface UserInternal extends User {
