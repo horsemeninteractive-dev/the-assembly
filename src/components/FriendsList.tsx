@@ -1,13 +1,13 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { socket } from '../socket';
-import { User } from '../types';
+import { User, RecentlyPlayedEntry } from '../types';
 import { cn, getProxiedUrl } from '../lib/utils';
 import { getFrameStyles } from '../lib/cosmetics';
 import { getLevelFromXp } from '../lib/xp';
 import { getRankTier, getRankLabel } from '../lib/ranks';
 import {
   UserPlus, Users, Gamepad2, UserMinus, Search, Check,
-  X, Clock, ChevronRight,
+  X, Clock, ChevronRight, History,
 } from 'lucide-react';
 
 interface FriendsListProps {
@@ -86,6 +86,9 @@ export const FriendsList: React.FC<FriendsListProps> = ({
   const [searchLoading, setSearchLoading] = useState(false);
   const [sentRequests, setSentRequests] = useState<Set<string>>(new Set());
   const [activeSection, setActiveSection] = useState<'friends' | 'search'>('friends');
+  const [recentlyPlayed, setRecentlyPlayed] = useState<RecentlyPlayedEntry[]>(
+    user.recentlyPlayedWith ?? []
+  );
   const searchDebounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const fetchAll = async () => {
@@ -120,9 +123,15 @@ export const FriendsList: React.FC<FriendsListProps> = ({
         f.id === userId ? { ...f, isOnline, currentRoomId: isOnline ? fRoomId : undefined } : f
       ));
     });
+    socket.on('userUpdate', (updatedUser: User) => {
+      if (updatedUser.id === user.id && updatedUser.recentlyPlayedWith) {
+        setRecentlyPlayed(updatedUser.recentlyPlayedWith);
+      }
+    });
     return () => {
       socket.off('friendRequestAccepted');
       socket.off('userStatusChanged');
+      socket.off('userUpdate');
     };
   }, [token]);
 
@@ -383,6 +392,77 @@ export const FriendsList: React.FC<FriendsListProps> = ({
               )}
             </>
           )}
+
+          {/* Recently played with */}
+          {recentlyPlayed.length > 0 && (
+            <div className="space-y-2">
+              <div className="text-[10px] font-mono uppercase tracking-widest text-faint flex items-center gap-2">
+                <History className="w-3 h-3" />
+                Recently Played With
+              </div>
+              {recentlyPlayed.slice(0, 5).map(entry => {
+                const isFriendAlready = friends.some(f => f.id === entry.userId);
+                const alreadySent = sentRequests.has(entry.userId);
+                const timeAgo = (() => {
+                  const diff = Date.now() - new Date(entry.lastPlayedAt).getTime();
+                  const mins  = Math.floor(diff / 60000);
+                  const hours = Math.floor(diff / 3600000);
+                  const days  = Math.floor(diff / 86400000);
+                  if (mins  < 60)  return `${mins}m ago`;
+                  if (hours < 24)  return `${hours}h ago`;
+                  return `${days}d ago`;
+                })();
+
+                return (
+                  <div
+                    key={entry.userId}
+                    className="flex items-center gap-3 p-3 bg-elevated rounded-2xl border border-subtle hover:border-default transition-colors"
+                  >
+                    <div className="relative shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-card border border-default overflow-hidden relative">
+                        {entry.avatarUrl
+                          ? <img src={getProxiedUrl(entry.avatarUrl)} alt={entry.username} className="w-full h-full object-cover" />
+                          : <div className="w-full h-full flex items-center justify-center text-faint text-sm font-mono">{entry.username.charAt(0).toUpperCase()}</div>}
+                        {entry.activeFrame && (
+                          <div className={cn('absolute inset-0 rounded-xl pointer-events-none', getFrameStyles(entry.activeFrame))} />
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-2">
+                        <span className="font-mono text-sm text-primary truncate">{entry.username}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <span className="text-[10px] leading-none">{getRankTier(entry.elo).icon}</span>
+                        <span className={cn('text-[10px] font-mono', getRankTier(entry.elo).color)}>
+                          {getRankLabel(entry.elo)}
+                        </span>
+                        <span className="text-[10px] font-mono text-faint">· {timeAgo}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1 shrink-0">
+                      {isFriendAlready ? (
+                        <span className="text-[10px] text-emerald-400 font-mono uppercase tracking-widest px-2">Friends</span>
+                      ) : alreadySent ? (
+                        <span className="text-[10px] text-faint font-mono uppercase tracking-widest px-2 flex items-center gap-1">
+                          <Clock className="w-3 h-3" /> Sent
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => sendRequest(entry.userId)}
+                          className="p-2 rounded-lg bg-card hover:bg-red-900/30 text-muted hover:text-red-400 transition-colors border border-default hover:border-red-900/50"
+                          title="Send friend request"
+                        >
+                          <UserPlus className="w-4 h-4" />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+
         </div>
       )}
     </div>

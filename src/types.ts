@@ -68,6 +68,15 @@ export interface Achievement {
   earnedAt: string; // ISO timestamp
 }
 
+export interface RecentlyPlayedEntry {
+  userId: string;
+  username: string;
+  avatarUrl?: string;
+  activeFrame?: string;
+  elo: number;
+  lastPlayedAt: string; // ISO timestamp
+}
+
 export interface UserStats {
   gamesPlayed: number;
   wins: number;
@@ -151,6 +160,7 @@ export interface User {
   claimedRewards: string[];
   earnedAchievements: Achievement[];
   pinnedAchievements: string[]; // up to 3 achievement IDs
+  recentlyPlayedWith: RecentlyPlayedEntry[]; // up to 20 entries, most recent first
 }
 
 export interface UserInternal extends User {

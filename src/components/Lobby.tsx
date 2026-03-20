@@ -145,7 +145,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
 
   return (
     <div
-      className="flex-1 w-full text-primary font-sans flex flex-col"
+      className="flex-1 w-full text-primary font-sans flex flex-col overflow-y-auto custom-scrollbar"
     >
       {/* Header */}
       <header className="h-[8vh] sm:h-[10vh] border-b border-subtle bg-surface-glass px-[4vw] flex items-center justify-between sticky top-0 z-50">
@@ -156,7 +156,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
           <div className="min-w-0">
             <div className="flex items-baseline gap-2">
               <h1 className="text-responsive-sm sm:text-responsive-xl font-thematic text-primary tracking-wide leading-none truncate">The Assembly</h1>
-              <span className="text-[8px] font-mono text-red-500/60 border border-red-900/40 rounded px-1 py-0.5 leading-none shrink-0">v0.9.7</span>
+              <span className="text-[8px] font-mono text-red-500/60 border border-red-900/40 rounded px-1 py-0.5 leading-none shrink-0">v0.9.8</span>
             </div>
             <p className="text-responsive-xs uppercase tracking-widest text-muted font-mono mt-0.5">Assembly Lobby</p>
           </div>

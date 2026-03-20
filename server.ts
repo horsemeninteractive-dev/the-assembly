@@ -959,7 +959,7 @@ async function startServer() {
     }));
 
     app.get('/version', (req, res) => {
-      res.json({ version: 'v0.9.7' });
+      res.json({ version: 'v0.9.8' });
     });
 
     app.get("*", (_req, res) => {

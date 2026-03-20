@@ -14,15 +14,10 @@
 import { randomUUID } from "crypto";
 import { Server, Socket } from "socket.io";
 import {
-  GameState,
-  Player,
-  Policy,
-  TitleRole,
-  ExecutiveAction,
-  RoomInfo,
-  GamePhase,
+  GameState, Player, Policy, ExecutiveAction, TitleRole, GamePhase,
 } from "../src/types.ts";
-import { createDeck, shuffle } from "./utils.ts";
+import { shuffle, createDeck } from "./utils.ts";
+import { AI_BOTS, CHAT } from "./aiConstants.ts";
 import { getExecutiveAction, assignRoles } from "./gameRules.ts";
 import {
   initializeSuspicion,
@@ -35,7 +30,6 @@ import {
   updateSuspicionFromNomination,
   updateSuspicionFromPolicyExpectation,
 } from "./suspicion.ts";
-import { AI_BOTS, CHAT } from "./aiConstants.ts";
 import { getUserById, saveUser, saveMatchResult, incrementGlobalWin } from "./supabaseService.ts";
 import { calculateXpGain } from "../src/lib/xp.ts";
 import { checkAchievements } from "./achievements.ts";
@@ -1564,6 +1558,53 @@ export class GameEngine {
         xpEarned,
         ipEarned,
       });
+    }
+
+    // ── Recently Played With ───────────────────────────────────────────────
+    // Build the list of human players in this game with their current profile
+    // snapshots, then for each of them update every other human player's list.
+    const humanPlayers = s.players.filter(p => !p.isAI && p.userId);
+    const now = new Date().toISOString();
+
+    // Pre-fetch all human user records (they were saved above, so data is fresh)
+    const userSnapshots: { userId: string; entry: any }[] = [];
+    for (const p of humanPlayers) {
+      const u = await getUserById(p.userId!);
+      if (!u) continue;
+      userSnapshots.push({
+        userId: p.userId!,
+        entry: {
+          userId:       u.id,
+          username:     u.username,
+          avatarUrl:    u.avatarUrl ?? null,
+          activeFrame:  u.activeFrame ?? null,
+          elo:          u.stats.elo,
+          lastPlayedAt: now,
+        },
+      });
+    }
+
+    // For each human player, merge co-players into their recentlyPlayedWith list
+    for (const { userId } of userSnapshots) {
+      const u = await getUserById(userId);
+      if (!u) continue;
+
+      const existing: any[] = u.recentlyPlayedWith ?? [];
+      const existingMap = new Map<string, any>(existing.map(e => [e.userId, e]));
+
+      for (const { userId: coId, entry } of userSnapshots) {
+        if (coId === userId) continue; // skip self
+        existingMap.set(coId, entry);  // upsert — overwrites with fresh snapshot
+      }
+
+      // Sort most-recent first, keep newest 20
+      u.recentlyPlayedWith = Array.from(existingMap.values())
+        .sort((a, b) => new Date(b.lastPlayedAt).getTime() - new Date(a.lastPlayedAt).getTime())
+        .slice(0, 20);
+
+      await saveUser(u);
+      const { password: _, ...safe } = u;
+      this.io.to(u.id).emit("userUpdate", safe);
     }
   }
 

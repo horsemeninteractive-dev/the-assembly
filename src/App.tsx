@@ -17,7 +17,7 @@ import { discordSdk, setupDiscordSdk } from './lib/discord';
 import { DISCORD_CLIENT_ID } from './constants';
 import { cn, getProxiedUrl } from './lib/utils';
 
-const CLIENT_VERSION = 'v0.9.7';
+const CLIENT_VERSION = 'v0.9.8';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);

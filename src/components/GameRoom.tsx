@@ -26,7 +26,7 @@ import { PlayerProfileModal } from './game/modals/PlayerProfileModal';
 import { TitleAbilityModal } from './game/modals/TitleAbilityModal';
 import { GameReferencePanel } from './game/GameReferencePanel';
 
-const CLIENT_VERSION = 'v0.9.7';
+const CLIENT_VERSION = 'v0.9.8';
 
 interface GameRoomProps {
   gameState: GameState;

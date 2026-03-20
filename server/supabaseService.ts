@@ -48,6 +48,7 @@ function mapSupabaseToUser(data: any): UserInternal {
     claimedRewards:    data.claimed_rewards || [],
     earnedAchievements: data.earned_achievements || [],
     pinnedAchievements: data.pinned_achievements || [],
+    recentlyPlayedWith: data.recently_played_with || [],
     googleId:          data.google_id,
     discordId:         data.discord_id,
   };
@@ -70,6 +71,7 @@ function mapUserToSupabase(userData: UserInternal): any {
     claimed_rewards:        userData.claimedRewards,
     earned_achievements:    userData.earnedAchievements || [],
     pinned_achievements:    userData.pinnedAchievements || [],
+    recently_played_with:   userData.recentlyPlayedWith || [],
     google_id:        userData.googleId,
     discord_id:       userData.discordId,
     stats:            userData.stats,
@@ -404,6 +406,7 @@ export function makeNewUser(overrides: Partial<any> = {}): any {
     claimedRewards: [],
     earnedAchievements: [],
     pinnedAchievements: [],
+    recentlyPlayedWith: [],
     ownedCosmetics: ['music-ambient'],
     ...overrides,
   };
