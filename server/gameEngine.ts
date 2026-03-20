@@ -1872,59 +1872,102 @@ export class GameEngine {
   // Disconnection & Pause
   // ═══════════════════════════════════════════════════════════════════════════
 
-  handleLeave(socket: Socket, roomId: string): void {
+  handleLeave(socket: Socket, roomId: string, isIntentional: boolean = false): void {
     const state = this.rooms.get(roomId);
     if (!state) return;
 
     const player = state.players.find(p => p.id === socket.id);
     if (player) {
-      if (!player.isAI && !player.isDisconnected) {
-        player.isDisconnected = true;
-        
-        if (state.phase === "Lobby") {
-          addLog(state, `${player.name} disconnected from lobby. They will be removed in 60s if they don't return.`);
-        } else if (state.phase !== "GameOver") {
-          state.isPaused             = true;
-          state.pauseReason          = `${player.name} disconnected. Waiting 60 s for reconnection…`;
-          state.pauseTimer           = 60;
-          state.disconnectedPlayerId = player.id;
-          addLog(state, `${player.name} disconnected. Game paused.`);
-          this.clearActionTimer(roomId);
-          state.actionTimerEnd = undefined;
-        }
-
-        const existing = this.pauseTimers.get(roomId);
-        if (existing) clearInterval(existing);
-
-        const iv = setInterval(() => {
-          const s = this.rooms.get(roomId);
-          if (!s || !player.isDisconnected) { 
-            clearInterval(iv); 
-            if (this.pauseTimers.get(roomId) === iv) this.pauseTimers.delete(roomId); 
-            return; 
-          }
-          
-          if (s.phase === "Lobby") {
-            if (s.lobbyPauseTimer === undefined) s.lobbyPauseTimer = 60;
-            s.lobbyPauseTimer--;
-            if (s.lobbyPauseTimer <= 0) {
-              clearInterval(iv);
-              s.players = s.players.filter(p => p.id !== player.id);
-              addLog(s, `${player.name} removed from lobby (timeout).`);
-              this.broadcastState(roomId);
-            }
+      if (!player.isAI && (!player.isDisconnected || isIntentional)) {
+        if (isIntentional) {
+          // Intentional leave: handle immediately based on phase and mode
+          if (state.phase === "Lobby" || state.phase === "GameOver") {
+            state.players = state.players.filter(p => p.id !== player.id);
+            addLog(state, `${player.name} left the room.`);
           } else {
-            s.pauseTimer!--;
-            if (s.pauseTimer! <= 0) {
-              clearInterval(iv);
-              this.pauseTimers.delete(roomId);
-              this.handlePauseTimeout(roomId);
+            // In-progress game
+            if (state.mode === "Ranked") {
+              // Ranked: Forfeit/End game immediately
+              state.phase = "GameOver";
+              state.winner = undefined;
+              state.isPaused = false;
+              const msg = `${player.name} has left the game. Match ended as inconclusive.`;
+              addLog(state, msg);
+              state.messages.push({ sender: "System", text: msg, timestamp: Date.now(), type: "text" });
+            } else {
+              // Casual: Replace with AI immediately
+              const takenNames = new Set(state.players.map(p => p.name.replace(" (AI)", "")));
+              const available = AI_BOTS.filter(b => !takenNames.has(b.name));
+              const bot = pick(available) ?? AI_BOTS[Math.floor(AI_BOTS.length * Math.random())];
+
+              const oldId = player.id;
+              player.isAI = true;
+              player.isDisconnected = false;
+              player.id = `ai-${randomUUID()}`;
+              player.userId = undefined;
+              player.name = `${bot.name} (AI)`;
+              player.avatarUrl = bot.avatarUrl;
+              player.personality = bot.personality;
+
+              if (state.presidentialOrder) {
+                const idx = state.presidentialOrder.indexOf(oldId);
+                if (idx !== -1) state.presidentialOrder[idx] = player.id;
+              }
+              if (state.presidentId === oldId) state.presidentId = player.id;
+              if (state.chancellorId === oldId) state.chancellorId = player.id;
+
+              addLog(state, `${bot.name} (AI) has replaced ${player.name}.`);
             }
           }
-          this.broadcastState(roomId);
-        }, 1000);
+        } else {
+          // Unintentional disconnect: Start reconnection timer
+          player.isDisconnected = true;
+          
+          if (state.phase === "Lobby") {
+            addLog(state, `${player.name} disconnected from lobby. They will be removed in 60s if they don't return.`);
+          } else if (state.phase !== "GameOver") {
+            state.isPaused             = true;
+            state.pauseReason          = `${player.name} disconnected. Waiting 60 s for reconnection…`;
+            state.pauseTimer           = 60;
+            state.disconnectedPlayerId = player.id;
+            addLog(state, `${player.name} disconnected. Game paused.`);
+            this.clearActionTimer(roomId);
+            state.actionTimerEnd = undefined;
+          }
 
-        this.pauseTimers.set(roomId, iv);
+          const existing = this.pauseTimers.get(roomId);
+          if (existing) clearInterval(existing);
+
+          const iv = setInterval(() => {
+            const s = this.rooms.get(roomId);
+            if (!s || !player.isDisconnected) { 
+              clearInterval(iv); 
+              if (this.pauseTimers.get(roomId) === iv) this.pauseTimers.delete(roomId); 
+              return; 
+            }
+            
+            if (s.phase === "Lobby") {
+              if (s.lobbyPauseTimer === undefined) s.lobbyPauseTimer = 60;
+              s.lobbyPauseTimer--;
+              if (s.lobbyPauseTimer <= 0) {
+                clearInterval(iv);
+                s.players = s.players.filter(p => p.id !== player.id);
+                addLog(s, `${player.name} removed from lobby (timeout).`);
+                this.broadcastState(roomId);
+              }
+            } else {
+              s.pauseTimer!--;
+              if (s.pauseTimer! <= 0) {
+                clearInterval(iv);
+                this.pauseTimers.delete(roomId);
+                this.handlePauseTimeout(roomId);
+              }
+            }
+            this.broadcastState(roomId);
+          }, 1000);
+
+          this.pauseTimers.set(roomId, iv);
+        }
       }
     }
 

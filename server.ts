@@ -882,7 +882,7 @@ async function startServer() {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      engine.handleLeave(socket, roomId);
+      engine.handleLeave(socket, roomId, true);
       if (state && (state.phase === "Lobby" || state.phase === "GameOver")) {
         drainSpectatorQueue(state, roomId);
       }
