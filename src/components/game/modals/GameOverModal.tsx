@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Scroll, Target, CheckCircle, XCircle, TrendingUp, TrendingDown, Minus, Trophy, Zap, Coins, Medal } from 'lucide-react';
+import { Scroll, Target, CheckCircle, XCircle, TrendingUp, TrendingDown, Minus, Trophy, Zap, Coins, Medal, Flame } from 'lucide-react';
 import { GameState, PrivateInfo, PostMatchResult } from '../../../types';
 import { cn, getProxiedUrl } from '../../../lib/utils';
 import { OverseerIcon } from '../../icons';
@@ -138,7 +138,7 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                       {/* XP earned */}
                       <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                         <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                          <Zap className="w-3 h-3" /> XP
+                          <Flame className="w-3 h-3" /> XP
                         </div>
                         <span className="text-yellow-400 font-mono text-sm font-bold">+{postMatchResult.xpEarned}</span>
                       </div>
@@ -149,6 +149,14 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                           <Coins className="w-3 h-3" /> IP
                         </div>
                         <span className="text-emerald-400 font-mono text-sm font-bold">+{postMatchResult.ipEarned}</span>
+                      </div>
+
+                      {/* CP earned */}
+                      <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
+                        <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
+                          <Zap className="w-3 h-3" /> CP
+                        </div>
+                        <span className="text-purple-400 font-mono text-sm font-bold">+{postMatchResult.cpEarned}</span>
                       </div>
                     </div>
 
@@ -238,7 +246,7 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                           >
                             <span className="font-bold tracking-wide uppercase">{def.name}</span>
                             <span className="text-faint ml-auto font-mono whitespace-nowrap">
-                              +{def.xpReward} XP · +{def.ipReward} IP
+                              +{def.xpReward} XP · +{def.cpReward} CP
                             </span>
                           </motion.div>
                         ))}

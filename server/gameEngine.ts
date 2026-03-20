@@ -1640,6 +1640,7 @@ export class GameEngine {
       eloBeforeCalc:   number;
       xpEarned:        number;
       ipEarned:        number;
+      cpEarned:        number;
       agendaCompleted: boolean;
       agendaName:      string | undefined;
       newAchievementIds: string[];
@@ -1720,24 +1721,25 @@ export class GameEngine {
       // Achievements
       const newAchievementIds = checkAchievements({ user, s, p, won, agendaCompleted });
       let achievementXp = 0;
-      let achievementIp = 0;
+      let achievementCp = 0;
       if (newAchievementIds.length > 0) {
         if (!user.earnedAchievements) user.earnedAchievements = [];
         if (!user.pinnedAchievements) user.pinnedAchievements = [];
         for (const id of newAchievementIds) {
           user.earnedAchievements.push({ id, earnedAt: now });
           const def = ACHIEVEMENT_MAP.get(id);
-          if (def) { achievementXp += def.xpReward; achievementIp += def.ipReward; }
+          if (def) { achievementXp += def.xpReward; achievementCp += def.cpReward; }
         }
         user.stats.xp     += achievementXp;
-        user.cabinetPoints = (user.cabinetPoints ?? 0) + achievementIp;
+        user.cabinetPoints = (user.cabinetPoints ?? 0) + achievementCp;
       }
 
       const eloAfter      = user.stats.elo;
       const eloBeforeCalc = eloAfter - eloChange;
       const baseIp        = won ? (s.mode === "Ranked" ? 100 : 40) : (s.mode === "Ranked" ? 25 : 10);
       const xpEarned      = xpGain + (agendaCompleted ? 100 : 0) + achievementXp;
-      const ipEarned      = baseIp + (agendaCompleted ? (s.mode === "Ranked" ? 40 : 20) : 0) + achievementIp;
+      const ipEarned      = baseIp + (agendaCompleted ? (s.mode === "Ranked" ? 40 : 20) : 0);
+      const cpEarned      = achievementCp;
 
       results.push({
         playerId: p.id,
@@ -1747,6 +1749,7 @@ export class GameEngine {
         eloBeforeCalc,
         xpEarned,
         ipEarned,
+        cpEarned,
         agendaCompleted,
         agendaName: p.personalAgenda ? (AGENDA_MAP.get(p.personalAgenda)?.name ?? undefined) : undefined,
         newAchievementIds,
@@ -1768,6 +1771,7 @@ export class GameEngine {
           agendaCompleted,
           xpEarned,
           ipEarned,
+          cpEarned,
         },
       });
     }

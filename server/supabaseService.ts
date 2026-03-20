@@ -320,6 +320,7 @@ export async function saveMatchResult(match: Omit<MatchSummary, "id"> & { id: st
       agenda_completed: match.agendaCompleted,
       xp_earned:        match.xpEarned,
       ip_earned:        match.ipEarned,
+      cp_earned:        match.cpEarned,
     });
     if (error) console.error("Match history save error:", error.message);
   } else {
@@ -356,6 +357,7 @@ export async function getMatchHistory(userId: string, limit = 20): Promise<Match
       agendaCompleted:  r.agenda_completed,
       xpEarned:         r.xp_earned,
       ipEarned:         r.ip_earned,
+      cpEarned:         r.cp_earned,
     }));
   }
   return (matchHistoryStore.get(userId) ?? []).slice(0, limit);

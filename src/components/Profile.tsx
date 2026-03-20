@@ -856,7 +856,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
                               {/* Rewards */}
                               <div className="text-[9px] font-mono text-faint shrink-0 text-right hidden sm:block">
                                 <div>+{def.xpReward} XP</div>
-                                <div>+{def.ipReward} IP</div>
+                                <div>+{def.cpReward} CP</div>
                               </div>
 
                               {/* Pin indicator */}
@@ -1062,8 +1062,11 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
 
                       {/* Rewards */}
                       <div className="flex flex-col items-end gap-0.5 shrink-0">
-                        <span className="text-emerald-400 text-xs font-mono">+{match.xpEarned} XP</span>
-                        <span className="text-yellow-400 text-xs font-mono">+{match.ipEarned} IP</span>
+                        <span className="text-emerald-400 text-[10px] font-mono">+{match.xpEarned} XP</span>
+                        <div className="flex gap-1.5">
+                          {match.ipEarned > 0 && <span className="text-yellow-400 text-[10px] font-mono">+{match.ipEarned} IP</span>}
+                          {match.cpEarned > 0 && <span className="text-purple-400 text-[10px] font-mono">+{match.cpEarned} CP</span>}
+                        </div>
                       </div>
 
                       {/* Expand chevron */}

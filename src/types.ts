@@ -123,6 +123,7 @@ export interface MatchSummary {
   agendaCompleted: boolean;
   xpEarned: number;
   ipEarned: number;
+  cpEarned: number;
 }
 
 // Sent via socket immediately after a game ends — ephemeral, not persisted
@@ -136,6 +137,7 @@ export interface PostMatchResult {
   roomAverageElo: number;
   xpEarned: number;
   ipEarned: number;
+  cpEarned: number;
   agendaName?: string;
   agendaCompleted: boolean;
   rounds: number;

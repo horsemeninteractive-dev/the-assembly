@@ -11,7 +11,7 @@ export interface AchievementDef {
   description: string;
   tier: AchievementTier;
   xpReward: number;
-  ipReward: number;
+  cpReward: number;
   /** Lucide icon name (string key) for rendering on the client */
   icon: string;
   /** Broad category for grouping in the UI */
@@ -19,10 +19,10 @@ export interface AchievementDef {
 }
 
 // XP/IP per tier
-const TIER_REWARDS: Record<AchievementTier, { xp: number; ip: number }> = {
-  Bronze: { xp: 75,  ip: 15  },
-  Silver: { xp: 200, ip: 40  },
-  Gold:   { xp: 500, ip: 100 },
+const TIER_REWARDS: Record<AchievementTier, { xp: number; cp: number }> = {
+  Bronze: { xp: 75,  cp: 15  },
+  Silver: { xp: 200, cp: 40  },
+  Gold:   { xp: 500, cp: 100 },
 };
 
 function def(
@@ -33,8 +33,8 @@ function def(
   icon: string,
   category: AchievementDef['category'],
 ): AchievementDef {
-  const { xp, ip } = TIER_REWARDS[tier];
-  return { id, name, description, tier, xpReward: xp, ipReward: ip, icon, category };
+  const { xp, cp } = TIER_REWARDS[tier];
+  return { id, name, description, tier, xpReward: xp, cpReward: cp, icon, category };
 }
 
 // ---------------------------------------------------------------------------
