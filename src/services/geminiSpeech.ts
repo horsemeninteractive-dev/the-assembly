@@ -1,6 +1,5 @@
-import { GoogleGenAI, Modality } from "@google/genai";
-
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY || "" });
+// Gemini TTS is now proxied through /api/tts on the server.
+// The API key never touches the client bundle.
 
 export interface GeminiSpeechOptions {
   text: string;
@@ -9,25 +8,19 @@ export interface GeminiSpeechOptions {
 
 export const generateGeminiSpeech = async (options: GeminiSpeechOptions): Promise<HTMLAudioElement | null> => {
   try {
-    const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-preview-tts",
-      contents: [{ parts: [{ text: options.text }] }],
-      config: {
-        responseModalities: [Modality.AUDIO],
-        speechConfig: {
-          voiceConfig: {
-            prebuiltVoiceConfig: { voiceName: options.voice },
-          },
-        },
-      },
+    const res = await fetch("/api/tts", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: options.text, voice: options.voice }),
     });
 
-    const base64Audio = response.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
-    if (base64Audio) {
-      const audio = new Audio(`data:audio/wav;base64,${base64Audio}`);
-      return audio;
-    }
-    return null;
+    if (!res.ok) return null;
+
+    const data = await res.json() as { audio?: string };
+    if (!data.audio) return null;
+
+    const audio = new Audio(`data:audio/wav;base64,${data.audio}`);
+    return audio;
   } catch (error) {
     console.error("Gemini TTS error:", error);
     return null;

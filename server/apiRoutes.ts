@@ -5,7 +5,8 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import axios from "axios";
 import { GameEngine } from "./gameEngine.ts";
-import { GameState, RoomInfo } from "../src/types.ts";
+import rateLimit from "express-rate-limit";
+import { GameState, RoomInfo, UserInternal } from "../src/types.ts";
 import { DEFAULT_ITEMS } from "../src/constants.ts";
 import {
   getUser,
@@ -54,19 +55,59 @@ function getAppUrl(req?: Request): string {
   return process.env.APP_URL || "https://theassembly.web.app";
 }
 
-function oauthSuccessPage(user: any, token: string): string {
+function htmlEscape(str: string): string {
+  return str
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+/** Safely extracts a message from unknown catch values, including axios errors. */
+function getErrorMessage(err: unknown): string {
+  if (err && typeof err === "object") {
+    const e = err as Record<string, unknown>;
+    if (e.response && typeof e.response === "object") {
+      const r = e.response as Record<string, unknown>;
+      if (r.data) return String(r.data);
+    }
+    if (typeof e.message === "string") return e.message;
+  }
+  return String(err);
+}
+
+function oauthSuccessPage(user: UserInternal, token: string): string {
   const targetOrigin = process.env.APP_URL || "https://theassembly.web.app";
-  return `
-    <html><body><script>
-      if (window.opener) {
-        window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS', user: ${JSON.stringify(user)}, token: '${token}' }, '${targetOrigin}');
-        window.close();
-      } else {
-        const userEncoded = encodeURIComponent(JSON.stringify(${JSON.stringify(user)}));
-        window.location.href = '/?token=${token}&user=' + userEncoded;
-      }
-    </script><p>Authentication successful. Redirecting...</p></body></html>
-  `;
+
+  // Never interpolate user data or tokens directly into a <script> block —
+  // a crafted username like </script><script>evil()// would break out of the
+  // script context. Instead, store everything in HTML-escaped data attributes
+  // and read them from JS via getAttribute(), which is injection-safe.
+  const safeUser   = htmlEscape(JSON.stringify(user));
+  const safeToken  = htmlEscape(token);
+  const safeOrigin = htmlEscape(targetOrigin);
+
+  return `<!DOCTYPE html>
+<html><body>
+<div id="d"
+  data-user="${safeUser}"
+  data-token="${safeToken}"
+  data-origin="${safeOrigin}"
+></div>
+<script>
+  var el     = document.getElementById('d');
+  var user   = JSON.parse(el.getAttribute('data-user'));
+  var token  = el.getAttribute('data-token');
+  var origin = el.getAttribute('data-origin');
+  if (window.opener) {
+    window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS', user: user, token: token }, origin);
+    window.close();
+  } else {
+    window.location.href = '/?token=' + encodeURIComponent(token) + '&user=' + encodeURIComponent(JSON.stringify(user));
+  }
+<\/script>
+<p>Authentication successful. Redirecting...</p>
+</body></html>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -80,6 +121,40 @@ export function registerRoutes(
   userSockets: Map<string, string>
 ): void {
   const rooms = engine.rooms;
+
+  // ── Rate limiters ────────────────────────────────────────────────────────
+  // Strict: auth routes — prevent brute-force and account enumeration.
+  const authLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 10,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many attempts. Please try again later." },
+  });
+
+  // Moderate: cost-bearing endpoints (TTS calls Gemini, shop debits points).
+  const costLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 30,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many requests. Please slow down." },
+  });
+
+  // General: blanket cap on all other API routes.
+  const generalLimiter = rateLimit({
+    windowMs: 60 * 1000, // 1 minute
+    max: 100,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: "Too many requests. Please slow down." },
+  });
+
+  app.use("/api", generalLimiter);
+  app.use("/api/register", authLimiter);
+  app.use("/api/login",    authLimiter);
+  app.use("/api/tts",      costLimiter);
+  app.use("/api/shop/buy", costLimiter);
 
   // ── Version endpoint ────────────────────────────────────────────────────────
   app.get("/version", (_req: Request, res: Response) => {
@@ -105,19 +180,19 @@ export function registerRoutes(
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = makeNewUser({ id: randomUUID(), username, avatarUrl, password: hashedPassword });
     await saveUser(newUser);
-    const token = jwt.sign({ username }, JWT_SECRET);
-    const { password: _, ...userWithoutPassword } = newUser;
+    const token = jwt.sign({ username }, JWT_SECRET!, { expiresIn: "30d" });
+    const { password: _, ...userWithoutPassword } = newUser as any;
     res.json({ user: userWithoutPassword, token });
   });
 
   app.post("/api/login", async (req: Request, res: Response) => {
     const { username, password } = req.body;
     const user = await getUser(username);
-    if (!user || !(await bcrypt.compare(password, user.password))) {
+    if (!user || !user.password || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
-    const token = jwt.sign({ username }, JWT_SECRET);
-    const { password: _, ...userWithoutPassword } = user;
+    const token = jwt.sign({ username }, JWT_SECRET!, { expiresIn: "30d" });
+    const { password: _, ...userWithoutPassword } = user as any;
     res.json({ user: userWithoutPassword, token });
   });
 
@@ -125,10 +200,10 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user = await getUser(decoded.username);
       if (!user) return res.status(404).json({ error: "User not found" });
-      const { password: _, ...userWithoutPassword } = user;
+      const { password: _, ...userWithoutPassword } = user as any;
       res.json({ user: userWithoutPassword });
     } catch (_) {
       res.status(401).json({ error: "Invalid token" });
@@ -140,14 +215,14 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user = await getUser(decoded.username);
       if (!user) return res.status(404).json({ error: "User not found" });
       if (!user.claimedRewards.includes("tutorial-complete")) {
         user.claimedRewards.push("tutorial-complete");
         await saveUser(user);
       }
-      const { password: _, ...safe } = user;
+      const { password: _, ...safe } = user as any;
       res.json({ user: safe });
     } catch (_) {
       res.status(401).json({ error: "Invalid token" });
@@ -159,7 +234,7 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      jwt.verify(token, JWT_SECRET);
+      jwt.verify(token, JWT_SECRET!);
       const history = await getMatchHistory(req.params.userId, 20);
       res.json({ history });
     } catch (_) {
@@ -173,7 +248,7 @@ export function registerRoutes(
     const { rewardId, itemId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user = await getUser(decoded.username);
       if (!user) return res.status(404).json({ error: "User not found" });
       if (user.claimedRewards.includes(rewardId)) {
@@ -189,7 +264,7 @@ export function registerRoutes(
       }
       user.claimedRewards.push(rewardId);
       await saveUser(user);
-      const { password: _, ...safe } = user;
+      const { password: _, ...safe } = user as any;
       res.json({ user: safe });
     } catch (_) {
       res.status(401).json({ error: "Invalid token" });
@@ -201,7 +276,7 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user = await getUser(decoded.username);
       if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -218,7 +293,7 @@ export function registerRoutes(
 
       user.pinnedAchievements = valid;
       await saveUser(user);
-      const { password: _pw, ...safe } = user;
+      const { password: _pw, ...safe } = user as any;
       res.json({ user: safe });
     } catch (_) {
       res.status(401).json({ error: "Invalid token" });
@@ -230,7 +305,7 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user = await getUser(decoded.username);
       if (!user) return res.status(404).json({ error: "User not found" });
       res.json({ recentlyPlayedWith: user.recentlyPlayedWith ?? [] });
@@ -290,10 +365,10 @@ export function registerRoutes(
         await saveUser(user);
       }
 
-      const token = jwt.sign({ username: user.username }, JWT_SECRET);
+      const token = jwt.sign({ username: user.username }, JWT_SECRET!, { expiresIn: "30d" });
       res.send(oauthSuccessPage(user, token));
-    } catch (err: any) {
-      console.error("Google OAuth Error:", err.response?.data || err.message);
+    } catch (err: unknown) {
+      console.error("Google OAuth Error:", getErrorMessage(err));
       res.status(500).send("Authentication failed");
     }
   });
@@ -332,7 +407,7 @@ export function registerRoutes(
         await saveUser(user);
       }
 
-      const token = jwt.sign({ username: user.username }, JWT_SECRET);
+      const token = jwt.sign({ username: user.username }, JWT_SECRET!, { expiresIn: "30d" });
       return { user, token };
   }
 
@@ -361,10 +436,10 @@ export function registerRoutes(
     try {
       const origin = getAppUrl(req);
       const { user, token } = await handleDiscordAuth(code, origin);
-      const { password: _, ...userWithoutPassword } = user;
+      const { password: _, ...userWithoutPassword } = user as any;
       res.json({ user: userWithoutPassword, token });
-    } catch (err: any) {
-      console.error("Discord Activity Auth Error:", err.response?.data || err.message);
+    } catch (err: unknown) {
+      console.error("Discord Activity Auth Error:", getErrorMessage(err));
       res.status(500).json({ error: "Authentication failed" });
     }
   });
@@ -376,8 +451,8 @@ export function registerRoutes(
       const origin = getAppUrl(req);
       const { user, token } = await handleDiscordAuth(code as string, origin);
       res.send(oauthSuccessPage(user, token));
-    } catch (err: any) {
-      console.error("Discord OAuth Error:", err.response?.data || err.message);
+    } catch (err: unknown) {
+      console.error("Discord OAuth Error:", getErrorMessage(err));
       res.status(500).send("Authentication failed");
     }
   });
@@ -456,7 +531,7 @@ export function registerRoutes(
     const { itemId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user    = await getUser(decoded.username);
       if (!user)                                  return res.status(404).json({ error: "User not found" });
       
@@ -482,7 +557,7 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user = await getUser(decoded.username);
       if (!user) return res.status(404).json({ error: "User not found" });
       const friends = await getFriends(user.id);
@@ -513,7 +588,7 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user = await getUser(decoded.username);
       if (!user) return res.status(404).json({ error: "User not found" });
       const pending = await getPendingFriendRequests(user.id);
@@ -531,14 +606,14 @@ export function registerRoutes(
     if (!token) return res.status(401).json({ error: "No token" });
     if (!query || query.length < 2) return res.json({ users: [] });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const currentUser = await getUser(decoded.username);
       if (!currentUser) return res.status(404).json({ error: "User not found" });
       const results = await searchUsers(query, currentUser.id);
       // Attach isFriend status to each result
-      const withStatus = await Promise.all(results.map(async (u: any) => {
+      const withStatus = await Promise.all(results.map(async (u: UserInternal) => {
         const friendStatus = await isFriend(currentUser.id, u.id);
-        const { password: _, ...safe } = u;
+        const { password: _, ...safe } = u as any;
         return { ...safe, isFriend: friendStatus };
       }));
       res.json({ users: withStatus });
@@ -551,7 +626,7 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user = await getUser(decoded.username);
       if (!user) return res.status(404).json({ error: "User not found" });
       const friends = await getFriends(user.id);
@@ -566,7 +641,7 @@ export function registerRoutes(
     const { targetUserId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user = await getUser(decoded.username);
       if (!user) return res.status(404).json({ error: "User not found" });
       await sendFriendRequest(user.id, targetUserId);
@@ -581,7 +656,7 @@ export function registerRoutes(
     const { targetUserId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user = await getUser(decoded.username);
       if (!user) return res.status(404).json({ error: "User not found" });
       await acceptFriendRequest(user.id, targetUserId);
@@ -595,7 +670,7 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const currentUser = await getUser(decoded.username);
       if (!currentUser) return res.status(404).json({ error: "User not found" });
       
@@ -604,7 +679,7 @@ export function registerRoutes(
       
       const isFriendStatus = await isFriend(currentUser.id, user.id);
       
-      const { password: _, ...userWithoutPassword } = user;
+      const { password: _, ...userWithoutPassword } = user as any;
       res.json({ user: userWithoutPassword, isFriend: isFriendStatus });
     } catch (_) {
       res.status(401).json({ error: "Invalid token" });
@@ -615,7 +690,7 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user = await getUser(decoded.username);
       if (!user) return res.status(404).json({ error: "User not found" });
       await removeFriend(user.id, req.params.targetUserId);
@@ -630,7 +705,7 @@ export function registerRoutes(
     const { roomId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user = await getUser(decoded.username);
       if (!user) return res.status(404).json({ error: "User not found" });
       
@@ -649,7 +724,7 @@ export function registerRoutes(
     const { frameId, policyStyle, votingStyle, music, soundPack, backgroundId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET) as { username: string };
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
       const user    = await getUser(decoded.username);
       if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -715,6 +790,66 @@ export function registerRoutes(
       res.json({ user: userWithoutPassword });
     } catch (_) {
       res.status(401).json({ error: "Invalid token" });
+    }
+  });
+
+  // ── TTS proxy ─────────────────────────────────────────────────────────────
+  // Calls Gemini TTS server-side so the API key is never exposed in the
+  // client bundle. Returns the base64-encoded WAV audio from Gemini directly.
+
+  app.post("/api/tts", async (req: Request, res: Response) => {
+    const { text, voice } = req.body as { text?: string; voice?: string };
+
+    if (!text || typeof text !== "string" || text.trim().length === 0) {
+      return res.status(400).json({ error: "text is required" });
+    }
+    if (text.length > 500) {
+      return res.status(400).json({ error: "text too long (max 500 chars)" });
+    }
+
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) {
+      return res.status(503).json({ error: "TTS not configured" });
+    }
+
+    try {
+      const geminiRes = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-tts:generateContent?key=${apiKey}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text }] }],
+            generationConfig: {
+              responseModalities: ["AUDIO"],
+              speechConfig: {
+                voiceConfig: {
+                  prebuiltVoiceConfig: { voiceName: voice ?? "Puck" },
+                },
+              },
+            },
+          }),
+        }
+      );
+
+      if (!geminiRes.ok) {
+        const err = await geminiRes.text();
+        console.error("[TTS] Gemini error:", err);
+        return res.status(502).json({ error: "TTS upstream error" });
+      }
+
+      const data = await geminiRes.json() as any;
+      const base64Audio = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+
+      if (!base64Audio) {
+        return res.status(502).json({ error: "No audio returned from TTS" });
+      }
+
+      res.json({ audio: base64Audio });
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      console.error("[TTS] Request failed:", msg);
+      res.status(500).json({ error: "TTS request failed" });
     }
   });
 }

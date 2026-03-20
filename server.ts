@@ -64,27 +64,38 @@ async function startServer() {
     const url = req.query.url as string;
     if (!url) return res.status(400).send("URL is required");
 
-    console.log(`[Proxy] Requesting: ${url}`);
-
     try {
-      // Basic validation to prevent abuse
-      const allowedDomains = [
+      // Enforce HTTPS — block file://, http://, and other non-HTTPS schemes
+      // that could be used for SSRF against internal services.
+      let parsedUrl: URL;
+      try {
+        parsedUrl = new URL(url);
+      } catch {
+        return res.status(400).send("Invalid URL");
+      }
+      if (parsedUrl.protocol !== "https:") {
+        return res.status(403).send("Only HTTPS URLs are allowed");
+      }
+
+      // Exact hostname match — endsWith() is vulnerable to subdomain spoofing
+      // (e.g. "evildomain.googleapis.com" would pass an endsWith check).
+      const allowedHostnames = new Set([
         'storage.googleapis.com',
         'gamesounds.xyz',
         'api.dicebear.com',
         'picsum.photos',
         'raw.githubusercontent.com',
         'transparenttextures.com',
+        'www.transparenttextures.com',
         'images.unsplash.com',
         'i.pravatar.cc',
         'cdn.discordapp.com',
         'discord.com',
         'fonts.googleapis.com',
-        'fonts.gstatic.com'
-      ];
+        'fonts.gstatic.com',
+      ]);
 
-      const parsedUrl = new URL(url);
-      if (!allowedDomains.some(domain => parsedUrl.hostname.endsWith(domain))) {
+      if (!allowedHostnames.has(parsedUrl.hostname)) {
         return res.status(403).send("Domain not allowed");
       }
 
@@ -708,7 +719,9 @@ async function startServer() {
 
       if (text.startsWith('/debug')) {
         if (process.env.NODE_ENV !== 'production') {
-          state.log.push(`DEBUG: Phase: ${state.phase}, PresIdx: ${state.presidentIdx}, Pres: ${state.players[state.presidentIdx]?.name}, Chan: ${state.players[state.chancellorId || '']?.name}`);
+          const pres = state.players[state.presidentIdx];
+          const chan = state.players.find(p => p.id === state.chancellorId);
+          state.log.push(`DEBUG: Phase: ${state.phase}, PresIdx: ${state.presidentIdx}, Pres: ${pres?.name}, Chan: ${chan?.name}`);
           engine.broadcastState(roomId);
         }
         return;

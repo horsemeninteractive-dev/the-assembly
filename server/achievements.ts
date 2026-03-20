@@ -2,11 +2,11 @@
 // Server-side achievement evaluator
 // ---------------------------------------------------------------------------
 import { ACHIEVEMENT_DEFS } from "../src/lib/achievements.ts";
-import type { GameState, Player } from "../src/types";
+import type { GameState, Player, UserInternal } from "../src/types";
 
 export interface AchievementContext {
   /** User record AFTER stats have been incremented for this game */
-  user: any;
+  user: UserInternal;
   /** Full game state */
   s: GameState;
   /** This player's game-level record */
@@ -25,7 +25,7 @@ export interface AchievementContext {
 export function checkAchievements(ctx: AchievementContext): string[] {
   const { user, s, p, won, agendaCompleted } = ctx;
 
-  const earned: string[] = (user.earnedAchievements ?? []).map((a: any) =>
+  const earned: string[] = (user.earnedAchievements ?? []).map((a: { id: string }) =>
     typeof a === 'string' ? a : a.id
   );
   const alreadyEarned = new Set<string>(earned);

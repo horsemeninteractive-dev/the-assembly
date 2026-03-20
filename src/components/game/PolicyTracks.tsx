@@ -12,6 +12,7 @@ interface PolicyTracksProps {
 export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
   const numPlayers = gameState.players.length;
 
+  // slotIndex here is the directive number (1-6), but visually the track is reversed (6 on left, 1 on right)
   const getStatePower = (slotIndex: number) => {
     if (numPlayers <= 6) {
       if (slotIndex === 3) return { power: 'Peek', description: 'President previews top 3 directives', Icon: Eye };
@@ -29,8 +30,12 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
     return null;
   };
 
+  // Visual slot order for state track: reversed (slot 6 is leftmost, slot 1 is rightmost)
+  // stateVisualSlots[0] = directive number 6, stateVisualSlots[5] = directive number 1
+  const stateVisualSlots = [6, 5, 4, 3, 2, 1];
+
   return (
-    <div className="p-[1.5vh] grid grid-cols-[1fr_auto_1fr] gap-[1.5vh] bg-surface-glass border-b border-subtle shrink-0 items-start">
+    <div className="p-[1.5vh] grid grid-cols-[1fr_auto_1fr] gap-[1.5vh] bg-surface-glass border-b border-subtle shrink-0 items-start relative z-40">
       {/* Civil Track */}
       <div className="space-y-[0.5vh]">
         <div className="flex items-center justify-between uppercase tracking-widest font-mono text-blue-400/70">
@@ -41,17 +46,33 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
           <span className="text-[1.2vh] font-bold text-blue-400">{gameState.civilDirectives}</span>
         </div>
         <div className="flex gap-1">
-          {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                'flex-1 h-[3vh] rounded-sm border transition-all duration-500',
-                i < gameState.civilDirectives
-                  ? 'bg-blue-900/40 border-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.2)]'
-                  : 'bg-elevated border-subtle'
-              )}
-            />
-          ))}
+          {[...Array(5)].map((_, i) => {
+            const isCivilWin = i === 4;
+            return (
+              <div
+                key={i}
+                className={cn(
+                  'flex-1 h-[3vh] rounded-sm border transition-all duration-500 relative group',
+                  isCivilWin ? 'cursor-pointer' : '',
+                  i < gameState.civilDirectives
+                    ? 'bg-blue-900/40 border-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.2)]'
+                    : 'bg-elevated border-subtle'
+                )}
+              >
+                {isCivilWin && (
+                  <div className="absolute inset-0 flex items-center justify-center opacity-30 group-hover:opacity-100 transition-opacity">
+                    <Trophy className="w-[1.2vh] h-[1.2vh] text-blue-400" />
+                  </div>
+                )}
+                {isCivilWin && (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-32 p-2 bg-surface border border-default rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-[200] shadow-2xl">
+                    <div className="text-responsive-xs font-mono text-blue-400 uppercase mb-1">Win</div>
+                    <div className="text-[7px] text-tertiary leading-tight">Civil wins immediately</div>
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
 
@@ -84,18 +105,24 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
           </div>
         </div>
         <div className="flex gap-1">
-          {[...Array(6)].map((_, i) => {
-            const slot = getStatePower(i + 1);
+          {stateVisualSlots.map((directiveNum, visualIndex) => {
+            const slot = getStatePower(directiveNum);
             const Icon = slot?.Icon ?? Eye;
+            // A slot is "filled" (active) when stateDirectives >= directiveNum
+            const isFilled = gameState.stateDirectives >= directiveNum;
+            // Danger styling for directive numbers >= 4
+            const isDanger = directiveNum >= 4;
+            // Tooltip for leftmost slots should open to the right to stay in view
+            const tooltipAlign = visualIndex < 2 ? 'left-0 -translate-x-0' : 'left-1/2 -translate-x-1/2';
             return (
               <div
-                key={i}
+                key={directiveNum}
                 className={cn(
                   'flex-1 h-[3vh] rounded-sm border transition-all duration-500 relative group',
                   slot ? 'cursor-pointer' : '',
-                  i < gameState.stateDirectives
+                  isFilled
                     ? 'bg-red-900/40 border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.2)]'
-                    : i >= 3
+                    : isDanger
                       ? 'bg-red-900/10 border-red-900/30'
                       : 'bg-elevated border-subtle'
                 )}
@@ -107,7 +134,10 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
                   </div>
                 )}
                 {slot && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-32 p-2 bg-surface border border-default rounded-lg opacity-0 group-hover:opacity-100 group-[.tooltip-open]:opacity-100 pointer-events-none transition-opacity z-50 shadow-2xl">
+                  <div className={cn(
+                    'absolute top-full mt-2 w-32 p-2 bg-surface border border-default rounded-lg opacity-0 group-hover:opacity-100 group-[.tooltip-open]:opacity-100 pointer-events-none transition-opacity z-[200] shadow-2xl',
+                    tooltipAlign
+                  )}>
                     <div className="text-responsive-xs font-mono text-red-500 uppercase mb-1">{slot.power}</div>
                     <div className="text-[7px] text-tertiary leading-tight">{slot.description}</div>
                   </div>

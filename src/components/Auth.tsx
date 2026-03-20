@@ -33,8 +33,8 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
       if (!origin.endsWith('.run.app') && !origin.includes('localhost')) {
         return;
       }
-      if (event.data?.type === 'OAUTH_AUTH_SUCCESS') {
-        onAuthSuccess(event.data.user, event.data.token);
+      if (event.data?.type === 'OAUTH_AUTH_SUCCESS' && event.data.user && event.data.token) {
+        onAuthSuccess(event.data.user as User, event.data.token as string);
       }
     };
     window.addEventListener('message', handleMessage);
@@ -58,7 +58,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
           throw new Error("Configuration Error: Discord Client ID is missing from build. Please contact support.");
         }
         
-        const { code } = await discordSdk.commands.authorize({
+        const { code } = await discordSdk!.commands.authorize({
           client_id: DISCORD_CLIENT_ID,
           response_type: "code",
           state: "",

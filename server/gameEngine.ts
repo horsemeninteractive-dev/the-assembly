@@ -14,7 +14,7 @@
 import { randomUUID } from "crypto";
 import { Server, Socket } from "socket.io";
 import {
-  GameState, Player, Policy, ExecutiveAction, TitleRole, GamePhase,
+  GameState, Player, Policy, ExecutiveAction, TitleRole, GamePhase, UserInternal, RecentlyPlayedEntry,
 } from "../src/types.ts";
 import { shuffle, createDeck } from "./utils.ts";
 import { AI_BOTS, CHAT } from "./aiConstants.ts";
@@ -47,6 +47,16 @@ import {
 
 export type Deps = { io: Server };
 
+/** Typed payloads for each title ability action. */
+export type TitleAbilityData =
+  | { use: false }
+  | { use: true; role: "Assassin";    targetId: string }
+  | { use: true; role: "Strategist" }
+  | { use: true; role: "Broker" }
+  | { use: true; role: "Handler" }
+  | { use: true; role: "Auditor" }
+  | { use: true; role: "Interdictor"; targetId: string };
+
 // ---------------------------------------------------------------------------
 // Internal helpers
 // ---------------------------------------------------------------------------
@@ -57,6 +67,18 @@ function pick<T>(arr: T[]): T | undefined {
 
 function addLog(s: GameState, msg: string): void {
   s.log.push(msg);
+}
+
+/**
+ * Standard ELO formula adapted for team games.
+ * K=32 for players under 30 games (provisional), K=20 for established players.
+ * opponentAvgElo is the average ELO of the opposing team.
+ * Returns a signed integer delta (can be negative).
+ */
+function computeEloChange(playerElo: number, opponentAvgElo: number, won: boolean, gamesPlayed: number): number {
+  const K        = gamesPlayed < 30 ? 32 : 20;
+  const expected = 1 / (1 + Math.pow(10, (opponentAvgElo - playerElo) / 400));
+  return Math.round(K * ((won ? 1 : 0) - expected));
 }
 
 function ensureDeckHas(s: GameState, n: number): void {
@@ -76,11 +98,11 @@ export class GameEngine {
   readonly rooms: Map<string, GameState> = new Map();
 
   /** One action-timeout handle per room. */
-  private actionTimers: Map<string, ReturnType<typeof setTimeout>>  = new Map();
+  private actionTimers: Map<string, any> = new Map();
   /** One pause-countdown handle per room. */
-  private pauseTimers:  Map<string, ReturnType<typeof setInterval>> = new Map();
+  private pauseTimers:  Map<string, any> = new Map();
   /** Lobby countdown handles (kept for API compatibility). */
-  private lobbyTimers:  Map<string, ReturnType<typeof setInterval>> = new Map();
+  private lobbyTimers:  Map<string, any> = new Map();
 
   constructor({ io }: Deps) {
     this.io = io;
@@ -1085,7 +1107,7 @@ export class GameEngine {
   // Title Ability Resolution — single handler for all abilities
   // ═══════════════════════════════════════════════════════════════════════════
 
-  async handleTitleAbility(s: GameState, roomId: string, abilityData: any): Promise<void> {
+  async handleTitleAbility(s: GameState, roomId: string, abilityData: TitleAbilityData): Promise<void> {
     const prompt = s.titlePrompt;
     if (!prompt) return;
 
@@ -1109,15 +1131,16 @@ export class GameEngine {
   }
 
   /** Alias used by old server.ts path */
-  async resolveTitleAbility(s: GameState, roomId: string, abilityData: any): Promise<void> {
+  async resolveTitleAbility(s: GameState, roomId: string, abilityData: TitleAbilityData): Promise<void> {
     await this.handleTitleAbility(s, roomId, abilityData);
   }
 
   private async applyTitleAbility(
-    s: GameState, roomId: string, player: Player, role: TitleRole, data: any,
+    s: GameState, roomId: string, player: Player, role: TitleRole, data: TitleAbilityData,
   ): Promise<void> {
     switch (role) {
       case "Assassin": {
+        if (!data.use || data.role !== "Assassin") break;
         const target = s.players.find(p => p.id === data.targetId && p.isAlive);
         if (target) {
           target.isAlive = target.isPresident = target.isChancellor = false;
@@ -1193,6 +1216,7 @@ export class GameEngine {
       }
 
       case "Interdictor": {
+        if (!data.use || data.role !== "Interdictor") break;
         const president = s.players[s.presidentIdx];
         const target = s.players.find(
           p => p.id === data.targetId && p.isAlive &&
@@ -1427,20 +1451,58 @@ export class GameEngine {
   }
 
   async updateUserStats(s: GameState, winningSide: "Civil" | "State"): Promise<void> {
-    // Collect ELOs before any changes for the room average calculation
-    const preGameElos: number[] = [];
-    for (const p of s.players) {
-      if (p.isAI || !p.userId) continue;
-      const u = await getUserById(p.userId);
-      if (u) preGameElos.push(u.stats.elo);
+    const humanPlayers = s.players.filter(p => !p.isAI && p.userId);
+    if (humanPlayers.length === 0) return;
+
+    // ── Single parallel fetch — replaces N sequential getUserById calls ────
+    const fetched = await Promise.all(humanPlayers.map(p => getUserById(p.userId!)));
+    const userMap = new Map<string, UserInternal>();
+    for (let i = 0; i < humanPlayers.length; i++) {
+      const u = fetched[i];
+      if (u) userMap.set(humanPlayers[i].userId!, u);
     }
-    const roomAverageElo = preGameElos.length
-      ? Math.round(preGameElos.reduce((a, b) => a + b, 0) / preGameElos.length)
+
+    const validUsers = Array.from(userMap.values());
+    const roomAverageElo = validUsers.length
+      ? Math.round(validUsers.reduce((sum, u) => sum + u.stats.elo, 0) / validUsers.length)
       : 1000;
 
-    for (const p of s.players) {
-      if (p.isAI || !p.userId) continue;
-      const user = await getUserById(p.userId);
+    const now = new Date().toISOString();
+
+    // Per-player results collected for socket emissions after saves
+    type PlayerResult = {
+      playerId:        string;
+      user:            UserInternal;
+      won:             boolean;
+      eloChange:       number;
+      eloBeforeCalc:   number;
+      xpEarned:        number;
+      ipEarned:        number;
+      agendaCompleted: boolean;
+      agendaName:      string | undefined;
+      newAchievementIds: string[];
+      matchRecord:     Parameters<typeof saveMatchResult>[0];
+    };
+    const results: PlayerResult[] = [];
+
+    // ── Per-side ELO averages for opponent ELO calculation ───────────────
+    // For each player, "opponent" is the average rating of the opposing team.
+    const civilElos   = humanPlayers
+      .filter(p => p.role === "Civil")
+      .map(p => userMap.get(p.userId!)?.stats.elo ?? 1000);
+    const stateElos   = humanPlayers
+      .filter(p => p.role === "State" || p.role === "Overseer")
+      .map(p => userMap.get(p.userId!)?.stats.elo ?? 1000);
+    const avgCivilElo = civilElos.length
+      ? Math.round(civilElos.reduce((a, b) => a + b, 0) / civilElos.length)
+      : 1000;
+    const avgStateElo = stateElos.length
+      ? Math.round(stateElos.reduce((a, b) => a + b, 0) / stateElos.length)
+      : 1000;
+
+    // ── Mutate all user records in memory ─────────────────────────────────
+    for (const p of humanPlayers) {
+      const user = userMap.get(p.userId!);
       if (!user) continue;
 
       user.stats.gamesPlayed++;
@@ -1451,7 +1513,6 @@ export class GameEngine {
       const won = (winningSide === "Civil" && p.role === "Civil") ||
                   (winningSide === "State"  && (p.role === "State" || p.role === "Overseer"));
 
-      // Track per-role wins (used by achievement evaluator)
       if (won) {
         if (p.role === "Civil")    user.stats.civilWins    = (user.stats.civilWins    ?? 0) + 1;
         if (p.role === "State")    user.stats.stateWins    = (user.stats.stateWins    ?? 0) + 1;
@@ -1461,17 +1522,26 @@ export class GameEngine {
       const xpGain = calculateXpGain({ win: won, kills: p.role === "Overseer" ? p.stateEnactments || 0 : 0 });
       user.stats.xp += xpGain;
 
+      // Compute ELO delta here, before ELO is mutated, so eloBeforeCalc is accurate.
+      // opponentAvgElo is the average rating of the opposing team.
+      const opponentAvgElo = (p.role === "Civil") ? avgStateElo : avgCivilElo;
+      const eloChange      = s.mode === "Ranked"
+        ? computeEloChange(user.stats.elo, opponentAvgElo, won, user.stats.gamesPlayed)
+        : 0;
+
       if (won) {
         user.stats.wins++;
-        user.stats.elo    += s.mode === "Ranked" ? 20 : 0;
         user.stats.points += s.mode === "Ranked" ? 100 : 40;
       } else {
         user.stats.losses++;
-        user.stats.elo    = s.mode === "Ranked" ? Math.max(0, user.stats.elo - 20) : user.stats.elo;
         user.stats.points += s.mode === "Ranked" ? 25 : 10;
       }
 
-      // Personal agenda — evaluate once, used for both reward and match record
+      if (s.mode === "Ranked") {
+        user.stats.elo = Math.max(0, user.stats.elo + eloChange);
+      }
+
+      // Personal agenda
       let agendaCompleted = false;
       if (p.personalAgenda) {
         const agendaDef = AGENDA_MAP.get(p.personalAgenda);
@@ -1485,126 +1555,114 @@ export class GameEngine {
         }
       }
 
-      // ── Achievements ────────────────────────────────────────────────────
+      // Achievements
       const newAchievementIds = checkAchievements({ user, s, p, won, agendaCompleted });
       let achievementXp = 0;
       let achievementIp = 0;
       if (newAchievementIds.length > 0) {
         if (!user.earnedAchievements) user.earnedAchievements = [];
         if (!user.pinnedAchievements) user.pinnedAchievements = [];
-        const now = new Date().toISOString();
         for (const id of newAchievementIds) {
           user.earnedAchievements.push({ id, earnedAt: now });
           const def = ACHIEVEMENT_MAP.get(id);
-          if (def) {
-            achievementXp += def.xpReward;
-            achievementIp += def.ipReward;
-          }
+          if (def) { achievementXp += def.xpReward; achievementIp += def.ipReward; }
         }
-        user.stats.xp      += achievementXp;
-        user.cabinetPoints  = (user.cabinetPoints ?? 0) + achievementIp;
+        user.stats.xp     += achievementXp;
+        user.cabinetPoints = (user.cabinetPoints ?? 0) + achievementIp;
       }
 
-      const eloChange     = s.mode === "Ranked" ? (won ? 20 : -20) : 0;
       const eloAfter      = user.stats.elo;
       const eloBeforeCalc = eloAfter - eloChange;
+      const baseIp        = won ? (s.mode === "Ranked" ? 100 : 40) : (s.mode === "Ranked" ? 25 : 10);
+      const xpEarned      = xpGain + (agendaCompleted ? 100 : 0) + achievementXp;
+      const ipEarned      = baseIp + (agendaCompleted ? (s.mode === "Ranked" ? 40 : 20) : 0) + achievementIp;
 
-      const baseIp   = won
-        ? (s.mode === "Ranked" ? 100 : 40)
-        : (s.mode === "Ranked" ? 25  : 10);
-      const xpEarned = xpGain + (agendaCompleted ? 100 : 0) + achievementXp;
-      const ipEarned = baseIp + (agendaCompleted ? (s.mode === "Ranked" ? 40 : 20) : 0) + achievementIp;
-
-      await saveUser(user);
-      const { password: _, ...safe } = user;
-      this.io.to(p.id).emit("userUpdate", safe);
-
-      // Emit post-match summary to this player's socket
-      this.io.to(p.id).emit("postMatchResult", {
+      results.push({
+        playerId: p.id,
+        user,
         won,
-        mode:             s.mode,
-        role:             p.role,
         eloChange,
-        eloBefore:        eloBeforeCalc,
-        eloAfter,
-        roomAverageElo,
+        eloBeforeCalc,
         xpEarned,
         ipEarned,
-        agendaName:       p.personalAgenda ? (AGENDA_MAP.get(p.personalAgenda)?.name ?? undefined) : undefined,
         agendaCompleted,
-        rounds:           s.round,
-        civilDirectives:  s.civilDirectives,
-        stateDirectives:  s.stateDirectives,
-        newAchievements:  newAchievementIds,
-      });
-
-      // Save match history record
-      await saveMatchResult({
-        id:               randomUUID(),
-        userId:           p.userId,
-        playedAt:         new Date().toISOString(),
-        roomName:         s.roomId,
-        mode:             s.mode,
-        playerCount:      s.players.length,
-        role:             p.role,
-        won,
-        winReason:        s.winReason ?? "",
-        rounds:           s.round,
-        civilDirectives:  s.civilDirectives,
-        stateDirectives:  s.stateDirectives,
-        agendaId:         p.personalAgenda ?? null,
-        agendaName:       p.personalAgenda ? (AGENDA_MAP.get(p.personalAgenda)?.name ?? null) : null,
-        agendaCompleted,
-        xpEarned,
-        ipEarned,
-      });
-    }
-
-    // ── Recently Played With ───────────────────────────────────────────────
-    // Build the list of human players in this game with their current profile
-    // snapshots, then for each of them update every other human player's list.
-    const humanPlayers = s.players.filter(p => !p.isAI && p.userId);
-    const now = new Date().toISOString();
-
-    // Pre-fetch all human user records (they were saved above, so data is fresh)
-    const userSnapshots: { userId: string; entry: any }[] = [];
-    for (const p of humanPlayers) {
-      const u = await getUserById(p.userId!);
-      if (!u) continue;
-      userSnapshots.push({
-        userId: p.userId!,
-        entry: {
-          userId:       u.id,
-          username:     u.username,
-          avatarUrl:    u.avatarUrl ?? null,
-          activeFrame:  u.activeFrame ?? null,
-          elo:          u.stats.elo,
-          lastPlayedAt: now,
+        agendaName: p.personalAgenda ? (AGENDA_MAP.get(p.personalAgenda)?.name ?? undefined) : undefined,
+        newAchievementIds,
+        matchRecord: {
+          id:             randomUUID(),
+          userId:         p.userId!,
+          playedAt:       now,
+          roomName:       s.roomId,
+          mode:           s.mode,
+          playerCount:    s.players.length,
+          role:           p.role!,
+          won,
+          winReason:      s.winReason ?? "",
+          rounds:         s.round,
+          civilDirectives: s.civilDirectives,
+          stateDirectives: s.stateDirectives,
+          agendaId:       p.personalAgenda,
+          agendaName:     p.personalAgenda ? (AGENDA_MAP.get(p.personalAgenda)?.name) : undefined,
+          agendaCompleted,
+          xpEarned,
+          ipEarned,
         },
       });
     }
 
-    // For each human player, merge co-players into their recentlyPlayedWith list
-    for (const { userId } of userSnapshots) {
-      const u = await getUserById(userId);
+    // ── Recently Played With — computed from in-memory records, no re-fetch ─
+    const snapshots = results.map(r => ({
+      userId: r.user.id,
+      entry: {
+        userId:       r.user.id,
+        username:     r.user.username,
+        avatarUrl:    r.user.avatarUrl,
+        activeFrame:  r.user.activeFrame,
+        elo:          r.user.stats.elo,
+        lastPlayedAt: now,
+      } as RecentlyPlayedEntry,
+    }));
+
+    for (const { userId } of snapshots) {
+      const u = userMap.get(userId);
       if (!u) continue;
-
-      const existing: any[] = u.recentlyPlayedWith ?? [];
-      const existingMap = new Map<string, any>(existing.map(e => [e.userId, e]));
-
-      for (const { userId: coId, entry } of userSnapshots) {
-        if (coId === userId) continue; // skip self
-        existingMap.set(coId, entry);  // upsert — overwrites with fresh snapshot
+      const existingMap = new Map<string, any>((u.recentlyPlayedWith ?? []).map(e => [e.userId, e]));
+      for (const { userId: coId, entry } of snapshots) {
+        if (coId === userId) continue;
+        existingMap.set(coId, entry);
       }
-
-      // Sort most-recent first, keep newest 20
       u.recentlyPlayedWith = Array.from(existingMap.values())
         .sort((a, b) => new Date(b.lastPlayedAt).getTime() - new Date(a.lastPlayedAt).getTime())
         .slice(0, 20);
+    }
 
-      await saveUser(u);
-      const { password: _, ...safe } = u;
-      this.io.to(u.id).emit("userUpdate", safe);
+    // ── Single parallel save — replaces N sequential saveUser/saveMatchResult ─
+    await Promise.all([
+      ...validUsers.map(u => saveUser(u)),
+      ...results.map(r => saveMatchResult(r.matchRecord)),
+    ]);
+
+    // ── Socket emissions (after saves so clients receive final state) ──────
+    for (const r of results) {
+      const { password: _, ...safe } = r.user;
+      this.io.to(r.playerId).emit("userUpdate", safe);
+      this.io.to(r.playerId).emit("postMatchResult", {
+        won:             r.won,
+        mode:            s.mode,
+        role:            s.players.find(p => p.id === r.playerId)?.role,
+        eloChange:       r.eloChange,
+        eloBefore:       r.eloBeforeCalc,
+        eloAfter:        r.user.stats.elo,
+        roomAverageElo,
+        xpEarned:        r.xpEarned,
+        ipEarned:        r.ipEarned,
+        agendaName:      r.agendaName,
+        agendaCompleted: r.agendaCompleted,
+        rounds:          s.round,
+        civilDirectives: s.civilDirectives,
+        stateDirectives: s.stateDirectives,
+        newAchievements: r.newAchievementIds,
+      });
     }
   }
 
@@ -1997,21 +2055,27 @@ export class GameEngine {
       return;
     }
 
-    let data: any = { use: false };
+    let data: TitleAbilityData = { use: false };
 
     switch (prompt.role) {
       case "Assassin": {
         const targets = s.players.filter(p => p.isAlive && p.id !== player.id);
         const suspect = mostSuspicious(player, targets);
-        if (getSuspicion(player, suspect.id) > 0.7) data = { use: true, targetId: suspect.id };
+        if (getSuspicion(player, suspect.id) > 0.7) {
+          data = { use: true, role: "Assassin", targetId: suspect.id };
+        }
         break;
       }
       case "Strategist":
-        data = { use: Math.random() > 0.4 };
+        if (Math.random() > 0.4) {
+          data = { use: true, role: "Strategist" };
+        }
         break;
       case "Broker": {
         const candidate = s.players.find(p => p.isChancellorCandidate);
-        if (!isPresident && candidate && getSuspicion(player, candidate.id) > 0.6) data = { use: true };
+        if (!isPresident && candidate && getSuspicion(player, candidate.id) > 0.6) {
+          data = { use: true, role: "Broker" };
+        }
         break;
       }
       case "Handler": {
@@ -2019,19 +2083,23 @@ export class GameEngine {
           const curId  = s.players[s.presidentIdx].id;
           const curPos = s.presidentialOrder.indexOf(curId);
           const nextId = s.presidentialOrder[(curPos + 1) % s.presidentialOrder.length];
-          if (getSuspicion(player, nextId) > 0.6) data = { use: true };
+          if (getSuspicion(player, nextId) > 0.6) {
+            data = { use: true, role: "Handler" };
+          }
         }
         break;
       }
       case "Auditor":
-        data = { use: true };
+        data = { use: true, role: "Auditor" };
         break;
       case "Interdictor": {
         const candidates = s.players.filter(p =>
           p.isAlive && p.id !== s.players[s.presidentIdx].id && p.id !== player.id,
         );
         const suspect = candidates.find(p => getSuspicion(player, p.id) > 0.7);
-        if (suspect) data = { use: true, targetId: suspect.id };
+        if (suspect) {
+          data = { use: true, role: "Interdictor", targetId: suspect.id };
+        }
         break;
       }
     }
@@ -2053,7 +2121,7 @@ export class GameEngine {
   private triggerAIReactions(
     state: GameState, roomId: string,
     type: "nomination" | "enactment" | "failed_vote",
-    context?: any,
+    context?: { targetId?: string },
   ): void {
     const ai = state.players.filter(p => p.isAI && p.isAlive);
     if (ai.length === 0) return;

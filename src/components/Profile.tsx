@@ -128,7 +128,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
       // Play sound pack sequence
       const soundKeys = ['click', 'death', 'election_passed'];
       soundKeys.forEach((soundKey, index) => {
-        setTimeout(() => playSound(soundKey, item.id), index * 1000);
+        setTimeout(() => playSound(soundKey), index * 1000);
       });
       setTimeout(() => setPlayingItemId(null), soundKeys.length * 1000);
     } else if (item.type === 'music') {
@@ -203,7 +203,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
     }
   };
 
-  const handleEquip = async (type: 'frame' | 'policy' | 'vote' | 'music' | 'sound' | 'background', itemId: string | undefined) => {
+  const handleEquip = async (type: 'frame' | 'badge' | 'policy' | 'vote' | 'music' | 'sound' | 'background', itemId: string | undefined) => {
     console.log('handleEquip called', type, itemId);
     setIsLoading(true);
     setError('');

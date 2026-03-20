@@ -77,7 +77,7 @@ export default function App() {
           setIsDiscord(true);
           console.log("Discord instance detected, attempting auto-login...");
           try {
-            const { code } = await discordSdk.commands.authorize({
+            const { code } = await discordSdk!.commands.authorize({
               client_id: DISCORD_CLIENT_ID,
               response_type: "code",
               state: "",
@@ -114,7 +114,7 @@ export default function App() {
               const data = await res.json();
               if (data.user) {
                 currentUser = data.user;
-                console.log("Session restored for user:", currentUser.username);
+                console.log("Session restored for user:", currentUser!.username);
               }
             } else {
               console.warn("Session token invalid or expired, clearing.");
@@ -140,7 +140,7 @@ export default function App() {
 
             // Handle activity exit — fires when user closes/minimises the panel
             try {
-              discordSdk.subscribe('ACTIVITY_LAYOUT_MODE_UPDATE', (evt: any) => {
+              discordSdk!.subscribe('ACTIVITY_LAYOUT_MODE_UPDATE', (evt: any) => {
                 // layout_mode 0 = closed / picture-in-picture collapsed
                 if (evt?.layout_mode === 0) {
                   socket.emit('leaveRoom');
@@ -308,9 +308,12 @@ export default function App() {
     const urlUser = params.get('user');
     if (urlToken && urlUser) {
       try {
-        const userData = JSON.parse(decodeURIComponent(urlUser));
-        handleAuthSuccess(userData, urlToken);
-        window.history.replaceState({}, document.title, window.location.pathname);
+        const decodedUser = decodeURIComponent(urlUser);
+        if (decodedUser) {
+          const userData = JSON.parse(decodedUser);
+          handleAuthSuccess(userData, urlToken);
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
       } catch (e) { console.error('Failed to parse user from URL', e); }
     }
   }, []);
@@ -321,7 +324,7 @@ export default function App() {
       setGameState(state);
       setJoined(true);
     });
-    socket.on('privateInfo', (info) => setPrivateInfo(info));
+    socket.on('privateInfo', (info: PrivateInfo) => setPrivateInfo(info));
     socket.on('error', (msg: string) => {
       setError(msg);
       setTimeout(() => setError(null), 3000);

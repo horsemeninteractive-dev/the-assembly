@@ -17,9 +17,9 @@ interface ChatPanelProps {
   showEmojiPicker: boolean;
   setShowEmojiPicker: (v: boolean) => void;
   onEmojiClick: (data: any) => void;
-  chatEndRef: RefObject<HTMLDivElement>;
-  chatInputRef: RefObject<HTMLInputElement>;
-  chatGhostRef: RefObject<HTMLDivElement>;
+  chatEndRef: RefObject<HTMLDivElement | null>;
+  chatInputRef: RefObject<HTMLInputElement | null>;
+  chatGhostRef: RefObject<HTMLDivElement | null>;
   onChatScroll: () => void;
   playSound: (key: string) => void;
 }

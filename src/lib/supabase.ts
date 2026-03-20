@@ -19,6 +19,6 @@ const supabaseAnonKey = getEnv('SUPABASE_ANON_KEY');
 
 export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
 
-export const supabase = isSupabaseConfigured 
+export const supabase = (isSupabaseConfigured 
   ? createClient(supabaseUrl, supabaseAnonKey) 
-  : null as any;
+  : null) as any; // Using any to avoid null-checks everywhere where isSupabaseConfigured is used as a guard

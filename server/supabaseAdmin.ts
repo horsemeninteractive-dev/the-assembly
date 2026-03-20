@@ -9,11 +9,11 @@ const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY || '';
 export const isSupabaseAdminConfigured = !!(supabaseUrl && supabaseServiceKey);
 
 // This client bypasses RLS - ONLY use it in server-side code
-export const supabaseAdmin = isSupabaseAdminConfigured 
+export const supabaseAdmin = (isSupabaseAdminConfigured 
   ? createClient(supabaseUrl, supabaseServiceKey, {
       auth: {
         autoRefreshToken: false,
         persistSession: false
       }
     }) 
-  : null as any;
+  : null) as any;

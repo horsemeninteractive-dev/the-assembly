@@ -103,9 +103,9 @@ export const GameRoom = ({
   const [chatText, setChatText] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0);
-  const chatInputRef = useRef<HTMLInputElement>(null);
-  const chatGhostRef = useRef<HTMLDivElement>(null);
-  const chatEndRef = useRef<HTMLDivElement>(null);
+  const chatInputRef = useRef<HTMLInputElement | null>(null);
+  const chatGhostRef = useRef<HTMLDivElement | null>(null);
+  const chatEndRef = useRef<HTMLDivElement | null>(null);
 
   const hasNewMessages = !isChatOpen && gameState.messages
     .slice(lastSeenMessageCount)
@@ -303,6 +303,7 @@ export const GameRoom = ({
   }, [gameState.lastEnactedPolicy?.trackerReady, gameState.lastEnactedPolicy?.timestamp, gameState.declarations?.length, gameState.phase, showPolicyAnim]);
 
   const handleSubmitDeclaration = () => {
+    if (!declarationType) return;
     socket.emit('declarePolicies', {
       civ: declCiv,
       sta: declSta,

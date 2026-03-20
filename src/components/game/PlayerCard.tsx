@@ -84,7 +84,7 @@ export const PlayerCard = React.memo(({
   const hasVideo = stream?.getVideoTracks().some(t => t.enabled) ?? false;
   // Use server-side state (p.isCamOn) as source of truth for visibility
   // If it's me, allow local toggle to also hide it for preview
-  const showVideo = isMe ? (isVideoActive && p.isCamOn && hasVideo) : (p.isCamOn && hasVideo);
+  const showVideo = isMe ? (isVideoActive && !!p.isCamOn && hasVideo) : (!!p.isCamOn && hasVideo);
 
   return (
     <motion.div

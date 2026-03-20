@@ -45,8 +45,9 @@ export const getPolicyStyles = (styleId: string | undefined, type: Policy) => {
   }
 };
 
-export const getVoteStyles = (styleId: string | undefined, type: 'Aye' | 'Nay') => {
+export const getVoteStyles = (styleId: string | undefined, type: 'Aye' | 'Nay' | undefined) => {
   const isAye = type === 'Aye';
+  if (!type) return "bg-black border-default text-white";
   switch(styleId) {
     case 'vote-wax':
       return isAye ? "bg-[#8b0000] border-[#5a0000] text-white shadow-[0_4px_0_#5a0000]" : "bg-surface border-default text-muted";

@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
 import { supabase, isSupabaseConfigured } from "../src/lib/supabase.ts";
 import { supabaseAdmin, isSupabaseAdminConfigured } from "./supabaseAdmin.ts";
-import { User, UserInternal } from "../src/types.ts";
+import { User, UserInternal, MatchSummary } from "../src/types.ts";
 
 // Use admin client if available, fallback to regular client
 const db = isSupabaseAdminConfigured ? supabaseAdmin : supabase;
@@ -51,10 +51,10 @@ function mapSupabaseToUser(data: any): UserInternal {
     recentlyPlayedWith: data.recently_played_with || [],
     googleId:          data.google_id,
     discordId:         data.discord_id,
-  };
+  } as UserInternal;
 }
 
-function mapUserToSupabase(userData: UserInternal): any {
+function mapUserToSupabase(userData: UserInternal): Record<string, unknown> {
   return {
     id:               userData.id,
     username:         userData.username,
@@ -128,7 +128,7 @@ export async function incrementGlobalWin(faction: 'Civil' | 'State'): Promise<vo
 // Read operations
 // ---------------------------------------------------------------------------
 
-export async function getUser(username: string): Promise<any> {
+export async function getUser(username: string): Promise<UserInternal | null> {
   if (isConfigured) {
     const { data, error } = await db
       .from("users")
@@ -141,7 +141,7 @@ export async function getUser(username: string): Promise<any> {
   return users.get(username) ?? null;
 }
 
-export async function getUserById(id: string): Promise<any> {
+export async function getUserById(id: string): Promise<UserInternal | null> {
   if (isConfigured) {
     const { data, error } = await db
       .from("users")
@@ -157,7 +157,7 @@ export async function getUserById(id: string): Promise<any> {
   return null;
 }
 
-export async function getUserByGoogleId(googleId: string): Promise<any> {
+export async function getUserByGoogleId(googleId: string): Promise<UserInternal | null> {
   if (isConfigured) {
     const { data, error } = await db
       .from("users")
@@ -173,7 +173,7 @@ export async function getUserByGoogleId(googleId: string): Promise<any> {
   return null;
 }
 
-export async function getUserByDiscordId(discordId: string): Promise<any> {
+export async function getUserByDiscordId(discordId: string): Promise<UserInternal | null> {
   if (isConfigured) {
     const { data, error } = await db
       .from("users")
@@ -193,7 +193,7 @@ export async function getUserByDiscordId(discordId: string): Promise<any> {
 // Friends operations
 // ---------------------------------------------------------------------------
 
-export async function getFriends(userId: string): Promise<any[]> {
+export async function getFriends(userId: string): Promise<UserInternal[]> {
   if (isConfigured) {
     const { data, error } = await db
       .from("friends")
@@ -202,7 +202,7 @@ export async function getFriends(userId: string): Promise<any[]> {
       .eq("status", "accepted");
     if (error) return [];
     
-    const friendIds = data.map(f => f.user_id_1 === userId ? f.user_id_2 : f.user_id_1);
+    const friendIds = data.map((f: any) => f.user_id_1 === userId ? f.user_id_2 : f.user_id_1);
     const { data: friendsData, error: friendsError } = await db
       .from("users")
       .select("*")
@@ -253,7 +253,7 @@ export async function removeFriend(userId1: string, userId2: string): Promise<vo
 }
 
 
-export async function searchUsers(query: string, currentUserId: string, limit = 10): Promise<any[]> {
+export async function searchUsers(query: string, currentUserId: string, limit = 10): Promise<UserInternal[]> {
   if (!query.trim() || query.length < 2) return [];
   if (isConfigured) {
     const { data, error } = await db
@@ -271,7 +271,7 @@ export async function searchUsers(query: string, currentUserId: string, limit = 
     .slice(0, limit);
 }
 
-export async function getPendingFriendRequests(userId: string): Promise<any[]> {
+export async function getPendingFriendRequests(userId: string): Promise<UserInternal[]> {
   if (isConfigured) {
     // Requests where userId is the recipient (user_id_2) and status is pending
     const { data, error } = await db
@@ -280,7 +280,7 @@ export async function getPendingFriendRequests(userId: string): Promise<any[]> {
       .eq("user_id_2", userId)
       .eq("status", "pending");
     if (error || !data || data.length === 0) return [];
-    const senderIds = data.map((r: any) => r.user_id_1);
+    const senderIds = (data as Array<{ user_id_1: string }>).map(r => r.user_id_1);
     const { data: senders, error: sendersError } = await db
       .from("users")
       .select("*")
@@ -295,7 +295,7 @@ export async function getPendingFriendRequests(userId: string): Promise<any[]> {
 // Write operations
 // ---------------------------------------------------------------------------
 
-export async function saveUser(userData: any): Promise<void> {
+export async function saveUser(userData: UserInternal): Promise<void> {
   if (isConfigured) {
     const { error } = await db
       .from("users")
@@ -313,9 +313,9 @@ export async function saveUser(userData: any): Promise<void> {
 // ---------------------------------------------------------------------------
 
 // In-memory fallback for match history (keyed by userId)
-const matchHistoryStore: Map<string, any[]> = new Map();
+const matchHistoryStore: Map<string, MatchSummary[]> = new Map();
 
-export async function saveMatchResult(match: any): Promise<void> {
+export async function saveMatchResult(match: Omit<MatchSummary, "id"> & { id: string }): Promise<void> {
   if (isConfigured) {
     const { error } = await db.from("match_history").insert({
       id:               match.id,
@@ -339,12 +339,12 @@ export async function saveMatchResult(match: any): Promise<void> {
     if (error) console.error("Match history save error:", error.message);
   } else {
     const existing = matchHistoryStore.get(match.userId) ?? [];
-    existing.unshift(match);
+    existing.unshift(match as any);
     matchHistoryStore.set(match.userId, existing.slice(0, 50));
   }
 }
 
-export async function getMatchHistory(userId: string, limit = 20): Promise<any[]> {
+export async function getMatchHistory(userId: string, limit = 20): Promise<MatchSummary[]> {
   if (isConfigured) {
     const { data, error } = await db
       .from("match_history")
@@ -353,7 +353,7 @@ export async function getMatchHistory(userId: string, limit = 20): Promise<any[]
       .order("played_at", { ascending: false })
       .limit(limit);
     if (error || !data) return [];
-    return data.map(r => ({
+    return data.map((r: any) => ({
       id:               r.id,
       userId:           r.user_id,
       playedAt:         r.played_at,
@@ -380,7 +380,7 @@ export async function getMatchHistory(userId: string, limit = 20): Promise<any[]
 // New-user factory — shared by register, Google OAuth, Discord OAuth
 // ---------------------------------------------------------------------------
 
-export function makeNewUser(overrides: Partial<any> = {}): any {
+export function makeNewUser(overrides: Partial<UserInternal> = {}): UserInternal {
   return {
     id: randomUUID(),
     username: "",

@@ -11,14 +11,14 @@ interface InventoryProps {
   onUpdateUser: (user: User) => void;
   token: string;
   playSound: (soundKey: string) => void;
-  handleEquip: (type: 'frame' | 'policy' | 'vote' | 'music' | 'sound' | 'background', itemId: string | undefined) => void;
+  handleEquip: (type: 'frame' | 'badge' | 'policy' | 'vote' | 'music' | 'sound' | 'background', itemId: string | undefined) => void;
   items: CosmeticItem[];
   playPreview: (item: CosmeticItem) => void;
   playingItemId: string | null;
 }
 
 export const Inventory: React.FC<InventoryProps> = ({ user, handleEquip, playSound, items, playPreview, playingItemId }) => {
-  const [category, setCategory] = useState<'frame' | 'policy' | 'vote' | 'music' | 'sound' | 'background'>('frame');
+  const [category, setCategory] = useState<'frame' | 'badge' | 'policy' | 'vote' | 'music' | 'sound' | 'background'>('frame');
   const typeItems = DEFAULT_ITEMS.filter(item => {
     if (item.type !== category) return false;
     
@@ -33,7 +33,7 @@ export const Inventory: React.FC<InventoryProps> = ({ user, handleEquip, playSou
     return isOwned || isUnlocked;
   });
   
-  const categories: { id: 'frame' | 'policy' | 'vote' | 'music' | 'sound' | 'background', label: string }[] = [
+  const categories: { id: 'frame' | 'badge' | 'policy' | 'vote' | 'music' | 'sound' | 'background', label: string }[] = [
     { id: 'frame', label: 'Frames' },
     { id: 'policy', label: 'Directives' },
     { id: 'vote', label: 'Votes' },

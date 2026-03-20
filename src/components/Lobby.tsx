@@ -10,17 +10,18 @@ import { HowToPlayModal } from './HowToPlayModal';
 
 interface LobbyProps {
   user: User;
-  onJoinRoom: (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked', isSpectator?: boolean, privacy?: string, inviteCode?: string) => void;
+  onJoinRoom: (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked', isSpectator?: boolean, privacy?: RoomPrivacy, inviteCode?: string) => void;
   onLogout: () => void;
   onOpenProfile: () => void;
   playSound: (soundKey: string) => void;
   token?: string;
+  uiScaleSetting?: number;
 }
 
 import { getBackgroundTexture } from '../lib/cosmetics';
 import { getRankTier, getRankLabel } from '../lib/ranks';
 
-export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpenProfile, playSound, token }) => {
+export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpenProfile, playSound, token, uiScaleSetting }) => {
   const [rooms, setRooms] = useState<RoomInfo[]>([]);
   const [rejoinInfo, setRejoinInfo] = useState<{ canRejoin: boolean; roomId?: string; roomName?: string; mode?: string } | null>(null);
   const [globalStats, setGlobalStats] = useState<{ civilWins: number; stateWins: number }>({ civilWins: 0, stateWins: 0 });
@@ -161,7 +162,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
             <p className="text-responsive-xs uppercase tracking-widest text-muted font-mono mt-0.5">Assembly Lobby</p>
           </div>
 
-          <div className="ml-2">
+          <div className="ml-2 hidden sm:block">
             <Tooltip content="Leaderboard">
               <button
                 onClick={() => {
@@ -235,6 +236,19 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                   </span>
                 )}
               </div>
+            </button>
+          </Tooltip>
+
+          {/* Leaderboard — mobile only (desktop version is in the title group) */}
+          <Tooltip content="Leaderboard">
+            <button
+              onClick={() => {
+                playSound('click');
+                setIsLeaderboardOpen(true);
+              }}
+              className="sm:hidden w-[4vh] h-[4vh] rounded-xl bg-card border border-default flex items-center justify-center hover:border-yellow-900/50 transition-colors"
+            >
+              <Trophy className="w-[2vh] h-[2vh] text-yellow-500" />
             </button>
           </Tooltip>
 
