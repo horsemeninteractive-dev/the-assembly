@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { socket } from '../../../socket';
-import { TitleRole, GameState } from '../../../types';
+import { TitleRole, GameState, TitleAbilityData } from '../../../types';
 
 interface TitleAbilityModalProps {
   role: TitleRole;
@@ -18,8 +18,13 @@ export const TitleAbilityModal = ({ role, gameState, onClose }: TitleAbilityModa
   });
 
   const handleUse = () => {
-    if (role === 'Assassin' && !targetId) return;
-    socket.emit('useTitleAbility', { use: true, targetId });
+    if ((role === 'Assassin' || role === 'Interdictor') && !targetId) return;
+    
+    const payload = (role === 'Assassin' || role === 'Interdictor')
+      ? { use: true as const, role, targetId }
+      : { use: true as const, role } as TitleAbilityData;
+
+    socket.emit('useTitleAbility', payload);
     onClose();
   };
 

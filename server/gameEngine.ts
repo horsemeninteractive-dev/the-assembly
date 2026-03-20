@@ -14,7 +14,7 @@
 import { randomUUID } from "crypto";
 import { Server, Socket } from "socket.io";
 import {
-  GameState, Player, Policy, ExecutiveAction, TitleRole, GamePhase, UserInternal, RecentlyPlayedEntry,
+  GameState, Player, Policy, ExecutiveAction, TitleRole, TitleAbilityData, GamePhase, UserInternal, RecentlyPlayedEntry,
 } from "../src/types.ts";
 import { shuffle, createDeck } from "./utils.ts";
 import { AI_BOTS, CHAT } from "./aiConstants.ts";
@@ -47,15 +47,6 @@ import {
 
 export type Deps = { io: Server };
 
-/** Typed payloads for each title ability action. */
-export type TitleAbilityData =
-  | { use: false }
-  | { use: true; role: "Assassin";    targetId: string }
-  | { use: true; role: "Strategist" }
-  | { use: true; role: "Broker" }
-  | { use: true; role: "Handler" }
-  | { use: true; role: "Auditor" }
-  | { use: true; role: "Interdictor"; targetId: string };
 
 // ---------------------------------------------------------------------------
 // Internal helpers
@@ -619,7 +610,7 @@ export class GameEngine {
     state.presidentSaw       = undefined;
     state.chancellorSaw      = undefined;
     state.lastEnactedPolicy  = undefined;
-    state.isStrategistAction = undefined as any;
+    state.isStrategistAction = undefined;
 
     state.players[state.presidentIdx].isPresidentialCandidate = true;
     addLog(state, `${state.players[state.presidentIdx].name} is the Presidential Candidate.`);
@@ -1158,7 +1149,7 @@ export class GameEngine {
       case "Strategist": {
         ensureDeckHas(s, 4);
         s.drawnPolicies      = s.deck.splice(0, 4);
-        s.isStrategistAction = true as any;
+        s.isStrategistAction = true;
         addLog(s, `${player.name} (Strategist) drew an extra directive (4 total).`);
         this.enterPhase(s, roomId, "Legislative_President");
         break;

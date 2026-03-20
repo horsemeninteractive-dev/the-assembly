@@ -1,6 +1,16 @@
 export type Role = 'Civil' | 'State' | 'Overseer';
 export type TitleRole = 'Assassin' | 'Strategist' | 'Broker' | 'Handler' | 'Auditor' | 'Interdictor';
 
+/** Typed payloads for each title ability action. */
+export type TitleAbilityData =
+  | { use: false }
+  | { use: true; role: "Assassin";    targetId: string }
+  | { use: true; role: "Strategist" }
+  | { use: true; role: "Broker" }
+  | { use: true; role: "Handler" }
+  | { use: true; role: "Auditor" }
+  | { use: true; role: "Interdictor"; targetId: string };
+
 export type PersonalAgendaId =
   | 'chaos_agent'
   | 'the_purist'
@@ -363,7 +373,7 @@ export interface ClientToServerEvents {
   presidentDiscard: (policyIdx: number) => void;
   chancellorPlay: (policyIdx: number) => void;
   performExecutiveAction: (targetId: string) => void;
-  useTitleAbility: (abilityData: any) => void;
+  useTitleAbility: (abilityData: TitleAbilityData) => void;
   sendMessage: (message: string) => void;
   declarePolicies: (data: { civ: number; sta: number; drewCiv?: number; drewSta?: number; type: 'President' | 'Chancellor' } | null) => void;
   vetoRequest: () => void;
