@@ -40,6 +40,7 @@ import {
   getPlayerAgenda,
   AGENDA_MAP,
 } from "./personalAgendas.ts";
+import { stateClient, roomKey, ROOM_TTL_SECONDS, isRedisConfigured } from "./redis.ts";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -89,11 +90,11 @@ export class GameEngine {
   readonly rooms: Map<string, GameState> = new Map();
 
   /** One action-timeout handle per room. */
-  private actionTimers: Map<string, any> = new Map();
+  private actionTimers: Map<string, ReturnType<typeof setTimeout>>  = new Map();
   /** One pause-countdown handle per room. */
-  private pauseTimers:  Map<string, any> = new Map();
+  private pauseTimers:  Map<string, ReturnType<typeof setInterval>> = new Map();
   /** Lobby countdown handles (kept for API compatibility). */
-  private lobbyTimers:  Map<string, any> = new Map();
+  private lobbyTimers:  Map<string, ReturnType<typeof setInterval>> = new Map();
 
   constructor({ io }: Deps) {
     this.io = io;
@@ -180,6 +181,106 @@ export class GameEngine {
           });
         }
       }
+    }
+
+    // Persist state to Redis on every broadcast (write-through cache).
+    // Fire-and-forget — we never block the game loop on a Redis write.
+    if (isRedisConfigured && stateClient) {
+      stateClient
+        .set(roomKey(roomId), JSON.stringify(state), "EX", ROOM_TTL_SECONDS)
+        .catch(err => console.error(`[Redis] failed to persist room ${roomId}:`, err.message));
+    }
+  }
+
+  /** Remove a room from the in-memory map and Redis. */
+  private deleteRoom(roomId: string): void {
+    this.rooms.delete(roomId);
+    if (isRedisConfigured && stateClient) {
+      stateClient.del(roomKey(roomId)).catch(err =>
+        console.error(`[Redis] failed to delete room ${roomId}:`, err.message)
+      );
+    }
+  }
+
+  /**
+   * On server startup, reload all persisted rooms from Redis and restart
+   * any timers that were live when the previous instance went down.
+   *
+   * Called once from server.ts after the Socket.IO adapter is ready.
+   */
+  public async restoreFromRedis(): Promise<void> {
+    if (!isRedisConfigured || !stateClient) return;
+
+    const keys = await stateClient.keys("room:*");
+    if (keys.length === 0) return;
+
+    console.log(`[Redis] restoring ${keys.length} room(s) from Redis...`);
+
+    for (const key of keys) {
+      const raw = await stateClient.get(key);
+      if (!raw) continue;
+
+      let state: GameState;
+      try {
+        state = JSON.parse(raw) as GameState;
+      } catch {
+        console.warn(`[Redis] skipping malformed state for key ${key}`);
+        continue;
+      }
+
+      const roomId = state.roomId;
+
+      // Drop finished or empty rooms — nothing to restore
+      if (state.phase === "GameOver") {
+        await stateClient.del(key);
+        continue;
+      }
+      if (state.players.filter(p => !p.isAI).length === 0) {
+        await stateClient.del(key);
+        continue;
+      }
+
+      // Mark all human players as disconnected — they'll need to rejoin.
+      // The 60-second reconnect grace period will handle them naturally.
+      for (const p of state.players) {
+        if (!p.isAI) p.isDisconnected = true;
+      }
+
+      // Pause the game if it was mid-round so it doesn't auto-advance
+      // while nobody is connected yet.
+      if (state.phase !== "Lobby") {
+        state.isPaused    = true;
+        state.pauseReason = "Server restarted. Waiting for players to reconnect…";
+      }
+
+      this.rooms.set(roomId, state);
+
+      // Restart action timer with remaining duration if one was live.
+      // If the timer already expired while the server was down, fire
+      // the expiry handler immediately via a zero-delay timeout.
+      if (state.actionTimerEnd !== undefined && !state.isPaused) {
+        const remaining = state.actionTimerEnd - Date.now();
+        if (remaining > 0) {
+          const handle = setTimeout(async () => {
+            this.actionTimers.delete(roomId);
+            const s = this.rooms.get(roomId);
+            if (!s || s.phase === "Lobby" || s.phase === "GameOver" || s.isPaused) return;
+            s.actionTimerEnd = undefined;
+            await this.onActionTimerExpired(s, roomId);
+          }, remaining);
+          this.actionTimers.set(roomId, handle);
+        } else {
+          // Expired while server was down — handle on next tick
+          setTimeout(async () => {
+            const s = this.rooms.get(roomId);
+            if (!s || s.phase === "Lobby" || s.phase === "GameOver" || s.isPaused) return;
+            s.actionTimerEnd = undefined;
+            await this.onActionTimerExpired(s, roomId);
+          }, 0);
+        }
+      }
+
+      console.log(`[Redis] restored room ${roomId} (phase: ${state.phase}, players: ${state.players.length})`);
     }
   }
 
@@ -328,9 +429,59 @@ export class GameEngine {
     this.enterPhase(s, roomId, "Legislative_Chancellor");
   }
 
-  // ═══════════════════════════════════════════════════════════════════════════
-  // AI Turn Scheduling — fires once per phase entry, never recursively
-  // ═══════════════════════════════════════════════════════════════════════════
+  /** Human president discards a policy by index. */
+  public handlePresidentDiscard(s: GameState, roomId: string, presidentSocketId: string, idx: number): void {
+    if (s.phase !== "Legislative_President") return;
+    if (s.presidentId !== presidentSocketId) return;
+    const player = s.players.find(p => p.id === presidentSocketId);
+    if (!player || !player.isAlive || player.hasActed) return;
+    player.hasActed = true;
+
+    // Guard: timer may have already auto-discarded and cleared the hand
+    if (s.drawnPolicies.length === 0) return;
+
+    s.presidentSaw = [...s.drawnPolicies];
+    const discarded = s.drawnPolicies.splice(idx, 1)[0];
+    if (!discarded) return;
+    s.discard.push(discarded);
+
+    if (s.drawnPolicies.length > 2) {
+      // Still more to discard (Strategist drew 4 — needs to discard 2)
+      player.hasActed = false;
+      this.broadcastState(roomId);
+      return;
+    }
+
+    s.chancellorPolicies = [...s.drawnPolicies];
+    s.chancellorSaw      = [...s.chancellorPolicies];
+    s.drawnPolicies      = [];
+    this.enterLegislativeChancellor(s, roomId);
+  }
+
+  /** Human chancellor enacts a policy by index. */
+  public handleChancellorPlay(s: GameState, roomId: string, chancellorSocketId: string, idx: number): void {
+    if (s.phase !== "Legislative_Chancellor") return;
+    if (s.chancellorId !== chancellorSocketId) return;
+    const player = s.players.find(p => p.id === chancellorSocketId);
+    if (!player || !player.isAlive || player.hasActed) return;
+    player.hasActed = true;
+
+    // Guard: timer may have already auto-played and cleared the hand
+    if (s.chancellorPolicies.length === 0) return;
+
+    const played = s.chancellorPolicies.splice(idx, 1)[0];
+    // Guard: splice on a partially-cleared array can return undefined
+    if (!played) return;
+
+    s.discard.push(...s.chancellorPolicies);
+    s.chancellorPolicies = [];
+    // Do NOT restart the timer here — phase stays Legislative_Chancellor during
+    // the animation window; restarting would create a stale misfire.
+    this.enactPolicy(s, roomId, played, false, chancellorSocketId);
+    this.broadcastState(roomId);
+  }
+
+
 
   scheduleAITurns(s: GameState, roomId: string): void {
     if (s.phase === "Lobby" || s.phase === "GameOver" || s.isPaused) return;
@@ -622,7 +773,7 @@ export class GameEngine {
     );
 
     if (interdictor) {
-      state.titlePrompt = { playerId: interdictor.id, role: "Interdictor", context: {}, nextPhase: "Nominate_Chancellor" };
+      state.titlePrompt = { playerId: interdictor.id, role: "Interdictor", context: { role: "Interdictor" }, nextPhase: "Nominate_Chancellor" };
       this.enterPhase(state, roomId, "Nomination_Review");
     } else {
       this.enterPhase(state, roomId, "Nominate_Chancellor");
@@ -649,7 +800,7 @@ export class GameEngine {
   private advanceToVotingOrBroker(s: GameState, roomId: string): void {
     const broker = s.players.find(p => p.titleRole === "Broker" && !p.titleUsed && p.isAlive);
     if (broker) {
-      s.titlePrompt = { playerId: broker.id, role: "Broker", context: {}, nextPhase: "Voting" };
+      s.titlePrompt = { playerId: broker.id, role: "Broker", context: { role: "Broker" }, nextPhase: "Voting" };
       this.enterPhase(s, roomId, "Nomination_Review");
     } else {
       this.enterPhase(s, roomId, "Voting");
@@ -667,11 +818,24 @@ export class GameEngine {
 
     const chancellor = s.players.find(p => p.id === chancellorId);
     if (!chancellor || !chancellor.isAlive || chancellor.id === president.id) return;
-    if (s.rejectedChancellorId === chancellor.id) return;
-    if (s.detainedPlayerId    === chancellor.id) return;
+
+    if (s.rejectedChancellorId === chancellor.id) {
+      this.io.to(presidentSocketId).emit("error", "This player was rejected by the Broker and cannot be nominated again this round.");
+      president.hasActed = false;
+      return;
+    }
+    if (s.detainedPlayerId === chancellor.id) {
+      this.io.to(presidentSocketId).emit("error", "This player is detained by the Interdictor and cannot be nominated.");
+      president.hasActed = false;
+      return;
+    }
 
     const alive = s.players.filter(p => p.isAlive).length;
-    if (chancellor.wasChancellor || (alive > 5 && chancellor.wasPresident)) return;
+    if (chancellor.wasChancellor || (alive > 5 && chancellor.wasPresident)) {
+      this.io.to(presidentSocketId).emit("error", "Player is ineligible due to term limits.");
+      president.hasActed = false;
+      return;
+    }
 
     s.players.forEach(p => (p.isChancellorCandidate = false));
     chancellor.isChancellorCandidate = true;
@@ -778,7 +942,7 @@ export class GameEngine {
 
     // Strategist draws 4 instead of 3
     if (president.titleRole === "Strategist" && !president.titleUsed) {
-      s.titlePrompt   = { playerId: president.id, role: "Strategist", context: {}, nextPhase: "Legislative_President" };
+      s.titlePrompt   = { playerId: president.id, role: "Strategist", context: { role: "Strategist" }, nextPhase: "Legislative_President" };
       s.drawnPolicies = [];
       this.enterPhase(s, roomId, "Legislative_President");
     } else {
@@ -1041,21 +1205,21 @@ export class GameEngine {
 
     const auditor = s.players.find(p => p.titleRole === "Auditor" && !p.titleUsed && p.isAlive);
     if (auditor) {
-      s.titlePrompt = { playerId: auditor.id, role: "Auditor", context: { discardPile: s.discard.slice(-3) } };
+      s.titlePrompt = { playerId: auditor.id, role: "Auditor", context: { role: "Auditor", discardPile: s.discard.slice(-3) } };
       this.enterPhase(s, roomId, "Auditor_Action");
       return;
     }
 
     const president = s.players[s.presidentIdx];
     if (president.titleRole === "Assassin" && !president.titleUsed && president.isAlive) {
-      s.titlePrompt = { playerId: president.id, role: "Assassin", context: {}, nextPhase: "Handler_Action" };
+      s.titlePrompt = { playerId: president.id, role: "Assassin", context: { role: "Assassin" }, nextPhase: "Handler_Action" };
       this.enterPhase(s, roomId, "Assassin_Action");
       return;
     }
 
     const handler = s.players.find(p => p.titleRole === "Handler" && !p.titleUsed && p.isAlive);
     if (handler) {
-      s.titlePrompt = { playerId: handler.id, role: "Handler", context: {}, nextPhase: "Nominate_Chancellor" };
+      s.titlePrompt = { playerId: handler.id, role: "Handler", context: { role: "Handler" }, nextPhase: "Nominate_Chancellor" };
       this.enterPhase(s, roomId, "Handler_Action");
       return;
     }
@@ -1070,7 +1234,7 @@ export class GameEngine {
     if (after === "Auditor") {
       const president = s.players[s.presidentIdx];
       if (president.titleRole === "Assassin" && !president.titleUsed && president.isAlive) {
-        s.titlePrompt = { playerId: president.id, role: "Assassin", context: {}, nextPhase: "Handler_Action" };
+        s.titlePrompt = { playerId: president.id, role: "Assassin", context: { role: "Assassin" }, nextPhase: "Handler_Action" };
         this.enterPhase(s, roomId, "Assassin_Action");
         return;
       }
@@ -1079,7 +1243,7 @@ export class GameEngine {
     if (after === "Auditor" || after === "Assassin") {
       const handler = s.players.find(p => p.titleRole === "Handler" && !p.titleUsed && p.isAlive);
       if (handler) {
-        s.titlePrompt = { playerId: handler.id, role: "Handler", context: {}, nextPhase: "Nominate_Chancellor" };
+        s.titlePrompt = { playerId: handler.id, role: "Handler", context: { role: "Handler" }, nextPhase: "Nominate_Chancellor" };
         this.enterPhase(s, roomId, "Handler_Action");
         return;
       }
@@ -1165,7 +1329,7 @@ export class GameEngine {
         // Chain to a second Broker if one exists
         const nextBroker = s.players.find(p => p.titleRole === "Broker" && !p.titleUsed && p.isAlive && p.id !== player.id);
         if (nextBroker) {
-          s.titlePrompt = { playerId: nextBroker.id, role: "Broker", context: {}, nextPhase: "Voting" };
+          s.titlePrompt = { playerId: nextBroker.id, role: "Broker", context: { role: "Broker" }, nextPhase: "Voting" };
           this.enterPhase(s, roomId, "Nomination_Review");
         } else {
           this.enterPhase(s, roomId, "Nominate_Chancellor");
@@ -1219,7 +1383,7 @@ export class GameEngine {
         }
         const nextInterdictor = s.players.find(p => p.titleRole === "Interdictor" && !p.titleUsed && p.isAlive && p.id !== player.id);
         if (nextInterdictor) {
-          s.titlePrompt = { playerId: nextInterdictor.id, role: "Interdictor", context: {}, nextPhase: "Nominate_Chancellor" };
+          s.titlePrompt = { playerId: nextInterdictor.id, role: "Interdictor", context: { role: "Interdictor" }, nextPhase: "Nominate_Chancellor" };
           this.enterPhase(s, roomId, "Nomination_Review");
         } else {
           this.enterPhase(s, roomId, "Nominate_Chancellor");
@@ -1286,7 +1450,14 @@ export class GameEngine {
     }
   }
 
-  async handleExecutiveAction(s: GameState, roomId: string, targetId: string): Promise<void> {
+  async handleExecutiveAction(s: GameState, roomId: string, targetId: string, presidentSocketId?: string): Promise<void> {
+    if (presidentSocketId) {
+      if (s.phase !== "Executive_Action") return;
+      if (s.presidentId !== presidentSocketId) return;
+      const player = s.players.find(p => p.id === presidentSocketId);
+      if (!player || !player.isAlive || player.hasActed) return;
+      player.hasActed = true;
+    }
     await this.applyExecutiveAction(s, roomId, targetId);
     this.broadcastState(roomId);
   }
@@ -1400,7 +1571,7 @@ export class GameEngine {
       // Check for Auditor even on a veto
       const auditor = s.players.find(p => p.titleRole === "Auditor" && !p.titleUsed && p.isAlive);
       if (auditor) {
-        s.titlePrompt = { playerId: auditor.id, role: "Auditor", context: { discardPile: s.discard.slice(-3) } };
+        s.titlePrompt = { playerId: auditor.id, role: "Auditor", context: { role: "Auditor", discardPile: s.discard.slice(-3) } };
         this.enterPhase(s, roomId, "Auditor_Action");
       } else {
         this.nextRound(s, roomId, false);
@@ -1766,7 +1937,7 @@ export class GameEngine {
     socket.leave(roomId);
 
     if (state.players.filter(p => !p.isAI).length === 0 && state.spectators.length === 0) {
-      this.rooms.delete(roomId);
+      this.deleteRoom(roomId);
       const lt = this.lobbyTimers.get(roomId);
       if (lt) { clearInterval(lt); this.lobbyTimers.delete(roomId); }
     } else {

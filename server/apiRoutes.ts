@@ -35,23 +35,30 @@ if (!JWT_SECRET) throw new Error("JWT_SECRET env variable is not set");
 // ---------------------------------------------------------------------------
 
 function getAppUrl(req?: Request): string {
-  // Try to find origin in query, body, or state
+  // Legitimate origins: explicit allowlist + Cloud Run deployment URLs.
+  // Cloud Run URLs follow the pattern:
+  //   https://<service>-<hash>-<region>.a.run.app
+  // We match that exactly rather than using endsWith('.run.app'), which would
+  // accept any attacker-controlled subdomain like "evil.run.app".
+  const CLOUD_RUN_PATTERN = /^https:\/\/[a-z0-9-]+-[a-z0-9]+-[a-z]{2,4}\.a\.run\.app$/;
+
+  const isAllowedOrigin = (o: string): boolean => {
+    const explicit = [process.env.APP_URL, "https://theassembly.web.app", "http://localhost:3000"].filter(Boolean);
+    return explicit.includes(o) || CLOUD_RUN_PATTERN.test(o);
+  };
+
   const origin = (req?.query?.origin as string) || (req?.body?.origin as string);
-  
-  if (origin) {
-    const allowedOrigins = [process.env.APP_URL, "https://theassembly.web.app", "http://localhost:3000"].filter(Boolean);
-    // Be more permissive with Cloud Run URLs if we are on Cloud Run
-    if (allowedOrigins.includes(origin) || origin.endsWith('.run.app')) return origin;
-  }
-  
+  if (origin && isAllowedOrigin(origin)) return origin;
+
   if (req?.query?.state) {
     try {
       const stateData = JSON.parse(decodeURIComponent(req.query.state as string));
-      if (stateData.origin) {
+      if (stateData.origin && isAllowedOrigin(stateData.origin)) {
         return stateData.origin;
       }
     } catch (_) {}
   }
+
   return process.env.APP_URL || "https://theassembly.web.app";
 }
 

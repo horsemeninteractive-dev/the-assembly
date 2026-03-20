@@ -49,25 +49,25 @@ export interface PrivateInfo {
   personalAgenda?: PersonalAgenda;
 }
 export type Policy = 'Civil' | 'State';
+
+export type TitlePromptContext =
+  | { role: 'Auditor';     discardPile: Policy[] }
+  | { role: 'Assassin' }
+  | { role: 'Strategist' }
+  | { role: 'Broker' }
+  | { role: 'Handler' }
+  | { role: 'Interdictor' };
 export type GamePhase = 
   | 'Lobby' 
-  | 'Interdictor_Action' 
-  | 'Next_President' 
   | 'Nominate_Chancellor' 
   | 'Nomination_Review'
-  | 'Election'
-  | 'Broker_Action' 
   | 'Voting' 
   | 'Voting_Reveal' 
-  | 'Strategist_Action' 
   | 'Legislative_President' 
   | 'Legislative_Chancellor' 
-  | 'President_Declaration' 
-  | 'Chancellor_Declaration' 
   | 'Auditor_Action' 
   | 'Assassin_Action' 
   | 'Handler_Action' 
-  | 'Round_End' 
   | 'Executive_Action' 
   | 'GameOver';
 export type ExecutiveAction = 'Investigate' | 'SpecialElection' | 'Execution' | 'PolicyPeek' | 'None';
@@ -309,7 +309,7 @@ export interface GameState {
   titlePrompt?: {
     playerId: string;
     role: TitleRole;
-    context?: any;
+    context: TitlePromptContext;
     nextPhase?: GamePhase;
   };
   // Used by the Bayesian suspicion model: stores who voted how for the most

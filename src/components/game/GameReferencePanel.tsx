@@ -25,13 +25,27 @@ function getPhaseHelp(phase: GamePhase, me: Player | undefined, gameState: GameS
   const presidentName = gameState.players[gameState.presidentIdx]?.name ?? 'The President';
 
   switch (phase) {
-    case 'Nomination_Review':
+    case 'Nomination_Review': {
+      const role = gameState.titlePrompt?.role;
+      if (role === 'Interdictor') return {
+        title: 'Interdictor Ability',
+        what: 'The Interdictor is choosing a player to detain for this round.',
+        youShouldDo: 'Wait. The detained player cannot vote or be nominated as Chancellor this round.',
+        tip: 'The Interdictor fires before nomination — the detained player is excluded from this government entirely.',
+      };
+      if (role === 'Broker') return {
+        title: 'Broker Ability',
+        what: 'The Broker is deciding whether to veto the current Chancellor nomination.',
+        youShouldDo: 'Wait. If the Broker vetoes, the President must nominate a different Chancellor.',
+        tip: 'The Broker can use this strategically — blocking a dangerous government or protecting an ally.',
+      };
       return {
         title: 'Nomination Review',
-        what: 'A Title Role ability (Interdictor or Broker) is being resolved before or after nomination.',
+        what: 'A Title Role ability is being resolved around the nomination.',
         youShouldDo: 'Wait for the ability holder to make their decision.',
         tip: 'The Interdictor can detain a player before nomination. The Broker can veto a nomination after it\'s made.',
       };
+    }
     case 'Nominate_Chancellor':
       return isPresidentCandidate
         ? {
@@ -55,6 +69,12 @@ function getPhaseHelp(phase: GamePhase, me: Player | undefined, gameState: GameS
         tip: 'Three failed elections in a row triggers a chaos policy drawn from the top of the deck.',
       };
     case 'Legislative_President':
+      if (gameState.titlePrompt?.role === 'Strategist') return {
+        title: 'Strategist Ability',
+        what: 'The President has the Strategist title role and drew 4 policy cards instead of 3.',
+        youShouldDo: 'Wait. The Strategist will discard 2 cards before passing the remaining 2 to the Chancellor.',
+        tip: 'A Strategist President has more control over what gets passed — they see more of the deck.',
+      };
       return isPresident
         ? {
             title: 'Presidential Discard',
@@ -68,6 +88,12 @@ function getPhaseHelp(phase: GamePhase, me: Player | undefined, gameState: GameS
             youShouldDo: 'Wait. After this phase, the President will pass 2 cards to the Chancellor.',
           };
     case 'Legislative_Chancellor':
+      if (gameState.lastEnactedPolicy) return {
+        title: 'Policy Declaration',
+        what: 'The President and Chancellor are declaring what cards they drew, passed, and received.',
+        youShouldDo: 'Read the declarations carefully. If the President says they passed 1 Civil and 1 State but the Chancellor says they received 2 State — one of them is lying.',
+        tip: 'Declarations are voluntary claims. They can be true or false. Cross-reference them with the enacted policy.',
+      };
       return isChancellor
         ? {
             title: 'Chancellor Enactment',
@@ -80,14 +106,6 @@ function getPhaseHelp(phase: GamePhase, me: Player | undefined, gameState: GameS
             what: 'The Chancellor is choosing which policy to enact from the 2 cards the President passed them.',
             youShouldDo: 'Wait. After enactment, both President and Chancellor will make declarations.',
           };
-    case 'President_Declaration':
-    case 'Chancellor_Declaration':
-      return {
-        title: 'Policy Declaration',
-        what: 'The President and Chancellor are declaring what cards they drew, passed, and received.',
-        youShouldDo: 'Read the declarations carefully. If the President says they passed 1 Civil and 1 State but the Chancellor says they received 2 State — one of them is lying.',
-        tip: 'Declarations are voluntary claims. They can be true or false. Cross-reference them with the enacted policy.',
-      };
     case 'Auditor_Action':
       return {
         title: 'Auditor Ability',
@@ -108,27 +126,6 @@ function getPhaseHelp(phase: GamePhase, me: Player | undefined, gameState: GameS
         what: 'A player with the Handler title role is swapping the next two players in the presidential rotation.',
         youShouldDo: 'Wait. The Handler\'s swap lasts for the next two presidential terms, then the order reverts.',
         tip: 'The Handler can be used defensively (put a trusted player in power earlier) or offensively.',
-      };
-    case 'Interdictor_Action':
-      return {
-        title: 'Interdictor Ability',
-        what: 'The Interdictor is choosing a player to detain for this round.',
-        youShouldDo: 'Wait. The detained player cannot vote or be nominated as Chancellor this round.',
-        tip: 'The Interdictor fires before nomination — the detained player is excluded from this government entirely.',
-      };
-    case 'Broker_Action':
-      return {
-        title: 'Broker Ability',
-        what: 'The Broker is deciding whether to veto the current Chancellor nomination.',
-        youShouldDo: 'Wait. If the Broker vetoes, the President must nominate a different Chancellor.',
-        tip: 'The Broker can use this strategically — blocking a dangerous government or protecting an ally.',
-      };
-    case 'Strategist_Action':
-      return {
-        title: 'Strategist Ability',
-        what: 'The President has the Strategist title role and drew 4 policy cards instead of 3.',
-        youShouldDo: 'Wait. The Strategist will discard 2 cards before passing the remaining 2 to the Chancellor.',
-        tip: 'A Strategist President has more control over what gets passed — they see more of the deck.',
       };
     case 'Executive_Action':
       return {

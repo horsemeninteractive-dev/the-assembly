@@ -3,6 +3,7 @@ import cors from "cors";
 import path from "path";
 import { createServer } from "http";
 import { Server } from "socket.io";
+import { createAdapter } from "@socket.io/redis-adapter";
 import { createServer as createViteServer } from "vite";
 import { randomUUID } from "crypto";
 
@@ -11,13 +12,33 @@ import { createDeck } from "./server/utils.ts";
 import { GameEngine } from "./server/gameEngine.ts";
 import { registerRoutes } from "./server/apiRoutes.ts";
 import { getUserById, sendFriendRequest, acceptFriendRequest, getFriends, isFriend } from "./server/supabaseService.ts";
+import { pubClient, subClient, isRedisConfigured } from "./server/redis.ts";
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+
+// Cloud Run URLs: https://<service>-<hash>-<region>.a.run.app
+const CLOUD_RUN_PATTERN = /^https:\/\/[a-z0-9-]+-[a-z0-9]+-[a-z]{2,4}\.a\.run\.app$/;
+
+function isAllowedOrigin(origin: string | undefined): boolean {
+  if (!origin) return false;
+  const explicit = [
+    process.env.APP_URL,
+    "https://theassembly.web.app",
+    "http://localhost:3000",
+  ].filter(Boolean);
+  return explicit.includes(origin) || CLOUD_RUN_PATTERN.test(origin);
+}
 
 async function startServer() {
   const app = express();
   app.set("trust proxy", 1);
-  app.use(cors({ origin: "*" }));
+  app.use(cors({
+    origin: (origin, callback) => {
+      // Allow requests with no origin (server-to-server, curl, Postman)
+      if (!origin || isAllowedOrigin(origin)) return callback(null, true);
+      callback(new Error(`CORS: origin '${origin}' not allowed`));
+    },
+  }));
   app.use(express.json());
 
   const httpServer = createServer(app);
@@ -25,13 +46,25 @@ async function startServer() {
     pingTimeout: 60000,
     pingInterval: 25000,
     cors: {
-      origin: "*",
-      methods: ["GET", "POST"]
-    }
+      origin: (origin, callback) => {
+        if (!origin || isAllowedOrigin(origin)) return callback(null, true);
+        callback(new Error(`CORS: origin '${origin}' not allowed`));
+      },
+      methods: ["GET", "POST"],
+    },
   });
+
+  // Attach Redis adapter for multi-instance pub/sub (no-op if Redis not configured)
+  if (isRedisConfigured && pubClient && subClient) {
+    io.adapter(createAdapter(pubClient, subClient));
+    console.log("[Redis] Socket.IO adapter attached");
+  }
 
   const engine = new GameEngine({ io });
   const userSockets = new Map<string, string>();
+
+  // Restore persisted game rooms from Redis before accepting connections
+  await engine.restoreFromRedis();
 
   registerRoutes(app, io, engine, userSockets);
 
@@ -186,15 +219,12 @@ async function startServer() {
     };
 
     socket.on("userConnected", async (userId) => {
-      console.log(`User connected: ${userId}, socket: ${socket.id}`);
       socket.data.userId = userId;
       userSockets.set(userId, socket.id);
       const friends = await getFriends(userId);
-      console.log(`Notifying ${friends.length} friends for user ${userId}`);
       for (const friend of friends) {
         const friendSocketId = userSockets.get(friend.id);
         if (friendSocketId) {
-          console.log(`Notifying friend ${friend.id} at socket ${friendSocketId}`);
           // Find which room the friend is in (if any)
           let friendRoomId: string | undefined;
           for (const [rId, state] of engine.rooms.entries()) {
@@ -506,36 +536,13 @@ async function startServer() {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      if (!state || state.phase !== "Nominate_Chancellor") return;
-
-      const president = state.players[state.presidentIdx];
-      if (president.id !== socket.id || !president.isAlive || president.hasActed) return;
-
-      const chancellor = state.players.find(p => p.id === chancellorId);
-      if (!chancellor || !chancellor.isAlive || chancellor.id === president.id) return;
-
-      if (state.rejectedChancellorId === chancellor.id) {
-        socket.emit("error", "This player was rejected by the Broker and cannot be nominated again this round.");
-        return;
-      }
-
-      if (state.detainedPlayerId === chancellor.id) {
-        socket.emit("error", "This player is detained by the Interdictor and cannot be nominated.");
-        return;
-      }
-
-      const aliveCount = state.players.filter(p => p.isAlive).length;
-      if (chancellor.wasChancellor || (aliveCount > 5 && chancellor.wasPresident)) {
-        socket.emit("error", "Player is ineligible due to term limits.");
-        return;
-      }
-
-      // hasActed is set inside engine.nominateChancellor — do NOT set it here
-      // or the engine guard will see it as already acted and silently abort.
+      if (!state) return;
       engine.nominateChancellor(state, roomId, chancellorId, socket.id);
     });
 
     socket.on("vote", (vote) => {
+      if (vote !== "Aye" && vote !== "Nay") return;
+
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -566,58 +573,16 @@ async function startServer() {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      if (!state || state.phase !== "Legislative_President") return;
-      if (state.presidentId !== socket.id) return;
-      const player = state.players.find(p => p.id === socket.id);
-      if (!player || !player.isAlive || player.hasActed) return;
-      player.hasActed = true;
-      // Guard: timer may have already auto-discarded and cleared the hand
-      if (state.drawnPolicies.length === 0) return;
-
-      state.presidentSaw = [...state.drawnPolicies];
-      const discarded = state.drawnPolicies.splice(idx, 1)[0];
-      if (!discarded) return;
-      state.discard.push(discarded);
-
-      if (state.drawnPolicies.length > 2) {
-        // Still more to discard (Strategist case)
-        player.hasActed = false; // Allow another discard
-        engine.broadcastState(roomId);
-        return;
-      }
-
-      state.chancellorPolicies = [...state.drawnPolicies];
-      state.chancellorSaw = [...state.chancellorPolicies];
-      state.drawnPolicies = [];
-      engine.enterLegislativeChancellor(state, roomId);
+      if (!state) return;
+      engine.handlePresidentDiscard(state, roomId, socket.id, idx);
     });
 
     socket.on("chancellorPlay", (idx) => {
-      console.log(`[DEBUG] chancellorPlay received: idx=${idx}, roomId=${getRoom()}`);
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      console.log(`[DEBUG] chancellorPlay state: phase=${state?.phase}, chancellorId=${state?.chancellorId}, policies=${state?.chancellorPolicies.length}`);
-      if (!state || state.phase !== "Legislative_Chancellor") return;
-      if (state.chancellorId !== socket.id) return;
-      const player = state.players.find(p => p.id === socket.id);
-      if (!player || !player.isAlive || player.hasActed) return;
-      player.hasActed = true;
-      // Guard: timer may have already auto-played and cleared the hand
-      if (state.chancellorPolicies.length === 0) return;
-
-      const played = state.chancellorPolicies.splice(idx, 1)[0];
-      // Guard: splice on a partially-cleared array can return undefined
-      if (!played) {
-        console.log(`[DEBUG] chancellorPlay: played is undefined for idx=${idx}`);
-        return;
-      }
-      state.discard.push(...state.chancellorPolicies);
-      state.chancellorPolicies = [];
-      engine.triggerPolicyEnactment(state, roomId, played, false, state.chancellorId);
-      // Do NOT restart the timer here — phase stays Legislative_Chancellor during
-      // the 6 s animation window; restarting would create a stale misfire.
-      engine.broadcastState(roomId);
+      if (!state) return;
+      engine.handleChancellorPlay(state, roomId, socket.id, idx);
     });
 
     socket.on("declarePolicies", (data) => {
@@ -661,12 +626,8 @@ async function startServer() {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      if (!state || state.phase !== "Executive_Action") return;
-      if (state.presidentId !== socket.id) return;
-      const player = state.players.find(p => p.id === socket.id);
-      if (!player || !player.isAlive || player.hasActed) return;
-      player.hasActed = true;
-      await engine.handleExecutiveAction(state, roomId, targetId);
+      if (!state) return;
+      await engine.handleExecutiveAction(state, roomId, targetId, socket.id);
     });
 
     socket.on("useTitleAbility", async (abilityData) => {
@@ -709,6 +670,8 @@ async function startServer() {
     });
 
     socket.on("sendMessage", (text) => {
+      if (typeof text !== "string") return;
+
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -727,8 +690,16 @@ async function startServer() {
         return;
       }
 
-      if (text.length > 300) return;
-      state.messages.push({ sender: player.name, text, timestamp: Date.now() });
+      // Strip HTML tags and null bytes before storing — defense in depth
+      // against stored XSS if rendering ever changes from JSX to innerHTML.
+      const sanitized = text
+        .replace(/<[^>]*>/g, "")   // strip any HTML tags
+        .replace(/\0/g, "")        // strip null bytes
+        .trim();
+
+      if (sanitized.length === 0 || sanitized.length > 300) return;
+
+      state.messages.push({ sender: player.name, text: sanitized, timestamp: Date.now() });
       if (state.messages.length > 50) state.messages.shift();
       engine.broadcastState(roomId);
     });

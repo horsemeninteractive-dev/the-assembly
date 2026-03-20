@@ -31,19 +31,19 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
   const phaseLabel = () => {
     switch (gameState.phase) {
       case 'Lobby': return `Waiting for players (${gameState.players.length}/${gameState.maxPlayers})...`;
-      case 'Interdictor_Action': return 'Interdictor is choosing a target.';
-      case 'Next_President': return 'Preparing for the next round.';
       case 'Nominate_Chancellor': return `${gameState.players[gameState.presidentIdx]?.name} is nominating a Chancellor.`;
-      case 'Nomination_Review': return 'The Assembly is reviewing the nomination.';
-      case 'Broker_Action': return 'Broker is reviewing the nomination.';
+      case 'Nomination_Review':
+        if (gameState.titlePrompt?.role === 'Interdictor') return 'Interdictor is choosing a target.';
+        if (gameState.titlePrompt?.role === 'Broker') return 'Broker is reviewing the nomination.';
+        return 'The Assembly is reviewing the nomination.';
       case 'Voting':
       case 'Voting_Reveal': return 'The Assembly is voting.';
-      case 'Election': return 'The Assembly is waiting for the election results.';
-      case 'Strategist_Action': return 'Strategist is looking at the deck.';
-      case 'Legislative_President': return 'President is reviewing directives.';
-      case 'Legislative_Chancellor': return 'Chancellor is enacting a directive.';
-      case 'President_Declaration': return 'President is declaring directives.';
-      case 'Chancellor_Declaration': return 'Chancellor is declaring directives.';
+      case 'Legislative_President':
+        if (gameState.titlePrompt?.role === 'Strategist') return 'Strategist is looking at the deck.';
+        return 'President is reviewing directives.';
+      case 'Legislative_Chancellor':
+        if (gameState.lastEnactedPolicy) return 'Players are declaring directives.';
+        return 'Chancellor is enacting a directive.';
       case 'Auditor_Action': return 'Auditor is inspecting the discard pile.';
       case 'Assassin_Action': return 'Assassin is choosing a target.';
       case 'Handler_Action': return 'Handler is using their power.';
@@ -55,7 +55,6 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
           case 'PolicyPeek': return 'President is reviewing the top three policies.';
           default: return 'President is deciding on an executive action.';
         }
-      case 'Round_End': return 'The round is ending.';
       case 'GameOver': return `${gameState.winner === 'Civil' ? 'Civil' : 'State'} faction victorious!`;
       default: return 'The Assembly is in session.';
     }
@@ -78,12 +77,12 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
           ? 'Discard one policy card. The other two go to the Chancellor.'
           : 'The President is choosing which policy to pass to the Chancellor.';
       case 'Legislative_Chancellor':
+        if (gameState.lastEnactedPolicy) {
+          return 'Declarations tell the table what was drawn and passed. They may be lies.';
+        }
         return isChancellor
           ? 'Enact one policy. You may propose a Veto if 5+ State directives are enacted.'
           : 'The Chancellor is choosing which policy to enact.';
-      case 'President_Declaration':
-      case 'Chancellor_Declaration':
-        return 'Declarations tell the table what was drawn and passed. They may be lies.';
       case 'Executive_Action':
         if (isPresident) {
           switch (gameState.currentExecutiveAction) {

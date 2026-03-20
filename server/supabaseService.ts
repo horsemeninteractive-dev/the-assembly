@@ -16,25 +16,10 @@ const users: Map<string, UserInternal> = new Map();
 
 function mapSupabaseToUser(data: any): UserInternal {
   if (!data) return null as any;
-  
-  // Migrate old stats keys if they exist
-  const stats = data.stats || {};
-  if (stats.liberalGames !== undefined && (stats.civilGames === undefined || stats.civilGames === null)) {
-    stats.civilGames = stats.liberalGames;
-    delete stats.liberalGames;
-  }
-  if (stats.fascistGames !== undefined && (stats.stateGames === undefined || stats.stateGames === null)) {
-    stats.stateGames = stats.fascistGames;
-    delete stats.fascistGames;
-  }
-  if (stats.hitlerGames !== undefined && (stats.overseerGames === undefined || stats.overseerGames === null)) {
-    stats.overseerGames = stats.hitlerGames;
-    delete stats.hitlerGames;
-  }
 
   return {
     ...data,
-    stats,
+    stats: data.stats || {},
     createdAt:         data.created_at,
     avatarUrl:         data.avatar_url,
     ownedCosmetics:    data.owned_cosmetics,
