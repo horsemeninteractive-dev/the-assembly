@@ -6,8 +6,8 @@
  * Status is evaluated at game end from GameState alone.
  */
 
-import { GameState, PersonalAgendaId, AgendaStatus, PersonalAgenda } from "../src/types";
-import { shuffle } from "./utils";
+import { GameState, Player, PersonalAgendaId, AgendaStatus, PersonalAgenda } from "../src/types.ts";
+import { shuffle } from "./utils.ts";
 
 // ---------------------------------------------------------------------------
 // Agenda catalogue

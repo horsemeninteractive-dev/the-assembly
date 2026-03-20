@@ -1,7 +1,7 @@
 import { randomUUID } from "crypto";
-import { supabase, isSupabaseConfigured } from "../src/lib/supabase";
-import { supabaseAdmin, isSupabaseAdminConfigured } from "./supabaseAdmin";
-import { User, UserInternal } from "../src/types";
+import { supabase, isSupabaseConfigured } from "../src/lib/supabase.ts";
+import { supabaseAdmin, isSupabaseAdminConfigured } from "./supabaseAdmin.ts";
+import { User, UserInternal } from "../src/types.ts";
 
 // Use admin client if available, fallback to regular client
 const db = isSupabaseAdminConfigured ? supabaseAdmin : supabase;

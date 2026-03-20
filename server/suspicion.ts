@@ -1,4 +1,4 @@
-import { GameState, Player, Policy } from "../src/types";
+import { GameState, Player, Policy } from "../src/types.ts";
 
 // =============================================================================
 // BAYESIAN SUSPICION MODEL

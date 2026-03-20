@@ -1,7 +1,7 @@
 // ---------------------------------------------------------------------------
 // Server-side achievement evaluator
 // ---------------------------------------------------------------------------
-import { ACHIEVEMENT_DEFS } from "../src/lib/achievements";
+import { ACHIEVEMENT_DEFS } from "../src/lib/achievements.ts";
 import type { GameState, Player } from "../src/types";
 
 export interface AchievementContext {

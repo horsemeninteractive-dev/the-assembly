@@ -14,11 +14,16 @@
 import { randomUUID } from "crypto";
 import { Server, Socket } from "socket.io";
 import {
-  GameState, Player, Policy, ExecutiveAction, TitleRole, GamePhase,
-} from "../src/types";
-import { shuffle, createDeck } from "./utils";
-import { AI_BOTS, CHAT } from "./aiConstants";
-import { getExecutiveAction, assignRoles } from "./gameRules";
+  GameState,
+  Player,
+  Policy,
+  TitleRole,
+  ExecutiveAction,
+  RoomInfo,
+  GamePhase,
+} from "../src/types.ts";
+import { createDeck, shuffle } from "./utils.ts";
+import { getExecutiveAction, assignRoles } from "./gameRules.ts";
 import {
   initializeSuspicion,
   getSuspicion,
@@ -29,17 +34,18 @@ import {
   updateSuspicionFromInvestigation,
   updateSuspicionFromNomination,
   updateSuspicionFromPolicyExpectation,
-} from "./suspicion";
-import { getUserById, saveUser, saveMatchResult, incrementGlobalWin } from "./supabaseService";
-import { calculateXpGain } from "../src/lib/xp";
-import { checkAchievements } from "./achievements";
-import { ACHIEVEMENT_MAP } from "../src/lib/achievements";
+} from "./suspicion.ts";
+import { AI_BOTS, CHAT } from "./aiConstants.ts";
+import { getUserById, saveUser, saveMatchResult, incrementGlobalWin } from "./supabaseService.ts";
+import { calculateXpGain } from "../src/lib/xp.ts";
+import { checkAchievements } from "./achievements.ts";
+import { ACHIEVEMENT_MAP } from "../src/lib/achievements.ts";
 import {
   assignPersonalAgendas,
   evaluateAllAgendas,
   getPlayerAgenda,
   AGENDA_MAP,
-} from "./personalAgendas";
+} from "./personalAgendas.ts";
 
 // ---------------------------------------------------------------------------
 // Types

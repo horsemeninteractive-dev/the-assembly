@@ -1,4 +1,4 @@
-import { AIPersonality } from "../src/types";
+import { AIPersonality } from "../src/types.ts";
 
 export const AI_BOTS: { name: string; avatarUrl: string; personality: AIPersonality }[] = [
   { name: "Arbiter",    avatarUrl: "https://api.dicebear.com/7.x/avataaars/svg?seed=Arbiter",    personality: "Strategic"  },

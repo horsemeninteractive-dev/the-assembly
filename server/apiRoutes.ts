@@ -1,11 +1,11 @@
 import { Express, Request, Response } from "express";
 import { Server } from "socket.io";
 import { randomUUID } from "crypto";
-import * as bcrypt from "bcryptjs";
-import * as jwt from "jsonwebtoken";
+import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
 import axios from "axios";
-import { GameEngine } from "./gameEngine";
-import { GameState, RoomInfo } from "../src/types";
+import { GameEngine } from "./gameEngine.ts";
+import { User, UserInternal, GameState, Player, RoomInfo } from "../src/types.ts";
 import { DEFAULT_ITEMS } from "../src/constants";
 import {
   getUser,
