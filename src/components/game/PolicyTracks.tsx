@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { Scale, Eye, Search, Zap, Target, Trophy, Layers, Trash2 } from 'lucide-react';
 import { GameState } from '../../types';
 import { cn } from '../../lib/utils';
@@ -35,7 +36,12 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
   const stateVisualSlots = [6, 5, 4, 3, 2, 1];
 
   return (
-    <div className="p-[1.5vh] grid grid-cols-[1fr_auto_1fr] gap-[1.5vh] bg-surface-glass border-b border-subtle shrink-0 items-start relative z-40">
+    <motion.div 
+      initial={{ opacity: 0, y: -20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.1, duration: 0.4, ease: 'easeOut' }}
+      className="p-[1.5vh] grid grid-cols-[1fr_auto_1fr] gap-[1.5vh] bg-surface-glass border-b border-subtle shrink-0 items-start relative z-40"
+    >
       {/* Civil Track */}
       <div className="space-y-[0.5vh]">
         <div className="flex items-center justify-between uppercase tracking-widest font-mono text-blue-400/70">
@@ -55,7 +61,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
                   'flex-1 h-[3vh] rounded-sm border transition-all duration-500 relative group',
                   isCivilWin ? 'cursor-pointer' : '',
                   i < gameState.civilDirectives
-                    ? 'bg-blue-900/40 border-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.2)]'
+                    ? 'bg-blue-900/40 border-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.2)] animate-shine'
                     : 'bg-elevated border-subtle'
                 )}
               >
@@ -121,7 +127,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
                   'flex-1 h-[3vh] rounded-sm border transition-all duration-500 relative group',
                   slot ? 'cursor-pointer' : '',
                   isFilled
-                    ? 'bg-red-900/40 border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.2)]'
+                    ? 'bg-red-900/40 border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.2)] animate-shine'
                     : isDanger
                       ? 'bg-red-900/10 border-red-900/30'
                       : 'bg-elevated border-subtle'
@@ -189,6 +195,6 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
           ))}
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 };

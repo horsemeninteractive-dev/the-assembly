@@ -149,7 +149,12 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
       className="flex-1 w-full text-primary font-sans flex flex-col overflow-y-auto custom-scrollbar"
     >
       {/* Header */}
-      <header className="h-[8vh] sm:h-[10vh] border-b border-subtle bg-surface-glass px-[4vw] flex items-center justify-between sticky top-0 z-50">
+      <motion.header 
+        initial={{ y: -50, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+        className="h-[8vh] sm:h-[10vh] border-b border-subtle bg-surface-glass px-[4vw] flex items-center justify-between sticky top-0 z-50"
+      >
         <div className="flex items-center gap-[1vw] sm:gap-[2vw] min-w-0 flex-1">
           <div className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] bg-elevated rounded-xl flex items-center justify-center border border-white/40 shrink-0 overflow-hidden">
             <img src={getProxiedUrl("https://storage.googleapis.com/secretchancellor/SC.png")} alt="The Assembly Logo" className="w-full h-full object-contain p-1" referrerPolicy="no-referrer" />
@@ -276,11 +281,16 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
             </button>
           </Tooltip>
         </div>
-      </header>
+      </motion.header>
 
       <main className="flex-1 max-w-6xl w-full mx-auto p-[4vw] flex flex-col gap-[4vh]">
         {/* Actions (Header/Text) & Swing Meter */}
-        <div className="flex flex-col lg:flex-row items-stretch gap-4">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1, duration: 0.4, ease: 'easeOut' }}
+          className="flex flex-col lg:flex-row items-stretch gap-4"
+        >
           <div className="bg-surface border border-subtle rounded-3xl p-[2vh] flex flex-col justify-center text-center lg:text-left">
             <h2 className="text-responsive-2xl sm:text-responsive-3xl font-thematic text-primary tracking-wide">Available Assemblies</h2>
             <p className="text-responsive-xs text-muted mt-1">Join an existing session or convene your own.</p>
@@ -302,10 +312,15 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
               <div className="bg-red-600 h-full" style={{ width: `${(globalStats.stateWins / (globalStats.civilWins + globalStats.stateWins || 1)) * 100}%` }}></div>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Action Buttons */}
-        <div className="flex gap-3">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.2, duration: 0.4, ease: 'easeOut' }}
+          className="flex gap-3"
+        >
           {/* Quick Join */}
           <button
             onClick={handleQuickJoin}
@@ -336,7 +351,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
             <Plus className="w-[2vh] h-[2vh]" />
             Start New Assembly
           </button>
-        </div>
+        </motion.div>
 
         {/* Rejoin Banner */}
         <AnimatePresence>
@@ -367,7 +382,12 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
         </AnimatePresence>
 
         {/* Filter & Sort Bar */}
-        <div className="flex flex-col gap-1.5">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3, duration: 0.4, ease: 'easeOut' }}
+          className="flex flex-col gap-1.5"
+        >
           {/* Row 1: filters */}
           <div className="flex items-center gap-1.5">
             <SlidersHorizontal className="w-3 h-3 text-muted shrink-0" />
@@ -434,7 +454,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
               </span>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Room Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[2vh]">
@@ -465,11 +485,12 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
               )}
             </div>
           ) : (
-            visibleRooms.map((room) => (
+            visibleRooms.map((room, idx) => (
               <motion.div
                 key={room.id}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, scale: 0.95, y: 20 }}
+                animate={{ opacity: 1, scale: 1, y: 0 }}
+                transition={{ delay: 0.4 + idx * 0.05, duration: 0.3, ease: 'easeOut' }}
                 whileHover={{ y: -4 }}
                 onClick={() => {
                   playSound('click');

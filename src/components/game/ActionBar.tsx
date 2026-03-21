@@ -1,5 +1,6 @@
 import React from 'react';
 import { Scroll, Scale, Eye, Mic, Video, VideoOff, MicOff, Lock, Unlock, Play, ShieldAlert } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 import { Tooltip } from '../Tooltip';
 import { socket } from '../../socket';
 import { GameState, Player, User } from '../../types';
@@ -102,12 +103,30 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
   };
 
   return (
-    <div className="shrink-0 bg-elevated border-t border-subtle flex flex-col">
+    <motion.div 
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3, duration: 0.4, ease: 'easeOut' }}
+      className="shrink-0 bg-elevated border-t border-subtle flex flex-col"
+    >
       {/* Phase status */}
       <div className="px-[2vw] py-[1.5vh] bg-white/5 border-b border-subtle flex justify-between items-center">
         <div className="min-w-0 flex-1 mr-2 flex flex-col justify-center">
           <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono mb-1">Current Phase</div>
-          <div className="text-responsive-sm font-serif italic text-primary min-h-[1.5em]">{phaseLabel() || '\u00A0'}</div>
+          <div className="min-h-[1.5em] overflow-hidden">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={gameState.phase}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.3 }}
+                className="text-responsive-sm font-serif italic text-primary"
+              >
+                {phaseLabel() || '\u00A0'}
+              </motion.div>
+            </AnimatePresence>
+          </div>
           {/* Phase hints — always render the block to maintain 3-line height */}
           <div className="text-responsive-xs text-faint font-mono mt-1 leading-tight truncate min-h-[1.25em]">
             {(user && (user.stats?.gamesPlayed ?? 0) < 5 && phaseHint()) || '\u00A0'}
@@ -296,6 +315,6 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
         </div>
         <div className="text-responsive-xs uppercase tracking-widest text-ghost font-mono">Log</div>
       </button>
-    </div>
+    </motion.div>
   );
 };

@@ -57,8 +57,10 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
           className="absolute inset-0 z-[50] bg-backdrop backdrop-blur-md flex items-center justify-center p-4 pb-16"
         >
           <motion.div
-            initial={{ y: 20 }}
-            animate={{ y: 0 }}
+            initial={{ opacity: 0, scale: 0.95, y: 40 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
             className="max-w-md w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-full"
           >
             {/* Win banner */}
@@ -149,14 +151,6 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                           <Coins className="w-3 h-3" /> IP
                         </div>
                         <span className="text-emerald-400 font-mono text-sm font-bold">+{postMatchResult.ipEarned}</span>
-                      </div>
-
-                      {/* CP earned */}
-                      <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
-                        <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                          <Zap className="w-3 h-3" /> CP
-                        </div>
-                        <span className="text-purple-400 font-mono text-sm font-bold">+{postMatchResult.cpEarned}</span>
                       </div>
                     </div>
 
@@ -262,26 +256,41 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                     <span>Secret Identity</span>
                   </div>
                   <div className="space-y-[1vh]">
-                    {gameState.players.map(p => (
-                      <div key={p.id} className="flex items-center justify-between py-[1vh] border-b border-subtle/30">
-                        <div className="flex items-center gap-3">
-                          <div className="w-[4vh] h-[4vh] rounded-full bg-card flex items-center justify-center text-responsive-xs text-muted font-mono overflow-hidden border border-default">
-                            {p.avatarUrl
-                              ? <img src={getProxiedUrl(p.avatarUrl)} alt={p.name} className="w-full h-full object-cover" />
-                              : p.name.charAt(0)}
+                    {gameState.players.map(p => {
+                      const specInfo = gameState.spectatorRoles?.[p.id];
+                      const titleRole = specInfo?.titleRole || p.titleRole;
+                      const agendaName = specInfo?.agendaName;
+
+                      return (
+                        <div key={p.id} className="flex flex-col py-1 border-b border-subtle/30">
+                          <div className="flex items-center justify-between">
+                            <div className="flex items-center gap-2">
+                              <div className="w-6 h-6 rounded-full bg-card flex items-center justify-center text-[10px] text-muted font-mono overflow-hidden border border-default shrink-0">
+                                {p.avatarUrl
+                                  ? <img src={getProxiedUrl(p.avatarUrl)} alt={p.name} className="w-full h-full object-cover" />
+                                  : p.name.charAt(0)}
+                              </div>
+                              <span className="text-sm text-primary font-medium truncate max-w-[120px]">{p.name.replace(' (AI)', '')}</span>
+                            </div>
+                            <div className={cn(
+                              'px-1.5 py-0.5 rounded text-[10px] font-mono uppercase tracking-widest shrink-0',
+                              p.role === 'Civil'    ? 'bg-blue-900/20 border-blue-500/30 text-blue-400 border' :
+                              p.role === 'State'    ? 'bg-red-900/20 border-red-500/30 text-red-500 border' :
+                              'bg-red-900/40 border-red-500 text-red-400 font-bold border'
+                            )}>
+                              {p.role === 'Civil' ? 'Civil' : p.role === 'State' ? 'State' : 'The Overseer'}
+                            </div>
                           </div>
-                          <span className="text-responsive-sm text-primary font-medium">{p.name.replace(' (AI)', '')}</span>
+                          {(titleRole || agendaName) && (
+                            <div className="flex items-center gap-2 mt-0.5 ml-8 text-[9px] font-mono text-faint uppercase tracking-widest">
+                              {titleRole && <span className="text-tertiary">{titleRole}</span>}
+                              {titleRole && agendaName && <span>·</span>}
+                              {agendaName && <span>Agenda: {agendaName}</span>}
+                            </div>
+                          )}
                         </div>
-                        <div className={cn(
-                          'px-3 py-1 rounded-lg border text-responsive-xs font-mono uppercase tracking-widest',
-                          p.role === 'Civil'    ? 'bg-blue-900/20 border-blue-500/30 text-blue-400' :
-                          p.role === 'State'    ? 'bg-red-900/20 border-red-500/30 text-red-500' :
-                          'bg-red-900/40 border-red-500 text-red-400 font-bold'
-                        )}>
-                          {p.role === 'Civil' ? 'Civil' : p.role === 'State' ? 'State' : 'The Overseer'}
-                        </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
 

@@ -45,12 +45,18 @@ export const DossierModal = ({ isOpen, onClose, privateInfo }: DossierModalProps
   <AnimatePresence>
     {isOpen && (
       <motion.div
-        initial={{ opacity: 0, scale: 0.95 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0, scale: 0.95 }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         className="fixed inset-0 z-[100] bg-backdrop backdrop-blur-sm flex items-center justify-center p-6"
       >
-        <div className="max-w-sm w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl max-h-[95vh] flex flex-col">
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.95, y: 40 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -20 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+          className="max-w-sm w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl max-h-[95vh] flex flex-col"
+        >
           <div className="p-[3vh] space-y-[2vh] flex-1 flex flex-col min-h-0">
             <div className="flex items-center justify-between shrink-0">
               <h3 className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono">Your Secret Dossier</h3>
@@ -186,7 +192,7 @@ export const DossierModal = ({ isOpen, onClose, privateInfo }: DossierModalProps
               Close Dossier
             </button>
           </div>
-        </div>
+        </motion.div>
       </motion.div>
     )}
   </AnimatePresence>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { motion } from 'motion/react';
 import { socket } from '../../../socket';
 import { TitleRole, GameState, TitleAbilityData } from '../../../types';
 
@@ -34,8 +35,17 @@ export const TitleAbilityModal = ({ role, gameState, onClose }: TitleAbilityModa
   };
 
   return (
-    <div className="fixed inset-0 bg-backdrop flex items-center justify-center z-50 p-4">
-      <div className="bg-surface border border-default rounded-2xl p-6 max-w-md w-full shadow-2xl">
+    <motion.div 
+      initial={{ opacity: 0 }} 
+      animate={{ opacity: 1 }} 
+      className="fixed inset-0 bg-backdrop-heavy backdrop-blur-md flex items-center justify-center z-[250] p-4"
+    >
+      <motion.div 
+        initial={{ opacity: 0, scale: 0.95, y: 40 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        className="bg-surface border border-default rounded-2xl p-6 max-w-md w-full shadow-2xl"
+      >
         <h2 className="text-2xl font-thematic text-primary mb-4">Title Ability: {role}</h2>
         <div className="text-gray-300 mb-6">
           {role === 'Broker' && (
@@ -69,7 +79,7 @@ export const TitleAbilityModal = ({ role, gameState, onClose }: TitleAbilityModa
           <button onClick={handleUse} className="flex-1 btn-primary py-3 rounded-xl font-bold hover:bg-subtle transition-all">Yes</button>
           <button onClick={handleSkip} className="flex-1 bg-subtle text-primary py-3 rounded-xl font-bold hover:bg-muted-bg transition-all">No</button>
         </div>
-      </div>
-    </div>
+      </motion.div>
+    </motion.div>
   );
 };

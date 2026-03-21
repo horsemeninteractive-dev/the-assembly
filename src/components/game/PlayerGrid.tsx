@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { socket } from '../../socket';
 import { GameState, Player } from '../../types';
 import { cn } from '../../lib/utils';
@@ -31,7 +32,12 @@ export const PlayerGrid = ({
   const isManyPlayers           = gameState.players.length > 6;
 
   return (
-    <div className="flex-1 p-[1vh] sm:p-[1.5vh] min-h-0 overflow-hidden">
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.98 }}
+      animate={{ opacity: 1, scale: 1 }}
+      transition={{ delay: 0.2, duration: 0.4, ease: 'easeOut' }}
+      className="flex-1 p-[1vh] sm:p-[1.5vh] min-h-0 overflow-hidden"
+    >
       <div className={cn(
         'grid gap-[1vh] sm:gap-[1.5vh] h-full grid-cols-2',
         gameState.players.length <= 6 ? 'grid-rows-3' :
@@ -63,6 +69,6 @@ export const PlayerGrid = ({
           );
         })}
       </div>
-    </div>
+    </motion.div>
   );
 };

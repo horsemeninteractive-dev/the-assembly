@@ -106,9 +106,10 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ userId, 
         className="absolute inset-0 bg-backdrop-heavy backdrop-blur-md"
       />
       <motion.div 
-        initial={{ opacity: 0, scale: 0.9, y: 20 }}
+        initial={{ opacity: 0, scale: 0.95, y: 40 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.9, y: 20 }}
+        exit={{ opacity: 0, scale: 0.95, y: -20 }}
+        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
         className="relative w-full max-w-sm bg-surface border border-subtle rounded-[2rem] overflow-hidden shadow-2xl text-primary"
       >
         {/* Header - Matching Profile.tsx */}

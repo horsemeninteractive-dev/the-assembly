@@ -271,7 +271,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="relative w-full max-w-4xl bg-surface border border-subtle rounded-[2rem] overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+        className="relative w-full max-w-4xl bg-surface border border-subtle rounded-[2rem] overflow-hidden shadow-2xl flex flex-col h-[85vh] max-h-[900px]"
       >
         {/* Header */}
         <div className="p-6 bg-elevated border-b border-subtle flex flex-col sm:flex-row items-center gap-6">

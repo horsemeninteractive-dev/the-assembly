@@ -31,8 +31,10 @@ export const DeclarationModal = ({
         className="fixed inset-0 z-[300] bg-backdrop-heavy backdrop-blur-md flex items-center justify-center p-6"
       >
         <motion.div
-          initial={{ scale: 0.9, y: 20 }}
-          animate={{ scale: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.95, y: 40 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -20 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className="max-w-sm w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl p-8 space-y-6"
         >
           <div className="text-center space-y-2">

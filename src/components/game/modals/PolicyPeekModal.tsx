@@ -20,8 +20,10 @@ export const PolicyPeekModal = ({ policies, title, onClose }: PolicyPeekModalPro
         className="fixed inset-0 z-[250] bg-backdrop-heavy backdrop-blur-md flex items-center justify-center p-6"
       >
         <motion.div
-          initial={{ scale: 0.9, y: 20 }}
-          animate={{ scale: 1, y: 0 }}
+          initial={{ opacity: 0, scale: 0.95, y: 40 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.95, y: -20 }}
+          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
           className="max-w-md w-full bg-surface border border-default rounded-3xl p-8 text-center space-y-8 shadow-2xl"
         >
           <div className="space-y-2">

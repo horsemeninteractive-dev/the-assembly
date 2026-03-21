@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { socket } from './socket';
 import { GameState, Role, User, PrivateInfo, RoomPrivacy } from './types';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import { getBackgroundTexture } from './lib/cosmetics';
 import { Auth } from './components/Auth';
 import { Lobby } from './components/Lobby';
@@ -479,137 +479,177 @@ export default function App() {
           </div>
         )}
 
-        {loading ? (
-          <div className="min-h-screen bg-base flex items-center justify-center text-primary font-mono">Loading...</div>
-        ) : !token || !user ? (
-          <Auth onAuthSuccess={handleAuthSuccess} />
-        ) : !isInteracted && !document.fullscreenElement ? (
-          <div className="flex-1 w-full bg-texture flex items-center justify-center p-4">
+        <AnimatePresence mode="wait">
+          {loading ? (
             <motion.div
-              initial={{ opacity: 0, scale: 0.9 }}
-              animate={{ opacity: 1, scale: 1 }}
-              className="w-full max-w-md bg-surface border border-subtle rounded-3xl p-8 shadow-2xl text-center"
+              key="loading"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, filter: 'blur(10px)' }}
+              className="min-h-screen bg-base flex items-center justify-center text-primary font-mono"
             >
-              <div className="w-20 h-20 bg-elevated rounded-2xl flex items-center justify-center border border-white/40 mx-auto mb-6 overflow-hidden">
-                <img src={getProxiedUrl("https://storage.googleapis.com/secretchancellor/SC.png")} alt="The Assembly Logo" className="w-full h-full object-contain p-2" referrerPolicy="no-referrer" />
-              </div>
-              <h2 className="text-3xl font-thematic text-primary tracking-wide uppercase mb-2">Welcome, {user.username}</h2>
-              <div className="space-y-4 mb-8">
-                <p className="text-tertiary text-xs font-serif italic leading-relaxed px-4">
-                  "The old world ended with The Crisis. Now, only The Assembly stands between us and total collapse. Will you defend the Civil Charter, or will you build the new State?"
-                </p>
-                <p className="text-muted text-[10px] font-mono uppercase tracking-[0.2em]">The Assembly awaits your assessment.</p>
-              </div>
-              <button
-                onClick={handleEnterAssembly}
-                className="w-full btn-primary font-thematic text-2xl py-4 rounded-xl hover:bg-subtle transition-all shadow-xl shadow-white/5 uppercase tracking-widest"
-              >
-                Enter Assembly
-              </button>
+              Loading...
             </motion.div>
-          </div>
-        ) : !joined || !gameState ? (
-          <>
-            <Lobby
-              user={user}
-              onJoinRoom={handleJoinRoom}
-              onLogout={handleLogout}
-              onOpenProfile={() => setIsProfileOpen(true)}
-              playSound={playSound}
-              uiScaleSetting={uiScaleSetting}
-              token={token}
-            />
-            {isProfileOpen && (
-              <Profile
+          ) : !token || !user ? (
+            <motion.div
+              key="auth"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, filter: 'blur(10px)' }}
+              transition={{ duration: 0.5 }}
+              className="flex-1 flex flex-col"
+            >
+              <Auth onAuthSuccess={handleAuthSuccess} />
+            </motion.div>
+          ) : !isInteracted && !document.fullscreenElement ? (
+            <motion.div
+              key="splash"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, filter: 'blur(10px)' }}
+              transition={{ duration: 0.5 }}
+              className="flex-1 w-full bg-texture flex items-center justify-center p-4"
+            >
+              <motion.div
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                className="w-full max-w-md bg-surface border border-subtle rounded-3xl p-8 shadow-2xl text-center"
+              >
+                <div className="w-20 h-20 bg-elevated rounded-2xl flex items-center justify-center border border-white/40 mx-auto mb-6 overflow-hidden">
+                  <img src={getProxiedUrl("https://storage.googleapis.com/secretchancellor/SC.png")} alt="The Assembly Logo" className="w-full h-full object-contain p-2" referrerPolicy="no-referrer" />
+                </div>
+                <h2 className="text-3xl font-thematic text-primary tracking-wide uppercase mb-2">Welcome, {user.username}</h2>
+                <div className="space-y-4 mb-8">
+                  <p className="text-tertiary text-xs font-serif italic leading-relaxed px-4">
+                    "The old world ended with The Crisis. Now, only The Assembly stands between us and total collapse. Will you defend the Civil Charter, or will you build the new State?"
+                  </p>
+                  <p className="text-muted text-[10px] font-mono uppercase tracking-[0.2em]">The Assembly awaits your assessment.</p>
+                </div>
+                <button
+                  onClick={handleEnterAssembly}
+                  className="w-full btn-primary font-thematic text-2xl py-4 rounded-xl hover:bg-subtle transition-all shadow-xl shadow-white/5 uppercase tracking-widest"
+                >
+                  Enter Assembly
+                </button>
+              </motion.div>
+            </motion.div>
+          ) : !joined || !gameState ? (
+            <motion.div
+              key="lobby"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, filter: 'blur(10px)' }}
+              transition={{ duration: 0.5 }}
+              className="flex-1 flex flex-col"
+            >
+              <Lobby
                 user={user}
-                token={token!}
-                onClose={() => setIsProfileOpen(false)}
-                onUpdateUser={setUser}
+                onJoinRoom={handleJoinRoom}
+                onLogout={handleLogout}
+                onOpenProfile={() => setIsProfileOpen(true)}
                 playSound={playSound}
-                playMusic={playMusic}
-                stopMusic={stopMusic}
-                settings={{
-                  isMusicOn, setIsMusicOn,
-                  isSoundOn, setIsSoundOn,
-                  musicVolume, setMusicVolume,
-                  soundVolume, setSoundVolume,
-                  isFullscreen, setIsFullscreen,
-                  ttsVoice, setTtsVoice,
-                  ttsEngine, setTtsEngine,
-                  isAiVoiceEnabled, setIsAiVoiceEnabled,
-                  uiScaleSetting, setUiScaleSetting,
-                  isLightMode, setIsLightMode
-                }}
-                onJoinRoom={(roomId) => { setIsProfileOpen(false); handleJoinRoom(roomId); }}
+                uiScaleSetting={uiScaleSetting}
+                token={token}
               />
-            )}
-            {pendingInvite && (
-              <InviteModal
-                inviterName={pendingInvite.fromUsername}
-                roomId={pendingInvite.roomId}
-                onAccept={() => { handleJoinRoom(pendingInvite.roomId); setPendingInvite(null); }}
-                onReject={() => setPendingInvite(null)}
-              />
-            )}
-          </>
-        ) : (
-          <>
-            <GameRoom
-              gameState={gameState}
-              privateInfo={privateInfo}
-              user={user}
-              token={token}
-              onLeaveRoom={handleLeaveRoom}
-              onPlayAgain={() => socket.emit('playAgain')}
-              onOpenProfile={() => setIsProfileOpen(true)}
-              onJoinRoom={handleJoinRoom}
-              setUser={setUser}
-              setGameState={setGameState}
-              setPrivateInfo={setPrivateInfo}
-              updateAvailable={updateAvailable}
-              playSound={playSound}
-              soundVolume={soundVolume}
-              ttsVoice={ttsVoice}
-              ttsEngine={ttsEngine}
-              isAiVoiceEnabled={isAiVoiceEnabled}
-              uiScaleSetting={uiScaleSetting}
-            />
-            {isProfileOpen && (
-              <Profile
+              {isProfileOpen && (
+                <Profile
+                  user={user}
+                  token={token!}
+                  onClose={() => setIsProfileOpen(false)}
+                  onUpdateUser={setUser}
+                  playSound={playSound}
+                  playMusic={playMusic}
+                  stopMusic={stopMusic}
+                  settings={{
+                    isMusicOn, setIsMusicOn,
+                    isSoundOn, setIsSoundOn,
+                    musicVolume, setMusicVolume,
+                    soundVolume, setSoundVolume,
+                    isFullscreen, setIsFullscreen,
+                    ttsVoice, setTtsVoice,
+                    ttsEngine, setTtsEngine,
+                    isAiVoiceEnabled, setIsAiVoiceEnabled,
+                    uiScaleSetting, setUiScaleSetting,
+                    isLightMode, setIsLightMode
+                  }}
+                  onJoinRoom={(roomId) => { setIsProfileOpen(false); handleJoinRoom(roomId); }}
+                />
+              )}
+              {pendingInvite && (
+                <InviteModal
+                  inviterName={pendingInvite.fromUsername}
+                  roomId={pendingInvite.roomId}
+                  onAccept={() => { handleJoinRoom(pendingInvite.roomId); setPendingInvite(null); }}
+                  onReject={() => setPendingInvite(null)}
+                />
+              )}
+            </motion.div>
+          ) : (
+            <motion.div
+              key="gameroom"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, filter: 'blur(10px)' }}
+              transition={{ duration: 0.5 }}
+              className="flex-1 flex flex-col"
+            >
+              <GameRoom
+                gameState={gameState}
+                privateInfo={privateInfo}
                 user={user}
-                token={token!}
-                onClose={() => setIsProfileOpen(false)}
-                onUpdateUser={setUser}
+                token={token}
+                onLeaveRoom={handleLeaveRoom}
+                onPlayAgain={() => socket.emit('playAgain')}
+                onOpenProfile={() => setIsProfileOpen(true)}
+                onJoinRoom={handleJoinRoom}
+                setUser={setUser}
+                setGameState={setGameState}
+                setPrivateInfo={setPrivateInfo}
+                updateAvailable={updateAvailable}
                 playSound={playSound}
-                playMusic={playMusic}
-                stopMusic={stopMusic}
-                settings={{
-                  isMusicOn, setIsMusicOn,
-                  isSoundOn, setIsSoundOn,
-                  musicVolume, setMusicVolume,
-                  soundVolume, setSoundVolume,
-                  isFullscreen, setIsFullscreen,
-                  ttsVoice, setTtsVoice,
-                  ttsEngine, setTtsEngine,
-                  isAiVoiceEnabled, setIsAiVoiceEnabled,
-                  uiScaleSetting, setUiScaleSetting,
-                  isLightMode, setIsLightMode
-                }}
-                roomId={gameState?.roomId}
-                mode={gameState?.mode}
-                onJoinRoom={(roomId) => { setIsProfileOpen(false); handleLeaveRoom(() => handleJoinRoom(roomId)); }}
+                soundVolume={soundVolume}
+                ttsVoice={ttsVoice}
+                ttsEngine={ttsEngine}
+                isAiVoiceEnabled={isAiVoiceEnabled}
+                uiScaleSetting={uiScaleSetting}
               />
-            )}
-            {pendingInvite && (
-              <InviteModal
-                inviterName={pendingInvite.fromUsername}
-                roomId={pendingInvite.roomId}
-                onAccept={() => { handleLeaveRoom(() => handleJoinRoom(pendingInvite.roomId)); setPendingInvite(null); }}
-                onReject={() => setPendingInvite(null)}
-              />
-            )}
-          </>
-        )}
+              {isProfileOpen && (
+                <Profile
+                  user={user}
+                  token={token!}
+                  onClose={() => setIsProfileOpen(false)}
+                  onUpdateUser={setUser}
+                  playSound={playSound}
+                  playMusic={playMusic}
+                  stopMusic={stopMusic}
+                  settings={{
+                    isMusicOn, setIsMusicOn,
+                    isSoundOn, setIsSoundOn,
+                    musicVolume, setMusicVolume,
+                    soundVolume, setSoundVolume,
+                    isFullscreen, setIsFullscreen,
+                    ttsVoice, setTtsVoice,
+                    ttsEngine, setTtsEngine,
+                    isAiVoiceEnabled, setIsAiVoiceEnabled,
+                    uiScaleSetting, setUiScaleSetting,
+                    isLightMode, setIsLightMode
+                  }}
+                  roomId={gameState?.roomId}
+                  mode={gameState?.mode}
+                  onJoinRoom={(roomId) => { setIsProfileOpen(false); handleLeaveRoom(() => handleJoinRoom(roomId)); }}
+                />
+              )}
+              {pendingInvite && (
+                <InviteModal
+                  inviterName={pendingInvite.fromUsername}
+                  roomId={pendingInvite.roomId}
+                  onAccept={() => { handleLeaveRoom(() => handleJoinRoom(pendingInvite.roomId)); setPendingInvite(null); }}
+                  onReject={() => setPendingInvite(null)}
+                />
+              )}
+            </motion.div>
+          )}
+        </AnimatePresence>
         <TutorialModal
           isOpen={showTutorial}
           onComplete={handleTutorialComplete}

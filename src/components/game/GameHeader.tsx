@@ -1,4 +1,5 @@
 import React from 'react';
+import { motion } from 'motion/react';
 import { MessageSquare, LogOut, BookOpen, Scale, Eye, Mic, MicOff, User as UserIcon, HelpCircle, Lock } from 'lucide-react';
 import { Tooltip } from '../Tooltip';
 import { GameState, Player, Role, PrivateInfo } from '../../types';
@@ -34,7 +35,12 @@ export const GameHeader = ({
     : null;
 
   return (
-    <header className="h-[8vh] sm:h-[10vh] border-b border-subtle bg-surface-glass px-[2vw] sm:px-[4vw] flex items-center justify-between shrink-0 shadow-lg z-10">
+    <motion.header 
+      initial={{ y: -50, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+      className="h-[8vh] sm:h-[10vh] border-b border-subtle bg-surface-glass px-[2vw] sm:px-[4vw] flex items-center justify-between shrink-0 shadow-lg z-10"
+    >
       <div className="flex items-center gap-[1vw] sm:gap-[2vw]">
         <div className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] bg-elevated rounded-xl flex items-center justify-center border border-white/40 shrink-0 overflow-hidden">
           <img
@@ -165,6 +171,6 @@ export const GameHeader = ({
           </button>
         </Tooltip>
       </div>
-    </header>
+    </motion.header>
   );
 };
