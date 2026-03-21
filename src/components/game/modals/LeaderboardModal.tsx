@@ -1,83 +1,150 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
-import { X, Trophy } from 'lucide-react';
+import { X, Trophy, Shield, Zap, Star } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { User } from '../../../types';
 import { getRankTier, getRankLabel } from '../../../lib/ranks';
+import { getProxiedUrl } from '../../../lib/utils';
 
 interface LeaderboardModalProps {
   user: User;
   onClose: () => void;
 }
 
+type ModeTab = 'Overall' | 'Ranked' | 'Casual' | 'Classic';
+type StatTab = 'Win%' | 'Games' | 'Wins' | 'ELO';
+
+const MODE_TABS: { id: ModeTab; label: string; color: string; activeBg: string }[] = [
+  { id: 'Overall', label: 'Overall',  color: 'text-white',       activeBg: 'bg-zinc-700 border-zinc-500' },
+  { id: 'Ranked',  label: 'Ranked',   color: 'text-yellow-400',  activeBg: 'bg-yellow-900/40 border-yellow-600/60' },
+  { id: 'Casual',  label: 'Casual',   color: 'text-blue-400',    activeBg: 'bg-blue-900/40 border-blue-600/60' },
+  { id: 'Classic', label: 'Classic',  color: 'text-emerald-400', activeBg: 'bg-emerald-900/40 border-emerald-600/60' },
+];
+
+const positionDisplay = (index: number) => {
+  if (index === 0) return '🥇';
+  if (index === 1) return '🥈';
+  if (index === 2) return '🥉';
+  return `#${index + 1}`;
+};
+
 export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
-  const [leaderboard, setLeaderboard] = useState<any[]>([]);
+  const [boards, setBoards] = useState<Record<string, any[]>>({
+    overall: [], ranked: [], casual: [], classic: [],
+  });
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'ELO' | 'Win%' | 'Games'>('ELO');
+  const [modeTab, setModeTab] = useState<ModeTab>('Overall');
+  const [statTab, setStatTab] = useState<StatTab>('ELO');
 
   useEffect(() => {
     fetch('/api/leaderboard')
       .then(res => res.json())
-      .then(data => { setLeaderboard(data); setLoading(false); })
-      .catch(console.error);
+      .then(data => { setBoards(data); setLoading(false); })
+      .catch(() => setLoading(false));
   }, []);
 
-  const sortedData = [...leaderboard].sort((a, b) => {
-    if (activeTab === 'ELO')   return (b.stats.elo || 0) - (a.stats.elo || 0);
-    if (activeTab === 'Win%') {
-      const ra = (a.stats.gamesPlayed || 0) > 0 ? (a.stats.wins || 0) / a.stats.gamesPlayed : 0;
-      const rb = (b.stats.gamesPlayed || 0) > 0 ? (b.stats.wins || 0) / b.stats.gamesPlayed : 0;
-      return rb - ra;
-    }
-    return (b.stats.gamesPlayed || 0) - (a.stats.gamesPlayed || 0);
-  });
+  // When mode changes, set a sensible default stat
+  useEffect(() => {
+    if (modeTab === 'Ranked' || modeTab === 'Overall') setStatTab('ELO');
+    else setStatTab('Win%');
+  }, [modeTab]);
 
+  const rawData: any[] = boards[modeTab.toLowerCase()] ?? [];
+
+  // Which stats to offer based on mode
+  const availableStats: StatTab[] =
+    modeTab === 'Ranked' || modeTab === 'Overall'
+      ? ['ELO', 'Win%', 'Wins', 'Games']
+      : ['Win%', 'Wins', 'Games'];
+
+  const getStatValue = (u: any, stat: StatTab): number => {
+    const mode = modeTab.toLowerCase();
+    switch (stat) {
+      case 'ELO':   return u.stats?.elo ?? 1000;
+      case 'Wins':
+        if (modeTab === 'Overall') return u.stats?.wins ?? 0;
+        return u.stats?.[`${mode}Wins`] ?? 0;
+      case 'Games':
+        if (modeTab === 'Overall') return u.stats?.gamesPlayed ?? 0;
+        return u.stats?.[`${mode}Games`] ?? 0;
+      case 'Win%': {
+        const wins  = modeTab === 'Overall' ? (u.stats?.wins ?? 0)        : (u.stats?.[`${mode}Wins`]  ?? 0);
+        const games = modeTab === 'Overall' ? (u.stats?.gamesPlayed ?? 0) : (u.stats?.[`${mode}Games`] ?? 0);
+        return games > 0 ? (wins / games) * 100 : 0;
+      }
+    }
+  };
+
+  const sortedData = [...rawData].sort((a, b) => getStatValue(b, statTab) - getStatValue(a, statTab));
   const currentUserRank = sortedData.findIndex(u => u.id === user.id) + 1;
   const currentUserData = sortedData.find(u => u.id === user.id);
 
-  const positionDisplay = (index: number) => {
-    if (index === 0) return '🥇';
-    if (index === 1) return '🥈';
-    if (index === 2) return '🥉';
-    return `#${index + 1}`;
+  const formatStat = (u: any, stat: StatTab) => {
+    const val = getStatValue(u, stat);
+    if (stat === 'Win%') return `${val.toFixed(1)}%`;
+    if (stat === 'ELO')  return val.toString();
+    return val.toString();
   };
 
-  const TABS: { id: 'ELO' | 'Win%' | 'Games'; color: string }[] = [
-    { id: 'ELO',   color: 'border-yellow-500 text-primary' },
-    { id: 'Win%',  color: 'border-emerald-500 text-primary' },
-    { id: 'Games', color: 'border-blue-500 text-primary' },
-  ];
+  const statColor = (stat: StatTab) => {
+    if (stat === 'ELO')   return 'text-yellow-400';
+    if (stat === 'Win%')  return 'text-emerald-400';
+    if (stat === 'Wins')  return 'text-blue-400';
+    return 'text-purple-400';
+  };
+
+  const activeModeConfig = MODE_TABS.find(m => m.id === modeTab)!;
 
   return (
     <div className="fixed inset-0 bg-backdrop flex items-center justify-center z-50 p-4">
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-surface border border-default rounded-2xl p-6 max-w-lg w-full shadow-2xl flex flex-col max-h-[80vh]"
+        className="bg-surface border border-default rounded-2xl p-6 max-w-lg w-full shadow-2xl flex flex-col max-h-[85vh]"
       >
         {/* Header */}
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex items-center justify-between mb-5">
           <h2 className="text-2xl font-thematic text-primary flex items-center gap-2">
             <Trophy className="w-6 h-6 text-yellow-500" />
-            Ranked Leaderboard
+            Leaderboard
           </h2>
           <button onClick={onClose} className="p-2 text-muted hover:text-primary transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Tabs */}
-        <div className="flex gap-4 mb-4 border-b border-default">
-          {TABS.map(tab => (
+        {/* Mode Tabs (tier 1) */}
+        <div className="flex gap-1 p-1 bg-elevated rounded-xl border border-subtle mb-3">
+          {MODE_TABS.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
+              onClick={() => setModeTab(tab.id)}
               className={cn(
-                'pb-2 border-b-2 font-mono text-sm uppercase tracking-widest transition-colors',
-                activeTab === tab.id ? tab.color : 'border-transparent text-muted'
+                'flex-1 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-widest transition-all border',
+                modeTab === tab.id
+                  ? cn(tab.activeBg, tab.color)
+                  : 'border-transparent text-muted hover:text-ghost'
               )}
             >
-              {tab.id}
+              {tab.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Stat Tabs (tier 2) */}
+        <div className="flex gap-3 border-b border-default mb-3">
+          {availableStats.map(stat => (
+            <button
+              key={stat}
+              onClick={() => setStatTab(stat)}
+              className={cn(
+                'pb-2 text-xs font-mono uppercase tracking-widest border-b-2 transition-colors',
+                statTab === stat
+                  ? cn('border-current', statColor(stat))
+                  : 'border-transparent text-muted hover:text-ghost'
+              )}
+            >
+              {stat}
             </button>
           ))}
         </div>
@@ -87,22 +154,20 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
           <div className="flex items-center gap-3 px-3 text-[10px] uppercase tracking-widest text-muted font-mono mb-2">
             <div className="w-8 text-center shrink-0">#</div>
             <div className="flex-1">Player</div>
-            {activeTab === 'ELO' && <div className="w-24 text-right shrink-0">Rank · ELO</div>}
-            {activeTab !== 'ELO' && <div className="w-16 text-right shrink-0">{activeTab}</div>}
+            {statTab === 'ELO' && <div className="w-28 text-right shrink-0">Rank · ELO</div>}
+            {statTab !== 'ELO' && <div className="w-16 text-right shrink-0">{statTab}</div>}
           </div>
         )}
 
         {/* List */}
-        <div className="space-y-1.5 overflow-y-auto custom-scrollbar flex-1 mb-6">
+        <div className="space-y-1.5 overflow-y-auto custom-scrollbar flex-1 mb-4">
           {loading ? (
             <div className="text-center text-muted py-10 font-mono text-sm">Loading...</div>
+          ) : sortedData.length === 0 ? (
+            <div className="text-center text-muted py-10 font-mono text-xs">No data yet. Play some {modeTab} games!</div>
           ) : sortedData.map((u, i) => {
-            const wins    = u.stats.wins || 0;
-            const games   = u.stats.gamesPlayed || 0;
-            const winRate = games > 0 ? ((wins / games) * 100).toFixed(1) : '0.0';
-            const tier    = getRankTier(u.stats.elo || 1000);
-            const isMe    = u.id === user.id;
-
+            const tier = getRankTier(u.stats?.elo ?? 1000);
+            const isMe = u.id === user.id;
             return (
               <div
                 key={u.id}
@@ -111,34 +176,39 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
                   isMe ? 'bg-red-900/10 border-red-900/50' : 'bg-card border-subtle hover:border-default'
                 )}
               >
-                {/* Position */}
                 <div className="w-8 text-center font-mono text-muted text-sm shrink-0">
                   {positionDisplay(i)}
                 </div>
 
-                {/* Name */}
-                <div className="flex-1 min-w-0">
-                  <div className="font-medium text-primary text-sm truncate">{u.username}</div>
-                  {isMe && <div className="text-[9px] font-mono text-faint uppercase tracking-widest">You</div>}
+                {/* Avatar + Name */}
+                <div className="flex items-center gap-2 flex-1 min-w-0">
+                  {u.avatarUrl && (
+                    <img
+                      src={getProxiedUrl(u.avatarUrl)}
+                      alt={u.username}
+                      className="w-6 h-6 rounded-lg object-cover shrink-0 border border-default"
+                    />
+                  )}
+                  <div className="min-w-0">
+                    <div className="font-medium text-primary text-sm truncate">{u.username}</div>
+                    {isMe && <div className="text-[9px] font-mono text-faint uppercase tracking-widest">You</div>}
+                  </div>
                 </div>
 
-                {/* Stat */}
-                {activeTab === 'ELO' ? (
+                {/* Stat value */}
+                {statTab === 'ELO' ? (
                   <div className="flex items-center gap-1.5 shrink-0">
                     <span className="text-sm leading-none">{tier.icon}</span>
                     <div className="text-right">
                       <div className={cn('text-xs font-mono font-bold', tier.color)}>
-                        {getRankLabel(u.stats.elo || 1000)}
+                        {getRankLabel(u.stats?.elo ?? 1000)}
                       </div>
-                      <div className="text-[9px] font-mono text-faint">{u.stats.elo || 1000}</div>
+                      <div className="text-[9px] font-mono text-faint">{u.stats?.elo ?? 1000}</div>
                     </div>
                   </div>
                 ) : (
-                  <div className={cn(
-                    'font-mono text-right text-sm w-16 shrink-0',
-                    activeTab === 'Win%' ? 'text-emerald-400' : 'text-blue-400'
-                  )}>
-                    {activeTab === 'Win%' ? `${winRate}%` : u.stats.gamesPlayed || 0}
+                  <div className={cn('font-mono text-right text-sm w-16 shrink-0', statColor(statTab))}>
+                    {formatStat(u, statTab)}
                   </div>
                 )}
               </div>
@@ -148,26 +218,24 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
 
         {/* Your rank footer */}
         {currentUserData && (
-          <div className="pt-4 border-t border-default">
+          <div className="pt-3 border-t border-default">
             <div className="text-[10px] uppercase tracking-widest text-muted font-mono mb-2">Your Position</div>
             <div className="flex items-center gap-3 p-3 bg-card rounded-xl border border-red-900/40">
               <div className="w-8 text-center font-mono text-muted text-sm shrink-0">#{currentUserRank}</div>
               <div className="flex-1 font-medium text-primary truncate text-sm">{currentUserData.username}</div>
-              {activeTab === 'ELO' ? (
+              {statTab === 'ELO' ? (
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="text-sm">{getRankTier(currentUserData.stats.elo || 1000).icon}</span>
+                  <span className="text-sm">{getRankTier(currentUserData.stats?.elo ?? 1000).icon}</span>
                   <div className="text-right">
-                    <div className={cn('text-xs font-mono font-bold', getRankTier(currentUserData.stats.elo || 1000).color)}>
-                      {getRankLabel(currentUserData.stats.elo || 1000)}
+                    <div className={cn('text-xs font-mono font-bold', getRankTier(currentUserData.stats?.elo ?? 1000).color)}>
+                      {getRankLabel(currentUserData.stats?.elo ?? 1000)}
                     </div>
-                    <div className="text-[9px] font-mono text-faint">{currentUserData.stats.elo || 1000}</div>
+                    <div className="text-[9px] font-mono text-faint">{currentUserData.stats?.elo ?? 1000}</div>
                   </div>
                 </div>
               ) : (
-                <div className={cn('font-mono text-sm shrink-0', activeTab === 'Win%' ? 'text-emerald-400' : 'text-blue-400')}>
-                  {activeTab === 'Win%'
-                    ? `${((currentUserData.stats.wins || 0) / Math.max(1, currentUserData.stats.gamesPlayed || 1) * 100).toFixed(1)}%`
-                    : currentUserData.stats.gamesPlayed || 0}
+                <div className={cn('font-mono text-sm shrink-0', statColor(statTab))}>
+                  {formatStat(currentUserData, statTab)}
                 </div>
               )}
             </div>

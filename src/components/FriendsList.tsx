@@ -16,7 +16,7 @@ interface FriendsListProps {
   playSound: (sound: string) => void;
   roomId?: string;
   onJoinRoom?: (roomId: string) => void;
-  mode?: 'Casual' | 'Ranked';
+  mode?: 'Casual' | 'Ranked' | 'Classic';
 }
 
 interface FriendWithStatus extends User {

@@ -71,7 +71,7 @@ export type GamePhase =
   | 'Executive_Action' 
   | 'GameOver';
 export type ExecutiveAction = 'Investigate' | 'SpecialElection' | 'Execution' | 'PolicyPeek' | 'None';
-export type GameMode = 'Casual' | 'Ranked';
+export type GameMode = 'Casual' | 'Ranked' | 'Classic';
 
 export interface Achievement {
   id: string;
@@ -103,6 +103,13 @@ export interface UserStats {
   civilWins: number;
   stateWins: number;
   overseerWins: number;
+  // Per-mode counters for segmented leaderboards
+  rankedWins: number;
+  rankedGames: number;
+  casualWins: number;
+  casualGames: number;
+  classicWins: number;
+  classicGames: number;
 }
 
 export interface MatchSummary {

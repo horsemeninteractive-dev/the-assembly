@@ -8,11 +8,31 @@ import { cn } from '../../lib/utils';
 interface PolicyAnimationProps {
   gameState: GameState;
   show: boolean;
+  playSound: (key: string) => void;
 }
 
-export const PolicyAnimation = ({ gameState, show }: PolicyAnimationProps) => (
-  <AnimatePresence>
-    {show && gameState.lastEnactedPolicy && (
+export const PolicyAnimation = ({ gameState, show, playSound }: PolicyAnimationProps) => {
+  // Use a ref for the callback so it never causes the effect to re-run
+  const playSoundRef = React.useRef(playSound);
+  React.useEffect(() => { playSoundRef.current = playSound; });
+
+  // Track which policy we already played a sound for to prevent duplicates
+  const playedKeyRef = React.useRef<string | null>(null);
+
+  React.useEffect(() => {
+    if (!show || !gameState.lastEnactedPolicy) return;
+    // Build a stable key: type + policyTrack length acts as a unique identifier per reveal
+    const key = `${gameState.lastEnactedPolicy.type}-${gameState.civilDirectives}-${gameState.stateDirectives}`;
+    if (playedKeyRef.current === key) return; // already played for this reveal
+    playedKeyRef.current = key;
+    playSoundRef.current(gameState.lastEnactedPolicy.type === 'Civil' ? 'win_civil' : 'win_state');
+  // Only react to show toggling on/off and the policy identity — NOT playSound
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [show, gameState.lastEnactedPolicy, gameState.civilDirectives, gameState.stateDirectives]);
+
+  return (
+    <AnimatePresence>
+      {show && gameState.lastEnactedPolicy && (
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -70,4 +90,5 @@ export const PolicyAnimation = ({ gameState, show }: PolicyAnimationProps) => (
       </motion.div>
     )}
   </AnimatePresence>
-);
+  );
+};

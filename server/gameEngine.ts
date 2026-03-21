@@ -605,8 +605,12 @@ export class GameEngine {
 
     const roles = assignRoles(state.players.length);
     state.players.forEach((p, i) => (p.role = roles[i]));
-    this.assignTitleRoles(state);
-    assignPersonalAgendas(state);
+    
+    if (state.mode !== 'Classic') {
+      this.assignTitleRoles(state);
+      assignPersonalAgendas(state);
+    }
+    
     initializeSuspicion(state);
 
     state.presidentialOrder = state.players.map(p => p.id);
@@ -1698,6 +1702,18 @@ export class GameEngine {
       } else {
         user.stats.losses++;
         user.stats.points += s.mode === "Ranked" ? 25 : 10;
+      }
+
+      // Per-mode counters for segmented leaderboards
+      if (s.mode === "Ranked") {
+        user.stats.rankedGames = (user.stats.rankedGames ?? 0) + 1;
+        if (won) user.stats.rankedWins = (user.stats.rankedWins ?? 0) + 1;
+      } else if (s.mode === "Classic") {
+        user.stats.classicGames = (user.stats.classicGames ?? 0) + 1;
+        if (won) user.stats.classicWins = (user.stats.classicWins ?? 0) + 1;
+      } else {
+        user.stats.casualGames = (user.stats.casualGames ?? 0) + 1;
+        if (won) user.stats.casualWins = (user.stats.casualWins ?? 0) + 1;
       }
 
       if (s.mode === "Ranked") {

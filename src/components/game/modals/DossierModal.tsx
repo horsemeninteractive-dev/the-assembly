@@ -50,14 +50,15 @@ export const DossierModal = ({ isOpen, onClose, privateInfo }: DossierModalProps
         exit={{ opacity: 0 }}
         className="fixed inset-0 z-[100] bg-backdrop backdrop-blur-sm flex items-center justify-center p-6"
       >
-        <motion.div 
-          initial={{ opacity: 0, scale: 0.95, y: 40 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.95, y: -20 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="max-w-sm w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl max-h-[95vh] flex flex-col"
-        >
-          <div className="p-[3vh] space-y-[2vh] flex-1 flex flex-col min-h-0">
+        <div className="perspective-1000 max-w-sm w-full max-h-[95vh] flex">
+          <motion.div 
+            initial={{ opacity: 0, rotateY: -90, scale: 0.95 }}
+            animate={{ opacity: 1, rotateY: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 0.95, y: -20 }}
+            transition={{ type: 'spring', damping: 20, stiffness: 200 }}
+            className="w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col preserve-3d"
+          >
+            <div className="p-[3vh] space-y-[2vh] flex-1 flex flex-col min-h-0 backface-hidden">
             <div className="flex items-center justify-between shrink-0">
               <h3 className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono">Your Secret Dossier</h3>
               <button onClick={onClose} className="text-ghost hover:text-white">
@@ -193,6 +194,7 @@ export const DossierModal = ({ isOpen, onClose, privateInfo }: DossierModalProps
             </button>
           </div>
         </motion.div>
+        </div>
       </motion.div>
     )}
   </AnimatePresence>

@@ -424,7 +424,7 @@ export default function App() {
     setGameState(null);
   };
 
-  const handleJoinRoom = (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked', isSpectator?: boolean, privacy?: RoomPrivacy, inviteCode?: string) => {
+  const handleJoinRoom = (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked' | 'Classic', isSpectator?: boolean, privacy?: RoomPrivacy, inviteCode?: string) => {
     if (user) {
       socket.emit('joinRoom', {
         roomId, name: user.username, userId: user.id,

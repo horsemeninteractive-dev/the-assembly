@@ -10,7 +10,7 @@ import { HowToPlayModal } from './HowToPlayModal';
 
 interface LobbyProps {
   user: User;
-  onJoinRoom: (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked', isSpectator?: boolean, privacy?: RoomPrivacy, inviteCode?: string) => void;
+  onJoinRoom: (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked' | 'Classic', isSpectator?: boolean, privacy?: RoomPrivacy, inviteCode?: string) => void;
   onLogout: () => void;
   onOpenProfile: () => void;
   playSound: (soundKey: string) => void;
@@ -32,13 +32,14 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
   const [newRoomName, setNewRoomName] = useState('');
   const [maxPlayers, setMaxPlayers] = useState(5);
   const [actionTimer, setActionTimer] = useState(60);
-  const [mode, setMode] = useState<'Casual' | 'Ranked'>('Ranked');
+  const [mode, setMode] = useState<'Casual' | 'Ranked' | 'Classic'>('Ranked');
   const [privacy, setPrivacy] = useState<RoomPrivacy>('public');
   const [isLoading, setIsLoading] = useState(true);
   const [invitePrompt, setInvitePrompt] = useState<{ roomId: string; roomName: string } | null>(null);
   const [inviteCodeInput, setInviteCodeInput] = useState('');
   const [filterCasual, setFilterCasual] = useState(true);
   const [filterRanked, setFilterRanked] = useState(true);
+  const [filterClassic, setFilterClassic] = useState(true);
   const [filterJoinable, setFilterJoinable] = useState(false);
   const [filterInProgress, setFilterInProgress] = useState(true);
   const [sortBy, setSortBy] = useState<'players' | 'newest'>('newest');
@@ -135,6 +136,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
     .filter(room => {
       if (!filterCasual && room.mode === 'Casual') return false;
       if (!filterRanked && room.mode === 'Ranked') return false;
+      if (!filterClassic && room.mode === 'Classic') return false;
       if (filterJoinable && room.phase !== 'Lobby') return false;
       if (!filterInProgress && room.phase !== 'Lobby') return false;
       return true;
@@ -396,6 +398,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
             {([
               { label: 'Casual', active: filterCasual, toggle: () => setFilterCasual(v => !v), color: 'border-blue-500/60 text-blue-400 bg-blue-900/20' },
               { label: 'Ranked', active: filterRanked, toggle: () => setFilterRanked(v => !v), color: 'border-yellow-500/60 text-yellow-400 bg-yellow-900/20' },
+              { label: 'Classic', active: filterClassic, toggle: () => setFilterClassic(v => !v), color: 'border-emerald-500/60 text-emerald-400 bg-emerald-900/20' },
             ] as const).map(f => (
               <button
                 key={f.label}
@@ -477,7 +480,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                 </button>
               ) : (
                 <button
-                  onClick={() => { setFilterCasual(true); setFilterRanked(true); setFilterJoinable(false); setFilterInProgress(true); }}
+                  onClick={() => { setFilterCasual(true); setFilterRanked(true); setFilterClassic(true); setFilterJoinable(false); setFilterInProgress(true); }}
                   className="mt-4 text-responsive-xs text-red-500 font-mono uppercase tracking-widest hover:underline"
                 >
                   Clear filters
@@ -515,7 +518,9 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                     </div>
                     <div className={cn(
                       "px-2 py-0.5 rounded-full text-[7px] font-mono uppercase tracking-widest border",
-                      room.mode === 'Ranked' ? "bg-yellow-900/10 border-yellow-900/30 text-yellow-500" : "bg-blue-900/10 border-blue-900/30 text-blue-400"
+                      room.mode === 'Ranked' ? "bg-yellow-900/10 border-yellow-900/30 text-yellow-500" : 
+                      room.mode === 'Classic' ? "bg-emerald-900/10 border-emerald-900/30 text-emerald-500" :
+                      "bg-blue-900/10 border-blue-900/30 text-blue-400"
                     )}>
                       {room.mode}
                     </div>
@@ -767,9 +772,19 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                     >
                       Casual
                     </button>
+                    <button
+                      type="button"
+                      onClick={() => setMode('Classic')}
+                      className={cn(
+                        "flex-1 py-[1vh] rounded-xl border text-responsive-xs font-mono uppercase tracking-widest transition-all",
+                        mode === 'Classic' ? "bg-emerald-900/20 border-emerald-500 text-emerald-500" : "bg-elevated border-subtle text-ghost"
+                      )}
+                    >
+                      Classic
+                    </button>
                   </div>
-                  <p className="text-[8px] text-ghost italic ml-1">
-                    {mode === 'Ranked' ? 'ELO and full points awarded.' : 'No ELO changes, reduced points.'}
+                  <p className="text-[8px] text-ghost italic ml-1 pt-1">
+                    {mode === 'Ranked' ? 'ELO and full points awarded.' : mode === 'Classic' ? 'Standard roles/rules. No ELO, reduced points.' : 'No ELO changes, reduced points.'}
                   </p>
                 </div>
 

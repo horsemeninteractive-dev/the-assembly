@@ -20,7 +20,7 @@ import {
   acceptFriendRequest,
   isFriend,
   removeFriend,
-  getLeaderboard,
+  getAllLeaderboards,
   getGlobalStats,
   getMatchHistory,
   getPendingFriendRequests,
@@ -500,8 +500,14 @@ export function registerRoutes(
   });
 
   app.get("/api/leaderboard", async (_req: Request, res: Response) => {
-    const leaderboard = await getLeaderboard();
-    res.json(leaderboard.map(({ password: _, ...u }) => u));
+    const boards = await getAllLeaderboards();
+    const strip = (arr: any[]) => arr.map(({ password: _, ...u }) => u);
+    res.json({
+      overall: strip(boards.overall),
+      ranked:  strip(boards.ranked),
+      casual:  strip(boards.casual),
+      classic: strip(boards.classic),
+    });
   });
 
   app.get("/api/global-stats", async (_req: Request, res: Response) => {

@@ -444,3 +444,14 @@
 .rotate-y-180 {
   transform: rotateY(180deg);
 }
+
+@keyframes wrap-chains {
+  from { background-position: 0 0; }
+  to { background-position: 30px 0; }
+}
+
+.bg-detained-chains {
+  background-image: url("data:image/svg+xml,%3Csvg width='30' height='20' viewBox='0 0 30 20' xmlns='http://www.w3.org/2000/svg'%3E%3Crect x='3' y='7' width='24' height='6' fill='none' stroke='%23c084fc' stroke-width='2.5' rx='3' /%3E%3Crect x='-5' y='2' width='10' height='16' fill='none' stroke='%239333ea' stroke-width='2.5' rx='3' /%3E%3Crect x='25' y='2' width='10' height='16' fill='none' stroke='%239333ea' stroke-width='2.5' rx='3' /%3E%3C/svg%3E");
+  background-size: 30px 20px;
+  animation: wrap-chains 1.5s linear infinite;
+}

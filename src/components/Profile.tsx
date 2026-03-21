@@ -43,7 +43,7 @@ interface ProfileProps {
   };
   roomId?: string;
   onJoinRoom?: (roomId: string) => void;
-  mode?: 'Casual' | 'Ranked';
+  mode?: 'Casual' | 'Ranked' | 'Classic';
 }
 
 export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, token, playSound, playMusic, stopMusic, settings, roomId, onJoinRoom, mode }) => {
@@ -1049,7 +1049,9 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
                           </span>
                           <span className={cn(
                             'text-[10px] font-mono uppercase tracking-widest px-1.5 py-0.5 rounded border',
-                            match.mode === 'Ranked' ? 'text-yellow-500 bg-yellow-900/10 border-yellow-900/30' : 'text-blue-400 bg-blue-900/10 border-blue-900/30'
+                            match.mode === 'Ranked' ? 'text-yellow-500 bg-yellow-900/10 border-yellow-900/30' : 
+                            match.mode === 'Classic' ? 'text-emerald-500 bg-emerald-900/10 border-emerald-900/30' :
+                            'text-blue-400 bg-blue-900/10 border-blue-900/30'
                           )}>
                             {match.mode}
                           </span>

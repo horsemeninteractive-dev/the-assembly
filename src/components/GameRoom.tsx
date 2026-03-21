@@ -100,6 +100,9 @@ export const GameRoom = ({
   const [isDossierOpen, setIsDossierOpen] = useState(false);
   const [isReferenceOpen, setIsReferenceOpen] = useState(false);
   const [postMatchResult, setPostMatchResult] = useState<PostMatchResult | null>(null);
+  // Client-side dismiss flag for TitleAbilityModal — resets whenever a new prompt arrives
+  const [titleAbilityDismissed, setTitleAbilityDismissed] = useState(false);
+  const prevTitlePromptRef = useRef<string | undefined>(undefined);
   const [chatText, setChatText] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0);
@@ -127,6 +130,17 @@ export const GameRoom = ({
       hasAutoOpenedDossier.current = false;
     }
   }, [gameState.phase, gameState.round, isSpectator]);
+
+  // Reset the client-side dismiss flag whenever the server sends a fresh titlePrompt
+  useEffect(() => {
+    const currentPromptKey = gameState.titlePrompt
+      ? `${gameState.titlePrompt.role}-${gameState.titlePrompt.playerId}`
+      : undefined;
+    if (currentPromptKey !== prevTitlePromptRef.current) {
+      prevTitlePromptRef.current = currentPromptKey;
+      if (currentPromptKey) setTitleAbilityDismissed(false);
+    }
+  }, [gameState.titlePrompt]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -884,7 +898,7 @@ export const GameRoom = ({
       </main>
 
       {/* Policy flip animation */}
-      <PolicyAnimation gameState={gameState} show={showPolicyAnim} />
+      <PolicyAnimation gameState={gameState} show={showPolicyAnim} playSound={playSound} />
 
       {/* Panels */}
       <AssemblyLog
@@ -953,11 +967,11 @@ export const GameRoom = ({
         setDeclDrawSta={setDeclDrawSta}
         onSubmit={handleSubmitDeclaration}
       />
-      {gameState.titlePrompt && gameState.titlePrompt.playerId === socket.id && (
+      {gameState.titlePrompt && gameState.titlePrompt.playerId === socket.id && !titleAbilityDismissed && (
         <TitleAbilityModal
           role={gameState.titlePrompt.role}
           gameState={gameState}
-          onClose={() => {}}
+          onClose={() => setTitleAbilityDismissed(true)}
         />
       )}
       <GameReferencePanel

@@ -135,8 +135,17 @@ export const PlayerCard = React.memo(({
       )}
 
       <motion.div
-        animate={{ rotateY: prevVote ? 180 : 0 }}
-        transition={{ duration: 0.6, type: 'spring', stiffness: 260, damping: 20, delay: gameState.phase === 'Voting_Reveal' ? index * 0.2 : 0 }}
+        animate={{ 
+          rotateY: prevVote ? 180 : 0,
+          scale: gameState.phase === 'Voting_Reveal' && prevVote ? [1, 1.05, 1] : 1
+        }}
+        transition={{ 
+          duration: 0.6, 
+          type: 'spring', 
+          stiffness: 260, 
+          damping: 20, 
+          delay: gameState.phase === 'Voting_Reveal' ? index * 0.15 : 0 
+        }}
         className="w-full h-full relative preserve-3d"
       >
         {/* Front */}
@@ -283,7 +292,7 @@ export const PlayerCard = React.memo(({
       {/* Assassin overlay */}
       {gameState.phase === 'Assassin_Action' && gameState.titlePrompt?.playerId === socket.id && p.id !== socket.id && p.isAlive && (
         <button
-          onClick={(e) => { e.stopPropagation(); playSound('click'); socket.emit('useTitleAbility', { use: true, targetId: p.id }); }}
+          onClick={(e) => { e.stopPropagation(); playSound('click'); socket.emit('useTitleAbility', { use: true, role: 'Assassin', targetId: p.id }); }}
           className="absolute inset-0 bg-red-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
         >
           Execute
@@ -308,6 +317,13 @@ export const PlayerCard = React.memo(({
         >
           <ShieldOff className="w-[1.5vh] h-[1.5vh]" />
         </button>
+      )}
+
+      {/* Detained Chains Overlay */}
+      {gameState.detainedPlayerId === p.id && (
+        <div className="absolute inset-0 z-20 pointer-events-none rounded-xl overflow-hidden shadow-[inset_0_0_40px_rgba(147,51,234,0.4)] border-2 border-purple-500/50">
+          <div className="absolute -inset-[100%] rotate-45 bg-detained-chains transition-opacity duration-300 opacity-70" />
+        </div>
       )}
     </motion.div>
   );

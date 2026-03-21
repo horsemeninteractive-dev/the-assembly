@@ -185,32 +185,44 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
         {/* President discard */}
         {gameState.phase === 'Legislative_President' && isPresident && (
           <div className="flex gap-[1vw] sm:gap-[2vw] w-full justify-center h-full items-center">
-            {gameState.drawnPolicies.map((p, i) => (
-              <button
-                key={i}
-                onClick={() => { playSound('click'); socket.emit('presidentDiscard', i); }}
-                className={cn('flex-1 h-full max-h-[12vh] rounded-lg border-2 flex flex-col items-center justify-center gap-1 transition-all', getPolicyStyles(user?.activePolicyStyle, p))}
-              >
-                {p === 'Civil' ? <Scale className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" /> : <Eye className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" />}
-                <span className="text-responsive-xs font-mono uppercase tracking-widest">Discard</span>
-              </button>
-            ))}
+            <AnimatePresence>
+              {gameState.drawnPolicies.map((p, i) => (
+                <motion.button
+                  key={`pres-${i}`}
+                  initial={{ rotateY: 90, opacity: 0 }}
+                  animate={{ rotateY: 0, opacity: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.4, delay: i * 0.15 }}
+                  onClick={() => { playSound('click'); socket.emit('presidentDiscard', i); }}
+                  className={cn('flex-1 h-full max-h-[12vh] rounded-lg border-2 flex flex-col items-center justify-center gap-1 transition-all hover:scale-[1.02] active:scale-95 shadow-lg preserve-3d', getPolicyStyles(user?.activePolicyStyle, p))}
+                >
+                  {p === 'Civil' ? <Scale className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" /> : <Eye className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" />}
+                  <span className="text-responsive-xs font-mono uppercase tracking-widest">Discard</span>
+                </motion.button>
+              ))}
+            </AnimatePresence>
           </div>
         )}
 
         {/* Chancellor enact */}
         {gameState.phase === 'Legislative_Chancellor' && isChancellor && (
           <div className="flex gap-[1vw] sm:gap-[2vw] w-full justify-center h-full items-center">
-            {gameState.chancellorPolicies.map((p, i) => (
-              <button
-                key={i}
-                onClick={() => { playSound('click'); socket.emit('chancellorPlay', i); }}
-                className={cn('flex-1 h-full max-h-[12vh] rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all', getPolicyStyles(user?.activePolicyStyle, p))}
-              >
-                {p === 'Civil' ? <Scale className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" /> : <Eye className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" />}
-                <span className="text-responsive-xs font-mono uppercase tracking-widest">Enact</span>
-              </button>
-            ))}
+            <AnimatePresence>
+              {gameState.chancellorPolicies.map((p, i) => (
+                <motion.button
+                  key={`chan-${i}`}
+                  initial={{ rotateY: 90, opacity: 0 }}
+                  animate={{ rotateY: 0, opacity: 1 }}
+                  exit={{ opacity: 0, scale: 0.8 }}
+                  transition={{ duration: 0.4, delay: i * 0.15 }}
+                  onClick={() => { playSound('click'); socket.emit('chancellorPlay', i); }}
+                  className={cn('flex-1 h-full max-h-[12vh] rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95 shadow-lg preserve-3d', getPolicyStyles(user?.activePolicyStyle, p))}
+                >
+                  {p === 'Civil' ? <Scale className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" /> : <Eye className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" />}
+                  <span className="text-responsive-xs font-mono uppercase tracking-widest">Enact</span>
+                </motion.button>
+              ))}
+            </AnimatePresence>
           </div>
         )}
 

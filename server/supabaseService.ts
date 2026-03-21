@@ -63,19 +63,39 @@ function mapUserToSupabase(userData: UserInternal): Record<string, unknown> {
   };
 }
 
-export async function getLeaderboard(): Promise<any[]> {
+type LeaderboardMode = 'Overall' | 'Ranked' | 'Casual' | 'Classic';
+
+export async function getLeaderboard(mode: LeaderboardMode = 'Overall'): Promise<any[]> {
+  const orderField =
+    mode === 'Ranked'  ? 'stats->elo' :
+    mode === 'Casual'  ? 'stats->casualWins' :
+    mode === 'Classic' ? 'stats->classicWins' :
+    'stats->elo'; // Overall sorts by ELO too
+
   if (isConfigured) {
     const { data, error } = await db
       .from("users")
       .select("*")
-      .order("stats->elo", { ascending: false })
+      .order(orderField as any, { ascending: false })
       .limit(50);
     if (error) return [];
     return data.map(mapSupabaseToUser);
   }
-  return Array.from(users.values())
-    .sort((a, b) => b.stats.elo - a.stats.elo)
-    .slice(0, 50);
+  const allUsers = Array.from(users.values());
+  if (mode === 'Ranked')  return allUsers.sort((a, b) => (b.stats.elo ?? 0) - (a.stats.elo ?? 0)).slice(0, 50);
+  if (mode === 'Casual')  return allUsers.sort((a, b) => (b.stats.casualWins ?? 0) - (a.stats.casualWins ?? 0)).slice(0, 50);
+  if (mode === 'Classic') return allUsers.sort((a, b) => (b.stats.classicWins ?? 0) - (a.stats.classicWins ?? 0)).slice(0, 50);
+  return allUsers.sort((a, b) => b.stats.elo - a.stats.elo).slice(0, 50);
+}
+
+export async function getAllLeaderboards(): Promise<{ overall: any[]; ranked: any[]; casual: any[]; classic: any[] }> {
+  const [overall, ranked, casual, classic] = await Promise.all([
+    getLeaderboard('Overall'),
+    getLeaderboard('Ranked'),
+    getLeaderboard('Casual'),
+    getLeaderboard('Classic'),
+  ]);
+  return { overall, ranked, casual, classic };
 }
 
 export async function getGlobalStats(): Promise<{ civilWins: number; stateWins: number }> {
@@ -388,6 +408,12 @@ export function makeNewUser(overrides: Partial<UserInternal> = {}): UserInternal
       civilWins:    0,
       stateWins:    0,
       overseerWins: 0,
+      rankedWins:   0,
+      rankedGames:  0,
+      casualWins:   0,
+      casualGames:  0,
+      classicWins:  0,
+      classicGames: 0,
     },
     cabinetPoints: 0,
     claimedRewards: [],
