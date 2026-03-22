@@ -90,6 +90,7 @@ export const PlayerCard = React.memo(({
     <motion.div
       animate={{ scale: speakingPlayers[p.id] ? 1.05 : 1 }}
       transition={{ duration: 0.2 }}
+      onMouseEnter={() => playSound('hover')}
       onMouseDown={handlePressStart}
       onMouseUp={handlePressEnd}
       onMouseLeave={handlePressEnd}

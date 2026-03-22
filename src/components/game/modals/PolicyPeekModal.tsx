@@ -8,9 +8,10 @@ interface PolicyPeekModalProps {
   policies: Policy[] | null;
   title?: string;
   onClose: () => void;
+  playSound: (key: string) => void;
 }
 
-export const PolicyPeekModal = ({ policies, title, onClose }: PolicyPeekModalProps) => (
+export const PolicyPeekModal = ({ policies, title, onClose, playSound }: PolicyPeekModalProps) => (
   <AnimatePresence>
     {policies && (
       <motion.div
@@ -59,6 +60,7 @@ export const PolicyPeekModal = ({ policies, title, onClose }: PolicyPeekModalPro
             )}
           </div>
           <button
+            onMouseEnter={() => playSound('hover')}
             onClick={onClose}
             className="w-full py-3 bg-card text-primary rounded-xl hover:bg-subtle transition-all text-sm font-serif italic border border-default"
           >

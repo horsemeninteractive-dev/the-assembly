@@ -378,6 +378,33 @@ export const GameRoom = ({
     prevPhase.current = gameState.phase;
   }, [gameState]);
 
+  // ── Panel sound effects ──────────────────────────────────────────────────
+  const prevPanelsState = useRef({
+    isLogOpen, isChatOpen, isHistoryOpen, isDossierOpen, isReferenceOpen,
+    isPeekOpen: !!peekedPolicies,
+    isInvestigationOpen: !!investigationResult,
+    isDeclarationOpen: showDeclarationUI,
+    isProfileOpen: !!selectedPlayerId
+  });
+
+  useEffect(() => {
+    const current = {
+      isLogOpen, isChatOpen, isHistoryOpen, isDossierOpen, isReferenceOpen,
+      isPeekOpen: !!peekedPolicies,
+      isInvestigationOpen: !!investigationResult,
+      isDeclarationOpen: showDeclarationUI,
+      isProfileOpen: !!selectedPlayerId
+    };
+
+    const opened = Object.keys(current).some(k => (current as any)[k] && !(prevPanelsState.current as any)[k]);
+    const closed = Object.keys(current).some(k => !(current as any)[k] && (prevPanelsState.current as any)[k]);
+
+    if (opened) playSound('modal_open');
+    else if (closed) playSound('modal_close');
+
+    prevPanelsState.current = current;
+  }, [isLogOpen, isChatOpen, isHistoryOpen, isDossierOpen, isReferenceOpen, peekedPolicies, investigationResult, showDeclarationUI, selectedPlayerId]);
+
   // ── Voice chat ───────────────────────────────────────────────────────────
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [isVideoActive, setIsVideoActive] = useState(false);
@@ -893,6 +920,7 @@ export const GameRoom = ({
             onPlayAgain={onPlayAgain}
             onLeave={onLeaveRoom}
             onOpenLog={() => setIsLogOpen(true)}
+            playSound={playSound}
           />
         </div>
       </main>
@@ -943,16 +971,19 @@ export const GameRoom = ({
       <InvestigationModal
         result={investigationResult}
         onClose={() => setInvestigationResult(null)}
+        playSound={playSound}
       />
       <PolicyPeekModal
         policies={peekedPolicies}
         title={peekTitle}
         onClose={() => { setPeekedPolicies(null); setPeekTitle(undefined); }}
+        playSound={playSound}
       />
       <DossierModal
         isOpen={isDossierOpen}
         onClose={() => setIsDossierOpen(false)}
         privateInfo={privateInfo}
+        playSound={playSound}
       />
       <DeclarationModal
         show={showDeclarationUI}
@@ -966,12 +997,14 @@ export const GameRoom = ({
         setDeclDrawCiv={setDeclDrawCiv}
         setDeclDrawSta={setDeclDrawSta}
         onSubmit={handleSubmitDeclaration}
+        playSound={playSound}
       />
       {gameState.titlePrompt && gameState.titlePrompt.playerId === socket.id && !titleAbilityDismissed && (
         <TitleAbilityModal
           role={gameState.titlePrompt.role}
           gameState={gameState}
           onClose={() => setTitleAbilityDismissed(true)}
+          playSound={playSound}
         />
       )}
       <GameReferencePanel
@@ -979,6 +1012,7 @@ export const GameRoom = ({
         onClose={() => setIsReferenceOpen(false)}
         gameState={gameState}
         me={me}
+        playSound={playSound}
       />
     </div>
   );

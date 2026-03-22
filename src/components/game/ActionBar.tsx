@@ -135,6 +135,7 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
         <div className="flex gap-2">
           <Tooltip content={isVoiceActive ? "Mute Mic" : "Unmute Mic"}>
             <button
+              onMouseEnter={() => playSound('hover')}
               onClick={() => { playSound('click'); setIsVoiceActive(!isVoiceActive); }}
               className={cn("p-[1vh] rounded-full transition-colors", isVoiceActive ? "bg-red-900/40 text-red-500" : "bg-card text-muted")}
             >
@@ -143,6 +144,7 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
           </Tooltip>
           <Tooltip content={isVideoActive ? "Stop Video" : "Start Video"}>
             <button
+              onMouseEnter={() => playSound('hover')}
               onClick={() => { playSound('click'); setIsVideoActive(!isVideoActive); }}
               className={cn("p-[1vh] rounded-full transition-colors", isVideoActive ? "bg-red-900/40 text-red-500" : "bg-card text-muted")}
             >
@@ -164,14 +166,16 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
             ) : (
               <>
                 <button
-                  onClick={() => { socket.emit('vote', 'Aye'); playSound('click'); }}
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => { socket.emit('vote', 'Aye'); playSound('stamp_aye'); }}
                   className={cn('flex-1 h-full max-h-[10vh] rounded-xl border-2 sm:border-4 flex flex-col items-center justify-center transition-all hover:scale-[1.02] active:scale-95 shadow-lg', getVoteStyles(user?.activeVotingStyle, 'Aye'))}
                 >
                   <span className="text-responsive-2xl sm:text-responsive-3xl font-thematic uppercase leading-none">AYE!</span>
                   <span className="text-responsive-xs font-mono uppercase tracking-widest opacity-60">(YES)</span>
                 </button>
                 <button
-                  onClick={() => { socket.emit('vote', 'Nay'); playSound('defeat'); }}
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => { socket.emit('vote', 'Nay'); playSound('stamp_nay'); }}
                   className={cn('flex-1 h-full max-h-[10vh] rounded-xl border-2 sm:border-4 flex flex-col items-center justify-center transition-all hover:scale-[1.02] active:scale-95 shadow-lg', getVoteStyles(user?.activeVotingStyle, 'Nay'))}
                 >
                   <span className="text-responsive-2xl sm:text-responsive-3xl font-thematic uppercase leading-none">NAY!</span>
@@ -193,7 +197,8 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
                   animate={{ rotateY: 0, opacity: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.4, delay: i * 0.15 }}
-                  onClick={() => { playSound('click'); socket.emit('presidentDiscard', i); }}
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => { playSound('paper_slide'); socket.emit('presidentDiscard', i); }}
                   className={cn('flex-1 h-full max-h-[12vh] rounded-lg border-2 flex flex-col items-center justify-center gap-1 transition-all hover:scale-[1.02] active:scale-95 shadow-lg preserve-3d', getPolicyStyles(user?.activePolicyStyle, p))}
                 >
                   {p === 'Civil' ? <Scale className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" /> : <Eye className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" />}
@@ -215,7 +220,8 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
                   animate={{ rotateY: 0, opacity: 1 }}
                   exit={{ opacity: 0, scale: 0.8 }}
                   transition={{ duration: 0.4, delay: i * 0.15 }}
-                  onClick={() => { playSound('click'); socket.emit('chancellorPlay', i); }}
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => { playSound('gavel'); socket.emit('chancellorPlay', i); }}
                   className={cn('flex-1 h-full max-h-[12vh] rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95 shadow-lg preserve-3d', getPolicyStyles(user?.activePolicyStyle, p))}
                 >
                   {p === 'Civil' ? <Scale className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" /> : <Eye className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" />}
@@ -318,6 +324,7 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
 
       {/* Log bar */}
       <button
+        onMouseEnter={() => playSound('hover')}
         onClick={() => { playSound('click'); onOpenLog(); }}
         className="h-[5vh] sm:h-[6vh] px-[2vw] flex items-center gap-3 bg-elevated hover:bg-surface transition-colors border-t border-subtle group"
       >

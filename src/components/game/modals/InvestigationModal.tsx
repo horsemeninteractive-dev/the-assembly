@@ -7,9 +7,10 @@ import { cn } from '../../../lib/utils';
 interface InvestigationModalProps {
   result: { targetName: string; role: Role } | null;
   onClose: () => void;
+  playSound: (key: string) => void;
 }
 
-export const InvestigationModal = ({ result, onClose }: InvestigationModalProps) => (
+export const InvestigationModal = ({ result, onClose, playSound }: InvestigationModalProps) => (
   <AnimatePresence>
     {result && (
       <motion.div
@@ -43,6 +44,7 @@ export const InvestigationModal = ({ result, onClose }: InvestigationModalProps)
             {result.role === 'Civil' ? 'CIVIL' : 'STATE'}
           </div>
           <button
+            onMouseEnter={() => playSound('hover')}
             onClick={onClose}
             className="w-full py-3 bg-card text-primary rounded-xl hover:bg-subtle transition-all text-sm font-serif italic"
           >

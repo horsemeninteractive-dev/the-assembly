@@ -16,6 +16,7 @@ interface GameOverModalProps {
   onPlayAgain: () => void;
   onLeave: () => void;
   onOpenLog: () => void;
+  playSound: (key: string) => void;
 }
 
 const TIER_COLOURS: Record<string, string> = {
@@ -39,7 +40,7 @@ const EloChange = ({ change }: { change: number }) => {
   );
 };
 
-export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, onPlayAgain, onLeave, onOpenLog }: GameOverModalProps) => {
+export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, onPlayAgain, onLeave, onOpenLog, playSound }: GameOverModalProps) => {
   const agenda          = privateInfo?.personalAgenda;
   const agendaCompleted = agenda?.status === 'completed';
   const agendaFailed    = agenda?.status === 'failed';
@@ -61,7 +62,7 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="max-w-md w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-full"
+            className="max-w-4xl w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
           >
             {/* Win banner */}
             <div className={cn(
@@ -89,7 +90,9 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
 
             {/* Scrollable middle content */}
             <div className="flex-1 overflow-y-auto custom-scrollbar">
-              <div className="p-[3vh] space-y-[2vh]">
+              <div className="p-[4vh] grid grid-cols-1 md:grid-cols-2 gap-[4vh] items-start">
+                {/* Left Column */}
+                <div className="space-y-[3vh]">
 
                 {/* ── Post-match ELO summary (ranked only) ────────────────── */}
                 {postMatchResult && (
@@ -166,6 +169,7 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
 
                 {/* ── Log button ─────────────────────────────────────────── */}
                 <button
+                  onMouseEnter={() => playSound('hover')}
                   onClick={onOpenLog}
                   className="w-full py-[1vh] bg-card text-tertiary border border-default rounded-xl hover:bg-hover hover:text-primary transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2"
                 >
@@ -248,7 +252,10 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                     </div>
                   );
                 })()}
+                </div>
 
+                {/* Right Column */}
+                <div className="space-y-[3vh]">
                 {/* ── Identity reveal ─────────────────────────────────────── */}
                 <div className="space-y-[2vh]">
                   <div className="text-responsive-xs uppercase tracking-[0.2em] text-ghost font-mono border-b border-subtle pb-2 flex justify-between">
@@ -293,6 +300,7 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                     })}
                   </div>
                 </div>
+                </div>
 
               </div>
             </div>
@@ -300,12 +308,14 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
             {/* Pinned action buttons */}
             <div className="flex gap-3 p-[3vh] pt-0 shrink-0">
               <button
+                onMouseEnter={() => playSound('hover')}
                 onClick={onPlayAgain}
                 className="flex-1 py-[1.5vh] btn-primary rounded-xl hover:bg-subtle transition-all font-thematic text-responsive-sm uppercase tracking-widest"
               >
                 Play Again
               </button>
               <button
+                onMouseEnter={() => playSound('hover')}
                 onClick={onLeave}
                 className="flex-1 py-[1.5vh] bg-card text-primary rounded-xl hover:bg-subtle transition-all font-thematic text-responsive-sm uppercase tracking-widest border border-default"
               >

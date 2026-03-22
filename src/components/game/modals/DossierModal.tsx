@@ -9,6 +9,7 @@ interface DossierModalProps {
   isOpen: boolean;
   onClose: () => void;
   privateInfo: PrivateInfo | null;
+  playSound: (key: string) => void;
 }
 
 const TITLE_ROLE_DESCRIPTIONS: Record<TitleRole, string> = {
@@ -41,7 +42,7 @@ const AgendaStatusBadge = ({ status }: { status: AgendaStatus }) => {
   );
 };
 
-export const DossierModal = ({ isOpen, onClose, privateInfo }: DossierModalProps) => (
+export const DossierModal = ({ isOpen, onClose, privateInfo, playSound }: DossierModalProps) => (
   <AnimatePresence>
     {isOpen && (
       <motion.div
@@ -61,7 +62,11 @@ export const DossierModal = ({ isOpen, onClose, privateInfo }: DossierModalProps
             <div className="p-[3vh] space-y-[2vh] flex-1 flex flex-col min-h-0 backface-hidden">
             <div className="flex items-center justify-between shrink-0">
               <h3 className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono">Your Secret Dossier</h3>
-              <button onClick={onClose} className="text-ghost hover:text-white">
+              <button 
+                onMouseEnter={() => playSound('hover')}
+                onClick={onClose} 
+                className="text-ghost hover:text-white"
+              >
                 <X className="w-[2.5vh] h-[2.5vh]" />
               </button>
             </div>
@@ -187,6 +192,7 @@ export const DossierModal = ({ isOpen, onClose, privateInfo }: DossierModalProps
             )}
 
             <button
+              onMouseEnter={() => playSound('hover')}
               onClick={onClose}
               className="w-full py-[1.2vh] bg-card text-primary rounded-xl hover:bg-subtle transition-all text-responsive-sm font-serif italic shrink-0"
             >

@@ -14,13 +14,14 @@ interface DeclarationModalProps {
   setDeclDrawCiv: (n: number) => void;
   setDeclDrawSta: (n: number) => void;
   onSubmit: () => void;
+  playSound: (key: string) => void;
 }
 
 export const DeclarationModal = ({
   show, declarationType,
   declCiv, declSta, declDrawCiv, declDrawSta,
   setDeclCiv, setDeclSta, setDeclDrawCiv, setDeclDrawSta,
-  onSubmit,
+  onSubmit, playSound
 }: DeclarationModalProps) => (
   <AnimatePresence>
     {show && declarationType && (
@@ -54,6 +55,7 @@ export const DeclarationModal = ({
                   {[0, 1, 2, 3].map(n => (
                     <button
                       key={n}
+                      onMouseEnter={() => playSound('hover')}
                       onClick={() => { setDeclDrawCiv(n); setDeclDrawSta(3 - n); }}
                       className={cn(
                         'flex-1 py-3 rounded-xl border transition-all font-mono text-sm',
@@ -83,6 +85,7 @@ export const DeclarationModal = ({
                 {[0, 1, 2].map(n => (
                   <button
                     key={n}
+                    onMouseEnter={() => playSound('hover')}
                     onClick={() => { setDeclCiv(n); setDeclSta(2 - n); }}
                     className={cn(
                       'flex-1 py-3 rounded-xl border transition-all font-mono text-sm',
@@ -104,6 +107,7 @@ export const DeclarationModal = ({
           </div>
 
           <button
+            onMouseEnter={() => playSound('hover')}
             onClick={onSubmit}
             className="w-full py-4 btn-primary rounded-xl hover:bg-subtle transition-all font-thematic text-xl uppercase tracking-wide"
           >

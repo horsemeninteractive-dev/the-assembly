@@ -9,6 +9,7 @@ interface GameReferenceProps {
   onClose: () => void;
   gameState: GameState;
   me: Player | undefined;
+  playSound: (key: string) => void;
 }
 
 interface PhaseHelp {
@@ -149,7 +150,7 @@ function getPhaseHelp(phase: GamePhase, me: Player | undefined, gameState: GameS
   }
 }
 
-export const GameReferencePanel: React.FC<GameReferenceProps> = ({ isOpen, onClose, gameState, me }) => {
+export const GameReferencePanel: React.FC<GameReferenceProps> = ({ isOpen, onClose, gameState, me, playSound }) => {
   const help = getPhaseHelp(gameState.phase, me, gameState);
 
   return (
@@ -175,7 +176,11 @@ export const GameReferencePanel: React.FC<GameReferenceProps> = ({ isOpen, onClo
                 <HelpCircle className="w-4 h-4 text-muted" />
                 <span className="text-muted text-xs font-mono uppercase tracking-widest">Phase Reference</span>
               </div>
-              <button onClick={onClose} className="text-ghost hover:text-white transition-colors">
+              <button 
+                onMouseEnter={() => playSound('hover')}
+                onClick={onClose} 
+                className="text-ghost hover:text-white transition-colors"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -209,6 +214,7 @@ export const GameReferencePanel: React.FC<GameReferenceProps> = ({ isOpen, onClo
 
             <div className="px-5 pb-5">
               <button
+                onMouseEnter={() => playSound('hover')}
                 onClick={onClose}
                 className="w-full py-2.5 bg-card text-tertiary rounded-xl hover:bg-hover hover:text-white transition-all text-xs font-mono uppercase tracking-widest border border-default"
               >

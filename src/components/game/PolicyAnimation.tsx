@@ -25,7 +25,7 @@ export const PolicyAnimation = ({ gameState, show, playSound }: PolicyAnimationP
     const key = `${gameState.lastEnactedPolicy.type}-${gameState.civilDirectives}-${gameState.stateDirectives}`;
     if (playedKeyRef.current === key) return; // already played for this reveal
     playedKeyRef.current = key;
-    playSoundRef.current(gameState.lastEnactedPolicy.type === 'Civil' ? 'win_civil' : 'win_state');
+    playSoundRef.current(gameState.lastEnactedPolicy.type === 'Civil' ? 'reveal_civil' : 'reveal_state');
   // Only react to show toggling on/off and the policy identity — NOT playSound
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show, gameState.lastEnactedPolicy, gameState.civilDirectives, gameState.stateDirectives]);

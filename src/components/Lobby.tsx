@@ -28,6 +28,12 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
   const [isCreating, setIsCreating] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
+
+  useEffect(() => {
+    if (isCreating || isLeaderboardOpen || isHowToPlayOpen) {
+      playSound('modal_open');
+    }
+  }, [isCreating, isLeaderboardOpen, isHowToPlayOpen]);
   const [pendingRequestCount, setPendingRequestCount] = useState(0);
   const [newRoomName, setNewRoomName] = useState('');
   const [maxPlayers, setMaxPlayers] = useState(5);
@@ -48,6 +54,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
   const handleQuickJoin = () => {
     playSound('click');
     setQuickJoinStatus('searching');
+    playSound('searching'); // New searching sound
     // Find joinable rooms (Lobby phase, has open slot)
     const joinable = rooms.filter(r => r.phase === 'Lobby' && r.playerCount < r.maxPlayers);
     if (joinable.length === 0) {
@@ -172,6 +179,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
           <div className="ml-2 hidden sm:block">
             <Tooltip content="Leaderboard">
               <button
+                onMouseEnter={() => playSound('hover')}
                 onClick={() => {
                   playSound('click');
                   setIsLeaderboardOpen(true);
@@ -218,6 +226,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
         <div className="flex items-center gap-[2vw] sm:gap-[3vw] flex-1 justify-end">
           <Tooltip content="My Profile">
             <button
+              onMouseEnter={() => playSound('hover')}
               onClick={() => {
                 playSound('click');
                 onOpenProfile();
@@ -249,6 +258,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
           {/* Leaderboard — mobile only (desktop version is in the title group) */}
           <Tooltip content="Leaderboard">
             <button
+              onMouseEnter={() => playSound('hover')}
               onClick={() => {
                 playSound('click');
                 setIsLeaderboardOpen(true);
@@ -261,6 +271,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
 
           <Tooltip content="How to Play">
             <button
+              onMouseEnter={() => playSound('hover')}
               onClick={() => {
                 playSound('click');
                 setIsHowToPlayOpen(true);
@@ -273,6 +284,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
 
           <Tooltip content="Logout">
             <button
+              onMouseEnter={() => playSound('hover')}
               onClick={() => {
                 playSound('click');
                 onLogout();
@@ -325,6 +337,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
         >
           {/* Quick Join */}
           <button
+            onMouseEnter={() => playSound('hover')}
             onClick={handleQuickJoin}
             disabled={quickJoinStatus === 'searching' || quickJoinStatus === 'found'}
             className={cn(
@@ -347,6 +360,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
 
           {/* Start New Assembly */}
           <button
+            onMouseEnter={() => playSound('hover')}
             onClick={() => { playSound('click'); setIsCreating(true); }}
             className="flex-1 flex items-center justify-center gap-2 btn-primary px-[4vw] py-[1.5vh] rounded-2xl font-thematic text-responsive-xl hover:bg-subtle transition-all shadow-xl shadow-white/5"
           >
@@ -402,6 +416,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
             ] as const).map(f => (
               <button
                 key={f.label}
+                onMouseEnter={() => playSound('hover')}
                 onClick={() => { playSound('click'); f.toggle(); }}
                 className={cn(
                   'flex items-center gap-1 px-2 py-1 rounded-lg border text-[9px] font-mono uppercase tracking-widest transition-all shrink-0',
@@ -443,6 +458,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
               ]).map(s => (
                 <button
                   key={s.value}
+                  onMouseEnter={() => playSound('hover')}
                   onClick={() => { playSound('click'); setSortBy(s.value); }}
                   className={cn(
                     'px-2 py-1 rounded-lg border text-[9px] font-mono uppercase tracking-widest transition-all',
@@ -494,7 +510,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                 initial={{ opacity: 0, scale: 0.95, y: 20 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 transition={{ delay: 0.4 + idx * 0.05, duration: 0.3, ease: 'easeOut' }}
-                whileHover={{ y: -4 }}
+                onMouseEnter={() => playSound('hover')}
                 onClick={() => {
                   playSound('click');
                   if (room.privacy === 'private') {
@@ -591,8 +607,10 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                         : 'Join'}
                   </button>
                   <button
+                    onMouseEnter={() => playSound('hover')}
                     onClick={(e) => {
                       e.stopPropagation();
+                      playSound('click');
                       onJoinRoom(room.id, undefined, undefined, undefined, true);
                     }}
                     className="flex-1 py-[1vh] bg-card text-primary text-responsive-xs font-mono uppercase tracking-widest rounded-lg border border-default hover:bg-subtle transition-colors"
@@ -606,9 +624,9 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
         </div>
 
         {isLeaderboardOpen && (
-          <LeaderboardModal user={user} onClose={() => setIsLeaderboardOpen(false)} />
+          <LeaderboardModal user={user} onClose={() => { playSound('modal_close'); setIsLeaderboardOpen(false); }} />
         )}
-        <HowToPlayModal isOpen={isHowToPlayOpen} onClose={() => setIsHowToPlayOpen(false)} />
+        <HowToPlayModal isOpen={isHowToPlayOpen} onClose={() => { playSound('modal_close'); setIsHowToPlayOpen(false); }} />
       </main>
 
       {/* Invite Code Prompt Modal */}
@@ -689,7 +707,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              onClick={() => setIsCreating(false)}
+              onClick={() => { playSound('modal_close'); setIsCreating(false); }}
               className="absolute inset-0 bg-backdrop backdrop-blur-sm"
             />
             <motion.div
@@ -800,7 +818,8 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                       <button
                         key={opt.value}
                         type="button"
-                        onClick={() => setPrivacy(opt.value)}
+                        onMouseEnter={() => playSound('hover')}
+                        onClick={() => { playSound('click'); setPrivacy(opt.value); }}
                         className={cn(
                           'flex flex-col items-center gap-1 py-2 px-1 rounded-xl border text-center transition-all',
                           privacy === opt.value
