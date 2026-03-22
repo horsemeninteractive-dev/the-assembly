@@ -199,32 +199,26 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <label className="text-[10px] uppercase tracking-widest text-ghost font-mono ml-1">Username</label>
-            <div className="relative">
-              <UserIcon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ghost" />
-              <input 
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-elevated border border-subtle rounded-xl py-3 pl-10 pr-4 text-sm text-primary focus:outline-none focus:border-red-900/50 transition-colors"
-                placeholder="Enter username"
-                required
-              />
-            </div>
+            <input
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              className="w-full bg-surface border border-subtle rounded-xl px-4 py-3 text-sm focus:border-strong focus:outline-none transition-all placeholder:text-muted"
+              placeholder="Agent Handle"
+              required
+            />
           </div>
-
+          
           <div className="space-y-2">
-            <label className="text-[10px] uppercase tracking-widest text-ghost font-mono ml-1">Password</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ghost" />
-              <input 
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-elevated border border-subtle rounded-xl py-3 pl-10 pr-4 text-sm text-primary focus:outline-none focus:border-red-900/50 transition-colors"
-                placeholder="Enter password"
-                required
-              />
-            </div>
+            <label className="text-[10px] font-mono text-ghost uppercase tracking-widest ml-1">Secure Key</label>
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full bg-surface border border-subtle rounded-xl px-4 py-3 text-sm focus:border-strong focus:outline-none transition-all placeholder:text-muted"
+               placeholder="••••••••"
+              required
+            />
           </div>
 
           {!isLogin && (

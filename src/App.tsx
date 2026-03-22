@@ -16,6 +16,7 @@ import { DiscordSDK } from "@discord/embedded-app-sdk";
 import { discordSdk, setupDiscordSdk } from './lib/discord';
 import { DISCORD_CLIENT_ID } from './constants';
 import { cn, getProxiedUrl } from './lib/utils';
+import { PurchaseCPModal } from './components/PurchaseCPModal';
 
 const CLIENT_VERSION = 'v0.9.8';
 
@@ -23,6 +24,7 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [isProfileOpen, setIsProfileOpen] = useState(false);
+  const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const [joined, setJoined] = useState(false);
   const [isInteracted, setIsInteracted] = useState(false);
   const [gameState, setGameState] = useState<GameState | null>(null);
@@ -549,6 +551,7 @@ export default function App() {
                 onJoinRoom={handleJoinRoom}
                 onLogout={handleLogout}
                 onOpenProfile={() => setIsProfileOpen(true)}
+                onOpenPurchase={() => setIsPurchaseModalOpen(true)}
                 playSound={playSound}
                 uiScaleSetting={uiScaleSetting}
                 token={token}
@@ -558,6 +561,7 @@ export default function App() {
                   user={user}
                   token={token!}
                   onClose={() => setIsProfileOpen(false)}
+                  onOpenPurchase={() => { setIsProfileOpen(false); setIsPurchaseModalOpen(true); }}
                   onUpdateUser={setUser}
                   playSound={playSound}
                   playMusic={playMusic}
@@ -638,6 +642,7 @@ export default function App() {
                   }}
                   roomId={gameState?.roomId}
                   mode={gameState?.mode}
+                  onOpenPurchase={() => { setIsProfileOpen(false); setIsPurchaseModalOpen(true); }}
                   onJoinRoom={(roomId) => { setIsProfileOpen(false); handleLeaveRoom(() => handleJoinRoom(roomId)); }}
                 />
               )}
@@ -652,6 +657,12 @@ export default function App() {
             </motion.div>
           )}
         </AnimatePresence>
+        <PurchaseCPModal 
+          isOpen={isPurchaseModalOpen} 
+          onClose={() => { playSound('modal_close'); setIsPurchaseModalOpen(false); }} 
+          token={token || ''}
+          playSound={playSound}
+        />
         <TutorialModal
           isOpen={showTutorial}
           onComplete={handleTutorialComplete}

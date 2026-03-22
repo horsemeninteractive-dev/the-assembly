@@ -13,6 +13,9 @@ import { GameEngine } from "./server/gameEngine.ts";
 import { registerRoutes } from "./server/apiRoutes.ts";
 import { getUserById, sendFriendRequest, acceptFriendRequest, getFriends, isFriend } from "./server/supabaseService.ts";
 import { pubClient, subClient, isRedisConfigured } from "./server/redis.ts";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
@@ -30,6 +33,7 @@ function isAllowedOrigin(origin: string | undefined): boolean {
 }
 
 async function startServer() {
+  console.log("[Server] Starting with Stripe integration...");
   const app = express();
   app.set("trust proxy", 1);
   app.use(cors({
@@ -39,6 +43,52 @@ async function startServer() {
       callback(new Error(`CORS: origin '${origin}' not allowed`));
     },
   }));
+
+  // Stripe webhook must be placed BEFORE express.json() to get the raw body
+  app.post("/api/webhook/stripe", express.raw({ type: "application/json" }), async (req, res) => {
+    const sig = req.headers["stripe-signature"];
+    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
+
+    if (!sig || !webhookSecret) {
+      console.error("[Stripe] Missing signature or webhook secret");
+      return res.status(400).send("Webhook Error: Missing signature or secret");
+    }
+
+    let event: Stripe.Event;
+
+    try {
+      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
+    } catch (err: any) {
+      console.error(`[Stripe] Webhook Error: ${err.message}`);
+      return res.status(400).send(`Webhook Error: ${err.message}`);
+    }
+
+    // Handle the event
+    if (event.type === "checkout.session.completed") {
+      const session = event.data.object as Stripe.Checkout.Session;
+      const userId = session.metadata?.userId;
+      const cpAmount = parseInt(session.metadata?.cpAmount || "0", 10);
+
+      if (userId && cpAmount > 0) {
+        console.log(`[Stripe] Crediting ${cpAmount} CP to user ${userId}`);
+        const user = await getUserById(userId);
+        if (user) {
+          user.cabinetPoints = (user.cabinetPoints ?? 0) + cpAmount;
+          const { saveUser } = await import("./server/supabaseService.ts");
+          await saveUser(user);
+          
+          // Notify the user via socket if they are online
+          const socketId = userSockets.get(userId);
+          if (socketId) {
+            io.to(socketId).emit("userUpdate", user);
+          }
+        }
+      }
+    }
+
+    res.json({ received: true });
+  });
+
   app.use(express.json());
 
   const httpServer = createServer(app);
@@ -66,7 +116,7 @@ async function startServer() {
   // Restore persisted game rooms from Redis before accepting connections
   await engine.restoreFromRedis();
 
-  registerRoutes(app, io, engine, userSockets);
+  registerRoutes(app, io, engine, userSockets, stripe);
 
   // Add headers for Discord Activity media permissions
   app.use((req, res, next) => {

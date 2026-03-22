@@ -110,7 +110,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ userId, 
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: -20 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-sm bg-surface border border-subtle rounded-[2rem] overflow-hidden shadow-2xl text-primary"
+        className="relative w-full max-w-sm bg-surface border border-subtle rounded-3xl overflow-hidden shadow-2xl text-primary"
       >
         {/* Header - Matching Profile.tsx */}
         <div className="p-[3vh] bg-elevated border-b border-subtle flex flex-col items-center gap-[2vh]">
@@ -132,7 +132,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ userId, 
                 )} />
               )}
             </div>
-            <div className="absolute -bottom-2 -right-2 bg-red-900 border border-red-500 text-white text-[8px] font-mono px-2 py-0.5 rounded-lg shadow-lg">
+            <div className="absolute -bottom-2 -right-2 bg-red-900 border border-red-500 text-white text-[8px] font-mono px-2 py-0.5 rounded-xl shadow-lg">
               LVL {getLevelFromXp(user.stats.xp)}
             </div>
           </div>
@@ -140,7 +140,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ userId, 
           <div className="text-center">
             <h2 className="text-responsive-xl font-thematic text-primary tracking-wide mb-2">{user.username}</h2>
             <div className="flex justify-center gap-2">
-              <div className={cn('flex items-center gap-1.5 px-2.5 py-1 rounded-lg border', getRankTier(user.stats.elo).bg, getRankTier(user.stats.elo).border)}>
+              <div className={cn('flex items-center gap-1.5 px-2.5 py-1 rounded-xl border', getRankTier(user.stats.elo).bg, getRankTier(user.stats.elo).border)}>
                 <span className="text-sm leading-none">{getRankTier(user.stats.elo).icon}</span>
                 <span className={cn('text-responsive-xs font-mono font-bold', getRankTier(user.stats.elo).color)}>{getRankLabel(user.stats.elo)}</span>
                 <span className="text-responsive-xs font-mono text-faint">· {user.stats.elo}</span>

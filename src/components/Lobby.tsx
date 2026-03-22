@@ -8,11 +8,13 @@ import { getFrameStyles } from '../lib/cosmetics';
 import { LeaderboardModal } from './game/modals/LeaderboardModal';
 import { HowToPlayModal } from './HowToPlayModal';
 
+
 interface LobbyProps {
   user: User;
   onJoinRoom: (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked' | 'Classic', isSpectator?: boolean, privacy?: RoomPrivacy, inviteCode?: string) => void;
   onLogout: () => void;
   onOpenProfile: () => void;
+  onOpenPurchase: () => void;
   playSound: (soundKey: string) => void;
   token?: string;
   uiScaleSetting?: number;
@@ -21,7 +23,7 @@ interface LobbyProps {
 import { getBackgroundTexture } from '../lib/cosmetics';
 import { getRankTier, getRankLabel } from '../lib/ranks';
 
-export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpenProfile, playSound, token, uiScaleSetting }) => {
+export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpenProfile, onOpenPurchase, playSound, token, uiScaleSetting }) => {
   const [rooms, setRooms] = useState<RoomInfo[]>([]);
   const [rejoinInfo, setRejoinInfo] = useState<{ canRejoin: boolean; roomId?: string; roomName?: string; mode?: string } | null>(null);
   const [globalStats, setGlobalStats] = useState<{ civilWins: number; stateWins: number }>({ civilWins: 0, stateWins: 0 });
@@ -56,7 +58,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
     setQuickJoinStatus('searching');
     playSound('searching'); // New searching sound
     // Find joinable rooms (Lobby phase, has open slot)
-    const joinable = rooms.filter(r => r.phase === 'Lobby' && r.playerCount < r.maxPlayers);
+    const joinable = (Array.isArray(rooms) ? rooms : []).filter(r => r.phase === 'Lobby' && r.playerCount < r.maxPlayers);
     if (joinable.length === 0) {
       setQuickJoinStatus('none');
       setTimeout(() => setQuickJoinStatus('idle'), 3000);
@@ -84,7 +86,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
     try {
       const response = await fetch('/api/rooms');
       const data = await response.json();
-      setRooms(data);
+      setRooms(Array.isArray(data) ? data : []);
 
       // Check for rejoin info
       const rejoinResponse = await fetch(`/api/rejoin-info?userId=${user.id}`);
@@ -139,7 +141,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
   };
 
   // Derived filtered + sorted room list
-  const visibleRooms = rooms
+  const visibleRooms = (Array.isArray(rooms) ? rooms : [])
     .filter(room => {
       if (!filterCasual && room.mode === 'Casual') return false;
       if (!filterRanked && room.mode === 'Ranked') return false;
@@ -162,21 +164,110 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
         initial={{ y: -50, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-        className="h-[8vh] sm:h-[10vh] border-b border-subtle bg-surface-glass px-[4vw] flex items-center justify-between sticky top-0 z-50"
+        className="border-b border-subtle bg-surface-glass sticky top-0 z-50 flex flex-col"
       >
-        <div className="flex items-center gap-[1vw] sm:gap-[2vw] min-w-0 flex-1">
-          <div className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] bg-elevated rounded-xl flex items-center justify-center border border-white/40 shrink-0 overflow-hidden">
-            <img src={getProxiedUrl("https://storage.googleapis.com/secretchancellor/SC.png")} alt="The Assembly Logo" className="w-full h-full object-contain p-1" referrerPolicy="no-referrer" />
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-baseline gap-2">
-              <h1 className="text-responsive-sm sm:text-responsive-xl font-thematic text-primary tracking-wide leading-none truncate">The Assembly</h1>
-              <span className="text-[8px] font-mono text-red-500/60 border border-red-900/40 rounded px-1 py-0.5 leading-none shrink-0">v0.9.8</span>
+        <div className="h-[8vh] sm:h-[10vh] px-[4vw] flex items-center justify-between">
+          <div className="flex items-center gap-[1vw] sm:gap-[2vw] min-w-0 flex-1">
+            <div className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] bg-elevated rounded-xl flex items-center justify-center border border-white/40 shrink-0 overflow-hidden">
+              <img src={getProxiedUrl("https://storage.googleapis.com/secretchancellor/SC.png")} alt="The Assembly Logo" className="w-full h-full object-contain p-1" referrerPolicy="no-referrer" />
             </div>
-            <p className="text-responsive-xs uppercase tracking-widest text-muted font-mono mt-0.5">Assembly Lobby</p>
+            <div className="min-w-0">
+              <div className="flex items-baseline gap-2">
+                <h1 className="text-responsive-sm sm:text-responsive-xl font-thematic text-primary tracking-wide leading-none truncate">The Assembly</h1>
+                <span className="text-[8px] font-mono text-red-500/60 border border-red-900/40 rounded px-1 py-0.5 leading-none shrink-0">v0.9.8</span>
+              </div>
+              <p className="text-responsive-xs uppercase tracking-widest text-muted font-mono mt-0.5">Assembly Lobby</p>
+            </div>
+
+            <div className="ml-2 hidden sm:block">
+              <Tooltip content="Leaderboard">
+                <button
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => {
+                    playSound('click');
+                    setIsLeaderboardOpen(true);
+                  }}
+                  className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] rounded-xl bg-card border border-default flex items-center justify-center hover:border-yellow-900/50 transition-colors"
+                >
+                  <Trophy className="w-[2vh] h-[2vh] text-yellow-500" />
+                </button>
+              </Tooltip>
+            </div>
           </div>
 
-          <div className="ml-2 hidden sm:block">
+          {/* Centered Stats (Desktop) */}
+          <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-4 px-4 py-2 bg-elevated border border-subtle rounded-2xl">
+            <div className="flex items-center gap-2">
+              <Coins className="w-[1.8vh] h-[1.8vh] text-emerald-500" />
+              <span className="text-responsive-xs font-mono text-emerald-500">{user.stats.points} IP</span>
+            </div>
+            <div className="w-px h-4 bg-card" />
+            
+            {/* ELO Badge */}
+            <div className={cn(
+              'flex items-center gap-2 px-3 py-1 rounded-xl border transition-all',
+              getRankTier(user.stats.elo).bg,
+              getRankTier(user.stats.elo).border
+            )}>
+              <span className="text-responsive-xs">{getRankTier(user.stats.elo).icon}</span>
+              <div className="flex flex-col leading-none">
+                <span className={cn('text-[8px] font-mono font-bold uppercase tracking-tighter', getRankTier(user.stats.elo).color)}>
+                  {getRankLabel(user.stats.elo)}
+                </span>
+                <span className="text-[10px] font-mono text-primary font-bold">{user.stats.elo} ELO</span>
+              </div>
+            </div>
+
+            <div className="w-px h-4 bg-card" />
+            <div className="flex items-center gap-2">
+              <Zap className="w-[1.8vh] h-[1.8vh] text-purple-500" />
+              <span className="text-responsive-xs font-mono text-purple-500">{user.cabinetPoints || 0} CP</span>
+              <button
+                onMouseEnter={() => playSound('hover')}
+                onClick={() => {
+                  playSound('click');
+                  onOpenPurchase();
+                }}
+                className="w-[2.2vh] h-[2.2vh] rounded-full bg-purple-900/20 border border-purple-500/30 flex items-center justify-center hover:bg-purple-900/40 hover:border-purple-500/50 transition-all ml-1 group/cp"
+              >
+                <Plus className="w-[1.4vh] h-[1.4vh] text-purple-400 group-hover/cp:text-purple-300" />
+              </button>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-[2vw] sm:gap-[3vw] flex-1 justify-end">
+            <Tooltip content="My Profile">
+              <button
+                onMouseEnter={() => playSound('hover')}
+                onClick={() => {
+                  playSound('click');
+                  onOpenProfile();
+                }}
+                className="flex items-center gap-3 group"
+              >
+                <div className="text-right hidden sm:block">
+                  <div className="text-responsive-xs font-medium group-hover:text-red-500 transition-colors">{user.username}</div>
+                  <div className="text-responsive-xs uppercase tracking-widest text-muted font-mono">View Profile</div>
+                </div>
+                <div className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] rounded-xl bg-card border border-default flex items-center justify-center group-hover:border-red-900/50 transition-colors relative">
+                  {user.avatarUrl ? (
+                    <img src={getProxiedUrl(user.avatarUrl)} alt={user.username} className="w-full h-full object-cover rounded-xl" />
+                  ) : (
+                    <UserIcon className="w-[2vh] h-[2vh] text-muted" />
+                  )}
+                  {user.activeFrame && (
+                    <div className={cn("absolute inset-0 rounded-xl pointer-events-none", getFrameStyles(user.activeFrame))} />
+                  )}
+                  {pendingRequestCount > 0 && (
+                    <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border border-deep flex items-center justify-center">
+                      <span className="text-[8px] font-bold text-primary leading-none">{pendingRequestCount}</span>
+                    </span>
+                  )}
+                </div>
+              </button>
+            </Tooltip>
+
+            {/* Leaderboard — mobile only (desktop version is in the title group) */}
             <Tooltip content="Leaderboard">
               <button
                 onMouseEnter={() => playSound('hover')}
@@ -184,116 +275,71 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                   playSound('click');
                   setIsLeaderboardOpen(true);
                 }}
-                className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] rounded-xl bg-card border border-default flex items-center justify-center hover:border-yellow-900/50 transition-colors"
+                className="sm:hidden w-[4vh] h-[4vh] rounded-xl bg-card border border-default flex items-center justify-center hover:border-yellow-900/50 transition-colors"
               >
                 <Trophy className="w-[2vh] h-[2vh] text-yellow-500" />
+              </button>
+            </Tooltip>
+
+            <Tooltip content="How to Play">
+              <button
+                onMouseEnter={() => playSound('hover')}
+                onClick={() => {
+                  playSound('click');
+                  setIsHowToPlayOpen(true);
+                }}
+                className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] rounded-xl bg-card border border-default flex items-center justify-center hover:border-blue-900/50 transition-colors"
+              >
+                <BookOpen className="w-[2vh] h-[2vh] text-blue-400" />
+              </button>
+            </Tooltip>
+
+            <Tooltip content="Logout">
+              <button
+                onMouseEnter={() => playSound('hover')}
+                onClick={() => {
+                  playSound('click');
+                  onLogout();
+                }}
+                className="p-[1vh] sm:p-[1.2vh] text-ghost hover:text-red-500 transition-colors bg-elevated border border-subtle rounded-xl"
+              >
+                <LogOut className="w-[2vh] h-[2vh]" />
               </button>
             </Tooltip>
           </div>
         </div>
 
-        {/* Centered Stats */}
-        {/* Centered Stats */}
-        <div className="hidden lg:flex absolute left-1/2 -translate-x-1/2 items-center gap-4 px-4 py-2 bg-elevated border border-subtle rounded-2xl">
-          <div className="flex items-center gap-2">
-            <Coins className="w-[1.8vh] h-[1.8vh] text-emerald-500" />
-            <span className="text-responsive-xs font-mono text-emerald-500">{user.stats.points} IP</span>
+        {/* Mobile Stats Row (Visible only on mobile) */}
+        <div className="lg:hidden flex items-center justify-center gap-4 py-2 bg-elevated/20">
+          <div className="flex items-center gap-1.5">
+            <Coins className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="text-[10px] font-mono text-emerald-500">{user.stats.points} IP</span>
           </div>
-          <div className="w-px h-4 bg-card" />
+          <div className="w-px h-3 bg-subtle/30" />
           
-          {/* ELO Badge */}
           <div className={cn(
-            'flex items-center gap-2 px-3 py-1 rounded-xl border transition-all',
+            'flex items-center gap-1.5 px-2 py-0.5 rounded-lg border transition-all',
             getRankTier(user.stats.elo).bg,
             getRankTier(user.stats.elo).border
           )}>
-            <span className="text-responsive-xs">{getRankTier(user.stats.elo).icon}</span>
-            <div className="flex flex-col leading-none">
-              <span className={cn('text-[8px] font-mono font-bold uppercase tracking-tighter', getRankTier(user.stats.elo).color)}>
-                {getRankLabel(user.stats.elo)}
-              </span>
-              <span className="text-[10px] font-mono text-primary font-bold">{user.stats.elo} ELO</span>
-            </div>
+            <span className="text-xs">{getRankTier(user.stats.elo).icon}</span>
+            <span className="text-[10px] font-mono text-primary font-bold">{user.stats.elo} ELO</span>
           </div>
 
-          <div className="w-px h-4 bg-card" />
-          <div className="flex items-center gap-2">
-            <Zap className="w-[1.8vh] h-[1.8vh] text-purple-500" />
-            <span className="text-responsive-xs font-mono text-purple-500">{user.cabinetPoints || 0} CP</span>
+          <div className="w-px h-3 bg-subtle/30" />
+          <div className="flex items-center gap-1.5">
+            <Zap className="w-3.5 h-3.5 text-purple-500" />
+            <span className="text-[10px] font-mono text-purple-500">{user.cabinetPoints || 0} CP</span>
+            <button
+              onClick={() => {
+                playSound('click');
+                onOpenPurchase();
+              }}
+              className="w-4 h-4 rounded-full bg-purple-900/20 border border-purple-500/30 flex items-center justify-center hover:bg-purple-900/40 hover:border-purple-500/50 transition-all ml-1"
+            >
+              <Plus className="w-2.5 h-2.5 text-purple-400" />
+            </button>
           </div>
-        </div>
-
-        <div className="flex items-center gap-[2vw] sm:gap-[3vw] flex-1 justify-end">
-          <Tooltip content="My Profile">
-            <button
-              onMouseEnter={() => playSound('hover')}
-              onClick={() => {
-                playSound('click');
-                onOpenProfile();
-              }}
-              className="flex items-center gap-3 group"
-            >
-              <div className="text-right hidden sm:block">
-                <div className="text-responsive-xs font-medium group-hover:text-red-500 transition-colors">{user.username}</div>
-                <div className="text-responsive-xs uppercase tracking-widest text-muted font-mono">View Profile</div>
-              </div>
-              <div className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] rounded-xl bg-card border border-default flex items-center justify-center group-hover:border-red-900/50 transition-colors relative">
-                {user.avatarUrl ? (
-                  <img src={getProxiedUrl(user.avatarUrl)} alt={user.username} className="w-full h-full object-cover rounded-xl" />
-                ) : (
-                  <UserIcon className="w-[2vh] h-[2vh] text-muted" />
-                )}
-                {user.activeFrame && (
-                  <div className={cn("absolute inset-0 rounded-xl pointer-events-none", getFrameStyles(user.activeFrame))} />
-                )}
-                {pendingRequestCount > 0 && (
-                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-red-500 rounded-full border border-deep flex items-center justify-center">
-                    <span className="text-[8px] font-bold text-primary leading-none">{pendingRequestCount}</span>
-                  </span>
-                )}
-              </div>
-            </button>
-          </Tooltip>
-
-          {/* Leaderboard — mobile only (desktop version is in the title group) */}
-          <Tooltip content="Leaderboard">
-            <button
-              onMouseEnter={() => playSound('hover')}
-              onClick={() => {
-                playSound('click');
-                setIsLeaderboardOpen(true);
-              }}
-              className="sm:hidden w-[4vh] h-[4vh] rounded-xl bg-card border border-default flex items-center justify-center hover:border-yellow-900/50 transition-colors"
-            >
-              <Trophy className="w-[2vh] h-[2vh] text-yellow-500" />
-            </button>
-          </Tooltip>
-
-          <Tooltip content="How to Play">
-            <button
-              onMouseEnter={() => playSound('hover')}
-              onClick={() => {
-                playSound('click');
-                setIsHowToPlayOpen(true);
-              }}
-              className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] rounded-xl bg-card border border-default flex items-center justify-center hover:border-blue-900/50 transition-colors"
-            >
-              <BookOpen className="w-[2vh] h-[2vh] text-blue-400" />
-            </button>
-          </Tooltip>
-
-          <Tooltip content="Logout">
-            <button
-              onMouseEnter={() => playSound('hover')}
-              onClick={() => {
-                playSound('click');
-                onLogout();
-              }}
-              className="p-[1vh] sm:p-[1.2vh] text-ghost hover:text-red-500 transition-colors bg-elevated border border-subtle rounded-xl"
-            >
-              <LogOut className="w-[2vh] h-[2vh]" />
-            </button>
-          </Tooltip>
         </div>
       </motion.header>
 
@@ -305,13 +351,13 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
           transition={{ delay: 0.1, duration: 0.4, ease: 'easeOut' }}
           className="flex flex-col lg:flex-row items-stretch gap-4"
         >
-          <div className="bg-surface border border-subtle rounded-3xl p-[2vh] flex flex-col justify-center text-center lg:text-left">
+          <div className="bg-surface border border-subtle rounded-2xl p-[2vh] flex flex-col justify-center text-center lg:text-left">
             <h2 className="text-responsive-2xl sm:text-responsive-3xl font-thematic text-primary tracking-wide">Available Assemblies</h2>
             <p className="text-responsive-xs text-muted mt-1">Join an existing session or convene your own.</p>
           </div>
 
           {/* Swing Meter */}
-          <div className="flex-1 bg-surface border border-subtle rounded-3xl p-[2vh] flex flex-col justify-center">
+          <div className="flex-1 bg-surface border border-subtle rounded-2xl p-[2vh] flex flex-col justify-center">
             <div className="flex items-center justify-between text-responsive-xs font-mono uppercase tracking-widest mb-2">
               <span className="text-blue-500">Civil</span>
               <span className="font-thematic text-responsive-xl">
@@ -341,7 +387,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
             onClick={handleQuickJoin}
             disabled={quickJoinStatus === 'searching' || quickJoinStatus === 'found'}
             className={cn(
-              'flex items-center justify-center gap-2 px-[4vw] py-[1.5vh] rounded-2xl font-thematic text-responsive-xl transition-all shadow-xl border',
+              'flex items-center justify-center gap-2 px-[4vw] py-[1.5vh] rounded-xl font-thematic text-responsive-xl transition-all shadow-xl border',
               quickJoinStatus === 'none'
                 ? 'bg-red-900/20 border-red-900/50 text-red-400 cursor-default'
                 : quickJoinStatus === 'found'
@@ -362,7 +408,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
           <button
             onMouseEnter={() => playSound('hover')}
             onClick={() => { playSound('click'); setIsCreating(true); }}
-            className="flex-1 flex items-center justify-center gap-2 btn-primary px-[4vw] py-[1.5vh] rounded-2xl font-thematic text-responsive-xl hover:bg-subtle transition-all shadow-xl shadow-white/5"
+            className="flex-1 flex items-center justify-center gap-2 btn-primary px-[4vw] py-[1.5vh] rounded-xl font-thematic text-responsive-xl transition-all shadow-xl shadow-white/5"
           >
             <Plus className="w-[2vh] h-[2vh]" />
             Start New Assembly
@@ -402,10 +448,10 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3, duration: 0.4, ease: 'easeOut' }}
-          className="flex flex-col gap-1.5"
+          className="flex flex-col gap-2"
         >
           {/* Row 1: filters */}
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center flex-wrap gap-1.5 justify-center sm:justify-start">
             <SlidersHorizontal className="w-3 h-3 text-muted shrink-0" />
 
             {/* Mode filters */}
@@ -448,8 +494,8 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
               </button>
             ))}
 
-            {/* Sort + count pushed to the right */}
-            <div className="flex-1" />
+            {/* Sort + count pushed to the right on desktop, centered on mobile */}
+            <div className="flex-1 hidden sm:block" />
             <div className="flex items-center gap-1 shrink-0">
               <span className="text-[9px] font-mono text-muted uppercase tracking-widest hidden sm:block">Sort</span>
               {([
@@ -469,7 +515,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                 </button>
               ))}
               <span className="text-[9px] font-mono text-faint pl-1">
-                {visibleRooms.length}/{rooms.length}
+                {visibleRooms.length}/{(Array.isArray(rooms) ? rooms.length : 0)}
               </span>
             </div>
           </div>
@@ -479,15 +525,15 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-[2vh]">
           {isLoading ? (
             Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="h-[20vh] bg-surface border border-subtle rounded-3xl animate-pulse" />
+              <div key={i} className="h-[20vh] bg-surface border border-subtle rounded-2xl animate-pulse" />
             ))
           ) : visibleRooms.length === 0 ? (
-            <div className="col-span-full py-[10vh] flex flex-col items-center justify-center text-center bg-surface border border-dashed border-subtle rounded-3xl">
+            <div className="col-span-full py-[10vh] flex flex-col items-center justify-center text-center bg-surface border border-dashed border-subtle rounded-2xl">
               <MessageSquare className="w-[6vh] h-[6vh] text-whisper mb-4" />
               <p className="text-responsive-sm text-muted font-serif italic">
-                {rooms.length === 0 ? 'No active rooms found.' : 'No rooms match your filters.'}
+                {(Array.isArray(rooms) ? rooms.length : 0) === 0 ? 'No active rooms found.' : 'No rooms match your filters.'}
               </p>
-              {rooms.length === 0 ? (
+              {(Array.isArray(rooms) ? rooms.length : 0) === 0 ? (
                 <button
                   onClick={() => setIsCreating(true)}
                   className="mt-4 text-responsive-xs text-red-500 font-mono uppercase tracking-widest hover:underline"
@@ -519,7 +565,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                     onJoinRoom(room.id);
                   }
                 }}
-                className="group relative bg-surface border border-subtle rounded-3xl p-[2vh] text-left transition-all hover:border-red-900/50 hover:shadow-2xl hover:shadow-red-900/5 cursor-pointer"
+                className="group relative bg-surface border border-subtle rounded-2xl p-[2vh] text-left transition-all hover:border-red-900/50 hover:shadow-2xl hover:shadow-red-900/5 cursor-pointer"
               >
                 <div className="flex items-start justify-between mb-[2vh]">
                   <div className="w-[6vh] h-[6vh] bg-elevated border border-subtle rounded-2xl flex items-center justify-center group-hover:bg-red-900/10 group-hover:border-red-900/30 transition-colors">

@@ -125,7 +125,8 @@ export function registerRoutes(
   app: Express,
   io: Server,
   engine: GameEngine,
-  userSockets: Map<string, string>
+  userSockets: Map<string, string>,
+  stripe: any
 ): void {
   const rooms = engine.rooms;
 
@@ -561,6 +562,62 @@ export function registerRoutes(
       res.json({ user: userWithoutPassword });
     } catch (_) {
       res.status(401).json({ error: "Invalid token" });
+    }
+  });
+
+  // ── Stripe Payments ──────────────────────────────────────────────────────
+  
+  const CP_PACKAGES = [
+    { id: "starter", name: "Starter Bundle", cp: 500, price: 499 }, // $4.99
+    { id: "pro", name: "Pro Pack", cp: 1200, price: 999 }, // $9.99
+    { id: "elite", name: "Elite Vault", cp: 3000, price: 1999 }, // $19.99
+    { id: "master", name: "Assembly Master", cp: 10000, price: 4999 }, // $49.99
+  ];
+
+  app.post("/api/create-checkout-session", async (req: Request, res: Response) => {
+    const token = req.headers.authorization?.split(" ")[1];
+    const { packageId } = req.body;
+    
+    if (!token) return res.status(401).json({ error: "No token" });
+    
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
+      const user = await getUser(decoded.username);
+      if (!user) return res.status(404).json({ error: "User not found" });
+
+      const pkg = CP_PACKAGES.find(p => p.id === packageId);
+      if (!pkg) return res.status(400).json({ error: "Invalid package" });
+
+      const origin = getAppUrl(req);
+
+      const session = await stripe.checkout.sessions.create({
+        payment_method_types: ["card"],
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: pkg.name,
+                description: `Purchase ${pkg.cp} Cabinet Points`,
+              },
+              unit_amount: pkg.price,
+            },
+            quantity: 1,
+          },
+        ],
+        mode: "payment",
+        success_url: `${origin}/?purchase=success`,
+        cancel_url: `${origin}/?purchase=cancel`,
+        metadata: {
+          userId: user.id,
+          cpAmount: pkg.cp.toString(),
+        },
+      });
+
+      res.json({ url: session.url });
+    } catch (err: any) {
+      console.error("[Stripe] Create Session Error:", err.message);
+      res.status(500).json({ error: "Failed to create checkout session" });
     }
   });
 

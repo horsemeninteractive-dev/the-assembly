@@ -776,7 +776,7 @@ export class GameEngine {
            p.id !== state.players[state.presidentIdx].id,
     );
 
-    if (interdictor) {
+    if (interdictor && state.round > 1) {
       state.titlePrompt = { playerId: interdictor.id, role: "Interdictor", context: { role: "Interdictor" }, nextPhase: "Nominate_Chancellor" };
       this.enterPhase(state, roomId, "Nomination_Review");
     } else {
@@ -1028,18 +1028,18 @@ export class GameEngine {
         }
       }
 
-      // Mark tracker as updated and broadcast so clients see the directive
-      // added to the tracker and receive the trackerReady=true signal to
-      // trigger their declaration prompts.
+      // 1. Update suspicion immediately after counts are updated
+      updateSuspicionFromPolicy(st, policy);
+      updateSuspicionFromPolicyExpectation(st, policy);
+
+      // 2. Check victory BEFORE flagging trackerReady for declarations
+      if (await this.checkVictory(st, roomId)) return;
+
+      // 3. Only if game continues, signal that the policy is ready for declaration
       if (st.lastEnactedPolicy) {
         st.lastEnactedPolicy.trackerReady = true;
       }
       this.broadcastState(roomId);
-
-      updateSuspicionFromPolicy(st, policy);
-      updateSuspicionFromPolicyExpectation(st, policy);
-
-      if (await this.checkVictory(st, roomId)) return;
 
       if (isChaos) {
         this.captureRoundHistory(st, policy, true);

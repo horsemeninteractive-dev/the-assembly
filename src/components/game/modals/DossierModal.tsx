@@ -23,19 +23,19 @@ const TITLE_ROLE_DESCRIPTIONS: Record<TitleRole, string> = {
 
 const AgendaStatusBadge = ({ status }: { status: AgendaStatus }) => {
   if (status === 'completed') return (
-    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-900/30 border border-emerald-500/40 text-emerald-400 text-[10px] font-mono uppercase tracking-widest shrink-0">
+    <div className="flex items-center gap-1 px-2 py-0.5 rounded-xl bg-emerald-900/30 border border-emerald-500/40 text-emerald-400 text-[10px] font-mono uppercase tracking-widest shrink-0">
       <CheckCircle className="w-3 h-3" />
       <span>Complete</span>
     </div>
   );
   if (status === 'failed') return (
-    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-red-900/30 border border-red-500/40 text-red-400 text-[10px] font-mono uppercase tracking-widest shrink-0">
+    <div className="flex items-center gap-1 px-2 py-0.5 rounded-xl bg-red-900/30 border border-red-500/40 text-red-400 text-[10px] font-mono uppercase tracking-widest shrink-0">
       <XCircle className="w-3 h-3" />
       <span>Failed</span>
     </div>
   );
   return (
-    <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-subtle border border-strong text-tertiary text-[10px] font-mono uppercase tracking-widest shrink-0">
+    <div className="flex items-center gap-1 px-2 py-0.5 rounded-xl bg-subtle border border-strong text-tertiary text-[10px] font-mono uppercase tracking-widest shrink-0">
       <Clock className="w-3 h-3" />
       <span>Active</span>
     </div>
@@ -105,7 +105,7 @@ export const DossierModal = ({ isOpen, onClose, privateInfo, playSound }: Dossie
                 <div className="space-y-[1vh] shrink-0">
                   <div className="text-responsive-xs uppercase tracking-widest text-muted border-b border-subtle pb-1">Personal Agenda</div>
                   <div className={cn(
-                    'p-[1.5vh] rounded-xl border',
+                    'p-[1.5vh] rounded-2xl border',
                     privateInfo.personalAgenda?.status === 'completed'
                       ? 'bg-emerald-900/10 border-emerald-500/20'
                       : privateInfo.personalAgenda?.status === 'failed'
@@ -146,7 +146,7 @@ export const DossierModal = ({ isOpen, onClose, privateInfo, playSound }: Dossie
                 {/* Title Role */}
                 <div className="space-y-[1vh] shrink-0">
                   <div className="text-responsive-xs uppercase tracking-widest text-muted border-b border-subtle pb-1">Title Role</div>
-                  <div className="bg-card p-[1.5vh] rounded-xl">
+                  <div className="bg-card p-[1.5vh] rounded-2xl border border-subtle">
                     {privateInfo.titleRole ? (
                       <div className="space-y-0.5">
                         <div className="text-responsive-sm font-bold text-primary uppercase tracking-wider">{privateInfo.titleRole}</div>

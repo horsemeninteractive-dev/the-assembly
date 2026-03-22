@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Trophy, Coins, Shield, User as UserIcon, Check, ShoppingBag, ArrowLeft, Star, Heart, Zap, Flame, Scroll, Play, Pause, Calendar, Clock, Target, ChevronDown, ChevronUp, Medal } from 'lucide-react';
+import { X, Trophy, Coins, Shield, User as UserIcon, Check, ShoppingBag, ArrowLeft, Star, Heart, Zap, Flame, Scroll, Play, Pause, Calendar, Clock, Target, ChevronDown, ChevronUp, Medal, Plus } from 'lucide-react';
 import { User, CosmeticItem, Policy, MatchSummary } from '../types';
 import { FriendsList } from './FriendsList';
 import { Inventory } from './Inventory';
@@ -14,9 +14,10 @@ import { ACHIEVEMENT_DEFS, ACHIEVEMENT_MAP } from '../lib/achievements';
 interface ProfileProps {
   user: User;
   onClose: () => void;
+  onOpenPurchase: () => void;
   onUpdateUser: (user: User) => void;
   token: string;
-  playSound: (soundKey: string) => void;
+  playSound: (soundKey: string, overridePack?: string) => void;
   playMusic: (trackKey: string) => void;
   stopMusic: () => void;
   settings: {
@@ -46,7 +47,7 @@ interface ProfileProps {
   mode?: 'Casual' | 'Ranked' | 'Classic';
 }
 
-export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, token, playSound, playMusic, stopMusic, settings, roomId, onJoinRoom, mode }) => {
+export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase, onUpdateUser, token, playSound, playMusic, stopMusic, settings, roomId, onJoinRoom, mode }) => {
   const [activeTab, setActiveTab] = useState<'stats' | 'shop' | 'settings' | 'pass' | 'friends' | 'inventory' | 'history' | 'achievements'>('stats');
   const [shopCategory, setShopCategory] = useState<'frame' | 'policy' | 'vote' | 'music' | 'sound' | 'background'>('frame');
   const [settingsTab, setSettingsTab] = useState<'general' | 'audio' | 'voice'>('general');
@@ -271,7 +272,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="relative w-full max-w-4xl bg-surface border border-subtle rounded-[2rem] overflow-hidden shadow-2xl flex flex-col h-[85vh] max-h-[900px]"
+        className="relative w-full max-w-4xl bg-surface border border-subtle rounded-3xl overflow-hidden shadow-2xl flex flex-col h-[85vh] max-h-[900px]"
       >
         {/* Header */}
         <div className="p-6 bg-elevated border-b border-subtle flex flex-col sm:flex-row items-center gap-6">
@@ -316,6 +317,15 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
                 <div className="flex items-center gap-2 px-2 py-1 bg-card rounded-xl border border-default">
                   <Zap className="w-3.5 h-3.5 text-purple-500" />
                   <span className="text-xs font-mono text-purple-500">{(user.cabinetPoints ?? 0)} CP</span>
+                  <button
+                    onClick={() => {
+                      playSound('click');
+                      onOpenPurchase();
+                    }}
+                    className="w-5 h-5 rounded-full bg-purple-900/20 border border-purple-500/30 flex items-center justify-center hover:bg-purple-900/40 hover:border-purple-500/50 transition-all ml-1 group/cp"
+                  >
+                    <Plus className="w-3 h-3 text-purple-400 group-hover/cp:text-purple-300" />
+                  </button>
                 </div>
               </div>
               <div className="flex-1 max-w-[200px] sm:ml-2">
@@ -375,7 +385,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
           {activeTab === 'stats' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Rank tier card — spans full width on mobile, 1 col on larger */}
-              <div className={cn('bg-elevated border rounded-3xl p-6 flex flex-col gap-2 sm:col-span-2 lg:col-span-3', getRankTier(user.stats.elo).border)}>
+              <div className={cn('bg-elevated border rounded-2xl p-6 flex flex-col gap-2 sm:col-span-2 lg:col-span-3', getRankTier(user.stats.elo).border)}>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <span className="text-3xl leading-none">{getRankTier(user.stats.elo).icon}</span>
@@ -745,7 +755,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
                             handleBuy(item);
                           }}
                           disabled={user.stats.points < item.price || isLoading}
-                          className="w-full py-2 bg-red-900 text-white rounded-xl text-[10px] font-mono uppercase tracking-widest hover:bg-red-800 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                          className="w-full py-2 bg-red-900 text-white rounded-xl text-[10px] font-thematic uppercase tracking-widest hover:bg-red-800 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                         >
                           <Coins className="w-3 h-3" />
                           {item.price} PTS
@@ -835,7 +845,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
                               whileHover={isEarned ? { scale: 1.01 } : {}}
                               whileTap={isEarned ? { scale: 0.99 } : {}}
                               className={cn(
-                                'flex items-center gap-3 px-4 py-3 rounded-xl border transition-all',
+                                'flex items-center gap-3 px-4 py-3 rounded-2xl border transition-all',
                                 isEarned
                                   ? cn('cursor-pointer', tc.row)
                                   : 'border-subtle opacity-35 grayscale cursor-default',
@@ -1150,7 +1160,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onUpdateUser, t
 };
 
 const StatCard = ({ label, value, icon }: { label: string; value: string | number; icon: React.ReactNode }) => (
-  <div className="bg-elevated border border-subtle rounded-3xl p-6 flex flex-col gap-2">
+  <div className="bg-elevated border border-subtle rounded-2xl p-6 flex flex-col gap-2">
     <div className="flex items-center gap-2 text-ghost">
       {icon}
       <span className="text-[10px] font-mono uppercase tracking-widest">{label}</span>

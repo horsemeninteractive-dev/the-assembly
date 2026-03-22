@@ -58,7 +58,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
               <div
                 key={i}
                 className={cn(
-                  'flex-1 h-[3vh] rounded-sm border transition-all duration-500 relative group',
+                  'flex-1 h-[3vh] rounded-[2px] border transition-all duration-500 relative group',
                   isCivilWin ? 'cursor-pointer' : '',
                   i < gameState.civilDirectives
                     ? 'bg-blue-900/40 border-blue-500 shadow-[0_0_8px_rgba(59,130,246,0.2)] animate-shine'
@@ -71,7 +71,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
                   </div>
                 )}
                 {isCivilWin && (
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-32 p-2 bg-surface border border-default rounded-lg opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-[200] shadow-2xl">
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-32 p-2 bg-surface border border-default rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-[200] shadow-2xl">
                     <div className="text-responsive-xs font-mono text-blue-400 uppercase mb-1">Win</div>
                     <div className="text-[7px] text-tertiary leading-tight">Civil wins immediately</div>
                   </div>
@@ -124,7 +124,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
               <div
                 key={directiveNum}
                 className={cn(
-                  'flex-1 h-[3vh] rounded-sm border transition-all duration-500 relative group',
+                  'flex-1 h-[3vh] rounded-[2px] border transition-all duration-500 relative group',
                   slot ? 'cursor-pointer' : '',
                   isFilled
                     ? 'bg-red-900/40 border-red-500 shadow-[0_0_8px_rgba(239,68,68,0.2)] animate-shine'
@@ -141,7 +141,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
                 )}
                 {slot && (
                   <div className={cn(
-                    'absolute top-full mt-2 w-32 p-2 bg-surface border border-default rounded-lg opacity-0 group-hover:opacity-100 group-[.tooltip-open]:opacity-100 pointer-events-none transition-opacity z-[200] shadow-2xl',
+                    'absolute top-full mt-2 w-32 p-2 bg-surface border border-default rounded-xl opacity-0 group-hover:opacity-100 group-[.tooltip-open]:opacity-100 pointer-events-none transition-opacity z-[200] shadow-2xl',
                     tooltipAlign
                   )}>
                     <div className="text-responsive-xs font-mono text-red-500 uppercase mb-1">{slot.power}</div>

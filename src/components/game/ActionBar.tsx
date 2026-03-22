@@ -199,7 +199,7 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
                   transition={{ duration: 0.4, delay: i * 0.15 }}
                   onMouseEnter={() => playSound('hover')}
                   onClick={() => { playSound('paper_slide'); socket.emit('presidentDiscard', i); }}
-                  className={cn('flex-1 h-full max-h-[12vh] rounded-lg border-2 flex flex-col items-center justify-center gap-1 transition-all hover:scale-[1.02] active:scale-95 shadow-lg preserve-3d', getPolicyStyles(user?.activePolicyStyle, p))}
+                  className={cn('flex-1 h-full max-h-[12vh] rounded-xl border-2 flex flex-col items-center justify-center gap-1 transition-all hover:scale-[1.02] active:scale-95 shadow-lg preserve-3d', getPolicyStyles(user?.activePolicyStyle, p))}
                 >
                   {p === 'Civil' ? <Scale className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" /> : <Eye className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" />}
                   <span className="text-responsive-xs font-mono uppercase tracking-widest">Discard</span>
@@ -222,7 +222,7 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
                   transition={{ duration: 0.4, delay: i * 0.15 }}
                   onMouseEnter={() => playSound('hover')}
                   onClick={() => { playSound('gavel'); socket.emit('chancellorPlay', i); }}
-                  className={cn('flex-1 h-full max-h-[12vh] rounded-lg border-2 flex flex-col items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95 shadow-lg preserve-3d', getPolicyStyles(user?.activePolicyStyle, p))}
+                  className={cn('flex-1 h-full max-h-[12vh] rounded-xl border-2 flex flex-col items-center justify-center gap-2 transition-all hover:scale-[1.02] active:scale-95 shadow-lg preserve-3d', getPolicyStyles(user?.activePolicyStyle, p))}
                 >
                   {p === 'Civil' ? <Scale className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" /> : <Eye className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" />}
                   <span className="text-responsive-xs font-mono uppercase tracking-widest">Enact</span>
@@ -268,7 +268,7 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
               <div className="flex flex-col gap-[0.5vh] items-center flex-1 max-w-[18vh]">
                 <button
                   onClick={() => { playSound('click'); socket.emit('toggleReady'); }}
-                  className={cn('w-full py-[1.5vh] font-thematic text-responsive-xl rounded-lg shadow-xl transition-all active:scale-95', me?.isReady ? 'bg-emerald-500 text-white shadow-emerald-500/10' : 'btn-primary shadow-white/5')}
+                  className={cn('w-full py-[1.5vh] font-thematic text-responsive-xl rounded-xl shadow-xl transition-all active:scale-95', me?.isReady ? 'bg-emerald-500 text-white shadow-emerald-500/10' : 'btn-primary shadow-white/5')}
                 >
                   {me?.isReady ? 'Ready!' : 'Ready Up'}
                 </button>
@@ -286,7 +286,7 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
                       <button
                         onClick={() => { playSound('click'); socket.emit('toggleLock'); }}
                         className={cn(
-                          'p-[1.2vh] rounded-lg border transition-all active:scale-95',
+                          'p-[1.2vh] rounded-xl border transition-all active:scale-95',
                           gameState.isLocked
                             ? 'bg-red-900/30 border-red-700/50 text-red-400 hover:bg-red-900/40'
                             : 'bg-card border-subtle text-muted hover:border-default hover:text-primary'
@@ -304,7 +304,7 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
                         onClick={() => { if (canForceStart) { playSound('click'); socket.emit('hostStartGame'); } }}
                         disabled={!canForceStart}
                         className={cn(
-                          'p-[1.2vh] rounded-lg border transition-all active:scale-95',
+                          'p-[1.2vh] rounded-xl border transition-all active:scale-95',
                           canForceStart
                             ? 'bg-emerald-900/20 border-emerald-700/40 text-emerald-400 hover:bg-emerald-900/30'
                             : 'bg-card border-subtle text-ghost cursor-not-allowed opacity-50'

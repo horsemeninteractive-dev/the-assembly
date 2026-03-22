@@ -100,7 +100,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-surface border border-default rounded-2xl p-6 max-w-lg w-full shadow-2xl flex flex-col max-h-[85vh]"
+        className="bg-surface border border-default rounded-3xl p-6 max-w-lg w-full shadow-2xl flex flex-col max-h-[85vh]"
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
@@ -120,7 +120,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
               key={tab.id}
               onClick={() => setModeTab(tab.id)}
               className={cn(
-                'flex-1 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-widest transition-all border',
+                'flex-1 py-1.5 rounded-xl text-[10px] font-mono uppercase tracking-widest transition-all border',
                 modeTab === tab.id
                   ? cn(tab.activeBg, tab.color)
                   : 'border-transparent text-muted hover:text-ghost'

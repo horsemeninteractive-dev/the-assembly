@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Scroll, Target, CheckCircle, XCircle, TrendingUp, TrendingDown, Minus, Trophy, Zap, Coins, Medal, Flame } from 'lucide-react';
+import { Scroll, Target, Shield, CheckCircle, XCircle, TrendingUp, TrendingDown, Minus, Trophy, Zap, Coins, Medal, Flame } from 'lucide-react';
 import { GameState, PrivateInfo, PostMatchResult } from '../../../types';
 import { cn, getProxiedUrl } from '../../../lib/utils';
 import { OverseerIcon } from '../../icons';
@@ -62,11 +62,11 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="w-full max-w-sm lg:max-w-5xl bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+            className="relative w-full max-w-sm lg:max-w-5xl bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh] lg:max-h-[85vh] mt-[5vh] lg:mt-0"
           >
             {/* Win banner */}
             <div className={cn(
-              'p-[3vh] text-center border-b border-subtle',
+              'p-[3vh] text-center',
               gameState.winner === 'Civil' ? 'bg-blue-900/20' : gameState.winner === 'State' ? 'bg-red-900/20' : 'bg-surface'
             )}>
               <div className={cn(
@@ -88,11 +88,11 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
               </p>
             </div>
 
-            {/* Split Content Area for Desktop */}
-            <div className="flex-1 flex flex-col lg:flex-row min-h-0 divide-y lg:divide-y-0 lg:divide-x divide-subtle/30">
+            {/* Split Content Area for Desktop, Scrollable Single Area for Mobile */}
+            <div className="flex-1 flex flex-col lg:flex-row min-h-0 overflow-y-auto lg:overflow-visible custom-scrollbar">
               
               {/* Left Column: Match Summary & Progress */}
-              <div className="lg:w-1/2 lg:basis-1/2 overflow-y-auto custom-scrollbar p-[3vh] space-y-[2.5vh]">
+              <div className="lg:w-1/2 lg:basis-1/2 lg:overflow-y-auto custom-scrollbar p-[3vh] space-y-[2.5vh] shrink-0">
                 <h4 className="text-[10px] uppercase tracking-[0.2em] text-muted font-mono border-b border-subtle/30 pb-2">Match Performance</h4>
                 
                 {/* ── Post-match ELO summary ────────────────── */}
@@ -155,18 +155,10 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                   </div>
                 )}
 
-                <button
-                  onMouseEnter={() => playSound('hover')}
-                  onClick={onOpenLog}
-                  className="w-full py-[1.2vh] bg-card text-tertiary border border-default rounded-xl hover:bg-hover hover:text-primary transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2"
-                >
-                  <Scroll className="w-[2vh] h-[2vh]" />
-                  View Assembly Log
-                </button>
 
                 {agenda && (
                   <div className={cn(
-                    'rounded-xl border p-[1.5vh]',
+                    'rounded-2xl border p-[1.5vh]',
                     agendaCompleted ? 'bg-emerald-900/15 border-emerald-500/30' :
                     agendaFailed    ? 'bg-red-900/15 border-red-500/20' :
                                       'bg-card border-default'
@@ -192,7 +184,7 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                     .map(id => ACHIEVEMENT_MAP.get(id))
                     .filter((d): d is AchievementDef => !!d);
                   return (
-                    <div className="rounded-xl border border-yellow-500/20 bg-yellow-900/10 p-[1.5vh]">
+                    <div className="rounded-2xl border border-yellow-500/20 bg-yellow-900/10 p-[1.5vh]">
                       <div className="flex items-center gap-2 mb-2">
                         <Medal className="w-[2vh] h-[2vh] text-yellow-400 shrink-0" />
                         <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-yellow-400">Achievements Unlocked</span>
@@ -211,8 +203,8 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
               </div>
 
               {/* Right Column: Identities Reveal */}
-              <div className="lg:w-1/2 lg:basis-1/2 flex flex-col min-h-0 bg-black/5 lg:bg-transparent">
-                <div className="flex-1 overflow-y-auto custom-scrollbar p-[3vh] space-y-[2.5vh]">
+              <div className="lg:w-1/2 lg:basis-1/2 flex flex-col min-h-0 bg-black/5 lg:bg-transparent shrink-0">
+                <div className="flex-1 lg:overflow-y-auto custom-scrollbar p-[3vh] space-y-[2.5vh]">
                   <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono border-b border-subtle/30 pb-2 flex justify-between items-center">
                     <span>Identity Revelations</span>
                     <OverseerIcon className="w-3 h-3 opacity-30" />
@@ -254,6 +246,28 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                               {p.role === 'Civil' ? 'Civil' : p.role === 'State' ? 'State' : 'The Overseer'}
                             </div>
                           </div>
+
+                          {/* Reveal extra info: Agenda & Title Role */}
+                          {(agendaName || titleRole) && (
+                            <div className="ml-11 mt-2 space-y-1.5 pt-2 border-t border-subtle/10">
+                              {agendaName && (
+                                <div className="flex items-center gap-1.5">
+                                  <Target className="w-2.5 h-2.5 text-muted" />
+                                  <span className="text-[10px] font-mono text-tertiary uppercase tracking-wider truncate">
+                                    Agenda: <span className="text-secondary">{agendaName}</span>
+                                  </span>
+                                </div>
+                              )}
+                              {titleRole && (
+                                <div className="flex items-center gap-1.5">
+                                  <Shield className="w-2.5 h-2.5 text-red-500/70" />
+                                  <span className="text-[10px] font-mono text-red-500/80 uppercase tracking-widest font-bold">
+                                    {titleRole}
+                                  </span>
+                                </div>
+                              )}
+                            </div>
+                          )}
                         </div>
                       );
                     })}
@@ -263,21 +277,32 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
             </div>
 
             {/* Pinned action buttons */}
-            <div className="flex gap-3 p-[3vh] pt-0 shrink-0">
+            <div className="p-[3vh] pt-0 shrink-0 space-y-3">
               <button
                 onMouseEnter={() => playSound('hover')}
-                onClick={onPlayAgain}
-                className="flex-1 py-[1.5vh] btn-primary rounded-xl hover:bg-subtle transition-all font-thematic text-responsive-sm uppercase tracking-widest"
+                onClick={onOpenLog}
+                className="w-full py-[1.2vh] bg-card text-tertiary border border-default rounded-xl hover:bg-hover hover:text-primary transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2"
               >
-                Play Again
+                <Scroll className="w-[2vh] h-[2vh]" />
+                View Assembly Log
               </button>
-              <button
-                onMouseEnter={() => playSound('hover')}
-                onClick={onLeave}
-                className="flex-1 py-[1.5vh] bg-card text-primary rounded-xl hover:bg-subtle transition-all font-thematic text-responsive-sm uppercase tracking-widest border border-default"
-              >
-                Lobby
-              </button>
+              
+              <div className="flex gap-3">
+                <button
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={onPlayAgain}
+                  className="flex-1 py-[1.5vh] btn-primary rounded-xl hover:bg-subtle transition-all font-thematic text-responsive-sm uppercase tracking-widest"
+                >
+                  Play Again
+                </button>
+                <button
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={onLeave}
+                  className="flex-1 py-[1.5vh] bg-card text-primary rounded-xl hover:bg-subtle transition-all font-thematic text-responsive-sm uppercase tracking-widest border border-default"
+                >
+                  Lobby
+                </button>
+              </div>
             </div>
           </motion.div>
         </motion.div>
