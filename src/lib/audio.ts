@@ -44,7 +44,7 @@ export const SOUND_PACKS: Record<string, Record<string, string>> = {
     'stamp_aye':       `${BASE}/Interface%20Sounds/confirmation_002.ogg`,
     'stamp_nay':       `${BASE}/Interface%20Sounds/error_002.ogg`,
     'paper_slide':     `${BASE}/RPG%20Audio/cloth1.ogg`,
-    'gavel':           `${BASE}/Impact%20Sounds/impactWood_heavy_000.ogg`,
+    'gavel':           `${BASE}/Impact%20Sounds/impactPlate_heavy_004.ogg`,
     'modal_open':      `${BASE}/Interface%20Sounds/maximize_002.ogg`,
     'modal_close':     `${BASE}/Interface%20Sounds/minimize_002.ogg`,
     'searching':       `${BASE}/Interface%20Sounds/back_001.ogg`,

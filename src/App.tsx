@@ -220,12 +220,14 @@ export default function App() {
         const { generateGeminiSpeech } = await import('./services/geminiSpeech');
         const audio = await generateGeminiSpeech({ text, voice: 'Zephyr' });
         if (audio) {
-          audio.volume = soundVolume / 100;
+          // Normalize volume: TTS is often perceived as quieter than SFX
+          audio.volume = Math.min(1, (soundVolume * 1.5) / 100);
           audio.play().catch(() => { });
         }
       } else {
         const utterance = new SpeechSynthesisUtterance(text);
-        utterance.volume = soundVolume / 100;
+        // Normalize volume: TTS is often perceived as quieter than SFX
+        utterance.volume = Math.min(1, (soundVolume * 1.5) / 100);
         const voices = window.speechSynthesis.getVoices();
         const voice = voices.find(v => v.name === ttsVoice) || voices.find(v => v.lang.startsWith('en'));
         if (voice) utterance.voice = voice;

@@ -62,7 +62,7 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="max-w-4xl w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+            className="w-full max-w-sm lg:max-w-5xl bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
           >
             {/* Win banner */}
             <div className={cn(
@@ -70,8 +70,8 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
               gameState.winner === 'Civil' ? 'bg-blue-900/20' : gameState.winner === 'State' ? 'bg-red-900/20' : 'bg-surface'
             )}>
               <div className={cn(
-                'text-responsive-2xl font-thematic tracking-widest uppercase mb-1',
-                gameState.winner === 'Civil' ? 'text-blue-400' : gameState.winner === 'State' ? 'text-red-500' : 'text-muted'
+                'text-[4vh] lg:text-[5vh] font-thematic tracking-[0.15em] uppercase mb-1 leading-tight',
+                gameState.winner === 'Civil' ? 'text-blue-400 drop-shadow-[0_0_15px_rgba(59,130,246,0.5)]' : gameState.winner === 'State' ? 'text-red-500 drop-shadow-[0_0_15px_rgba(239,68,68,0.5)]' : 'text-muted'
               )}>
                 {gameState.winner === 'Civil'
                   ? gameState.winReason || 'Charter Restored'
@@ -88,36 +88,34 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
               </p>
             </div>
 
-            {/* Scrollable middle content */}
-            <div className="flex-1 overflow-y-auto custom-scrollbar">
-              <div className="p-[4vh] grid grid-cols-1 md:grid-cols-2 gap-[4vh] items-start">
-                {/* Left Column */}
-                <div className="space-y-[3vh]">
-
-                {/* ── Post-match ELO summary (ranked only) ────────────────── */}
+            {/* Split Content Area for Desktop */}
+            <div className="flex-1 flex flex-col lg:flex-row min-h-0 divide-y lg:divide-y-0 lg:divide-x divide-subtle/30">
+              
+              {/* Left Column: Match Summary & Progress */}
+              <div className="lg:w-1/2 lg:basis-1/2 overflow-y-auto custom-scrollbar p-[3vh] space-y-[2.5vh]">
+                <h4 className="text-[10px] uppercase tracking-[0.2em] text-muted font-mono border-b border-subtle/30 pb-2">Match Performance</h4>
+                
+                {/* ── Post-match ELO summary ────────────────── */}
                 {postMatchResult && (
                   <div className={cn(
-                    'rounded-2xl border p-4',
+                    'rounded-2xl border p-4 shadow-inner',
                     postMatchResult.won
                       ? 'bg-emerald-900/10 border-emerald-700/30'
                       : 'bg-red-900/10 border-red-700/30'
                   )}>
-                    {/* Result headline */}
                     <div className="flex items-center justify-between mb-3">
                       <span className={cn(
                         'text-sm font-thematic uppercase tracking-widest',
                         postMatchResult.won ? 'text-emerald-400' : 'text-red-400'
                       )}>
-                        {postMatchResult.won ? 'Victory' : 'Defeat'}
+                        {postMatchResult.won ? 'Victory Achieved' : 'Mission Failed'}
                       </span>
                       <span className="text-[10px] font-mono text-faint uppercase tracking-widest">
                         {postMatchResult.mode} · {postMatchResult.role}
                       </span>
                     </div>
 
-                    {/* Stats grid */}
                     <div className="grid grid-cols-3 gap-2">
-                      {/* ELO change — only show for ranked */}
                       {isRanked ? (
                         <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                           <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
@@ -140,7 +138,6 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                         </div>
                       )}
 
-                      {/* XP earned */}
                       <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                         <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
                           <Flame className="w-3 h-3" /> XP
@@ -148,7 +145,6 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                         <span className="text-yellow-400 font-mono text-sm font-bold">+{postMatchResult.xpEarned}</span>
                       </div>
 
-                      {/* IP earned */}
                       <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                         <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
                           <Coins className="w-3 h-3" /> IP
@@ -156,28 +152,18 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                         <span className="text-emerald-400 font-mono text-sm font-bold">+{postMatchResult.ipEarned}</span>
                       </div>
                     </div>
-
-                    {/* Room average ELO — ranked only */}
-                    {isRanked && (
-                      <div className="mt-2 flex items-center justify-between text-[10px] font-mono text-faint px-1">
-                        <span>Room avg ELO</span>
-                        <span className="text-secondary">{postMatchResult.roomAverageElo}</span>
-                      </div>
-                    )}
                   </div>
                 )}
 
-                {/* ── Log button ─────────────────────────────────────────── */}
                 <button
                   onMouseEnter={() => playSound('hover')}
                   onClick={onOpenLog}
-                  className="w-full py-[1vh] bg-card text-tertiary border border-default rounded-xl hover:bg-hover hover:text-primary transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2"
+                  className="w-full py-[1.2vh] bg-card text-tertiary border border-default rounded-xl hover:bg-hover hover:text-primary transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2"
                 >
                   <Scroll className="w-[2vh] h-[2vh]" />
                   View Assembly Log
                 </button>
 
-                {/* ── Personal Agenda result ──────────────────────────────── */}
                 {agenda && (
                   <div className={cn(
                     'rounded-xl border p-[1.5vh]',
@@ -188,7 +174,7 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-start gap-2 min-w-0">
                         <Target className={cn(
-                          'w-[2vh] h-[2vh] shrink-0 mt-0.5',
+                          'w-[2vh] h-[2vh] shrink-0 mt-1',
                           agendaCompleted ? 'text-emerald-400' : agendaFailed ? 'text-red-400' : 'text-muted'
                         )} />
                         <div className="min-w-0">
@@ -197,28 +183,10 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                           <div className="text-responsive-xs text-tertiary leading-tight mt-0.5">{agenda.description}</div>
                         </div>
                       </div>
-                      <div className={cn(
-                        'flex items-center gap-1 px-2 py-1 rounded-full shrink-0 text-[10px] font-mono uppercase tracking-widest border',
-                        agendaCompleted ? 'bg-emerald-900/30 border-emerald-500/40 text-emerald-400' :
-                        agendaFailed    ? 'bg-red-900/30 border-red-500/40 text-red-400' :
-                                          'bg-subtle border-strong text-tertiary'
-                      )}>
-                        {agendaCompleted
-                          ? <><CheckCircle className="w-3 h-3" /><span>Complete</span></>
-                          : agendaFailed
-                            ? <><XCircle className="w-3 h-3" /><span>Failed</span></>
-                            : <span>—</span>}
-                      </div>
                     </div>
-                    {agendaCompleted && (
-                      <div className="mt-[1vh] pl-[2.5vh] text-[10px] text-emerald-400/70 font-mono">
-                        +100 XP · Bonus IP awarded
-                      </div>
-                    )}
                   </div>
                 )}
 
-                {/* ── Newly unlocked achievements ─────────────────────── */}
                 {postMatchResult && postMatchResult.newAchievements.length > 0 && (() => {
                   const defs = postMatchResult.newAchievements
                     .map(id => ACHIEVEMENT_MAP.get(id))
@@ -227,81 +195,70 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                     <div className="rounded-xl border border-yellow-500/20 bg-yellow-900/10 p-[1.5vh]">
                       <div className="flex items-center gap-2 mb-2">
                         <Medal className="w-[2vh] h-[2vh] text-yellow-400 shrink-0" />
-                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-yellow-400">
-                          Achievement{defs.length > 1 ? 's' : ''} Unlocked
-                        </span>
+                        <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-yellow-400">Achievements Unlocked</span>
                       </div>
                       <div className="space-y-1.5">
                         {defs.map(def => (
-                          <motion.div
-                            key={def.id}
-                            initial={{ opacity: 0, x: -8 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            className={cn(
-                              'flex items-center gap-2.5 px-2.5 py-1.5 rounded-lg border text-[11px]',
-                              TIER_COLOURS[def.tier]
-                            )}
-                          >
+                          <div key={def.id} className={cn('flex items-center justify-between px-2.5 py-1.5 rounded-lg border text-[10px]', TIER_COLOURS[def.tier])}>
                             <span className="font-bold tracking-wide uppercase">{def.name}</span>
-                            <span className="text-faint ml-auto font-mono whitespace-nowrap">
-                              +{def.xpReward} XP · +{def.cpReward} CP
-                            </span>
-                          </motion.div>
+                            <span className="font-mono opacity-60">+{def.xpReward} XP</span>
+                          </div>
                         ))}
                       </div>
                     </div>
                   );
                 })()}
-                </div>
+              </div>
 
-                {/* Right Column */}
-                <div className="space-y-[3vh]">
-                {/* ── Identity reveal ─────────────────────────────────────── */}
-                <div className="space-y-[2vh]">
-                  <div className="text-responsive-xs uppercase tracking-[0.2em] text-ghost font-mono border-b border-subtle pb-2 flex justify-between">
-                    <span>Final Identity Reveal</span>
-                    <span>Secret Identity</span>
+              {/* Right Column: Identities Reveal */}
+              <div className="lg:w-1/2 lg:basis-1/2 flex flex-col min-h-0 bg-black/5 lg:bg-transparent">
+                <div className="flex-1 overflow-y-auto custom-scrollbar p-[3vh] space-y-[2.5vh]">
+                  <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono border-b border-subtle/30 pb-2 flex justify-between items-center">
+                    <span>Identity Revelations</span>
+                    <OverseerIcon className="w-3 h-3 opacity-30" />
                   </div>
-                  <div className="space-y-[1vh]">
+                  
+                  <div className="space-y-[1.5vh]">
                     {gameState.players.map(p => {
                       const specInfo = gameState.spectatorRoles?.[p.id];
                       const titleRole = specInfo?.titleRole || p.titleRole;
                       const agendaName = specInfo?.agendaName;
 
                       return (
-                        <div key={p.id} className="flex flex-col py-1 border-b border-subtle/30">
+                        <div key={p.id} className="group p-2 rounded-xl transition-colors hover:bg-white/5 border border-transparent hover:border-subtle/20">
                           <div className="flex items-center justify-between">
-                            <div className="flex items-center gap-2">
-                              <div className="w-6 h-6 rounded-full bg-card flex items-center justify-center text-[10px] text-muted font-mono overflow-hidden border border-default shrink-0">
+                            <div className="flex items-center gap-3">
+                              <div className="w-8 h-8 rounded-full bg-card flex items-center justify-center text-[12px] text-muted font-mono overflow-hidden border border-default shadow-sm shrink-0">
                                 {p.avatarUrl
                                   ? <img src={getProxiedUrl(p.avatarUrl)} alt={p.name} className="w-full h-full object-cover" />
                                   : p.name.charAt(0)}
                               </div>
-                              <span className="text-sm text-primary font-medium truncate max-w-[120px]">{p.name.replace(' (AI)', '')}</span>
+                              <div className="flex flex-col">
+                                <span className={cn(
+                                  "text-sm font-medium transition-colors",
+                                  p.id === myId ? "text-primary font-bold" : "text-secondary group-hover:text-primary"
+                                )}>
+                                  {p.name.replace(' (AI)', '')}
+                                  {p.id === myId && <span className="ml-1.5 text-[9px] text-yellow-500 uppercase tracking-tighter">You</span>}
+                                </span>
+                                {titleRole && <span className="text-[9px] font-mono text-tertiary uppercase tracking-wider">{titleRole}</span>}
+                              </div>
                             </div>
+                            
                             <div className={cn(
-                              'px-1.5 py-0.5 rounded text-[10px] font-mono uppercase tracking-widest shrink-0',
-                              p.role === 'Civil'    ? 'bg-blue-900/20 border-blue-500/30 text-blue-400 border' :
-                              p.role === 'State'    ? 'bg-red-900/20 border-red-500/30 text-red-500 border' :
-                              'bg-red-900/40 border-red-500 text-red-400 font-bold border'
+                              'px-2 py-0.5 rounded-md text-[9px] font-mono uppercase tracking-[2px] shrink-0 border transition-all shadow-sm',
+                              p.role === 'Civil'    ? 'bg-blue-900/10 border-blue-500/20 text-blue-400' :
+                              p.role === 'State'    ? 'bg-red-900/10 border-red-500/20 text-red-500' :
+                              'bg-red-900/40 border-red-500 text-red-100 font-bold'
                             )}>
                               {p.role === 'Civil' ? 'Civil' : p.role === 'State' ? 'State' : 'The Overseer'}
                             </div>
                           </div>
-                          {(titleRole || agendaName) && (
-                            <div className="flex items-center gap-2 mt-0.5 ml-8 text-[9px] font-mono text-faint uppercase tracking-widest">
-                              {titleRole && <span className="text-tertiary">{titleRole}</span>}
-                              {titleRole && agendaName && <span>·</span>}
-                              {agendaName && <span>Agenda: {agendaName}</span>}
-                            </div>
-                          )}
                         </div>
                       );
                     })}
                   </div>
                 </div>
-                </div>
-
               </div>
             </div>
 

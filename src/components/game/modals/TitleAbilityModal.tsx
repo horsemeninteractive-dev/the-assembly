@@ -39,16 +39,14 @@ export const TitleAbilityModal = ({ role, gameState, onClose, playSound }: Title
     <motion.div 
       initial={{ opacity: 0 }} 
       animate={{ opacity: 1 }} 
-      className="fixed inset-0 z-[250] pointer-events-none flex items-end justify-center p-[4vh] pb-[12vh]"
+      className="fixed inset-0 bg-backdrop-heavy backdrop-blur-md flex items-center justify-center z-[250] p-4"
     >
       <motion.div 
         initial={{ opacity: 0, scale: 0.95, y: 40 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="bg-surface border border-default rounded-2xl p-6 max-w-md w-full shadow-2xl pointer-events-auto relative overflow-hidden"
+        className="bg-surface border border-default rounded-2xl p-6 max-w-md w-full shadow-2xl"
       >
-        {/* Subtle decorative glow to denote importance */}
-        <div className="absolute inset-0 bg-gradient-to-t from-primary/5 to-transparent pointer-none" />
         <h2 className="text-2xl font-thematic text-primary mb-4">Title Ability: {role}</h2>
         <div className="text-gray-300 mb-6">
           {role === 'Broker' && (
