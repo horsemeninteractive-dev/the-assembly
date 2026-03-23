@@ -28,6 +28,8 @@ function isAllowedOrigin(origin: string | undefined): boolean {
     process.env.APP_URL,
     "https://theassembly.web.app",
     "http://localhost:3000",
+    "http://localhost",
+    "capacitor://localhost"
   ].filter(Boolean);
   return explicit.includes(origin) || CLOUD_RUN_PATTERN.test(origin);
 }
@@ -176,6 +178,7 @@ async function startServer() {
         'discord.com',
         'fonts.googleapis.com',
         'fonts.gstatic.com',
+        'lh3.googleusercontent.com'
       ]);
 
       if (!allowedHostnames.has(parsedUrl.hostname)) {

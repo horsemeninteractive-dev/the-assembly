@@ -17,6 +17,10 @@ import { discordSdk, setupDiscordSdk } from './lib/discord';
 import { DISCORD_CLIENT_ID } from './constants';
 import { cn, getProxiedUrl } from './lib/utils';
 import { PurchaseCPModal } from './components/PurchaseCPModal';
+import { App as CapApp } from '@capacitor/app';
+import { Capacitor } from '@capacitor/core';
+import { StatusBar, Style } from '@capacitor/status-bar';
+import { Browser } from '@capacitor/browser';
 
 const CLIENT_VERSION = 'v0.9.8';
 
@@ -305,7 +309,7 @@ export default function App() {
   }, []);
 
 
-  // OAuth redirect token
+  // OAuth redirect token — web (URL params on mount)
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const urlToken = params.get('token');
@@ -320,6 +324,34 @@ export default function App() {
         }
       } catch (e) { console.error('Failed to parse user from URL', e); }
     }
+  }, []);
+
+  // OAuth redirect token — Android (Capacitor deep link)
+  // When the server redirects to intent:// after Google/Discord OAuth, 
+  // Capacitor fires this event on Android.
+  useEffect(() => {
+    let listenerHandle: any;
+    CapApp.addListener('appUrlOpen', (event: { url: string }) => {
+      try {
+        const url = new URL(event.url);
+        const urlToken = url.searchParams.get('token');
+        const urlUser = url.searchParams.get('user');
+        if (urlToken && urlUser) {
+          if (Capacitor.isNativePlatform()) Browser.close().catch(() => {});
+          const userData = JSON.parse(decodeURIComponent(urlUser));
+          handleAuthSuccess(userData, urlToken);
+        }
+      } catch (e) { console.error('Capacitor appUrlOpen parse failed', e); }
+    }).then(handle => { listenerHandle = handle; });
+
+    // Status Bar config for Native
+    if (Capacitor.isNativePlatform()) {
+      try {
+        StatusBar.hide();
+      } catch (e) { console.warn('Status bar config failed', e); }
+    }
+
+    return () => { listenerHandle?.remove(); };
   }, []);
 
   // Socket listeners

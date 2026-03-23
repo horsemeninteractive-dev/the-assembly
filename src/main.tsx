@@ -1,7 +1,20 @@
 import {StrictMode} from 'react';
 import {createRoot} from 'react-dom/client';
+import { Capacitor } from '@capacitor/core';
 import App from './App.tsx';
 import './index.css';
+
+// Global Fetch Interceptor for Native Capacitor
+if (Capacitor.isNativePlatform()) {
+  const originalFetch = window.fetch;
+  window.fetch = async function (...args) {
+    let url = args[0];
+    if (typeof url === 'string' && url.startsWith('/api/')) {
+      args[0] = 'https://theassembly.web.app' + url;
+    }
+    return originalFetch(...args);
+  };
+}
 
 // Global error handler for debugging white screens
 window.onerror = (message, source, lineno, colno, error) => {

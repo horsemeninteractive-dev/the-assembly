@@ -43,7 +43,13 @@ function getAppUrl(req?: Request): string {
   const CLOUD_RUN_PATTERN = /^https:\/\/[a-z0-9-]+-[a-z0-9]+-[a-z]{2,4}\.a\.run\.app$/;
 
   const isAllowedOrigin = (o: string): boolean => {
-    const explicit = [process.env.APP_URL, "https://theassembly.web.app", "http://localhost:3000"].filter(Boolean);
+    const explicit = [
+      process.env.APP_URL, 
+      "https://theassembly.web.app", 
+      "http://localhost:3000",
+      "http://localhost",
+      "capacitor://localhost"
+    ].filter(Boolean);
     return explicit.includes(o) || CLOUD_RUN_PATTERN.test(o);
   };
 
@@ -83,7 +89,7 @@ function getErrorMessage(err: unknown): string {
   return String(err);
 }
 
-function oauthSuccessPage(user: UserInternal, token: string): string {
+function oauthSuccessPage(user: UserInternal, token: string, platform: string = 'web'): string {
   const targetOrigin = process.env.APP_URL || "https://theassembly.web.app";
 
   // Never interpolate user data or tokens directly into a <script> block —
@@ -93,6 +99,7 @@ function oauthSuccessPage(user: UserInternal, token: string): string {
   const safeUser   = htmlEscape(JSON.stringify(user));
   const safeToken  = htmlEscape(token);
   const safeOrigin = htmlEscape(targetOrigin);
+  const safePlatform = htmlEscape(platform);
 
   return `<!DOCTYPE html>
 <html><body>
@@ -100,21 +107,44 @@ function oauthSuccessPage(user: UserInternal, token: string): string {
   data-user="${safeUser}"
   data-token="${safeToken}"
   data-origin="${safeOrigin}"
+  data-platform="${safePlatform}"
 ></div>
 <script>
-  var el     = document.getElementById('d');
-  var user   = JSON.parse(el.getAttribute('data-user'));
-  var token  = el.getAttribute('data-token');
-  var origin = el.getAttribute('data-origin');
-  if (window.opener) {
+  var el       = document.getElementById('d');
+  var user     = JSON.parse(el.getAttribute('data-user'));
+  var token    = el.getAttribute('data-token');
+  var origin   = el.getAttribute('data-origin');
+  var platform = el.getAttribute('data-platform');
+  
+  if (platform === 'android') {
+    // Attempt standard custom scheme and intent fallback for Android
+    var redirectParams = '?token=' + encodeURIComponent(token) + '&user=' + encodeURIComponent(JSON.stringify(user));
+    window.location.href = 'intent://auth' + redirectParams + '#Intent;scheme=theassembly;package=com.horsemeninteractive.theassembly;end';
+    // Fallback if intent isn't supported immediately (e.g. non-Chrome browsers)
+    setTimeout(function() {
+      window.location.href = 'theassembly://auth' + redirectParams;
+    }, 500);
+  } else if (window.opener) {
     window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS', user: user, token: token }, origin);
     window.close();
   } else {
     window.location.href = '/?token=' + encodeURIComponent(token) + '&user=' + encodeURIComponent(JSON.stringify(user));
   }
 <\/script>
-<p>Authentication successful. Redirecting...</p>
-</body></html>`;
+<\/script>
+<div style="display:flex;flex-direction:column;align-items:center;margin-top:20vh;font-family:sans-serif;color:white;background:#0a0a0a;">
+  <p>Authentication successful. Redirecting...</p>
+  <script>
+    if (platform === 'android') {
+      var intentLink = 'intent://auth' + redirectParams + '#Intent;scheme=theassembly;package=com.horsemeninteractive.theassembly;end';
+      document.write('<p style="margin-top:40px;color:#888;font-size:14px;">If you are not redirected automatically:</p>');
+      document.write('<a href="' + intentLink + '" style="margin-top:15px;padding:12px 24px;background:#2563eb;color:white;text-decoration:none;border-radius:6px;font-weight:bold;">Return to The Assembly</a>');
+    }
+  </script>
+</div>
+</body>
+<style>body { background: #0a0a0a; }</style>
+</html>`;
 }
 
 // ---------------------------------------------------------------------------
@@ -326,7 +356,8 @@ export function registerRoutes(
 
   app.get("/api/auth/google/url", (req: Request, res: Response) => {
     const origin = getAppUrl(req);
-    const state  = encodeURIComponent(JSON.stringify({ origin }));
+    const platform = req.query.platform === 'android' ? 'android' : 'web';
+    const state  = encodeURIComponent(JSON.stringify({ origin, platform }));
     const clientId = process.env.GOOGLE_CLIENT_ID;
     console.log("Google Client ID:", clientId);
     if (!clientId) {
@@ -350,6 +381,10 @@ export function registerRoutes(
     if (!code) return res.status(400).send("No code provided");
     try {
       const origin      = getAppUrl(req);
+      let platform = 'web';
+      if (req.query.state) {
+        try { platform = JSON.parse(decodeURIComponent(req.query.state as string)).platform || 'web'; } catch(e) {}
+      }
       const redirectUri = `${origin}/auth/google/callback`;
       const tokenRes    = await axios.post("https://oauth2.googleapis.com/token", {
         code, redirect_uri: redirectUri, grant_type: "authorization_code",
@@ -374,7 +409,7 @@ export function registerRoutes(
       }
 
       const token = jwt.sign({ username: user.username }, JWT_SECRET!, { expiresIn: "30d" });
-      res.send(oauthSuccessPage(user, token));
+      res.send(oauthSuccessPage(user, token, platform));
     } catch (err: unknown) {
       console.error("Google OAuth Error:", getErrorMessage(err));
       res.status(500).send("Authentication failed");
@@ -421,7 +456,8 @@ export function registerRoutes(
 
   app.get("/api/auth/discord/url", (req: Request, res: Response) => {
     const origin = getAppUrl(req);
-    const state  = encodeURIComponent(JSON.stringify({ origin }));
+    const platform = req.query.platform === 'android' ? 'android' : 'web';
+    const state  = encodeURIComponent(JSON.stringify({ origin, platform }));
     const clientId = process.env.DISCORD_CLIENT_ID;
     console.log("Discord Client ID:", clientId);
     if (!clientId) {
@@ -457,8 +493,12 @@ export function registerRoutes(
     if (!code) return res.status(400).send("No code provided");
     try {
       const origin = getAppUrl(req);
+      let platform = 'web';
+      if (req.query.state) {
+        try { platform = JSON.parse(decodeURIComponent(req.query.state as string)).platform || 'web'; } catch(e) {}
+      }
       const { user, token } = await handleDiscordAuth(code as string, origin);
-      res.send(oauthSuccessPage(user, token));
+      res.send(oauthSuccessPage(user, token, platform));
     } catch (err: unknown) {
       console.error("Discord OAuth Error:", getErrorMessage(err));
       res.status(500).send("Authentication failed");

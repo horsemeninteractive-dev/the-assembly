@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">The Assembly</string>
+    <string name="title_activity_main">The Assembly</string>
+    <string name="package_name">com.horsemeninteractive.theassembly</string>
+    <string name="custom_url_scheme">com.horsemeninteractive.theassembly</string>
+</resources>

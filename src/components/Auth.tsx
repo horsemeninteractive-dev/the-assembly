@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Lock, User as UserIcon, Loader2, Chrome, MessageSquare } from 'lucide-react';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
 import { User } from '../types';
 import { cn, getProxiedUrl } from '../lib/utils';
 import { discordSdk } from '../lib/discord';
@@ -85,17 +87,17 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
       } else {
         console.log("Environment: Standard Web. Using OAuth flow.");
         const origin = window.location.origin;
-        const response = await fetch(`/api/auth/discord/url?origin=${encodeURIComponent(origin)}`);
+        const isNative = Capacitor.isNativePlatform();
+        const response = await fetch(`/api/auth/discord/url?origin=${encodeURIComponent(origin)}${isNative ? '&platform=android' : ''}`);
         if (!response.ok) throw new Error('Failed to get auth URL from server');
         const { url } = await response.json();
         
-        // If we are in an Activity but instanceId is missing (unlikely but possible during init)
-        // or if we are in an iframe, try to use openExternalLink if available
-        if (discordSdk && (window.self !== window.top)) {
+        if (isNative) {
+          await Browser.open({ url });
+        } else if (discordSdk && (window.self !== window.top)) {
           console.log("In iframe, using SDK openExternalLink:", url);
           await discordSdk.commands.openExternalLink({ url });
         } else {
-          console.log("Standard redirect/popup flow.");
           const isIframe = window.self !== window.top;
           if (isIframe) {
             window.open(url, 'oauth_popup', 'width=600,height=700');
@@ -115,6 +117,24 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
     }
   };
 
+  const handleOAuthLogin = async (provider: 'google' | 'discord') => {
+    try {
+      const isNative = Capacitor.isNativePlatform();
+      const res = await fetch(`/api/auth/${provider}/url${isNative ? '?platform=android' : ''}`);
+      const data = await res.json();
+      if (data.url) {
+        if (isNative) {
+          await Browser.open({ url: data.url });
+        } else {
+          window.location.href = data.url;
+        }
+      }
+    } catch (err) {
+      console.error(`${provider} login error:`, err);
+      setError(`Failed to initiate ${provider} login`);
+    }
+  };
+
   const handleSocialLogin = async (provider: 'google' | 'discord') => {
     console.log(`handleSocialLogin clicked for: ${provider}`);
     setError('');
@@ -125,26 +145,20 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
     }
 
     try {
-      const origin = window.location.origin;
-      const response = await fetch(`/api/auth/${provider}/url?origin=${encodeURIComponent(origin)}`);
-      if (!response.ok) {
-        const data = await response.json().catch(() => ({}));
-        throw new Error(data.error || `Failed to reach auth server for ${provider}`);
-      }
-      const { url } = await response.json();
-      
       // If we are in a Discord Activity, we MUST use openExternalLink for third-party OAuth
       // because Google blocks OAuth in embedded webviews/iframes.
       if (discordSdk && (discordSdk.instanceId || window.self !== window.top)) {
+        const origin = window.location.origin;
+        const response = await fetch(`/api/auth/${provider}/url?origin=${encodeURIComponent(origin)}`);
+        if (!response.ok) {
+          const data = await response.json().catch(() => ({}));
+          throw new Error(data.error || `Failed to reach auth server for ${provider}`);
+        }
+        const { url } = await response.json();
         console.log(`In Discord, using commands.openExternalLink for ${provider}:`, url);
         await discordSdk.commands.openExternalLink({ url });
       } else {
-        const isIframe = window.self !== window.top;
-        if (isIframe) {
-          window.open(url, 'oauth_popup', 'width=600,height=700');
-        } else {
-          window.location.href = url;
-        }
+        await handleOAuthLogin(provider);
       }
     } catch (err: any) {
       console.error(`${provider} login process failed:`, err);
