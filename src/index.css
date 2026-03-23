@@ -299,7 +299,7 @@
    */
   .bg-texture {
     background-color: var(--texture-color);
-    background-image: url("/proxy?url=https%3A%2F%2Fwww.transparenttextures.com%2Fpatterns%2Fcarbon-fibre.png");
+    background-image: url("https://www.transparenttextures.com/patterns/carbon-fibre.png");
   }
 
   [data-theme="light"] .bg-texture {

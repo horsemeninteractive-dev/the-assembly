@@ -21,6 +21,7 @@ import { App as CapApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Browser } from '@capacitor/browser';
+import * as aiSpeech from './services/aiSpeech';
 
 const CLIENT_VERSION = 'v0.9.8';
 
@@ -231,13 +232,10 @@ export default function App() {
           audio.play().catch(() => { });
         }
       } else {
-        const utterance = new SpeechSynthesisUtterance(text);
-        // Normalize volume: TTS is often perceived as quieter than SFX
-        utterance.volume = Math.min(1, (soundVolume * 1.5) / 100);
-        const voices = window.speechSynthesis.getVoices();
-        const voice = voices.find(v => v.name === ttsVoice) || voices.find(v => v.lang.startsWith('en'));
-        if (voice) utterance.voice = voice;
-        window.speechSynthesis.speak(utterance);
+        aiSpeech.speak(text, { 
+          voice: ttsVoice, 
+          volume: Math.min(1, (soundVolume * 1.5) / 100) 
+        });
       }
     });
 

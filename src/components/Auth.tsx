@@ -217,7 +217,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              className="w-full bg-surface border border-subtle rounded-xl px-4 py-3 text-sm focus:border-strong focus:outline-none transition-all placeholder:text-muted"
+              className="w-full bg-white border border-subtle rounded-xl px-4 py-3 text-sm text-black focus:border-strong focus:outline-none transition-all placeholder:text-gray-400"
               placeholder="Agent Handle"
               required
             />
@@ -229,7 +229,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full bg-surface border border-subtle rounded-xl px-4 py-3 text-sm focus:border-strong focus:outline-none transition-all placeholder:text-muted"
+              className="w-full bg-white border border-subtle rounded-xl px-4 py-3 text-sm text-black focus:border-strong focus:outline-none transition-all placeholder:text-gray-400"
                placeholder="••••••••"
               required
             />

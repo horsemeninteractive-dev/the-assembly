@@ -453,7 +453,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
                 <div className="max-w-lg mx-auto space-y-6 pb-4">
                   {/* Season banner */}
                   <div className="relative overflow-hidden rounded-2xl border border-default bg-elevated p-5">
-                    <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'url("/proxy?url=https%3A%2F%2Fwww.transparenttextures.com%2Fpatterns%2Fcarbon-fibre.png")' }} />
+                    <div className="absolute inset-0 opacity-5" style={{ backgroundImage: 'url("https://www.transparenttextures.com/patterns/carbon-fibre.png")' }} />
                     <div className="relative">
                       <div className="flex items-start justify-between gap-4">
                         <div>

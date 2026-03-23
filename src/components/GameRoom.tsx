@@ -342,12 +342,12 @@ export const GameRoom = ({
   const prevAliveCount = useRef(0);
 
   const speak = (text: string) => {
-    const u = new SpeechSynthesisUtterance(text);
-    u.rate = 0.9; u.pitch = 0.8;
-    const voices = window.speechSynthesis.getVoices();
-    const voice = voices.find(v => v.name === ttsVoice);
-    if (voice) u.voice = voice;
-    window.speechSynthesis.speak(u);
+    aiSpeech.speak(text, { 
+      voice: ttsVoice,
+      volume: soundVolume / 100,
+      rate: 0.9,
+      pitch: 0.8
+    });
   };
 
   useEffect(() => {
