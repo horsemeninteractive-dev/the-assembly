@@ -6,6 +6,23 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+// The production server URL — used by native builds so relative API paths
+// resolve to the real backend instead of the local Capacitor file server.
+const SERVER_URL = 'https://the-assembly-874660478794.us-west1.run.app';
+
+/**
+ * Returns the correct base URL for API calls.
+ * On native Android, fetch('/api/rooms') resolves against capacitor://localhost
+ * which doesn't host our backend. This function prefixes the production URL.
+ * On web, it returns '' so relative paths work as usual.
+ */
+export function apiUrl(path: string): string {
+  if (Capacitor.isNativePlatform()) {
+    return `${SERVER_URL}${path}`;
+  }
+  return path;
+}
+
 export function getProxiedUrl(url: string | undefined): string {
   if (!url) return '';
   if (url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('/')) return url;

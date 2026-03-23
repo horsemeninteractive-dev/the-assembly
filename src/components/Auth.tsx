@@ -4,7 +4,7 @@ import { Lock, User as UserIcon, Loader2, Chrome, MessageSquare } from 'lucide-r
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import { User } from '../types';
-import { cn, getProxiedUrl } from '../lib/utils';
+import { cn, getProxiedUrl, apiUrl } from '../lib/utils';
 import { discordSdk } from '../lib/discord';
 import { DISCORD_CLIENT_ID } from "../constants";
 
@@ -69,7 +69,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
         });
         console.log("SDK authorize success. Exchanging code with server...");
 
-        const response = await fetch('/api/auth/discord/callback', {
+        const response = await fetch(apiUrl('/api/auth/discord/callback'), {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code, origin: window.location.origin }),
@@ -88,7 +88,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
         console.log("Environment: Standard Web. Using OAuth flow.");
         const origin = window.location.origin;
         const isNative = Capacitor.isNativePlatform();
-        const response = await fetch(`/api/auth/discord/url?origin=${encodeURIComponent(origin)}${isNative ? '&platform=android' : ''}`);
+        const response = await fetch(apiUrl(`/api/auth/discord/url?origin=${encodeURIComponent(origin)}${isNative ? '&platform=android' : ''}`));
         if (!response.ok) throw new Error('Failed to get auth URL from server');
         const { url } = await response.json();
         
@@ -120,7 +120,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
   const handleOAuthLogin = async (provider: 'google' | 'discord') => {
     try {
       const isNative = Capacitor.isNativePlatform();
-      const res = await fetch(`/api/auth/${provider}/url${isNative ? '?platform=android' : ''}`);
+      const res = await fetch(apiUrl(`/api/auth/${provider}/url${isNative ? '?platform=android' : ''}`));
       const data = await res.json();
       if (data.url) {
         if (isNative) {
@@ -149,7 +149,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
       // because Google blocks OAuth in embedded webviews/iframes.
       if (discordSdk && (discordSdk.instanceId || window.self !== window.top)) {
         const origin = window.location.origin;
-        const response = await fetch(`/api/auth/${provider}/url?origin=${encodeURIComponent(origin)}`);
+        const response = await fetch(apiUrl(`/api/auth/${provider}/url?origin=${encodeURIComponent(origin)}`));
         if (!response.ok) {
           const data = await response.json().catch(() => ({}));
           throw new Error(data.error || `Failed to reach auth server for ${provider}`);
@@ -173,7 +173,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
 
     try {
       const endpoint = isLogin ? '/api/login' : '/api/register';
-      const response = await fetch(endpoint, {
+      const response = await fetch(apiUrl(endpoint), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password, avatarUrl: isLogin ? undefined : avatarUrl }),

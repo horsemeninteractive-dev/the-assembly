@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Users, MessageSquare, LogOut, User as UserIcon, Trophy, Coins, Settings, Zap, BookOpen, Bell, SlidersHorizontal, Shuffle, Lock, Users2, Globe } from 'lucide-react';
 import { Tooltip } from './Tooltip';
 import { User, RoomInfo, RoomPrivacy } from '../types';
-import { cn, getProxiedUrl } from '../lib/utils';
+import { cn, getProxiedUrl, apiUrl } from '../lib/utils';
 import { getFrameStyles } from '../lib/cosmetics';
 import { LeaderboardModal } from './game/modals/LeaderboardModal';
 import { HowToPlayModal } from './HowToPlayModal';
@@ -84,12 +84,12 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
 
   const fetchRooms = async () => {
     try {
-      const response = await fetch('/api/rooms');
+      const response = await fetch(apiUrl('/api/rooms'));
       const data = await response.json();
       setRooms(Array.isArray(data) ? data : []);
 
       // Check for rejoin info
-      const rejoinResponse = await fetch(`/api/rejoin-info?userId=${user.id}`);
+      const rejoinResponse = await fetch(apiUrl(`/api/rejoin-info?userId=${user.id}`));
       const rejoinData = await rejoinResponse.json();
       setRejoinInfo(rejoinData);
     } catch (err) {
@@ -101,7 +101,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
 
   const fetchGlobalStats = async () => {
     try {
-      const response = await fetch(`${window.location.origin}/api/global-stats`);
+      const response = await fetch(apiUrl('/api/global-stats'));
       if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
       const data = await response.json();
       if (data && typeof data.civilWins === 'number') {
@@ -120,7 +120,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
     fetchGlobalStats();
     // Fetch pending friend requests on mount
     if (token) {
-      fetch('/api/friends/pending', { headers: { Authorization: `Bearer ${token}` } })
+      fetch(apiUrl('/api/friends/pending'), { headers: { Authorization: `Bearer ${token}` } })
         .then(r => r.json())
         .then(data => { if (data.pending) setPendingRequestCount(data.pending.length); })
         .catch(() => { });

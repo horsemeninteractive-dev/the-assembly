@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { motion } from 'motion/react';
 import { X, Trophy, User as UserIcon, UserPlus, UserMinus, Shield, Check, Zap, Medal } from 'lucide-react';
 import { User } from '../../../types';
-import { cn, getProxiedUrl } from '../../../lib/utils';
+import { cn, getProxiedUrl, apiUrl } from '../../../lib/utils';
 import { getFrameStyles } from '../../../lib/cosmetics';
 import { socket } from '../../../socket';
 import { getLevelFromXp } from '../../../lib/xp';
@@ -27,7 +27,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ userId, 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const response = await fetch(`/api/user/${userId}`, {
+        const response = await fetch(apiUrl(`/api/user/${userId}`), {
           headers: { Authorization: `Bearer ${token}` }
         });
         if (response.ok) {
@@ -61,7 +61,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({ userId, 
     playSound('click');
     try {
       if (isFriend) {
-        await fetch(`/api/friends/${userId}`, {
+        await fetch(apiUrl(`/api/friends/${userId}`), {
           method: 'DELETE',
           headers: { Authorization: `Bearer ${token}` }
         });

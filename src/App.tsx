@@ -15,7 +15,7 @@ import { MUSIC_TRACKS, SOUND_PACKS } from './lib/audio';
 import { DiscordSDK } from "@discord/embedded-app-sdk";
 import { discordSdk, setupDiscordSdk } from './lib/discord';
 import { DISCORD_CLIENT_ID } from './constants';
-import { cn, getProxiedUrl } from './lib/utils';
+import { cn, getProxiedUrl, apiUrl } from './lib/utils';
 import { PurchaseCPModal } from './components/PurchaseCPModal';
 import { App as CapApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
@@ -92,7 +92,7 @@ export default function App() {
               scope: ["identify", "guilds"],
             });
             console.log("Discord authorize success, exchanging code...");
-            const response = await fetch('/api/auth/discord/callback', {
+            const response = await fetch(apiUrl('/api/auth/discord/callback'), {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({ code, origin: window.location.origin }),
@@ -116,7 +116,7 @@ export default function App() {
         if (!currentUser && currentToken) {
           console.log("Restoring session from local token...");
           try {
-            const res = await fetch('/api/me', { headers: { Authorization: `Bearer ${currentToken}` } });
+            const res = await fetch(apiUrl('/api/me'), { headers: { Authorization: `Bearer ${currentToken}` } });
             if (res.ok) {
               const data = await res.json();
               if (data.user) {
@@ -293,7 +293,7 @@ export default function App() {
   useEffect(() => {
     const check = async () => {
       try {
-        const res = await fetch('/version');
+        const res = await fetch(apiUrl('/version'));
         if (!res.ok) return;
         const data = await res.json();
         if (data.version && data.version !== 'dev' && data.version !== CLIENT_VERSION) {
@@ -376,7 +376,7 @@ export default function App() {
     });
     socket.on('friendRequestReceived', async (data: { fromUserId: string }) => {
       try {
-        const res = await fetch(`/api/user/${data.fromUserId}`, {
+        const res = await fetch(apiUrl(`/api/user/${data.fromUserId}`), {
           headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
         });
         if (res.ok) {
@@ -437,12 +437,12 @@ export default function App() {
     // Mark tutorial complete on the server via claimedRewards
     if (token) {
       try {
-        await fetch('/api/tutorial-complete', {
+        await fetch(apiUrl('/api/tutorial-complete'), {
           method: 'POST',
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         });
         // Refresh user to get updated claimedRewards
-        const res = await fetch('/api/me', { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch(apiUrl('/api/me'), { headers: { Authorization: `Bearer ${token}` } });
         const data = await res.json();
         if (data.user) setUser(data.user);
       } catch { /* non-critical */ }
@@ -480,7 +480,7 @@ export default function App() {
     const safeOnComplete = typeof onComplete === 'function' ? onComplete : undefined;
 
     if (token) {
-      fetch('/api/me', { headers: { Authorization: `Bearer ${token}` } })
+      fetch(apiUrl('/api/me'), { headers: { Authorization: `Bearer ${token}` } })
         .then(res => res.json())
         .then(data => {
           if (data.user) setUser(data.user);

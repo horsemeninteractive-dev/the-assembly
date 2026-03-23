@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { socket } from '../socket';
 import { User, RecentlyPlayedEntry } from '../types';
-import { cn, getProxiedUrl } from '../lib/utils';
+import { cn, getProxiedUrl, apiUrl } from '../lib/utils';
 import { getFrameStyles } from '../lib/cosmetics';
 import { getLevelFromXp } from '../lib/xp';
 import { getRankTier, getRankLabel } from '../lib/ranks';
@@ -94,9 +94,9 @@ export const FriendsList: React.FC<FriendsListProps> = ({
   const fetchAll = async () => {
     try {
       const [friendsRes, statusRes, pendingRes] = await Promise.all([
-        fetch('/api/friends',         { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/friends/status',  { headers: { Authorization: `Bearer ${token}` } }),
-        fetch('/api/friends/pending', { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(apiUrl('/api/friends'),         { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(apiUrl('/api/friends/status'),  { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(apiUrl('/api/friends/pending'), { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       let friendsData: User[] = [];
       if (friendsRes.ok) { const d = await friendsRes.json(); friendsData = d.friends ?? []; }
@@ -141,7 +141,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
     setSearchLoading(true);
     searchDebounce.current = setTimeout(async () => {
       try {
-        const res = await fetch(`/api/users/search?q=${encodeURIComponent(searchQuery)}`, {
+        const res = await fetch(apiUrl(`/api/users/search?q=${encodeURIComponent(searchQuery)}`), {
           headers: { Authorization: `Bearer ${token}` },
         });
         if (res.ok) { const d = await res.json(); setSearchResults(d.users ?? []); }
@@ -166,7 +166,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
   const declineRequest = async (fromUserId: string) => {
     playSound('click');
     try {
-      await fetch(`/api/friends/${fromUserId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+      await fetch(apiUrl(`/api/friends/${fromUserId}`), { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
       setPending(prev => prev.filter(p => p.id !== fromUserId));
     } catch { /* non-critical */ }
   };
@@ -174,7 +174,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
   const removeFriend = async (friendId: string) => {
     playSound('click');
     try {
-      await fetch(`/api/friends/${friendId}`, { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
+      await fetch(apiUrl(`/api/friends/${friendId}`), { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
       setFriends(prev => prev.filter(f => f.id !== friendId));
     } catch { /* non-critical */ }
   };
@@ -182,7 +182,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
   const inviteFriend = async (friendId: string) => {
     playSound('click');
     try {
-      await fetch(`/api/friends/invite/${friendId}`, {
+      await fetch(apiUrl(`/api/friends/invite/${friendId}`), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ roomId }),

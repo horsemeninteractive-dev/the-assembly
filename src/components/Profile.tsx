@@ -4,7 +4,7 @@ import { X, Trophy, Coins, Shield, User as UserIcon, Check, ShoppingBag, ArrowLe
 import { User, CosmeticItem, Policy, MatchSummary } from '../types';
 import { FriendsList } from './FriendsList';
 import { Inventory } from './Inventory';
-import { cn, getProxiedUrl } from '../lib/utils';
+import { cn, getProxiedUrl, apiUrl } from '../lib/utils';
 import { getPolicyStyles, getVoteStyles, getFrameStyles, getRarity } from '../lib/cosmetics';
 import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../constants';
 import { getLevelFromXp, getXpForNextLevel, getXpInCurrentLevel, getTotalXpForLevel } from '../lib/xp';
@@ -66,7 +66,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
   const savePins = async (pins: string[]) => {
     setPinSaving(true);
     try {
-      const res = await fetch('/api/achievements/pin', {
+      const res = await fetch(apiUrl('/api/achievements/pin'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ pinnedAchievements: pins }),
@@ -155,7 +155,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
   const handleClaim = async (rewardId: string, item?: CosmeticItem) => {
     setClaimingReward(rewardId);
     try {
-      const response = await fetch('/api/pass/claim', {
+      const response = await fetch(apiUrl('/api/pass/claim'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ rewardId, itemId: item?.id }),
@@ -186,7 +186,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
     setIsLoading(true);
     setError('');
     try {
-      const response = await fetch('/api/shop/buy', {
+      const response = await fetch(apiUrl('/api/shop/buy'), {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -217,7 +217,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
       if (type === 'sound') body.soundPack = itemId || null;
       if (type === 'background') body.backgroundId = itemId || null;
 
-      const response = await fetch('/api/profile/frame', {
+      const response = await fetch(apiUrl('/api/profile/frame'), {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
@@ -239,7 +239,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
   useEffect(() => {
     if (activeTab !== 'history' || matchHistory.length > 0) return;
     setHistoryLoading(true);
-    fetch(`/api/match-history/${user.id}`, {
+    fetch(apiUrl(`/api/match-history/${user.id}`), {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(r => r.json())

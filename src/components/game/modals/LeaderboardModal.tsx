@@ -4,7 +4,7 @@ import { X, Trophy, Shield, Zap, Star } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { User } from '../../../types';
 import { getRankTier, getRankLabel } from '../../../lib/ranks';
-import { getProxiedUrl } from '../../../lib/utils';
+import { getProxiedUrl, apiUrl } from '../../../lib/utils';
 
 interface LeaderboardModalProps {
   user: User;
@@ -37,7 +37,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
   const [statTab, setStatTab] = useState<StatTab>('ELO');
 
   useEffect(() => {
-    fetch('/api/leaderboard')
+    fetch(apiUrl('/api/leaderboard'))
       .then(res => res.json())
       .then(data => { setBoards(data); setLoading(false); })
       .catch(() => setLoading(false));

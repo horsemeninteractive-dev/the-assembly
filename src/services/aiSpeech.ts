@@ -125,6 +125,9 @@ export const speakAiMessage = async (
   onEnd: () => void
 ) => {
   if (Capacitor.isNativePlatform()) {
+    // Safety timeout: if speech takes longer than 30s, force onEnd to prevent
+    // the speaking indicator from sticking indefinitely
+    const safetyTimer = setTimeout(() => onEnd(), 30000);
     try {
       onStart();
       await TextToSpeech.speak({
@@ -135,9 +138,10 @@ export const speakAiMessage = async (
         volume: 1.0,
         category: 'ambient'
       });
-      onEnd();
     } catch (err) {
       console.error('Native speech error:', err);
+    } finally {
+      clearTimeout(safetyTimer);
       onEnd();
     }
     return;

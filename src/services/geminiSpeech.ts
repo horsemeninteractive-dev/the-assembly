@@ -1,5 +1,6 @@
 // Gemini TTS is now proxied through /api/tts on the server.
 // The API key never touches the client bundle.
+import { apiUrl } from '../lib/utils';
 
 export interface GeminiSpeechOptions {
   text: string;
@@ -8,7 +9,7 @@ export interface GeminiSpeechOptions {
 
 export const generateGeminiSpeech = async (options: GeminiSpeechOptions): Promise<HTMLAudioElement | null> => {
   try {
-    const res = await fetch("/api/tts", {
+    const res = await fetch(apiUrl("/api/tts"), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ text: options.text, voice: options.voice }),

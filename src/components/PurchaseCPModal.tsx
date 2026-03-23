@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Zap, Loader2, CreditCard, ChevronRight, ShoppingBag } from 'lucide-react';
-import { cn } from '../lib/utils';
+import { cn, apiUrl } from '../lib/utils';
 
 interface PurchaseCPModalProps {
   isOpen: boolean;
@@ -27,7 +27,7 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({ isOpen, onClos
     playSound('click');
 
     try {
-      const response = await fetch('/api/create-checkout-session', {
+      const response = await fetch(apiUrl('/api/create-checkout-session'), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
