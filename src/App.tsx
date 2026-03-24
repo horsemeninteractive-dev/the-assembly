@@ -223,20 +223,10 @@ export default function App() {
 
       const text = `${data.role} power used`;
 
-      if (ttsEngine === 'gemini') {
-        const { generateGeminiSpeech } = await import('./services/geminiSpeech');
-        const audio = await generateGeminiSpeech({ text, voice: 'Zephyr' });
-        if (audio) {
-          // Normalize volume: TTS is often perceived as quieter than SFX
-          audio.volume = Math.min(1, (soundVolume * 1.5) / 100);
-          audio.play().catch(() => { });
-        }
-      } else {
-        aiSpeech.speak(text, { 
-          voice: ttsVoice, 
-          volume: Math.min(1, (soundVolume * 1.5) / 100) 
-        });
-      }
+      aiSpeech.speak(text, { 
+        voice: ttsVoice, 
+        volume: Math.min(1, (soundVolume * 1.5) / 100) 
+      });
     });
 
     return () => {
@@ -574,7 +564,7 @@ export default function App() {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0, filter: 'blur(10px)' }}
               transition={{ duration: 0.5 }}
-              className="flex-1 flex flex-col"
+              className="flex-1 flex flex-col min-h-0"
             >
               <Lobby
                 user={user}

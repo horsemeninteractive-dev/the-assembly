@@ -290,15 +290,32 @@ export const PlayerCard = React.memo(({
         );
       })()}
 
-      {/* Assassin overlay */}
-      {gameState.phase === 'Assassin_Action' && gameState.titlePrompt?.playerId === socket.id && p.id !== socket.id && p.isAlive && (
-        <button
-          onClick={(e) => { e.stopPropagation(); playSound('click'); socket.emit('useTitleAbility', { use: true, role: 'Assassin', targetId: p.id }); }}
-          className="absolute inset-0 bg-red-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
-        >
-          Execute
-        </button>
-      )}
+      {/* Title Role Targets (Assassin & Interdictor) */}
+      {gameState.titlePrompt && gameState.titlePrompt.playerId === socket.id && p.id !== socket.id && p.isAlive && (() => {
+        if (gameState.titlePrompt.role === 'Assassin') {
+          return (
+            <button
+              onClick={(e) => { e.stopPropagation(); playSound('click'); socket.emit('useTitleAbility', { use: true, role: 'Assassin', targetId: p.id }); }}
+              className="absolute inset-0 z-30 bg-red-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1 opacity-0 hover:opacity-100 transition-opacity"
+            >
+              Execute
+            </button>
+          );
+        } else if (gameState.titlePrompt.role === 'Interdictor') {
+          const currentPresidentId = gameState.players[gameState.presidentIdx]?.id;
+          if (p.id !== currentPresidentId) {
+            return (
+              <button
+                onClick={(e) => { e.stopPropagation(); playSound('click'); socket.emit('useTitleAbility', { use: true, role: 'Interdictor', targetId: p.id }); }}
+                className="absolute inset-0 z-30 bg-purple-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1 opacity-0 hover:opacity-100 transition-opacity"
+              >
+                Detain
+              </button>
+            );
+          }
+        }
+        return null;
+      })()}
 
       {/* Executive action overlay */}
       {gameState.phase === 'Executive_Action' && isPresident && p.id !== socket.id && p.isAlive && (

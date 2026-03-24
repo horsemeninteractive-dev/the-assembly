@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { X, Trophy, Coins, Shield, User as UserIcon, Check, ShoppingBag, ArrowLeft, Star, Heart, Zap, Flame, Scroll, Play, Pause, Calendar, Clock, Target, ChevronDown, ChevronUp, Medal, Plus } from 'lucide-react';
+import { X, Trophy, Coins, Shield, User as UserIcon, Check, ShoppingBag, ArrowLeft, Star, Heart, Zap, Flame, Scroll, Play, Pause, Calendar, Clock, Target, ChevronDown, ChevronUp, Medal, Plus, Pencil } from 'lucide-react';
 import { User, CosmeticItem, Policy, MatchSummary } from '../types';
 import { FriendsList } from './FriendsList';
 import { Inventory } from './Inventory';
@@ -62,6 +62,59 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
   const [justClaimed, setJustClaimed] = useState<string | null>(null);
   const [pinnedAchievements, setPinnedAchievements] = useState<string[]>(user.pinnedAchievements ?? []);
   const [pinSaving, setPinSaving] = useState(false);
+  const [isEditingName, setIsEditingName] = useState(false);
+  const [newName, setNewName] = useState(user.username);
+  const [isSavingName, setIsSavingName] = useState(false);
+
+  const handleUpdateUsername = async () => {
+    if (!newName || newName === user.username) {
+      setIsEditingName(false);
+      return;
+    }
+    if (newName.length < 3 || newName.length > 20) {
+      setError('Username must be 3-20 characters');
+      return;
+    }
+    setIsSavingName(true);
+    setError('');
+    try {
+      const res = await fetch(apiUrl('/api/user/update-username'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ newUsername: newName }),
+      });
+      
+      if (!res.ok) {
+        const text = await res.text();
+        let errorMsg = "Update failed";
+        try {
+          const json = JSON.parse(text);
+          errorMsg = json.error || errorMsg;
+        } catch (e) {
+          errorMsg = text || `Error ${res.status}: ${res.statusText}`;
+        }
+        throw new Error(errorMsg);
+      }
+      
+      const data = await res.json();
+      
+      // Update local storage if present? Usually handled by onUpdateUser
+      if (typeof window !== 'undefined') {
+        const storedToken = localStorage.getItem('th_token');
+        if (storedToken && data.token) {
+          localStorage.setItem('th_token', data.token);
+        }
+      }
+      
+      onUpdateUser(data.user);
+      setIsEditingName(false);
+      playSound('election_passed');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsSavingName(false);
+    }
+  };
 
   const savePins = async (pins: string[]) => {
     setPinSaving(true);
@@ -298,7 +351,44 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
           </div>
 
           <div className="flex-1 text-center sm:text-left">
-            <h2 className="text-2xl font-thematic text-primary tracking-wide mb-1">{user.username}</h2>
+            <div className="flex items-center justify-center sm:justify-start gap-2 mb-1">
+              {isEditingName ? (
+                <div className="flex items-center gap-2">
+                  <input
+                    autoFocus
+                    value={newName}
+                    onChange={(e) => setNewName(e.target.value)}
+                    onKeyDown={(e) => e.key === 'Enter' && handleUpdateUsername()}
+                    className="bg-card border border-primary text-primary px-2 py-1 rounded-lg text-lg font-thematic focus:outline-none w-48"
+                    disabled={isSavingName}
+                  />
+                  <button 
+                    onClick={handleUpdateUsername}
+                    disabled={isSavingName}
+                    className="p-1.5 rounded-lg bg-emerald-900/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-900/40"
+                  >
+                    {isSavingName ? <Clock className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                  </button>
+                  <button 
+                    onClick={() => { setIsEditingName(false); setNewName(user.username); }}
+                    className="p-1.5 rounded-lg bg-red-900/20 border border-red-500/30 text-red-500 hover:bg-red-900/40"
+                    disabled={isSavingName}
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ) : (
+                <>
+                  <h2 className="text-2xl font-thematic text-primary tracking-wide">{user.username}</h2>
+                  <button 
+                    onClick={() => { playSound('click'); setIsEditingName(true); }}
+                    className="p-1 rounded-md text-ghost hover:text-primary hover:bg-white/5 transition-all"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                </>
+              )}
+            </div>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3">
               {/* Row 1: Rank */}
               <div className="flex justify-center sm:justify-start">
@@ -382,6 +472,13 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
 
         {/* Content */}
         <div className="flex-1 overflow-y-auto p-8 custom-scrollbar">
+          {error && (
+            <div className="mb-6 p-4 bg-red-900/20 border border-red-500/50 rounded-xl text-red-400 text-sm flex items-center gap-3 animate-in fade-in slide-in-from-top-2">
+              <span className="text-lg">⚠️</span>
+              <p>{error}</p>
+              <button onClick={() => setError('')} className="ml-auto text-ghost hover:text-white"><X className="w-4 h-4" /></button>
+            </div>
+          )}
           {activeTab === 'stats' ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {/* Rank tier card — spans full width on mobile, 1 col on larger */}
@@ -982,17 +1079,7 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
                         <div className={cn("absolute top-1 w-4 h-4 rounded-full bg-white transition-all", isAiVoiceEnabled ? "left-7" : "left-1")} />
                       </button>
                     </div>
-                    <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
-                      <span className="text-sm font-mono text-primary">TTS Engine</span>
-                      <select 
-                        value={ttsEngine} 
-                        onChange={(e) => setTtsEngine(e.target.value)}
-                        className="w-full bg-card text-primary p-2 rounded-xl text-sm font-mono border border-default"
-                      >
-                        <option value="browser">Browser (Free, Offline)</option>
-                        <option value="gemini">Gemini (High Quality, Free Tier)</option>
-                      </select>
-                    </div>
+
                     <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
                       <span className="text-sm font-mono text-primary">TTS Voice</span>
                       <select 

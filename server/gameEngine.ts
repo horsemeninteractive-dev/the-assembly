@@ -1114,8 +1114,8 @@ export class GameEngine {
     const drew    = s.presidentSaw  ?? [];
     let civ       = saw.filter(p => p === "Civil").length;
     let sta       = saw.filter(p => p === "State").length;
-    const drewCiv = drew.filter(p => p === "Civil").length;
-    const drewSta = drew.filter(p => p === "State").length;
+    let drewCiv   = drew.filter(p => p === "Civil").length;
+    let drewSta   = drew.filter(p => p === "State").length;
 
     const presIsState = s.players.find(p => p.isPresident)?.role  !== "Civil";
     const chanIsState = s.players.find(p => p.isChancellor)?.role !== "Civil";
@@ -1137,11 +1137,31 @@ export class GameEngine {
       let lie = false;
       if (player.role !== "Civil") {
         if      (player.personality === "Deceptive")  lie = true;
-        else if (player.personality === "Aggressive")  lie = Math.random() > 0.15;
-        else if (player.personality === "Strategic")   lie = (s.stateDirectives ?? 0) >= 1;
-        else if (player.personality === "Chaotic")     lie = Math.random() > 0.3;
+        else if (player.personality === "Aggressive") lie = Math.random() > 0.15;
+        else if (player.personality === "Strategic")  lie = (s.stateDirectives ?? 0) >= 1;
+        else if (player.personality === "Chaotic")    lie = Math.random() > 0.3;
       }
-      if (lie && civ > 0) { civ--; sta++; }
+      if (lie && civ > 0) { 
+        if (enacted === "Civil" && civ === 1) {
+          // Do not lie, must claim at least 1 Civil since Civil was enacted
+        } else {
+          civ--; sta++; 
+        }
+      }
+    }
+
+    if (type === "President") {
+      if (player.role !== "Civil") {
+        const discardedCiv = drewCiv - civ;
+        // Always try to hide discarding a Civil by claiming we drew a State instead
+        if (discardedCiv > 0) {
+          drewCiv -= discardedCiv;
+          drewSta += discardedCiv;
+        }
+      }
+      // Absolute paradox prevention: you must have drawn what you claim you passed
+      while (drewSta < sta && drewCiv > 0) { drewCiv--; drewSta++; }
+      while (drewCiv < civ && drewSta > 0) { drewSta--; drewCiv++; }
     }
 
     s.declarations.push({

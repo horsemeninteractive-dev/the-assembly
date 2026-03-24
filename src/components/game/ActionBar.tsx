@@ -156,8 +156,54 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
 
       {/* Action area - fixed height to prevent layout shift */}
       <div className="px-[2vw] py-[1vh] sm:py-[1.5vh] h-[12vh] sm:h-[15vh] flex items-center justify-center">
+        {/* Title Role Prompt */}
+        {gameState.titlePrompt && gameState.titlePrompt.playerId === me?.id && (
+          <div className="flex flex-col gap-[1vh] w-full justify-center h-full items-center">
+            {['Strategist', 'Broker', 'Handler', 'Auditor'].includes(gameState.titlePrompt.role) ? (
+              <>
+                <div className="text-responsive-xs font-mono uppercase tracking-widest text-muted text-center">
+                  {gameState.titlePrompt.role === 'Strategist' && "Use Strategist power to draw an extra policy?"}
+                  {gameState.titlePrompt.role === 'Broker' && "Use Broker power to force a re-nomination?"}
+                  {gameState.titlePrompt.role === 'Handler' && "Use Handler power to swap the next two players in the presidential order?"}
+                  {gameState.titlePrompt.role === 'Auditor' && "Use Auditor power to peek at the discard pile?"}
+                </div>
+                <div className="flex gap-[2vw] w-full max-w-[30vh]">
+                  <button
+                    onMouseEnter={() => playSound('hover')}
+                    onClick={() => { playSound('click'); socket.emit('useTitleAbility', { use: true, role: gameState.titlePrompt!.role as 'Strategist' | 'Broker' | 'Handler' | 'Auditor' }); }}
+                    className="flex-1 py-[1vh] btn-primary rounded-xl font-bold hover:bg-subtle transition-all"
+                  >
+                    Yes
+                  </button>
+                  <button
+                    onMouseEnter={() => playSound('hover')}
+                    onClick={() => { playSound('click'); socket.emit('useTitleAbility', { use: false }); }}
+                    className="flex-1 py-[1vh] bg-subtle text-primary rounded-xl font-bold hover:bg-muted-bg transition-all"
+                  >
+                    No
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="text-responsive-xs font-mono uppercase tracking-widest text-muted text-center">
+                  {gameState.titlePrompt.role === 'Assassin' && "Select a player to execute on their card, or skip."}
+                  {gameState.titlePrompt.role === 'Interdictor' && "Select a player to detain on their card, or skip."}
+                </div>
+                <button
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => { playSound('click'); socket.emit('useTitleAbility', { use: false }); }}
+                  className="px-[4vw] py-[1vh] bg-subtle text-primary rounded-xl font-bold hover:bg-muted-bg transition-all"
+                >
+                  Skip Power
+                </button>
+              </>
+            )}
+          </div>
+        )}
+
         {/* Voting */}
-        {gameState.phase === 'Voting' && me?.isAlive && !me.vote && (
+        {gameState.phase === 'Voting' && me?.isAlive && !me.vote && !gameState.titlePrompt && (
           <div className="flex gap-[1vw] sm:gap-[2vw] w-full justify-center h-full items-center">
             {gameState.detainedPlayerId === me.id ? (
               <div className="text-purple-400 font-mono text-responsive-xs uppercase tracking-widest text-center animate-pulse">
@@ -187,7 +233,7 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
         )}
 
         {/* President discard */}
-        {gameState.phase === 'Legislative_President' && isPresident && (
+        {gameState.phase === 'Legislative_President' && isPresident && !gameState.titlePrompt && (
           <div className="flex gap-[1vw] sm:gap-[2vw] w-full justify-center h-full items-center">
             <AnimatePresence>
               {gameState.drawnPolicies.map((p, i) => (
@@ -210,7 +256,7 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
         )}
 
         {/* Chancellor enact */}
-        {gameState.phase === 'Legislative_Chancellor' && isChancellor && (
+        {gameState.phase === 'Legislative_Chancellor' && isChancellor && !gameState.titlePrompt && (
           <div className="flex gap-[1vw] sm:gap-[2vw] w-full justify-center h-full items-center">
             <AnimatePresence>
               {gameState.chancellorPolicies.map((p, i) => (
@@ -256,7 +302,7 @@ export const ActionBar = ({ gameState, me, user, showDebug, onOpenLog, onPlayAga
         )}
 
         {/* Lobby ready */}
-        {gameState.phase === 'Lobby' && (() => {
+        {gameState.phase === 'Lobby' && !gameState.titlePrompt && (() => {
           const isHost = !!(user?.id && gameState.hostUserId === user.id);
           const readyCount = gameState.players.filter(p => !p.isAI && p.isReady).length;
           const totalHuman = gameState.players.filter(p => !p.isAI).length;

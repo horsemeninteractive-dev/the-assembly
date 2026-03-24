@@ -4,7 +4,6 @@ import { GameState, Player, Role, Policy, User, PrivateInfo, PostMatchResult } f
 import { getBackgroundTexture } from '../lib/cosmetics';
 import { cn, getProxiedUrl } from '../lib/utils';
 import * as aiSpeech from '../services/aiSpeech';
-import * as geminiSpeech from '../services/geminiSpeech';
 
 import { GameHeader } from './game/GameHeader';
 import { PolicyTracks } from './game/PolicyTracks';
@@ -23,7 +22,6 @@ import { PolicyPeekModal } from './game/modals/PolicyPeekModal';
 import { DossierModal } from './game/modals/DossierModal';
 import { DeclarationModal } from './game/modals/DeclarationModal';
 import { PlayerProfileModal } from './game/modals/PlayerProfileModal';
-import { TitleAbilityModal } from './game/modals/TitleAbilityModal';
 import { GameReferencePanel } from './game/GameReferencePanel';
 
 const CLIENT_VERSION = 'v0.9.8';
@@ -100,9 +98,6 @@ export const GameRoom = ({
   const [isDossierOpen, setIsDossierOpen] = useState(false);
   const [isReferenceOpen, setIsReferenceOpen] = useState(false);
   const [postMatchResult, setPostMatchResult] = useState<PostMatchResult | null>(null);
-  // Client-side dismiss flag for TitleAbilityModal — resets whenever a new prompt arrives
-  const [titleAbilityDismissed, setTitleAbilityDismissed] = useState(false);
-  const prevTitlePromptRef = useRef<string | undefined>(undefined);
   const [chatText, setChatText] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0);
@@ -130,17 +125,6 @@ export const GameRoom = ({
       hasAutoOpenedDossier.current = false;
     }
   }, [gameState.phase, gameState.round, isSpectator]);
-
-  // Reset the client-side dismiss flag whenever the server sends a fresh titlePrompt
-  useEffect(() => {
-    const currentPromptKey = gameState.titlePrompt
-      ? `${gameState.titlePrompt.role}-${gameState.titlePrompt.playerId}`
-      : undefined;
-    if (currentPromptKey !== prevTitlePromptRef.current) {
-      prevTitlePromptRef.current = currentPromptKey;
-      if (currentPromptKey) setTitleAbilityDismissed(false);
-    }
-  }, [gameState.titlePrompt]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -420,27 +404,15 @@ export const GameRoom = ({
     
     const sender = gameState.players.find(p => p.name === lastMessage.sender);
     if (sender && sender.isAI) {
-      if (ttsEngine === 'gemini') {
-        const voice = geminiSpeech.getGeminiVoiceForAi(sender.name);
-        geminiSpeech.generateGeminiSpeech({ text: lastMessage.text, voice }).then(audio => {
-          if (audio) {
-            audio.volume = soundVolume / 100;
-            setSpeakingPlayers(prev => ({ ...prev, [sender.id]: true }));
-            audio.onended = () => setSpeakingPlayers(prev => ({ ...prev, [sender.id]: false }));
-            audio.play().catch(console.error);
-          }
-        });
-      } else {
-        const profile = aiSpeech.getVoiceProfileForAi(sender.name);
-        if (profile) {
-          aiSpeech.speakAiMessage(
-            lastMessage.text, 
-            sender.name, 
-            profile,
-            () => setSpeakingPlayers(prev4 => ({ ...prev4, [sender.id]: true })),
-            () => setSpeakingPlayers(prev4 => ({ ...prev4, [sender.id]: false }))
-          );
-        }
+      const profile = aiSpeech.getVoiceProfileForAi(sender.name);
+      if (profile) {
+        aiSpeech.speakAiMessage(
+          lastMessage.text, 
+          sender.name, 
+          profile,
+          () => setSpeakingPlayers(prev4 => ({ ...prev4, [sender.id]: true })),
+          () => setSpeakingPlayers(prev4 => ({ ...prev4, [sender.id]: false }))
+        );
       }
     }
   }, [gameState.messages.length, isAiVoiceEnabled, ttsEngine, soundVolume]);
@@ -999,14 +971,6 @@ export const GameRoom = ({
         onSubmit={handleSubmitDeclaration}
         playSound={playSound}
       />
-      {gameState.titlePrompt && gameState.titlePrompt.playerId === socket.id && !titleAbilityDismissed && (
-        <TitleAbilityModal
-          role={gameState.titlePrompt.role}
-          gameState={gameState}
-          onClose={() => setTitleAbilityDismissed(true)}
-          playSound={playSound}
-        />
-      )}
       <GameReferencePanel
         isOpen={isReferenceOpen}
         onClose={() => setIsReferenceOpen(false)}

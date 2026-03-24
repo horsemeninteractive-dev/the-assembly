@@ -61,8 +61,7 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
             initial={{ opacity: 0, scale: 0.95, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-sm lg:max-w-5xl bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh] lg:max-h-[85vh] mt-[5vh] lg:mt-0"
+            className="relative w-full max-w-sm lg:max-w-5xl bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh] lg:max-h-[80vh] mt-[5vh] lg:mt-[5vh]"
           >
             {/* Win banner */}
             <div className={cn(
@@ -93,7 +92,9 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
               
               {/* Left Column: Match Summary & Progress */}
               <div className="lg:w-1/2 lg:basis-1/2 lg:overflow-y-auto custom-scrollbar p-[3vh] space-y-[2.5vh] shrink-0">
-                <h4 className="text-[10px] uppercase tracking-[0.2em] text-muted font-mono border-b border-subtle/30 pb-2">Match Performance</h4>
+                <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono border-b border-subtle/30 pb-2 flex justify-between items-center">
+                  <span>Match Performance</span>
+                </div>
                 
                 {/* ── Post-match ELO summary ────────────────── */}
                 {postMatchResult && (
@@ -233,7 +234,6 @@ export const GameOverModal = ({ gameState, privateInfo, myId, postMatchResult, o
                                   {p.name.replace(' (AI)', '')}
                                   {p.id === myId && <span className="ml-1.5 text-[9px] text-yellow-500 uppercase tracking-tighter">You</span>}
                                 </span>
-                                {titleRole && <span className="text-[9px] font-mono text-tertiary uppercase tracking-wider">{titleRole}</span>}
                               </div>
                             </div>
                             

@@ -157,7 +157,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
 
   return (
     <div
-      className="flex-1 w-full text-primary font-sans flex flex-col overflow-y-auto custom-scrollbar"
+      className="flex-1 w-full text-primary font-sans flex flex-col overflow-y-auto custom-scrollbar min-h-0"
     >
       {/* Header */}
       <motion.header 

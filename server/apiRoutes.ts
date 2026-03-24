@@ -248,6 +248,56 @@ export function registerRoutes(
     }
   });
 
+  app.post("/api/user/update-username", async (req: Request, res: Response) => {
+    const token = req.headers.authorization?.split(" ")[1];
+    const { newUsername } = req.body;
+
+    if (!token) return res.status(401).json({ error: "No token" });
+    if (!newUsername || typeof newUsername !== 'string' || newUsername.length < 3 || newUsername.length > 20) {
+      return res.status(400).json({ error: "Username must be between 3 and 20 characters" });
+    }
+
+    // Alphanumeric only
+    if (!/^[a-zA-Z0-9_]+$/.test(newUsername)) {
+      return res.status(400).json({ error: "Username can only contain letters, numbers, and underscores" });
+    }
+
+    try {
+      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
+      const user = await getUser(decoded.username);
+      if (!user) return res.status(404).json({ error: "User not found" });
+
+      if (user.username === newUsername) {
+        return res.status(400).json({ error: "New username must be different" });
+      }
+
+      const existing = await getUser(newUsername);
+      if (existing) {
+        return res.status(400).json({ error: "Username already taken" });
+      }
+
+      // If using in-memory store in dev, we need to handle the key change
+      // Since supabaseService just exposes saveUser, we trust it or handle it there.
+      // But we can update the cached user here.
+      user.username = newUsername;
+      await saveUser(user);
+
+      // Re-sign token if needed? For now, the client usually just stores the user object.
+      // But the next auth'd request will use the OLD username in the token.
+      // So we MUST return a new token.
+      const newToken = jwt.sign({ username: newUsername }, JWT_SECRET!, { expiresIn: "30d" });
+
+      const { password: _, ...safe } = user as any;
+      res.json({ user: safe, token: newToken });
+    } catch (err: any) {
+      if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
+        return res.status(401).json({ error: "Session expired, please login again" });
+      }
+      console.error("[API] Username update failed:", err);
+      res.status(500).json({ error: err.message || "Failed to update username" });
+    }
+  });
+
   // Mark tutorial as completed — adds 'tutorial-complete' to claimedRewards
   app.post("/api/tutorial-complete", async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(" ")[1];
