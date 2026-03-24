@@ -1,5 +1,6 @@
 import { Express, Request, Response } from "express";
 import { Server } from "socket.io";
+import { appendFileSync } from "fs";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -25,6 +26,11 @@ import {
   getMatchHistory,
   getPendingFriendRequests,
   searchUsers,
+  getLeaderboard,
+  getSystemConfig,
+  updateSystemConfig,
+  db,
+  isConfigured,
 } from "./supabaseService.ts";
 
 const JWT_SECRET = process.env.JWT_SECRET;
@@ -602,6 +608,43 @@ export function registerRoutes(
       casual:  strip(boards.casual),
       classic: strip(boards.classic),
     });
+  });
+
+  // ── Admin ─────────────────────────────────────────────────────────────────
+
+  app.get("/api/admin/test", async (req, res) => {
+    const { data, error } = await db.from("users").select("id, username").limit(5);
+    res.json({ data, error, isConfigured });
+  });
+
+  app.get("/api/admin/users/search", async (req, res) => {
+    const userId = req.query.adminId as string;
+    const query = req.query.q as string;
+    const logMsg = `[AdminAPI] User Search Request from ${userId} for query: "${query}" at ${new Date().toISOString()}\n`;
+    try { appendFileSync('./admin_debug.log', logMsg); } catch(e) {}
+
+    if (!userId) return res.status(401).send("Unauthorized");
+    
+    const admin = await getUserById(userId);
+    if (!admin || !admin.isAdmin) {
+      const warnMsg = `[AdminAPI] Unauthorized search attempt by user: ${userId}\n`;
+      try { appendFileSync('./admin_debug.log', warnMsg); } catch(e) {}
+      return res.status(403).send("Forbidden");
+    }
+
+    const users = await searchUsers(query, userId, 20);
+    res.json(users.map(({ password: _, ...u }) => u));
+  });
+
+  app.get("/api/admin/config", async (req, res) => {
+    const userId = req.query.adminId as string;
+    if (!userId) return res.status(401).send("Unauthorized");
+    
+    const admin = await getUserById(userId);
+    if (!admin || !admin.isAdmin) return res.status(403).send("Forbidden");
+
+    const config = await getSystemConfig();
+    res.json(config);
   });
 
   app.get("/api/global-stats", async (_req: Request, res: Response) => {

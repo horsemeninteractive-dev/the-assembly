@@ -63,6 +63,7 @@ export const DEFAULT_ITEMS: CosmeticItem[] = [
   { id: 'bg-wood', name: 'Dark Mahogany', price: 2000, type: 'background', description: 'Rich, polished dark wood grain.', imageUrl: 'https://www.transparenttextures.com/patterns/dark-wood.png' },
   { id: 'bg-paper', name: 'Aged Parchment', price: 1800, type: 'background', description: 'Weathered, historical paper texture.', imageUrl: 'https://www.transparenttextures.com/patterns/old-mathematics.png' },
   { id: 'bg-concrete', name: 'Urban Concrete', price: 1400, type: 'background', description: 'Rough, brutalist concrete wall.', imageUrl: 'https://www.transparenttextures.com/patterns/concrete-wall.png' },
+  { id: 'bg-nebula-void', name: 'Nebula Void', price: 15000, type: 'background', description: 'LEGENDARY: A swirling, animated cosmic nebula that transforms the assembly hall into deep space.' },
   
   // Assembly Pass Rewards (Free Tier)
   { id: 'bg-pass-0', name: 'Season 0: Geometric Grid', price: 0, type: 'background', description: 'Exclusive Season 0 background.', imageUrl: 'https://www.transparenttextures.com/patterns/gplay.png' },

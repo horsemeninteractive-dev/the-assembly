@@ -181,6 +181,7 @@ export interface User {
   pinnedAchievements: string[]; // up to 3 achievement IDs
   recentlyPlayedWith: RecentlyPlayedEntry[]; // up to 20 entries, most recent first
   isAdmin?: boolean;
+  isBanned?: boolean;
 }
 
 export interface UserInternal extends User {
@@ -205,6 +206,13 @@ export interface RoomInfo {
   isLocked?: boolean;
   hostName?: string;
   spectatorCount?: number;
+}
+
+export interface SystemConfig {
+  maintenanceMode: boolean;
+  xpMultiplier: number;
+  ipMultiplier: number;
+  minVersion?: string;
 }
 
 export type AIPersonality = 'Honest' | 'Deceptive' | 'Chaotic' | 'Strategic' | 'Aggressive';
@@ -371,6 +379,9 @@ export interface ServerToClientEvents {
   postMatchResult: (result: PostMatchResult) => void;
   kicked: (reason?: string) => void;
   adminBroadcast: (data: { message: string; sender: string; timestamp: number }) => void;
+  adminConfigUpdate: (config: SystemConfig) => void;
+  adminChatLogs: (data: { roomId: string; logs: any[] }) => void;
+  adminClearRedisSuccess: (message: string) => void;
 }
 
 export interface ClientToServerEvents {
@@ -403,4 +414,8 @@ export interface ClientToServerEvents {
   updateMediaState: (data: { isMicOn: boolean; isCamOn: boolean }) => void;
   adminDeleteRoom: (roomId: string) => void;
   adminBroadcast: (message: string) => void;
+  adminUpdateUser: (data: { userId: string; updates: Partial<UserStats> & { isBanned?: boolean; cabinetPoints?: number } }) => void;
+  adminUpdateConfig: (config: Partial<SystemConfig>) => void;
+  adminGetChatLogs: (roomId: string) => void;
+  adminClearRedis: () => void;
 }

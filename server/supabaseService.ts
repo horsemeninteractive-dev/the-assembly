@@ -1,11 +1,12 @@
 import { randomUUID } from "crypto";
+import { appendFileSync } from "fs";
 import { supabase, isSupabaseConfigured } from "../src/lib/supabase.ts";
 import { supabaseAdmin, isSupabaseAdminConfigured } from "./supabaseAdmin.ts";
-import { User, UserInternal, MatchSummary } from "../src/types.ts";
+import { User, UserInternal, MatchSummary, SystemConfig } from "../src/types.ts";
 
 // Use admin client if available, fallback to regular client
-const db = isSupabaseAdminConfigured ? supabaseAdmin : supabase;
-const isConfigured = isSupabaseAdminConfigured || isSupabaseConfigured;
+export const db = isSupabaseAdminConfigured ? supabaseAdmin : supabase;
+export const isConfigured = isSupabaseAdminConfigured || isSupabaseConfigured;
 
 // In-memory fallback store (used when Supabase is not configured)
 const users: Map<string, UserInternal> = new Map();
@@ -36,7 +37,8 @@ function mapSupabaseToUser(data: any): UserInternal {
     recentlyPlayedWith: data.recently_played_with || [],
     googleId:          data.google_id,
     discordId:         data.discord_id,
-    isAdmin:           data.is_admin,
+    isAdmin:           data.is_admin || false,
+    isBanned:          data.is_banned || false,
   } as UserInternal;
 }
 
@@ -61,6 +63,7 @@ function mapUserToSupabase(userData: UserInternal): Record<string, unknown> {
     google_id:        userData.googleId,
     discord_id:       userData.discordId,
     is_admin:         userData.isAdmin,
+    is_banned:        userData.isBanned,
     stats:            userData.stats,
   };
 }
@@ -72,7 +75,7 @@ export async function getLeaderboard(mode: LeaderboardMode = 'Overall'): Promise
     mode === 'Ranked'  ? 'stats->elo' :
     mode === 'Casual'  ? 'stats->casualWins' :
     mode === 'Classic' ? 'stats->classicWins' :
-    'stats->elo'; // Overall sorts by ELO too
+    'stats->elo';
 
   if (isConfigured) {
     const { data, error } = await db
@@ -129,6 +132,53 @@ export async function incrementGlobalWin(faction: 'Civil' | 'State'): Promise<vo
           .eq("id", 1);
     }
   }
+}
+
+// ---------------------------------------------------------------------------
+// System Config
+// ---------------------------------------------------------------------------
+
+export async function getSystemConfig(): Promise<SystemConfig> {
+    const defaultConfig: SystemConfig = {
+      maintenanceMode: false,
+      xpMultiplier: 1.0,
+      ipMultiplier: 1.0,
+      minVersion: '0.9.0'
+    };
+
+    if (isConfigured) {
+        const { data, error } = await db
+            .from("system_config")
+            .select("*")
+            .eq("id", 1)
+            .single();
+        if (error || !data) return defaultConfig;
+        return {
+            maintenanceMode: data.maintenance_mode,
+            xpMultiplier: Number(data.xp_multiplier),
+            ipMultiplier: Number(data.ip_multiplier),
+            minVersion: data.min_version
+        };
+    }
+    return defaultConfig;
+}
+
+export async function updateSystemConfig(config: Partial<SystemConfig>): Promise<SystemConfig> {
+    const current = await getSystemConfig();
+    const updated = { ...current, ...config };
+    
+    if (isConfigured) {
+        await db
+            .from("system_config")
+            .update({
+                maintenance_mode: updated.maintenanceMode,
+                xp_multiplier:    updated.xpMultiplier,
+                ip_multiplier:    updated.ipMultiplier,
+                min_version:      updated.minVersion
+            })
+            .eq("id", 1);
+    }
+    return updated;
 }
 
 // ---------------------------------------------------------------------------
@@ -217,7 +267,7 @@ export async function getFriends(userId: string): Promise<UserInternal[]> {
     if (friendsError) return [];
     return friendsData.map(mapSupabaseToUser);
   }
-  return []; // In-memory fallback not implemented for friends yet
+  return [];
 }
 
 export async function sendFriendRequest(userId1: string, userId2: string): Promise<void> {
@@ -255,32 +305,46 @@ export async function removeFriend(userId1: string, userId2: string): Promise<vo
     await db
       .from("friends")
       .delete()
-      .or(`and(user_id_1.eq.${userId1},user_id_2.eq.${userId2}),and(user_id_1.eq.${userId2},user_id_2.eq.${userId1})`);
+      .or(`and(user_id_1.eq.${userId1},user_id_2.eq.${userId2}),and(user_id_1.eq.${userId2},user_id_1.eq.${userId1})`);
   }
 }
 
-
 export async function searchUsers(query: string, currentUserId: string, limit = 10): Promise<UserInternal[]> {
-  if (!query.trim() || query.length < 2) return [];
+  if (!query.trim()) return [];
+  
+  // Validate if query is a UUID to avoid Postgres errors
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(query.trim());
+
   if (isConfigured) {
+    // Simplify for debugging: search by username only first
     const { data, error } = await db
       .from("users")
       .select("*")
       .ilike("username", `%${query}%`)
       .neq("id", currentUserId)
       .limit(limit);
-    if (error || !data) return [];
-    return data.map(mapSupabaseToUser);
+    
+    const logMsg = `[AdminSearch] Simple Query: username ILIKE %${query}%, Results: ${data?.length || 0}, Error: ${JSON.stringify(error)}\n`;
+    try { appendFileSync('./admin_debug.log', logMsg); } catch(e) {}
+
+    if (error) return [];
+    return (data || []).map(mapSupabaseToUser);
   }
-  // In-memory fallback
-  return Array.from(users.values())
-    .filter(u => u.id !== currentUserId && u.username.toLowerCase().includes(query.toLowerCase()))
+  
+  const results = Array.from(users.values())
+    .filter(u => u.id !== currentUserId && (
+      u.username.toLowerCase().includes(query.toLowerCase()) || 
+      u.id === query ||
+      (u as any).email?.toLowerCase().includes(query.toLowerCase())
+    ))
     .slice(0, limit);
+  
+  console.log(`[AdminSearch-Fallback] Found ${results.length} results for "${query}"`);
+  return results;
 }
 
 export async function getPendingFriendRequests(userId: string): Promise<UserInternal[]> {
   if (isConfigured) {
-    // Requests where userId is the recipient (user_id_2) and status is pending
     const { data, error } = await db
       .from("friends")
       .select("user_id_1")
@@ -292,7 +356,6 @@ export async function getPendingFriendRequests(userId: string): Promise<UserInte
       .from("users")
       .select("*")
       .in("id", senderIds);
-    if (sendersError) return [];
     return senders.map(mapSupabaseToUser);
   }
   return [];
@@ -319,7 +382,6 @@ export async function saveUser(userData: UserInternal): Promise<void> {
 // Match history
 // ---------------------------------------------------------------------------
 
-// In-memory fallback for match history (keyed by userId)
 const matchHistoryStore: Map<string, MatchSummary[]> = new Map();
 
 export async function saveMatchResult(match: Omit<MatchSummary, "id"> & { id: string }): Promise<void> {
@@ -386,7 +448,7 @@ export async function getMatchHistory(userId: string, limit = 20): Promise<Match
 }
 
 // ---------------------------------------------------------------------------
-// New-user factory — shared by register, Google OAuth, Discord OAuth
+// New-user factory
 // ---------------------------------------------------------------------------
 
 export function makeNewUser(overrides: Partial<UserInternal> = {}): UserInternal {

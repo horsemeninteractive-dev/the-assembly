@@ -433,6 +433,103 @@
   perspective: 1000px;
 }
 
+/* ─── Premium Legendary Nebula Void Background ───────────────────────── */
+@keyframes nebula-float {
+  0%, 100% { transform: translateY(0) scale(1); opacity: 0.7; }
+  50% { transform: translateY(-30px) scale(1.05); opacity: 1; }
+}
+
+@keyframes nebula-swirl-slow {
+  from { transform: rotate(0deg) scale(1.5); }
+  to { transform: rotate(360deg) scale(1.8); }
+}
+
+@keyframes nebula-swirl-fast {
+  from { transform: rotate(360deg) scale(2); }
+  to { transform: rotate(0deg) scale(2.2); }
+}
+
+@keyframes star-twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(0.8); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.bg-nebula-void {
+  position: relative !important;
+  background: radial-gradient(circle at center, #0a0a1a 0%, #020205 100%) !important;
+  overflow: hidden !important;
+}
+
+/* Base Gas Clouds */
+.bg-nebula-void::before {
+  content: '';
+  position: absolute;
+  inset: -100%;
+  background: 
+    radial-gradient(circle at 30% 40%, rgba(76, 29, 149, 0.5) 0%, transparent 50%),
+    radial-gradient(circle at 70% 60%, rgba(30, 58, 138, 0.5) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(139, 92, 246, 0.3) 0%, transparent 60%),
+    radial-gradient(circle at 20% 80%, rgba(15, 23, 42, 0.8) 0%, transparent 70%);
+  filter: blur(100px);
+  animation: nebula-swirl-slow 60s linear infinite;
+  z-index: 1;
+  opacity: 0.8;
+}
+
+/* Secondary Gas & Starfield */
+.bg-nebula-void::after {
+  content: '';
+  position: absolute;
+  inset: -100%;
+  background: 
+    /* Secondary accent clouds */
+    radial-gradient(circle at 80% 20%, rgba(192, 132, 252, 0.2) 0%, transparent 40%),
+    radial-gradient(circle at 10% 70%, rgba(56, 189, 248, 0.2) 0%, transparent 40%),
+    
+    /* Distant stars (small, static-ish) */
+    radial-gradient(1px 1px at 15% 15%, #fff 100%, transparent),
+    radial-gradient(1px 1px at 85% 85%, #fff 100%, transparent),
+    radial-gradient(1px 1px at 50% 25%, #fff 100%, transparent),
+    radial-gradient(1px 1px at 25% 50%, #fff 100%, transparent),
+    radial-gradient(1.5px 1.5px at 75% 45%, #fff 80%, transparent),
+    radial-gradient(1.5px 1.5px at 40% 80%, #fff 80%, transparent),
+    
+    /* Nearer stars (a bit larger) */
+    radial-gradient(2px 2px at 10% 90%, #fff 100%, transparent),
+    radial-gradient(2px 2px at 90% 10%, #fff 100%, transparent),
+    
+    /* Grain/Noise texture */
+    url("https://www.transparenttextures.com/patterns/stardust.png");
+  
+  background-size: 100% 100%, 100% 100%, 300px 300px, 400px 400px, 250px 250px, 350px 350px, 200px 200px, 450px 450px, 500px 500px, 600px 600px, 200px 200px;
+  filter: blur(1px);
+  animation: nebula-swirl-fast 90s linear infinite;
+  mix-blend-mode: screen;
+  z-index: 2;
+  opacity: 0.4;
+}
+
+/* Extra layer for twinkling stars (needs to be above gas) */
+.bg-nebula-void .bg-vignette::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    radial-gradient(2px 2px at 20% 30%, #fff 100%, transparent),
+    radial-gradient(2px 2px at 80% 70%, #fff 100%, transparent),
+    radial-gradient(1.5px 1.5px at 50% 50%, #fff 100%, transparent),
+    radial-gradient(2px 2px at 10% 60%, #fff 100%, transparent),
+    radial-gradient(2px 2px at 90% 40%, #fff 100%, transparent);
+  background-size: 400px 400px;
+  animation: star-twinkle 4s ease-in-out infinite;
+  z-index: 3;
+}
+
+.bg-nebula-void .bg-vignette {
+  background: radial-gradient(circle, transparent 10%, rgba(0, 0, 0, 0.9) 100%) !important;
+  z-index: 5;
+}
+
 .preserve-3d {
   transform-style: preserve-3d;
 }

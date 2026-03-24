@@ -665,7 +665,11 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
                                       <span className="text-[9px] font-thematic uppercase relative z-10">AYE!</span>
                                     </div>
                                   ) : reward.item.type === 'background' ? (
-                                    <div className="w-full h-full" style={{ backgroundImage: `url("${getProxiedUrl(reward.item.imageUrl!)}")`, backgroundSize: 'cover' }} />
+                                    reward.item.id === 'bg-nebula-void' ? (
+                                      <div className="w-full h-full bg-nebula-void scale-[0.2] origin-center" />
+                                    ) : (
+                                      <div className="w-full h-full" style={{ backgroundImage: `url("${getProxiedUrl(reward.item.imageUrl!)}")`, backgroundSize: 'cover' }} />
+                                    )
                                   ) : null}
                                 </div>
                               </div>
@@ -722,8 +726,6 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
               playPreview={playPreview}
               playingItemId={playingItemId}
             />
-          ) : activeTab === 'admin' ? (
-            <AdminTools />
           ) : activeTab === 'shop' ? (
             <div className="space-y-8">
               {error && (
@@ -814,8 +816,12 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
                               <span className="text-[8px] font-mono uppercase">YES</span>
                             </div>
                           ) : item.type === 'background' ? (
-                            <div className="w-full h-full bg-elevated flex items-center justify-center">
-                              <div className="w-full h-full opacity-50" style={{ backgroundImage: `url("${getProxiedUrl(item.imageUrl!)}")` }} />
+                            <div className="w-full h-full bg-elevated flex items-center justify-center overflow-hidden">
+                              {item.id === 'bg-nebula-void' ? (
+                                <div className="w-full h-full bg-nebula-void scale-[0.25] origin-center opacity-50" />
+                              ) : (
+                                <div className="w-full h-full opacity-50" style={{ backgroundImage: `url("${getProxiedUrl(item.imageUrl!)}")`, backgroundSize: 'cover' }} />
+                              )}
                             </div>
                           ) : (
                             <div className="w-full h-full flex flex-col items-center justify-center gap-1">
@@ -1243,6 +1249,8 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
                 );
               })}
             </div>
+          ) : activeTab === 'admin' ? (
+            <AdminTools adminId={user.id} token={token} />
           ) : null}
         </div>
       </motion.div>

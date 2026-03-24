@@ -118,6 +118,8 @@ export const Inventory: React.FC<InventoryProps> = ({ user, handleEquip, playSou
                           <span className="text-lg font-thematic uppercase">AYE!</span>
                           <span className="text-[8px] font-mono uppercase">YES</span>
                       </div>
+                  ) : item.id === 'bg-nebula-void' ? (
+                      <div className="w-full h-full rounded-2xl bg-nebula-void overflow-hidden scale-[0.25] origin-center" />
                   ) : item.imageUrl ? (
                       <img src={getProxiedUrl(item.imageUrl)} alt={item.name} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
                   ) : (

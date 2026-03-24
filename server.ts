@@ -11,8 +11,9 @@ import { User, GameState, Player } from "./src/types.ts";
 import { createDeck } from "./server/utils.ts";
 import { GameEngine } from "./server/gameEngine.ts";
 import { registerRoutes } from "./server/apiRoutes.ts";
-import { getUserById, sendFriendRequest, acceptFriendRequest, getFriends, isFriend } from "./server/supabaseService.ts";
+import { getUserById, sendFriendRequest, acceptFriendRequest, getFriends, isFriend, getSystemConfig, updateSystemConfig, saveUser } from "./server/supabaseService.ts";
 import { pubClient, subClient, isRedisConfigured } from "./server/redis.ts";
+import { SystemConfig } from "./src/types.ts";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
@@ -112,7 +113,8 @@ async function startServer() {
     console.log("[Redis] Socket.IO adapter attached");
   }
 
-  const engine = new GameEngine({ io });
+  let currentConfig: SystemConfig = await getSystemConfig();
+  const engine = new GameEngine({ io, getConfig: () => currentConfig });
   const userSockets = new Map<string, string>();
 
   // Restore persisted game rooms from Redis before accepting connections
@@ -272,7 +274,14 @@ async function startServer() {
     };
 
     socket.on("userConnected", async (userId) => {
+      const user = await getUserById(userId);
+      if (user?.isBanned) {
+        socket.emit("error", "Your account has been restricted.");
+        socket.disconnect();
+        return;
+      }
       socket.data.userId = userId;
+      socket.data.isAdmin = user?.isAdmin || false;
       userSockets.set(userId, socket.id);
       const friends = await getFriends(userId);
       for (const friend of friends) {
@@ -296,9 +305,20 @@ async function startServer() {
       roomId, name, userId, activeFrame, activePolicyStyle, activeVotingStyle,
       maxPlayers, actionTimer, mode, isSpectator, privacy, inviteCode, hostUserId,
     }) => {
+      const user = userId ? await getUserById(userId) : null;
+      if (user?.isBanned) {
+        socket.emit("error", "Your account has been restricted.");
+        socket.disconnect();
+        return;
+      }
+
       let state = engine.rooms.get(roomId);
 
       if (!state) {
+        if (currentConfig.maintenanceMode && !user?.isAdmin) {
+          socket.emit("error", "The server is currently undergoing maintenance. New rooms cannot be created at this time.");
+          return;
+        }
         // Generating a 4-char invite code if private
         const code = privacy === 'private'
           ? Math.random().toString(36).substring(2, 6).toUpperCase()
@@ -990,6 +1010,91 @@ async function startServer() {
         timestamp: Date.now()
       });
       console.log(`Admin ${user.username} broadcast: ${message}`);
+    });
+
+    socket.on("adminUpdateUser", async (data: { userId: string; updates: any }) => {
+      if (!socket.data.userId) return;
+      const admin = await getUserById(socket.data.userId);
+      if (!admin || !admin.isAdmin) return;
+
+      const targetUser = await getUserById(data.userId);
+      if (!targetUser) return;
+
+      // Apply updates
+      if (data.updates.stats) {
+        targetUser.stats = { ...targetUser.stats, ...data.updates.stats };
+      }
+      if (typeof data.updates.cabinetPoints === 'number') {
+        targetUser.cabinetPoints = data.updates.cabinetPoints;
+      }
+      if (typeof data.updates.isBanned === 'boolean') {
+        targetUser.isBanned = data.updates.isBanned;
+      }
+
+      await saveUser(targetUser);
+      
+      // Notify target if online
+      const targetSocketId = userSockets.get(data.userId);
+      if (targetSocketId) {
+        io.to(targetSocketId).emit("userUpdate", targetUser);
+        if (targetUser.isBanned) {
+          io.to(targetSocketId).emit("kicked", "Your account has been restricted.");
+        }
+      }
+      console.log(`Admin ${admin.username} updated user ${targetUser.username}:`, data.updates);
+    });
+
+    socket.on("adminUpdateConfig", async (config: Partial<SystemConfig>) => {
+      if (!socket.data.userId) return;
+      const admin = await getUserById(socket.data.userId);
+      if (!admin || !admin.isAdmin) return;
+
+      currentConfig = await updateSystemConfig(config);
+      io.emit("adminConfigUpdate", currentConfig);
+      console.log(`Admin ${admin.username} updated system config:`, config);
+
+      if (config.maintenanceMode) {
+        io.emit("adminBroadcast", {
+          message: "The server is entering maintenance mode. New rooms cannot be created.",
+          sender: "System",
+          timestamp: Date.now()
+        });
+      }
+    });
+
+    socket.on("adminGetChatLogs", async (roomId: string) => {
+      if (!socket.data.userId) return;
+      const admin = await getUserById(socket.data.userId);
+      if (!admin || !admin.isAdmin) return;
+
+      const state = engine.rooms.get(roomId);
+      if (state) {
+        socket.emit("adminChatLogs", { roomId, logs: state.messages });
+      }
+    });
+
+    socket.on("adminDeleteRoom", async (roomId: string) => {
+      if (!socket.data.userId) return;
+      const admin = await getUserById(socket.data.userId);
+      if (!admin || !admin.isAdmin) return;
+
+      engine.deleteRoom(roomId);
+      console.log(`Admin ${admin.username} deleted room ${roomId}`);
+      io.emit("adminBroadcast", {
+        message: `Admin closed room: ${roomId}`,
+        sender: "System",
+        timestamp: Date.now()
+      });
+    });
+
+    socket.on("adminClearRedis", async () => {
+      if (!socket.data.userId) return;
+      const admin = await getUserById(socket.data.userId);
+      if (!admin || !admin.isAdmin) return;
+
+      await engine.clearAllRedisRooms();
+      console.log(`Admin ${admin.username} purged all Redis room data`);
+      socket.emit("adminClearRedisSuccess", "Successfully purged all Redis room state.");
     });
 
     socket.on("disconnect", async () => {

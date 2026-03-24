@@ -493,13 +493,19 @@ export default function App() {
 
   return (
     <div
-      className={cn("h-[100dvh] bg-base flex flex-col bg-texture relative overflow-hidden", isDiscord && isMobile ? "pt-12" : "")}
+      className={cn(
+        "h-[100dvh] bg-base flex flex-col bg-texture relative overflow-hidden",
+        isDiscord && isMobile ? "pt-12" : "",
+        user?.activeBackground === 'bg-nebula-void' && "bg-nebula-void"
+      )}
       data-theme={isLightMode ? "light" : "dark"}
       style={{
-        backgroundImage: `url("${getProxiedUrl(getBackgroundTexture(user?.activeBackground))}")`
+        backgroundImage: user?.activeBackground === 'bg-nebula-void' 
+          ? 'none' 
+          : `url("${getProxiedUrl(getBackgroundTexture(user?.activeBackground))}")`
       }}
     >
-      <div className="absolute inset-0 pointer-events-none bg-vignette z-0" />
+      <div className="absolute inset-0 pointer-events-none bg-vignette z-[5] flex items-center justify-center" />
       
       <div className="relative z-10 flex flex-col h-full w-full">
         <UpdateBanner visible={updateAvailable} />

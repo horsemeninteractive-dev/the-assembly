@@ -14,7 +14,7 @@
 import { randomUUID } from "crypto";
 import { Server, Socket } from "socket.io";
 import {
-  GameState, Player, Policy, ExecutiveAction, TitleRole, TitleAbilityData, GamePhase, UserInternal, RecentlyPlayedEntry,
+  GameState, Player, Policy, ExecutiveAction, TitleRole, TitleAbilityData, GamePhase, UserInternal, RecentlyPlayedEntry, SystemConfig,
 } from "../src/types.ts";
 import { shuffle, createDeck } from "./utils.ts";
 import { AI_BOTS, CHAT } from "./aiConstants.ts";
@@ -46,7 +46,10 @@ import { stateClient, roomKey, ROOM_TTL_SECONDS, isRedisConfigured } from "./red
 // Types
 // ---------------------------------------------------------------------------
 
-export type Deps = { io: Server };
+export type Deps = { 
+  io: Server;
+  getConfig: () => SystemConfig;
+};
 
 
 // ---------------------------------------------------------------------------
@@ -88,6 +91,7 @@ function ensureDeckHas(s: GameState, n: number): void {
 export class GameEngine {
   private io: Server;
   readonly rooms: Map<string, GameState> = new Map();
+  private getConfig: () => SystemConfig;
 
   /** One action-timeout handle per room. */
   private actionTimers: Map<string, ReturnType<typeof setTimeout>>  = new Map();
@@ -96,8 +100,9 @@ export class GameEngine {
   /** Lobby countdown handles (kept for API compatibility). */
   private lobbyTimers:  Map<string, ReturnType<typeof setInterval>> = new Map();
 
-  constructor({ io }: Deps) {
+  constructor({ io, getConfig }: Deps) {
     this.io = io;
+    this.getConfig = getConfig;
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -127,18 +132,18 @@ export class GameEngine {
         // At game over, everyone sees everything
         if (isGameOver) return { ...rest, role, titleRole, personalAgenda };
         
-        // Spectators see all roles
-        if (isSpectator) return { ...rest, role, titleRole, personalAgenda };
+        // Admins and Spectators see all roles
+        if (socket.data?.isAdmin || isSpectator) return { ...rest, role, titleRole, personalAgenda };
         
-        // Active players see ONLY their own secret info
+        // Active players see ONLY their own secret info (and haven't handled and/or at game over)
         if (p.id === socketId) return { ...rest, role, titleRole, personalAgenda };
         
         // Otherwise, hide secret info
         return rest;
       });
 
-      // Tailor spectatorRoles: only sent to spectators or at game over
-      const tailoredSpectatorRoles = (isSpectator || isGameOver) 
+      // Tailor spectatorRoles: only sent to spectators/admins or at game over
+      const tailoredSpectatorRoles = (isSpectator || socket.data?.isAdmin || isGameOver) 
         ? Object.fromEntries(
             state.players.map(p => [
               p.id,
@@ -193,12 +198,22 @@ export class GameEngine {
   }
 
   /** Remove a room from the in-memory map and Redis. */
-  private deleteRoom(roomId: string): void {
+  public deleteRoom(roomId: string): void {
     this.rooms.delete(roomId);
     if (isRedisConfigured && stateClient) {
       stateClient.del(roomKey(roomId)).catch(err =>
         console.error(`[Redis] failed to delete room ${roomId}:`, err.message)
       );
+    }
+  }
+
+  /** Clear all room keys from Redis. */
+  public async clearAllRedisRooms(): Promise<void> {
+    if (!isRedisConfigured || !stateClient) return;
+    const keys = await stateClient.keys("room:*");
+    if (keys.length > 0) {
+      await stateClient.del(...keys);
+      console.log(`[Redis] Purged ${keys.length} stale room(s).`);
     }
   }
 
@@ -1691,6 +1706,8 @@ export class GameEngine {
     for (const p of humanPlayers) {
       const user = userMap.get(p.userId!);
       if (!user) continue;
+      const oldXp = user.stats.xp;
+      const oldIp = user.stats.points;
 
       user.stats.gamesPlayed++;
       if      (p.role === "Civil")    user.stats.civilGames++;
@@ -1770,11 +1787,27 @@ export class GameEngine {
         user.cabinetPoints = (user.cabinetPoints ?? 0) + achievementCp;
       }
 
+      const config = this.getConfig();
+      const xpMult = config.xpMultiplier || 1.0;
+      const ipMult = config.ipMultiplier || 1.0;
+
+      const baseIp        = won ? (s.mode === "Ranked" ? 100 : 40) : (s.mode === "Ranked" ? 25 : 10);
+      const agendaIp      = agendaCompleted ? (s.mode === "Ranked" ? 40 : 20) : 0;
+      const agendaXp      = agendaCompleted ? 100 : 0;
+
+      const totalMatchXp = Math.floor((xpGain + agendaXp + achievementXp) * xpMult);
+      const totalMatchIp = Math.floor((baseIp + agendaIp) * ipMult);
+
+      // We already added raw xpGain/points/achievementXp to user stats above, 
+      // but we need to adjust them for the multiplier.
+      // Re-calculating the final state values:
+      user.stats.xp = oldXp + totalMatchXp;
+      user.stats.points = oldIp + totalMatchIp;
+
       const eloAfter      = user.stats.elo;
       const eloBeforeCalc = eloAfter - eloChange;
-      const baseIp        = won ? (s.mode === "Ranked" ? 100 : 40) : (s.mode === "Ranked" ? 25 : 10);
-      const xpEarned      = xpGain + (agendaCompleted ? 100 : 0) + achievementXp;
-      const ipEarned      = baseIp + (agendaCompleted ? (s.mode === "Ranked" ? 40 : 20) : 0);
+      const xpEarned      = totalMatchXp;
+      const ipEarned      = totalMatchIp;
       const cpEarned      = achievementCp;
 
       results.push({
