@@ -572,10 +572,12 @@ export function registerRoutes(
           );
           averageElo = Math.round(elos.reduce((a, b) => a + b, 0) / elos.length);
         }
+        const host = state.players.find(p => p.userId === state.hostUserId) || state.players[0];
         return {
           id,
           name:          state.roomId,
           playerCount:   state.players.length,
+          spectatorCount: state.spectators.length,
           maxPlayers:    state.maxPlayers,
           phase:         state.phase,
           actionTimer:   state.actionTimer,
@@ -584,6 +586,7 @@ export function registerRoutes(
           averageElo,
           privacy:       state.privacy ?? 'public',
           isLocked:      state.isLocked ?? false,
+          hostName:      host?.name || "Unknown",
         } as RoomInfo;
       })
     );

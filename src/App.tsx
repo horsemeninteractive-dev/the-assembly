@@ -22,6 +22,7 @@ import { Capacitor } from '@capacitor/core';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { Browser } from '@capacitor/browser';
 import * as aiSpeech from './services/aiSpeech';
+import { Megaphone, X } from 'lucide-react';
 
 const CLIENT_VERSION = 'v0.9.8';
 
@@ -49,6 +50,7 @@ export default function App() {
   const [pendingInvite, setPendingInvite] = useState<{ fromUsername: string; roomId: string } | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
   const [pendingFriendRequest, setPendingFriendRequest] = useState<{ fromUserId: string; fromUsername: string } | null>(null);
+  const [adminBroadcast, setAdminBroadcast] = useState<{ message: string; sender: string } | null>(null);
 
   const handleDiscordAutoJoin = (roomId: string, currentUser: User) => {
     console.log("Auto-joining Discord instance room:", roomId);
@@ -378,6 +380,11 @@ export default function App() {
         }
       } catch { /* non-critical */ }
     });
+    socket.on('adminBroadcast', (data: { message: string; sender: string }) => {
+      setAdminBroadcast(data);
+      playSound('notification');
+      setTimeout(() => setAdminBroadcast(null), 10000); // Hide after 10s
+    });
     return () => {
       socket.off('gameStateUpdate');
       socket.off('privateInfo');
@@ -699,6 +706,31 @@ export default function App() {
             onDeny={() => setPendingFriendRequest(null)}
           />
         )}
+
+        <AnimatePresence>
+          {adminBroadcast && (
+            <motion.div
+              initial={{ opacity: 0, y: -50, scale: 0.9 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              className="fixed top-20 left-1/2 -translate-x-1/2 z-[10000] w-full max-w-md px-4"
+            >
+              <div className="bg-yellow-900/90 border-2 border-yellow-500 text-yellow-100 rounded-3xl p-6 shadow-2xl backdrop-blur-xl flex gap-4 items-start">
+                <div className="w-12 h-12 rounded-2xl bg-yellow-500/20 flex items-center justify-center border border-yellow-500/30 shrink-0">
+                  <Megaphone className="w-6 h-6 text-yellow-500" />
+                </div>
+                <div className="flex-1">
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-yellow-500/70">System Announcement</span>
+                    <button onClick={() => setAdminBroadcast(null)} className="text-yellow-500/50 hover:text-yellow-500"><X className="w-4 h-4" /></button>
+                  </div>
+                  <p className="text-sm font-serif italic mb-2 leading-relaxed">"{adminBroadcast.message}"</p>
+                  <div className="text-[9px] font-mono text-yellow-500/50 uppercase tracking-widest text-right">— {adminBroadcast.sender}</div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </div>
   );

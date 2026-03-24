@@ -952,6 +952,46 @@ async function startServer() {
       });
     });
 
+    // ── Admin Tools ────────────────────────────────────────────────────────
+
+    socket.on("adminDeleteRoom", async (roomId: string) => {
+      if (!socket.data.userId) return;
+      const user = await getUserById(socket.data.userId);
+      if (!user || !user.isAdmin) {
+        socket.emit("error", "Unauthorized: Admin privileges required.");
+        return;
+      }
+
+      const state = engine.rooms.get(roomId);
+      if (state) {
+        state.log.push("This room has been terminated by an administrator.");
+        engine.broadcastState(roomId);
+        
+        // Give players a moment to see the message before closing
+        setTimeout(() => {
+          io.to(roomId).emit("kicked");
+          engine.rooms.delete(roomId);
+          console.log(`Admin ${user.username} deleted room ${roomId}`);
+        }, 2000);
+      }
+    });
+
+    socket.on("adminBroadcast", async (message: string) => {
+      if (!socket.data.userId) return;
+      const user = await getUserById(socket.data.userId);
+      if (!user || !user.isAdmin) {
+        socket.emit("error", "Unauthorized: Admin privileges required.");
+        return;
+      }
+
+      io.emit("adminBroadcast", { 
+        message, 
+        sender: user.username,
+        timestamp: Date.now()
+      });
+      console.log(`Admin ${user.username} broadcast: ${message}`);
+    });
+
     socket.on("disconnect", async () => {
       if (socket.data.userId) {
         const userId = socket.data.userId;

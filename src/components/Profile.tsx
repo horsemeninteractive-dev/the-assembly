@@ -10,6 +10,7 @@ import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../constants';
 import { getLevelFromXp, getXpForNextLevel, getXpInCurrentLevel, getTotalXpForLevel } from '../lib/xp';
 import { getRankTier, getRankLabel } from '../lib/ranks';
 import { ACHIEVEMENT_DEFS, ACHIEVEMENT_MAP } from '../lib/achievements';
+import { AdminTools } from './AdminTools';
 
 interface ProfileProps {
   user: User;
@@ -48,7 +49,7 @@ interface ProfileProps {
 }
 
 export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase, onUpdateUser, token, playSound, playMusic, stopMusic, settings, roomId, onJoinRoom, mode }) => {
-  const [activeTab, setActiveTab] = useState<'stats' | 'shop' | 'settings' | 'pass' | 'friends' | 'inventory' | 'history' | 'achievements'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'shop' | 'settings' | 'pass' | 'friends' | 'inventory' | 'history' | 'achievements' | 'admin'>('stats');
   const [shopCategory, setShopCategory] = useState<'frame' | 'policy' | 'vote' | 'music' | 'sound' | 'background'>('frame');
   const [settingsTab, setSettingsTab] = useState<'general' | 'audio' | 'voice'>('general');
   const [isLoading, setIsLoading] = useState(false);
@@ -454,7 +455,8 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
             { id: 'pass', label: 'Pass' },
             { id: 'friends', label: 'Friends' },
             { id: 'history', label: 'History' },
-            { id: 'settings', label: 'Settings' }
+            { id: 'settings', label: 'Settings' },
+            ...(user.isAdmin ? [{ id: 'admin', label: 'Admin' }] : [])
           ].map((tab) => (
             <button 
               key={tab.id}
@@ -720,6 +722,8 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
               playPreview={playPreview}
               playingItemId={playingItemId}
             />
+          ) : activeTab === 'admin' ? (
+            <AdminTools />
           ) : activeTab === 'shop' ? (
             <div className="space-y-8">
               {error && (

@@ -296,7 +296,7 @@ export const PlayerCard = React.memo(({
           return (
             <button
               onClick={(e) => { e.stopPropagation(); playSound('click'); socket.emit('useTitleAbility', { use: true, role: 'Assassin', targetId: p.id }); }}
-              className="absolute inset-0 z-30 bg-red-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1 opacity-0 hover:opacity-100 transition-opacity"
+              className="absolute inset-0 z-30 bg-red-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
             >
               Execute
             </button>
@@ -307,7 +307,7 @@ export const PlayerCard = React.memo(({
             return (
               <button
                 onClick={(e) => { e.stopPropagation(); playSound('click'); socket.emit('useTitleAbility', { use: true, role: 'Interdictor', targetId: p.id }); }}
-                className="absolute inset-0 z-30 bg-purple-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1 opacity-0 hover:opacity-100 transition-opacity"
+                className="absolute inset-0 z-30 bg-purple-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
               >
                 Detain
               </button>

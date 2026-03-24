@@ -36,6 +36,7 @@ function mapSupabaseToUser(data: any): UserInternal {
     recentlyPlayedWith: data.recently_played_with || [],
     googleId:          data.google_id,
     discordId:         data.discord_id,
+    isAdmin:           data.is_admin,
   } as UserInternal;
 }
 
@@ -59,6 +60,7 @@ function mapUserToSupabase(userData: UserInternal): Record<string, unknown> {
     recently_played_with:   userData.recentlyPlayedWith || [],
     google_id:        userData.googleId,
     discord_id:       userData.discordId,
+    is_admin:         userData.isAdmin,
     stats:            userData.stats,
   };
 }

@@ -180,6 +180,7 @@ export interface User {
   earnedAchievements: Achievement[];
   pinnedAchievements: string[]; // up to 3 achievement IDs
   recentlyPlayedWith: RecentlyPlayedEntry[]; // up to 20 entries, most recent first
+  isAdmin?: boolean;
 }
 
 export interface UserInternal extends User {
@@ -202,6 +203,8 @@ export interface RoomInfo {
   averageElo?: number;
   privacy: RoomPrivacy;
   isLocked?: boolean;
+  hostName?: string;
+  spectatorCount?: number;
 }
 
 export type AIPersonality = 'Honest' | 'Deceptive' | 'Chaotic' | 'Strategic' | 'Aggressive';
@@ -367,6 +370,7 @@ export interface ServerToClientEvents {
   queueDrained: () => void;
   postMatchResult: (result: PostMatchResult) => void;
   kicked: (reason?: string) => void;
+  adminBroadcast: (data: { message: string; sender: string; timestamp: number }) => void;
 }
 
 export interface ClientToServerEvents {
@@ -397,4 +401,6 @@ export interface ClientToServerEvents {
   toggleLock: () => void;
   hostStartGame: () => void;
   updateMediaState: (data: { isMicOn: boolean; isCamOn: boolean }) => void;
+  adminDeleteRoom: (roomId: string) => void;
+  adminBroadcast: (message: string) => void;
 }
