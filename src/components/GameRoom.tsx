@@ -24,8 +24,6 @@ import { DeclarationModal } from './game/modals/DeclarationModal';
 import { PlayerProfileModal } from './game/modals/PlayerProfileModal';
 import { GameReferencePanel } from './game/GameReferencePanel';
 
-const CLIENT_VERSION = 'v0.9.8';
-
 interface GameRoomProps {
   gameState: GameState;
   privateInfo: PrivateInfo | null;

@@ -7,6 +7,7 @@ import { cn, getProxiedUrl, apiUrl } from '../lib/utils';
 import { getFrameStyles } from '../lib/cosmetics';
 import { LeaderboardModal } from './game/modals/LeaderboardModal';
 import { HowToPlayModal } from './HowToPlayModal';
+import { CLIENT_VERSION } from '../constants';
 
 
 interface LobbyProps {
@@ -174,7 +175,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
             <div className="min-w-0">
               <div className="flex items-baseline gap-2">
                 <h1 className="text-responsive-sm sm:text-responsive-xl font-thematic text-primary tracking-wide leading-none truncate">The Assembly</h1>
-                <span className="text-[8px] font-mono text-red-500/60 border border-red-900/40 rounded px-1 py-0.5 leading-none shrink-0">v0.9.8</span>
+                <span className="text-[8px] font-mono text-red-500/60 border border-red-900/40 rounded px-1 py-0.5 leading-none shrink-0">{CLIENT_VERSION}</span>
               </div>
               <p className="text-responsive-xs uppercase tracking-widest text-muted font-mono mt-0.5">Assembly Lobby</p>
             </div>

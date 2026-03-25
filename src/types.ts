@@ -165,6 +165,7 @@ export interface CosmeticItem {
 export interface User {
   id: string;
   username: string;
+  email?: string;
   avatarUrl?: string;
   createdAt?: string;
   stats: UserStats;
@@ -186,6 +187,7 @@ export interface User {
 
 export interface UserInternal extends User {
   password?: string;
+  email?: string;
   googleId?: string;
   discordId?: string;
 }

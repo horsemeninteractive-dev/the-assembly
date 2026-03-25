@@ -14,7 +14,7 @@ import { TutorialModal } from './components/TutorialModal';
 import { MUSIC_TRACKS, SOUND_PACKS } from './lib/audio';
 import { DiscordSDK } from "@discord/embedded-app-sdk";
 import { discordSdk, setupDiscordSdk } from './lib/discord';
-import { DISCORD_CLIENT_ID } from './constants';
+import { DISCORD_CLIENT_ID, CLIENT_VERSION } from './constants';
 import { cn, getProxiedUrl, apiUrl } from './lib/utils';
 import { PurchaseCPModal } from './components/PurchaseCPModal';
 import { App as CapApp } from '@capacitor/app';
@@ -23,8 +23,6 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Browser } from '@capacitor/browser';
 import * as aiSpeech from './services/aiSpeech';
 import { Megaphone, X } from 'lucide-react';
-
-const CLIENT_VERSION = 'v0.9.8';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -72,7 +70,7 @@ export default function App() {
     const init = async () => {
       try {
         setLoading(true);
-        console.log("App initialization started [v0.9.7]. Initial detection - isDiscord:", isDiscord, "isMobile:", isMobile);
+        console.log(`App initialization started [${CLIENT_VERSION}]. Initial detection - isDiscord:`, isDiscord, "isMobile:", isMobile);
         
         await setupDiscordSdk();
         const instanceId = discordSdk?.instanceId;

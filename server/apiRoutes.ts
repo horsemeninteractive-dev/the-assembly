@@ -8,12 +8,14 @@ import axios from "axios";
 import { GameEngine } from "./gameEngine.ts";
 import rateLimit from "express-rate-limit";
 import { GameState, RoomInfo, UserInternal } from "../src/types.ts";
+import nodemailer from "nodemailer";
 import { DEFAULT_ITEMS } from "../src/constants.ts";
 import {
   getUser,
   getUserById,
   getUserByGoogleId,
   getUserByDiscordId,
+  getUserByEmail,
   saveUser,
   makeNewUser,
   getFriends,
@@ -29,9 +31,22 @@ import {
   getLeaderboard,
   getSystemConfig,
   updateSystemConfig,
+  createPasswordResetToken,
+  verifyPasswordResetToken,
+  deletePasswordResetTokens,
   db,
   isConfigured,
 } from "./supabaseService.ts";
+
+const transporter = process.env.EMAIL_USER && process.env.EMAIL_PASS 
+  ? nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
+      },
+    })
+  : null;
 
 const JWT_SECRET = process.env.JWT_SECRET;
 if (!JWT_SECRET) throw new Error("JWT_SECRET env variable is not set");
@@ -209,10 +224,13 @@ export function registerRoutes(
   // ── Auth ──────────────────────────────────────────────────────────────────
 
   app.post("/api/register", async (req: Request, res: Response) => {
-    const { username, password, avatarUrl } = req.body;
+    const { username, password, email, avatarUrl } = req.body;
     
     if (!username || typeof username !== 'string' || username.length < 3 || username.length > 20) {
       return res.status(400).json({ error: "Username must be between 3 and 20 characters" });
+    }
+    if (!email || typeof email !== 'string' || !email.includes('@')) {
+      return res.status(400).json({ error: "A valid email address is required for account recovery" });
     }
     if (!password || typeof password !== 'string' || password.length < 8) {
       return res.status(400).json({ error: "Password must be at least 8 characters long" });
@@ -221,12 +239,124 @@ export function registerRoutes(
     if (await getUser(username)) {
       return res.status(400).json({ error: "Username already exists" });
     }
+    if (await getUserByEmail(email)) {
+      return res.status(400).json({ error: "Email already in use" });
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
-    const newUser = makeNewUser({ id: randomUUID(), username, avatarUrl, password: hashedPassword });
+    const newUser = makeNewUser({ id: randomUUID(), username, email, avatarUrl, password: hashedPassword });
     await saveUser(newUser);
     const token = jwt.sign({ username }, JWT_SECRET!, { expiresIn: "30d" });
     const { password: _, ...userWithoutPassword } = newUser as any;
     res.json({ user: userWithoutPassword, token });
+  });
+
+  app.post("/api/auth/forgot-password", async (req: Request, res: Response) => {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: "Email is required" });
+
+    try {
+      const user = await getUserByEmail(email);
+      if (!user) {
+        // Return success even if user not found to prevent account enumeration
+        return res.json({ message: "If an account exists with that email, a reset link has been sent." });
+      }
+
+      if (!transporter) {
+        console.error("[Auth] Nodemailer transporter is not configured");
+        return res.status(500).json({ error: "Email service not configured" });
+      }
+
+      const resetToken = randomUUID();
+      const expiresAt = new Date(Date.now() + 3600000); // 1 hour
+      await createPasswordResetToken(user.id, resetToken, expiresAt);
+
+      const origin = getAppUrl(req);
+      const resetLink = `${origin}/reset-password?token=${resetToken}`;
+
+      await transporter.sendMail({
+        from: `"The Assembly" <${process.env.EMAIL_USER}>`,
+        to: email,
+        subject: 'Reset your Assembly Password',
+        html: `
+          <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; background-color: #0a0a0a; color: white; border: 1px solid #333; border-radius: 12px;">
+            <h1 style="color: #ef4444; text-transform: uppercase; letter-spacing: 2px;">The Assembly</h1>
+            <p>You requested to reset your password. Click the button below to proceed:</p>
+            <a href="${resetLink}" style="display: inline-block; padding: 12px 24px; background-color: #ef4444; color: white; text-decoration: none; border-radius: 6px; font-weight: bold; margin-top: 20px;">Reset Password</a>
+            <p style="margin-top: 30px; font-size: 12px; color: #888;">This link will expire in 1 hour. If you didn't request this, you can safely ignore this email.</p>
+          </div>
+        `
+      });
+
+      res.json({ message: "If an account exists with that email, a reset link has been sent." });
+    } catch (err: any) {
+      console.error("[Auth] Forgot password error:", err);
+      res.status(500).json({ error: "Failed to process request" });
+    }
+  });
+
+  app.post("/api/auth/reset-password", async (req: Request, res: Response) => {
+    const { token, newPassword } = req.body;
+    if (!token || !newPassword || newPassword.length < 8) {
+      return res.status(400).json({ error: "Invalid request or password too short" });
+    }
+
+    try {
+      const userId = await verifyPasswordResetToken(token);
+      if (!userId) {
+        return res.status(400).json({ error: "Invalid or expired reset token" });
+      }
+
+      const user = await getUserById(userId);
+      if (!user) return res.status(404).json({ error: "User not found" });
+
+      const hashedPassword = await bcrypt.hash(newPassword, 10);
+      user.password = hashedPassword;
+      await saveUser(user);
+      await deletePasswordResetTokens(userId);
+
+      res.json({ message: "Password reset successful. You can now login with your new password." });
+    } catch (err: any) {
+      console.error("[Auth] Reset password error:", err);
+      res.status(500).json({ error: "Failed to reset password" });
+    }
+  });
+
+  app.post("/api/user/update-email", async (req: Request, res: Response) => {
+    try {
+      const authHeader = req.headers.authorization;
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return res.status(401).json({ error: "Unauthorized" });
+      }
+
+      const token = authHeader.split(" ")[1];
+      const decoded = jwt.verify(token, JWT_SECRET!) as { username: string };
+      const user = await getUser(decoded.username);
+
+      if (!user) return res.status(404).json({ error: "User not found" });
+
+      const { email } = req.body;
+      if (!email || !email.includes('@')) {
+        return res.status(400).json({ error: "Invalid email address" });
+      }
+
+      // Check if email is already taken
+      const existingUser = await getUserByEmail(email);
+      if (existingUser && existingUser.id !== user.id) {
+        return res.status(400).json({ error: "Email already in use" });
+      }
+
+      user.email = email;
+      await saveUser(user);
+
+      const { password: _, ...safe } = user as any;
+      res.json({ success: true, user: safe });
+    } catch (err: any) {
+      console.error("[User] Update email error:", err);
+      if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
+        return res.status(401).json({ error: "Session expired, please login again" });
+      }
+      res.status(500).json({ error: "Internal server error" });
+    }
   });
 
   app.post("/api/login", async (req: Request, res: Response) => {

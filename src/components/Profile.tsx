@@ -66,6 +66,9 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState(user.username);
   const [isSavingName, setIsSavingName] = useState(false);
+  const [isEditingEmail, setIsEditingEmail] = useState(false);
+  const [newEmail, setNewEmail] = useState(user.email || '');
+  const [isSavingEmail, setIsSavingEmail] = useState(false);
 
   const handleUpdateUsername = async () => {
     if (!newName || newName === user.username) {
@@ -114,6 +117,37 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
       setError(err.message);
     } finally {
       setIsSavingName(false);
+    }
+  };
+  
+  const handleUpdateEmail = async () => {
+    if (!newEmail || newEmail === user.email) {
+      setIsEditingEmail(false);
+      return;
+    }
+    if (!newEmail.includes('@')) {
+      setError('Invalid email address');
+      return;
+    }
+    setIsSavingEmail(true);
+    setError('');
+    try {
+      const res = await fetch(apiUrl('/api/user/update-email'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ email: newEmail }),
+      });
+      
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Update failed");
+      
+      onUpdateUser(data.user);
+      setIsEditingEmail(false);
+      playSound('election_passed');
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setIsSavingEmail(false);
     }
   };
 
@@ -1052,6 +1086,57 @@ export const Profile: React.FC<ProfileProps> = ({ user, onClose, onOpenPurchase,
                         className="w-full accent-red-900" 
                       />
                       <p className="text-[10px] font-mono text-ghost uppercase">Adjusts the overall interface size</p>
+                    </div>
+                    <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-3">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <span className="text-sm font-mono text-primary">Recovery Email</span>
+                          <p className="text-[10px] font-mono text-muted uppercase mt-0.5">Used for password recovery</p>
+                        </div>
+                        {!isEditingEmail && (
+                          <button 
+                            onClick={() => { playSound('click'); setIsEditingEmail(true); }}
+                            className="p-1.5 rounded-lg bg-white/5 border border-default text-ghost hover:text-primary transition-all"
+                          >
+                            <Pencil className="w-3.5 h-3.5" />
+                          </button>
+                        )}
+                      </div>
+                      
+                      {isEditingEmail ? (
+                        <div className="flex items-center gap-2 animate-in fade-in slide-in-from-top-1">
+                          <input
+                            autoFocus
+                            type="email"
+                            value={newEmail}
+                            onChange={(e) => setNewEmail(e.target.value)}
+                            placeholder="Enter recovery email"
+                            onKeyDown={(e) => e.key === 'Enter' && handleUpdateEmail()}
+                            className="flex-1 bg-card border border-primary text-primary px-3 py-1.5 rounded-lg text-sm font-mono focus:outline-none"
+                            disabled={isSavingEmail}
+                          />
+                          <button 
+                            onClick={handleUpdateEmail}
+                            disabled={isSavingEmail}
+                            className="p-2 rounded-lg bg-emerald-900/20 border border-emerald-500/30 text-emerald-400 hover:bg-emerald-900/40"
+                          >
+                            {isSavingEmail ? <Clock className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
+                          </button>
+                          <button 
+                            onClick={() => { setIsEditingEmail(false); setNewEmail(user.email || ''); }}
+                            className="p-2 rounded-lg bg-red-900/20 border border-red-500/30 text-red-500 hover:bg-red-900/40"
+                            disabled={isSavingEmail}
+                          >
+                            <X className="w-4 h-4" />
+                          </button>
+                        </div>
+                      ) : (
+                        <div className="bg-card border border-default px-3 py-2 rounded-xl">
+                          <span className={cn("text-xs font-mono", user.email ? "text-primary" : "text-red-400 italic")}>
+                            {user.email || "Not set — recovery unavailable"}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </>
                 )}

@@ -1,5 +1,7 @@
 import { CosmeticItem } from './types';
 
+export const CLIENT_VERSION = 'v0.9.8';
+
 export const DISCORD_CLIENT_ID = "1477796608883294269";
 
 export const DEFAULT_ITEMS: CosmeticItem[] = [

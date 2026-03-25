@@ -20,6 +20,7 @@ function mapSupabaseToUser(data: any): UserInternal {
 
   return {
     ...data,
+    email:             data.email,
     stats: data.stats || {},
     createdAt:         data.created_at,
     avatarUrl:         data.avatar_url,
@@ -46,6 +47,7 @@ function mapUserToSupabase(userData: UserInternal): Record<string, unknown> {
   return {
     id:               userData.id,
     username:         userData.username,
+    email:            userData.email,
     password:         userData.password,
     avatar_url:       userData.avatarUrl,
     owned_cosmetics:  userData.ownedCosmetics,
@@ -244,6 +246,57 @@ export async function getUserByDiscordId(discordId: string): Promise<UserInterna
     if (u.discordId === discordId) return u;
   }
   return null;
+}
+
+export async function getUserByEmail(email: string): Promise<UserInternal | null> {
+  if (isConfigured) {
+    const { data, error } = await db
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
+    if (error) return null;
+    return mapSupabaseToUser(data);
+  }
+  for (const u of users.values()) {
+    if (u.email === email) return u;
+  }
+  return null;
+}
+
+// ---------------------------------------------------------------------------
+// Password Reset operations
+// ---------------------------------------------------------------------------
+
+export async function createPasswordResetToken(userId: string, token: string, expiresAt: Date): Promise<void> {
+  if (isConfigured) {
+    await db.from("password_resets").insert({
+      user_id: userId,
+      token,
+      expires_at: expiresAt.toISOString(),
+    });
+  }
+}
+
+export async function verifyPasswordResetToken(token: string): Promise<string | null> {
+  if (isConfigured) {
+    const { data, error } = await db
+      .from("password_resets")
+      .select("user_id")
+      .eq("token", token)
+      .gt("expires_at", new Date().toISOString())
+      .single();
+    
+    if (error || !data) return null;
+    return data.user_id;
+  }
+  return null;
+}
+
+export async function deletePasswordResetTokens(userId: string): Promise<void> {
+  if (isConfigured) {
+    await db.from("password_resets").delete().eq("user_id", userId);
+  }
 }
 
 // ---------------------------------------------------------------------------
