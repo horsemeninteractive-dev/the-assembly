@@ -673,6 +673,9 @@ async function startServer() {
         );
         if (alreadyDeclared) return;
 
+        // Remove any existing declaration of the same title (President/Chancellor)
+        state.declarations = state.declarations.filter(d => d.type !== data.type);
+
         state.declarations.push({
           playerId: player.id,
           playerName: player.name,
@@ -1141,7 +1144,7 @@ async function startServer() {
     }));
 
     app.get('/version', (req, res) => {
-      res.json({ version: 'v0.9.8' });
+      res.json({ version: 'v0.9.9' });
     });
 
     app.get("*", (_req, res) => {

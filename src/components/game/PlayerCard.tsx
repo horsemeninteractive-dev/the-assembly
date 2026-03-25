@@ -131,6 +131,60 @@ export const PlayerCard = React.memo(({
         </div>
       )}
 
+      {/* Declaration Indicators */}
+      {(() => {
+        const playerDecls = gameState.declarations.filter(d => d.playerId === p.id);
+        const presDecl = playerDecls.find(d => d.type === 'President');
+        const chanDecl = playerDecls.find(d => d.type === 'Chancellor');
+        if (!presDecl && !chanDecl) return null;
+
+        return (
+          <div className="absolute bottom-1.5 left-1.5 z-20 flex flex-col gap-1 pointer-events-none scale-[0.85] origin-bottom-left">
+            {presDecl && (
+              <div className="flex flex-col gap-1">
+                {/* Drawn Row */}
+                <div className="flex items-center gap-1 group/decl">
+                  <span className="text-[7px] font-mono font-bold text-yellow-500 w-2 shrink-0">D</span>
+                  <div className="flex gap-0.5">
+                    {[...Array(presDecl.drewCiv ?? 0)].map((_, i) => (
+                      <div key={`dc-${i}`} className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-blue-500/40 border border-blue-500/60 shadow-[0_0_4px_rgba(59,130,246,0.3)]" />
+                    ))}
+                    {[...Array(presDecl.drewSta ?? 0)].map((_, i) => (
+                      <div key={`ds-${i}`} className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-red-500/40 border border-red-500/60 shadow-[0_0_4px_rgba(239,68,68,0.3)]" />
+                    ))}
+                  </div>
+                </div>
+                {/* Passed Row */}
+                <div className="flex items-center gap-1 group/decl">
+                  <span className="text-[7px] font-mono font-bold text-yellow-500 w-2 shrink-0">P</span>
+                  <div className="flex gap-0.5">
+                    {[...Array(presDecl.civ ?? 0)].map((_, i) => (
+                      <div key={`pc-${i}`} className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-blue-500/40 border border-blue-500/60 shadow-[0_0_4px_rgba(59,130,246,0.3)]" />
+                    ))}
+                    {[...Array(presDecl.sta ?? 0)].map((_, i) => (
+                      <div key={`ps-${i}`} className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-red-500/40 border border-red-500/60 shadow-[0_0_4px_rgba(239,68,68,0.3)]" />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            )}
+            {chanDecl && (
+              <div className="flex items-center gap-1 group/decl">
+                <span className="text-[7px] font-mono font-bold text-blue-400 w-2 shrink-0">R</span>
+                <div className="flex gap-0.5">
+                  {[...Array(chanDecl.civ ?? 0)].map((_, i) => (
+                    <div key={`cc-${i}`} className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-blue-500/40 border border-blue-500/60 shadow-[0_0_4px_rgba(59,130,246,0.3)]" />
+                  ))}
+                  {[...Array(chanDecl.sta ?? 0)].map((_, i) => (
+                    <div key={`cs-${i}`} className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-red-500/40 border border-red-500/60 shadow-[0_0_4px_rgba(239,68,68,0.3)]" />
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       {speakingPlayers[p.id] && (
         <div className="absolute inset-0 pointer-events-none rounded-xl shadow-[inset_0_0_20px_rgba(16,185,129,0.4)] border border-emerald-500/50 z-20" />
       )}

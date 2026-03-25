@@ -559,13 +559,7 @@ export class GameEngine {
         if (chancellor?.isAI) {
           if (s.chancellorPolicies.length > 0) {
             this.aiChancellorPlay(s, roomId);
-          } else {
-            // Already played, but maybe hasn't declared.
-            this.autoDeclareMissing(s, roomId);
           }
-        } else {
-          // President might be AI and need to declare even if Chancellor is human
-          this.autoDeclareMissing(s, roomId);
         }
         break;
       }
@@ -772,7 +766,6 @@ export class GameEngine {
    */
   private beginNomination(state: GameState, roomId: string): void {
     this.resetPlayerActions(state);
-    state.declarations       = [];
     state.presidentTimedOut  = false;
     state.chancellorTimedOut = false;
     state.drawnPolicies      = [];
@@ -892,6 +885,7 @@ export class GameEngine {
 
     // Show the reveal for 4 seconds, then process the result
     s.actionTimerEnd = Date.now() + 4000;
+    s.declarations = [];
     this.enterPhase(s, roomId, "Voting_Reveal");
 
     setTimeout(async () => {
@@ -1124,6 +1118,9 @@ export class GameEngine {
     s: GameState, roomId: string, player: Player, type: "President" | "Chancellor",
   ): void {
     if (s.declarations.some(d => d.playerId === player.id && d.type === type)) return;
+    
+    // Remove any existing declaration of the same title (President/Chancellor)
+    s.declarations = s.declarations.filter(d => d.type !== type);
 
     const saw     = s.chancellorSaw ?? [];
     const drew    = s.presidentSaw  ?? [];

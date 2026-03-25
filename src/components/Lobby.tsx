@@ -7,6 +7,7 @@ import { cn, getProxiedUrl, apiUrl } from '../lib/utils';
 import { getFrameStyles } from '../lib/cosmetics';
 import { LeaderboardModal } from './game/modals/LeaderboardModal';
 import { HowToPlayModal } from './HowToPlayModal';
+import { CreditsModal } from './game/modals/CreditsModal';
 import { CLIENT_VERSION } from '../constants';
 
 
@@ -31,12 +32,13 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
   const [isCreating, setIsCreating] = useState(false);
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
+  const [isCreditsOpen, setIsCreditsOpen] = useState(false);
 
   useEffect(() => {
-    if (isCreating || isLeaderboardOpen || isHowToPlayOpen) {
+    if (isCreating || isLeaderboardOpen || isHowToPlayOpen || isCreditsOpen) {
       playSound('modal_open');
     }
-  }, [isCreating, isLeaderboardOpen, isHowToPlayOpen]);
+  }, [isCreating, isLeaderboardOpen, isHowToPlayOpen, isCreditsOpen]);
   const [pendingRequestCount, setPendingRequestCount] = useState(0);
   const [newRoomName, setNewRoomName] = useState('');
   const [maxPlayers, setMaxPlayers] = useState(5);
@@ -158,7 +160,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
 
   return (
     <div
-      className="flex-1 w-full text-primary font-sans flex flex-col overflow-y-auto custom-scrollbar min-h-0"
+      className="flex-1 w-full text-primary font-sans flex flex-col h-screen overflow-hidden"
     >
       {/* Header */}
       <motion.header 
@@ -344,7 +346,8 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
         </div>
       </motion.header>
 
-      <main className="flex-1 max-w-6xl w-full mx-auto p-[4vw] flex flex-col gap-[4vh]">
+      <main className="flex-1 overflow-y-auto custom-scrollbar">
+        <div className="max-w-6xl w-full mx-auto p-[4vw] flex flex-col gap-[4vh]">
         {/* Actions (Header/Text) & Swing Meter */}
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
@@ -673,8 +676,51 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
         {isLeaderboardOpen && (
           <LeaderboardModal user={user} onClose={() => { playSound('modal_close'); setIsLeaderboardOpen(false); }} />
         )}
-        <HowToPlayModal isOpen={isHowToPlayOpen} onClose={() => { playSound('modal_close'); setIsHowToPlayOpen(false); }} />
+          <HowToPlayModal isOpen={isHowToPlayOpen} onClose={() => { playSound('modal_close'); setIsHowToPlayOpen(false); }} />
+        </div>
       </main>
+
+      {/* Footer Branding */}
+      <footer className="w-full py-6 shrink-0 border-t border-subtle bg-surface-glass backdrop-blur-md sticky bottom-0 z-50 px-[4vw]">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-elevated rounded-lg p-1 border border-subtle">
+              <img 
+                src="https://storage.googleapis.com/secretchancellor/HILogo.png" 
+                alt="Horsemen Interactive" 
+                className="w-full h-full object-contain"
+              />
+            </div>
+            <div>
+              <p className="text-[10px] font-mono text-muted uppercase tracking-widest leading-none">Published by</p>
+              <p className="text-xs font-serif italic text-primary leading-tight">Horsemen Interactive</p>
+            </div>
+          </div>
+          
+          <div className="flex items-center gap-6">
+            <button
+              onMouseEnter={() => playSound('hover')}
+              onClick={() => {
+                playSound('click');
+                setIsCreditsOpen(true);
+              }}
+              className="text-[10px] font-mono text-red-500/80 hover:text-red-400 uppercase tracking-widest transition-colors"
+            >
+              Credits & Legal
+            </button>
+            <div className="w-px h-3 bg-subtle" />
+            <p className="text-[10px] font-mono text-faint uppercase tracking-tighter">
+              © 2026 Horsemen Interactive. All Rights Reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
+
+      <AnimatePresence>
+        {isCreditsOpen && (
+          <CreditsModal onClose={() => setIsCreditsOpen(false)} playSound={playSound} />
+        )}
+      </AnimatePresence>
 
       {/* Invite Code Prompt Modal */}
       <AnimatePresence>
