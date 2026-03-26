@@ -71,7 +71,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
         }
         
         const { code } = await discordSdk!.commands.authorize({
-          client_id: DISCORD_CLIENT_ID,
+          client_id: clientId,
           response_type: "code",
           state: "",
           // Removed prompt: "none" for manual clicks to allow first-time consent
