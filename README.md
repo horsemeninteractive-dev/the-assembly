@@ -1,20 +1,49 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://github.com/user-attachments/assets/0aa67016-6eaf-458a-adb2-6e31a0763ed6" />
-</div>
+# The Assembly
 
-# Run and deploy your AI Studio app
+**The Assembly** is a multiplayer social deduction and strategy engine combining real-time gameplay with intense Discord Activity capabilities. Featuring real-time socket communication, stateful authentication, and a scalable Node.js architecture with Redis pub/sub.
 
-This contains everything you need to run your app locally.
+## 🗂 Project Structure
 
-View your app in AI Studio: https://ai.studio/apps/6bfb28d4-8933-4d91-b7c2-c14ad61d6814
+- **`src/`** — Houses all frontend React/Vite code (UI components, game views, asset loaders, and WebRTC context logic).
+- **`server/`** — Comprises the core backend systems, including the Socket.IO `GameEngine`, REST API routes, Pino structured logger, and authentication schemas.
+- **`server.ts`** — The entry point for the Express backend, binding the HTTP server, Socket.IO instance, and Vite development middleware.
+- **`dist/`** — Contains the optimized and bundled frontend payload, served by the Express backend during production runtime.
 
-## Run Locally
+## 🛠 Local Development Setup
 
-**Prerequisites:**  Node.js
+To test and develop The Assembly locally:
 
+1. **Install Dependencies**  
+   \`\`\`bash
+   npm install
+   \`\`\`
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+2. **Configure Environment Variables**  
+   Copy the example environment template into a working `.env` file at the root.
+   \`\`\`bash
+   cp .env.example .env
+   \`\`\`
+   Fill out the `.env` file with your local instances or service keys (Supabase, Stripe, Google, Discord, Redis, etc.) as listed in `.env.example`.
+
+3. **Run the Development Server**  
+   Start both the backend server and the Vite HMR module simultaneously:
+   \`\`\`bash
+   npm run dev
+   \`\`\`
+   The application will be accessible at [http://localhost:3000](http://localhost:3000).
+
+## 🚀 Build and Deploy
+
+The project follows a standard build procedure that compiles the TypeScript and bundles the assets before being launched via a standalone Node process.
+
+1. **Build for Production**  
+   \`\`\`bash
+   npm run build
+   \`\`\`
+   This command generates the `/dist` directory for the frontend and correctly transpiles the backend dependencies if applicable.
+
+2. **Start the Production Server**  
+   \`\`\`bash
+   npm start
+   \`\`\`
+   This boots the backend Express app exclusively via `server.ts` statically serving the frontend bundle. Ideal for standard container environments (e.g. Docker, GCP Cloud Run).

@@ -83,8 +83,6 @@ export const getBackgroundTexture = (id: string | undefined, isLightMode?: boole
     'default':     'https://www.transparenttextures.com/patterns/carbon-fibre.png',
   };
 
-  // TODO: replace placeholder values with your actual inverted image URLs
-  // once uploaded. Each key matches the dark entry above.
   const light: Record<string, string> = {
     'bg-leather':  'https://storage.googleapis.com/secretchancellor/dark-leather%20(1).png',
     'bg-brushed':  'https://storage.googleapis.com/secretchancellor/brushed-alum%20(1).png',

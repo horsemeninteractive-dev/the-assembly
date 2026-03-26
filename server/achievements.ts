@@ -66,13 +66,8 @@ export function checkAchievements(ctx: AchievementContext): string[] {
   // power_used: this player used their title ability this game
   if (p.titleRole && p.titleUsed) grant('power_used');
 
-  // assassins_mark: Assassin killed someone (they used their ability and game
-  // still had living players — if they killed the Overseer the game ends).
-  if (
-    p.titleRole === 'Assassin' &&
-    p.titleUsed &&
-    (s.winReason === 'OVERSEER ASSASSINATED' || s.players.some(pl => !pl.isAlive && !pl.isAI))
-  ) {
+  // assassins_mark: Assassin killed someone successfully using their ability.
+  if (p.titleRole === 'Assassin' && p.titleUsed && !!p.assassinKilledId) {
     grant('assassins_mark');
   }
 

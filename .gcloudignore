@@ -3,7 +3,6 @@
 .gitignore
 .firebase
 node_modules
-dist
 deploy.ps1
 .env
 *.json
@@ -18,3 +17,7 @@ the-assembly.code-workspace
 .gemini/
 .agent/
 *.zip
+dist/
+android/.gradle/
+android/app/build/
+android/.idea/workspace.xml

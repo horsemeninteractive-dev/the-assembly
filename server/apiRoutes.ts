@@ -1,3 +1,4 @@
+import { logger } from "./logger.ts";
 import { Express, Request, Response, NextFunction } from "express";
 import { Server } from "socket.io";
 import { randomUUID } from "crypto";
@@ -96,18 +97,30 @@ function htmlEscape(str: string): string {
     .replace(/>/g, "&gt;");
 }
 
+async function validateToken(token: string): Promise<UserInternal | null> {
+  if (!token) return null;
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string; tokenVersion?: number };
+    const user = await getUserById(decoded.userId);
+    if (!user) return null;
+    // Critical: check if tokenVersion exists and matches the DB
+    if (decoded.tokenVersion !== undefined && decoded.tokenVersion !== user.tokenVersion) {
+      return null;
+    }
+    return user;
+  } catch (_) {
+    return null;
+  }
+}
+
 async function requireAdmin(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization?.split(" ")[1];
   if (!token) return res.status(401).json({ error: "No token" });
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-    const user = await getUserById(decoded.userId);
-    if (!user || !user.isAdmin) return res.status(403).json({ error: "Forbidden" });
-    (req as any).user = user;
-    next();
-  } catch (err) {
-    res.status(401).json({ error: "Invalid token" });
-  }
+  const user = await validateToken(token);
+  if (!user) return res.status(401).json({ error: "Invalid token" });
+  if (!user.isAdmin) return res.status(403).json({ error: "Forbidden" });
+  (req as any).user = user;
+  next();
 }
 
 /** Safely extracts a message from unknown catch values, including axios errors. */
@@ -164,7 +177,6 @@ function oauthSuccessPage(user: UserInternal, token: string, platform: string = 
   } else {
     window.location.href = '/?token=' + encodeURIComponent(token) + '&user=' + encodeURIComponent(JSON.stringify(user));
   }
-<\/script>
 <\/script>
 <div style="display:flex;flex-direction:column;align-items:center;margin-top:20vh;font-family:sans-serif;color:white;background:#0a0a0a;">
   <p>Authentication successful. Redirecting...</p>
@@ -258,7 +270,7 @@ export function registerRoutes(
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = makeNewUser({ id: randomUUID(), username, email, avatarUrl, password: hashedPassword });
     await saveUser(newUser);
-    const token = jwt.sign({ userId: newUser.id }, JWT_SECRET!, { expiresIn: "30d" });
+    const token = jwt.sign({ userId: newUser.id, tokenVersion: newUser.tokenVersion }, JWT_SECRET!, { expiresIn: "30d" });
     const { password: _, ...userWithoutPassword } = newUser as any;
     res.json({ user: userWithoutPassword, token });
   });
@@ -275,7 +287,7 @@ export function registerRoutes(
       }
 
       if (!transporter) {
-        console.error("[Auth] Nodemailer transporter is not configured");
+        logger.error('Nodemailer transporter is not configured');
         return res.status(500).json({ error: "Email service not configured" });
       }
 
@@ -302,7 +314,7 @@ export function registerRoutes(
 
       res.json({ message: "If an account exists with that email, a reset link has been sent." });
     } catch (err: any) {
-      console.error("[Auth] Forgot password error:", err);
+      logger.error({ err }, 'Forgot password error');
       res.status(500).json({ error: "Failed to process request" });
     }
   });
@@ -324,12 +336,13 @@ export function registerRoutes(
 
       const hashedPassword = await bcrypt.hash(newPassword, 10);
       user.password = hashedPassword;
+      user.tokenVersion = (user.tokenVersion || 0) + 1;
       await saveUser(user);
       await deletePasswordResetTokens(userId);
 
       res.json({ message: "Password reset successful. You can now login with your new password." });
     } catch (err: any) {
-      console.error("[Auth] Reset password error:", err);
+      logger.error({ err }, 'Reset password error');
       res.status(500).json({ error: "Failed to reset password" });
     }
   });
@@ -342,10 +355,9 @@ export function registerRoutes(
       }
 
       const token = authHeader.split(" ")[1];
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
+      const user = await validateToken(token);
 
-      if (!user) return res.status(404).json({ error: "User not found" });
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
 
       const { email } = req.body;
       if (!email || !email.includes('@')) {
@@ -364,7 +376,7 @@ export function registerRoutes(
       const { password: _, ...safe } = user as any;
       res.json({ success: true, user: safe });
     } catch (err: any) {
-      console.error("[User] Update email error:", err);
+      logger.error({ err }, 'Update email error');
       if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
         return res.status(401).json({ error: "Session expired, please login again" });
       }
@@ -378,18 +390,28 @@ export function registerRoutes(
     if (!user || !user.password || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
-    const token = jwt.sign({ userId: user.id }, JWT_SECRET!, { expiresIn: "30d" });
+    const token = jwt.sign({ userId: user.id, tokenVersion: user.tokenVersion }, JWT_SECRET!, { expiresIn: "30d" });
     const { password: _, ...userWithoutPassword } = user as any;
     res.json({ user: userWithoutPassword, token });
+  });
+
+  app.post("/api/logout", async (req: Request, res: Response) => {
+    const token = req.headers.authorization?.split(" ")[1];
+    if (!token) return res.status(401).json({ error: "No token" });
+    const user = await validateToken(token);
+    if (user) {
+      user.tokenVersion = (user.tokenVersion || 0) + 1;
+      await saveUser(user);
+    }
+    res.json({ success: true, message: "Logged out" });
   });
 
   app.get("/api/me", async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid token" });
       const { password: _, ...userWithoutPassword } = user as any;
       res.json({ user: userWithoutPassword });
     } catch (_) {
@@ -412,9 +434,8 @@ export function registerRoutes(
     }
 
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired token" });
 
       if (user.username === newUsername) {
         return res.status(400).json({ error: "New username must be different" });
@@ -431,9 +452,7 @@ export function registerRoutes(
       user.username = newUsername;
       await saveUser(user);
 
-      // Re-sign token if needed? For now, the client usually just stores the user object.
-      // But we still return a new token to keep patterns consistent.
-      const newToken = jwt.sign({ userId: user.id }, JWT_SECRET!, { expiresIn: "30d" });
+      const newToken = jwt.sign({ userId: user.id, tokenVersion: user.tokenVersion }, JWT_SECRET!, { expiresIn: "30d" });
 
       const { password: _, ...safe } = user as any;
       res.json({ user: safe, token: newToken });
@@ -441,7 +460,7 @@ export function registerRoutes(
       if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
         return res.status(401).json({ error: "Session expired, please login again" });
       }
-      console.error("[API] Username update failed:", err);
+      logger.error({ err }, 'Username update failed');
       res.status(500).json({ error: err.message || "Failed to update username" });
     }
   });
@@ -451,9 +470,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
       if (!user.claimedRewards.includes("tutorial-complete")) {
         user.claimedRewards.push("tutorial-complete");
         await saveUser(user);
@@ -470,7 +488,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      jwt.verify(token, JWT_SECRET!);
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid token" });
       const history = await getMatchHistory(req.params.userId, 20);
       res.json({ history });
     } catch (_) {
@@ -484,9 +503,8 @@ export function registerRoutes(
     const { rewardId, itemId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
       if (user.claimedRewards.includes(rewardId)) {
         return res.status(400).json({ error: "Already claimed" });
       }
@@ -512,9 +530,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
 
       const { pinnedAchievements } = req.body;
       if (!Array.isArray(pinnedAchievements) || pinnedAchievements.length > 3) {
@@ -541,9 +558,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
       res.json({ recentlyPlayedWith: user.recentlyPlayedWith ?? [] });
     } catch (_) {
       res.status(401).json({ error: "Invalid token" });
@@ -557,9 +573,9 @@ export function registerRoutes(
     const platform = req.query.platform === 'android' ? 'android' : 'web';
     const state  = encodeURIComponent(JSON.stringify({ origin, platform }));
     const clientId = process.env.GOOGLE_CLIENT_ID;
-    console.log("Google Client ID:", clientId);
+    logger.info({ clientId }, 'Google Client ID');
     if (!clientId) {
-        console.error("GOOGLE_CLIENT_ID is not set!");
+        logger.error('GOOGLE_CLIENT_ID is not set!');
         return res.status(500).json({ error: "Google OAuth not configured" });
     }
     const params = new URLSearchParams({
@@ -605,11 +621,10 @@ export function registerRoutes(
         user.avatarUrl = googleUser.picture;
         await saveUser(user);
       }
-
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET!, { expiresIn: "30d" });
+      const token = jwt.sign({ userId: user.id, tokenVersion: user.tokenVersion }, JWT_SECRET!, { expiresIn: "30d" });
       res.send(oauthSuccessPage(user, token, platform));
     } catch (err: unknown) {
-      console.error("Google OAuth Error:", getErrorMessage(err));
+      logger.error({ err: getErrorMessage(err) }, 'Google OAuth Error');
       res.status(500).send("Authentication failed");
     }
   });
@@ -647,8 +662,7 @@ export function registerRoutes(
         user.avatarUrl = avatarUrl;
         await saveUser(user);
       }
-
-      const token = jwt.sign({ userId: user.id }, JWT_SECRET!, { expiresIn: "30d" });
+      const token = jwt.sign({ userId: user.id, tokenVersion: user.tokenVersion }, JWT_SECRET!, { expiresIn: "30d" });
       return { user, token };
   }
 
@@ -657,9 +671,9 @@ export function registerRoutes(
     const platform = req.query.platform === 'android' ? 'android' : 'web';
     const state  = encodeURIComponent(JSON.stringify({ origin, platform }));
     const clientId = process.env.DISCORD_CLIENT_ID;
-    console.log("Discord Client ID:", clientId);
+    logger.info({ clientId }, 'Discord Client ID');
     if (!clientId) {
-        console.error("DISCORD_CLIENT_ID is not set!");
+        logger.error('DISCORD_CLIENT_ID is not set!');
         return res.status(500).json({ error: "Discord OAuth not configured" });
     }
     const params = new URLSearchParams({
@@ -681,7 +695,7 @@ export function registerRoutes(
       const { password: _, ...userWithoutPassword } = user as any;
       res.json({ user: userWithoutPassword, token });
     } catch (err: unknown) {
-      console.error("Discord Activity Auth Error:", getErrorMessage(err));
+      logger.error({ err: getErrorMessage(err) }, 'Discord Activity Auth Error');
       res.status(500).json({ error: "Authentication failed" });
     }
   });
@@ -698,7 +712,7 @@ export function registerRoutes(
       const { user, token } = await handleDiscordAuth(code as string, origin);
       res.send(oauthSuccessPage(user, token, platform));
     } catch (err: unknown) {
-      console.error("Discord OAuth Error:", getErrorMessage(err));
+      logger.error({ err: getErrorMessage(err) }, 'Discord OAuth Error');
       res.status(500).send("Authentication failed");
     }
   });
@@ -762,7 +776,7 @@ export function registerRoutes(
   app.get("/api/admin/users/search", requireAdmin, async (req, res) => {
     const admin = (req as any).user;
     const query = req.query.q as string;
-    console.log(`[AdminAPI] User Search Request from ${admin.id} for query: "${query}" at ${new Date().toISOString()}`);
+    logger.info({ adminId: admin.id, query }, 'Admin User Search Request');
 
     const users = await searchUsers(query, admin.id, 20);
     res.json(users.map(({ password: _, ...u }) => u));
@@ -778,7 +792,7 @@ export function registerRoutes(
       const stats = await getGlobalStats();
       res.json(stats || { civilWins: 0, stateWins: 0 });
     } catch (err) {
-      console.error("Error fetching global stats:", err);
+      logger.error({ err }, 'Error fetching global stats');
       res.json({ civilWins: 0, stateWins: 0 });
     }
   });
@@ -807,9 +821,8 @@ export function registerRoutes(
     const { itemId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user    = await getUserById(decoded.userId);
-      if (!user)                                  return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
       
       const item = DEFAULT_ITEMS.find(i => i.id === itemId);
       if (!item) return res.status(404).json({ error: "Item not found" });
@@ -837,15 +850,16 @@ export function registerRoutes(
   ];
 
   app.post("/api/create-checkout-session", async (req: Request, res: Response) => {
+    if (!process.env.STRIPE_SECRET_KEY) return res.status(503).json({ error: "Payments not configured." });
+
     const token = req.headers.authorization?.split(" ")[1];
     const { packageId } = req.body;
     
     if (!token) return res.status(401).json({ error: "No token" });
     
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
 
       const pkg = CP_PACKAGES.find(p => p.id === packageId);
       if (!pkg) return res.status(400).json({ error: "Invalid package" });
@@ -878,7 +892,7 @@ export function registerRoutes(
 
       res.json({ url: session.url });
     } catch (err: any) {
-      console.error("[Stripe] Create Session Error:", err.message);
+      logger.error({ err: err.message }, 'Stripe Create Session Error');
       res.status(500).json({ error: "Failed to create checkout session" });
     }
   });
@@ -889,9 +903,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
       const friends = await getFriends(user.id);
       const statuses: Record<string, { isOnline: boolean; roomId?: string }> = {};
       for (const friend of friends) {
@@ -920,9 +933,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
       const pending = await getPendingFriendRequests(user.id);
       res.json({ pending });
     } catch (_) {
@@ -938,9 +950,8 @@ export function registerRoutes(
     if (!token) return res.status(401).json({ error: "No token" });
     if (!query || query.length < 2) return res.json({ users: [] });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const currentUser = await getUserById(decoded.userId);
-      if (!currentUser) return res.status(404).json({ error: "User not found" });
+      const currentUser = await validateToken(token);
+      if (!currentUser) return res.status(401).json({ error: "Invalid or expired session" });
       const results = await searchUsers(query, currentUser.id);
       // Attach isFriend status to each result
       const withStatus = await Promise.all(results.map(async (u: UserInternal) => {
@@ -958,9 +969,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
       const friends = await getFriends(user.id);
       res.json({ friends });
     } catch (_) {
@@ -973,9 +983,8 @@ export function registerRoutes(
     const { targetUserId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
       await sendFriendRequest(user.id, targetUserId);
       res.json({ success: true });
     } catch (_) {
@@ -988,9 +997,8 @@ export function registerRoutes(
     const { targetUserId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
       await acceptFriendRequest(user.id, targetUserId);
       res.json({ success: true });
     } catch (_) {
@@ -1002,9 +1010,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const currentUser = await getUserById(decoded.userId);
-      if (!currentUser) return res.status(404).json({ error: "User not found" });
+      const currentUser = await validateToken(token);
+      if (!currentUser) return res.status(401).json({ error: "Invalid or expired session" });
       
       const user = await getUserById(req.params.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
@@ -1022,9 +1029,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
       await removeFriend(user.id, req.params.targetUserId);
       res.json({ success: true });
     } catch (_) {
@@ -1037,9 +1043,8 @@ export function registerRoutes(
     const { roomId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
       
       const friendSocketId = userSockets.get(req.params.friendId);
       if (friendSocketId) {
@@ -1056,9 +1061,8 @@ export function registerRoutes(
     const { frameId, policyStyle, votingStyle, music, soundPack, backgroundId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
-      const user    = await getUserById(decoded.userId);
-      if (!user) return res.status(404).json({ error: "User not found" });
+      const user = await validateToken(token);
+      if (!user) return res.status(401).json({ error: "Invalid or expired session" });
 
       const PASS_ITEM_LEVELS: { [key: string]: number } = {
         'bg-pass-0': 10,
@@ -1166,7 +1170,7 @@ export function registerRoutes(
 
       if (!geminiRes.ok) {
         const err = await geminiRes.text();
-        console.error("[TTS] Gemini error:", err);
+        logger.error({ err }, 'TTS Gemini error');
         return res.status(502).json({ error: "TTS upstream error" });
       }
 
@@ -1180,7 +1184,7 @@ export function registerRoutes(
       res.json({ audio: base64Audio });
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : String(err);
-      console.error("[TTS] Request failed:", msg);
+      logger.error({ msg }, 'TTS Request failed');
       res.status(500).json({ error: "TTS request failed" });
     }
   });

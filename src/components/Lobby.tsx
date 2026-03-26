@@ -820,6 +820,7 @@ export const Lobby: React.FC<LobbyProps> = ({ user, onJoinRoom, onLogout, onOpen
                     onChange={(e) => setNewRoomName(e.target.value)}
                     className="w-full bg-elevated border border-subtle rounded-xl py-[1.2vh] px-4 text-responsive-sm text-primary focus:outline-none focus:border-red-900/50 transition-colors"
                     placeholder="e.g. Berlin 1933"
+                    maxLength={40}
                     required
                   />
                 </div>

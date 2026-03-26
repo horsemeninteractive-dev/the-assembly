@@ -1,6 +1,5 @@
 node_modules/
 build/
-dist/
 coverage/
 .DS_Store
 *.log
@@ -9,3 +8,7 @@ coverage/
 the-assembly.code-workspace
 *.mjs
 *.zip
+dist/
+android/.gradle/
+android/app/build/
+android/.idea/workspace.xml

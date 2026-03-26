@@ -218,19 +218,19 @@ export default function App() {
 
   // Power Used TTS
   useEffect(() => {
-    socket.on('powerUsed', async (data: { role: string }) => {
+    const handlePowerUsed = async (data: { role: string }) => {
       if (!isSoundOn) return;
-
       const text = `${data.role} power used`;
-
       aiSpeech.speak(text, { 
         voice: ttsVoice, 
         volume: Math.min(1, (soundVolume * 1.5) / 100) 
       });
-    });
+    };
+
+    socket.on('powerUsed', handlePowerUsed);
 
     return () => {
-      socket.off('powerUsed');
+      socket.off('powerUsed', handlePowerUsed);
     };
   }, [isSoundOn, soundVolume, ttsVoice, ttsEngine]);
 

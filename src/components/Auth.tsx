@@ -46,9 +46,8 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
 
     const handleMessage = (event: MessageEvent) => {
       const origin = event.origin;
-      if (!origin.endsWith('.run.app') && !origin.includes('localhost')) {
-        return;
-      }
+      const CLOUD_RUN_PATTERN = /^https:\/\/[a-z0-9-]+-[a-z0-9]+-[a-z]{2,4}\.a\.run\.app$/;
+      if (!CLOUD_RUN_PATTERN.test(origin) && !origin.includes('localhost')) return;
       if (event.data?.type === 'OAUTH_AUTH_SUCCESS' && event.data.user && event.data.token) {
         onAuthSuccess(event.data.user as User, event.data.token as string);
       }
@@ -61,14 +60,11 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
     setIsLoading(true);
     setError('');
     const instanceId = discordSdk?.instanceId;
-    console.log("handleDiscordLogin triggered. SDK instanceId:", instanceId);
-    
     try {
       if (instanceId) {
         console.log("Environment: Discord Activity. Attempting SDK authorization...");
-        // Use hardcoded constant to avoid build-time env var issues
+        // Use environment variable for security
         const clientId = DISCORD_CLIENT_ID;
-        console.log("DEBUG: DISCORD_CLIENT_ID:", clientId);
         
         if (!clientId) {
           throw new Error("Configuration Error: Discord Client ID is missing from build. Please contact support.");

@@ -183,6 +183,7 @@ export interface User {
   recentlyPlayedWith: RecentlyPlayedEntry[]; // up to 20 entries, most recent first
   isAdmin?: boolean;
   isBanned?: boolean;
+  tokenVersion?: number;
 }
 
 export interface UserInternal extends User {
@@ -256,6 +257,7 @@ export interface Player {
   isProvenNotOverseer?: boolean;
   isMicOn?: boolean;
   isCamOn?: boolean;
+  assassinKilledId?: string;
 }
 
 export interface GameState {
@@ -343,7 +345,7 @@ export interface GameState {
   lastExecutiveActionStateCount?: number;
   // Used by coordinated State AI lying: president stores the chancellor's intended claim
   pendingChancellorClaim?: { civ: number; sta: number };
-  isStrategistAction?: boolean;
+  isStrategistAction?: boolean | undefined;
   // Structured per-round history for the history panel
   roundHistory?: {
     round: number;

@@ -15,8 +15,8 @@ const users: Map<string, UserInternal> = new Map();
 // Mapping helpers
 // ---------------------------------------------------------------------------
 
-function mapSupabaseToUser(data: any): UserInternal {
-  if (!data) return null as any;
+function mapSupabaseToUser(data: any): UserInternal | null {
+  if (!data) return null;
 
   return {
     ...data,
@@ -40,6 +40,7 @@ function mapSupabaseToUser(data: any): UserInternal {
     discordId:         data.discord_id,
     isAdmin:           data.is_admin || false,
     isBanned:          data.is_banned || false,
+    tokenVersion:      data.token_version || 0,
   } as UserInternal;
 }
 
@@ -67,6 +68,7 @@ function mapUserToSupabase(userData: UserInternal): Record<string, unknown> {
     is_admin:         userData.isAdmin,
     is_banned:        userData.isBanned,
     stats:            userData.stats,
+    token_version:    userData.tokenVersion || 0,
   };
 }
 
@@ -86,7 +88,7 @@ export async function getLeaderboard(mode: LeaderboardMode = 'Overall'): Promise
       .order(orderField as any, { ascending: false })
       .limit(50);
     if (error) return [];
-    return data.map(mapSupabaseToUser);
+    return data.map(mapSupabaseToUser).filter((u: UserInternal | null): u is UserInternal => u !== null);
   }
   const allUsers = Array.from(users.values());
   if (mode === 'Ranked')  return allUsers.sort((a, b) => (b.stats.elo ?? 0) - (a.stats.elo ?? 0)).slice(0, 50);
@@ -318,7 +320,7 @@ export async function getFriends(userId: string): Promise<UserInternal[]> {
       .select("*")
       .in("id", friendIds);
     if (friendsError) return [];
-    return friendsData.map(mapSupabaseToUser);
+    return friendsData.map(mapSupabaseToUser).filter((u: UserInternal | null): u is UserInternal => u !== null);
   }
   return [];
 }
@@ -381,7 +383,7 @@ export async function searchUsers(query: string, currentUserId: string, limit = 
     try { appendFileSync('./admin_debug.log', logMsg); } catch(e) {}
 
     if (error) return [];
-    return (data || []).map(mapSupabaseToUser);
+    return (data || []).map(mapSupabaseToUser).filter((u: UserInternal | null): u is UserInternal => u !== null);
   }
   
   const results = Array.from(users.values())
@@ -409,7 +411,7 @@ export async function getPendingFriendRequests(userId: string): Promise<UserInte
       .from("users")
       .select("*")
       .in("id", senderIds);
-    return senders.map(mapSupabaseToUser);
+    return senders.map(mapSupabaseToUser).filter((u: UserInternal | null): u is UserInternal => u !== null);
   }
   return [];
 }
@@ -538,6 +540,7 @@ export function makeNewUser(overrides: Partial<UserInternal> = {}): UserInternal
     pinnedAchievements: [],
     recentlyPlayedWith: [],
     ownedCosmetics: ['music-ambient'],
+    tokenVersion:   0,
     ...overrides,
   };
 }

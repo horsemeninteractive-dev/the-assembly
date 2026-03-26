@@ -49,17 +49,7 @@ export const AGENDA_DEFINITIONS: AgendaDefinition[] = [
     evaluate: (s, pid) => {
       let count = 0;
       for (const r of s.roundHistory ?? []) {
-        if (r.failed || r.chaos) continue; // only check voting rounds
-        const myEntry = r.votes.find(v => v.playerId === pid);
-        if (!myEntry) continue;
-        const ayes = r.votes.filter(v => v.vote === "Aye").length;
-        const nays = r.votes.filter(v => v.vote === "Nay").length;
-        const majority = ayes > nays ? "Aye" : "Nay";
-        if (myEntry.vote !== majority) count++;
-      }
-      // Also count failed elections where they voted against majority
-      for (const r of s.roundHistory ?? []) {
-        if (!r.failed || r.chaos) continue;
+        if (r.chaos) continue;
         const myEntry = r.votes.find(v => v.playerId === pid);
         if (!myEntry) continue;
         const ayes = r.votes.filter(v => v.vote === "Aye").length;

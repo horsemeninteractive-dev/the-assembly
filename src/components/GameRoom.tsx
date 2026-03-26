@@ -178,16 +178,25 @@ export const GameRoom = ({
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 
   useEffect(() => {
-    socket.on('policyPeekResult', (policies: Policy[], title?: string) => {
+    const handlePeek = (policies: Policy[], title?: string) => {
       setPeekedPolicies(policies);
       setPeekTitle(title);
-    });
-    socket.on('investigationResult', (result) => setInvestigationResult(result));
-    socket.on('postMatchResult', (result: PostMatchResult) => setPostMatchResult(result));
+    };
+    const handleInvestigation = (result: { targetName: string; role: Role }) => {
+      setInvestigationResult(result);
+    };
+    const handlePostMatch = (result: PostMatchResult) => {
+      setPostMatchResult(result);
+    };
+
+    socket.on('policyPeekResult', handlePeek);
+    socket.on('investigationResult', handleInvestigation);
+    socket.on('postMatchResult', handlePostMatch);
+
     return () => {
-      socket.off('policyPeekResult');
-      socket.off('investigationResult');
-      socket.off('postMatchResult');
+      socket.off('policyPeekResult', handlePeek);
+      socket.off('investigationResult', handleInvestigation);
+      socket.off('postMatchResult', handlePostMatch);
     };
   }, [token]);
 

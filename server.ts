@@ -1,3 +1,4 @@
+import { logger } from "./server/logger.ts";
 import express from "express";
 import cors from "cors";
 import path from "path";
@@ -5,7 +6,7 @@ import { createServer } from "http";
 import { Server } from "socket.io";
 import { createAdapter } from "@socket.io/redis-adapter";
 import { createServer as createViteServer } from "vite";
-import { randomUUID } from "crypto";
+import { randomUUID, randomBytes } from "crypto";
 
 import { User, GameState, Player } from "./src/types.ts";
 import { createDeck } from "./server/utils.ts";
@@ -17,6 +18,10 @@ import { SystemConfig } from "./src/types.ts";
 import Stripe from "stripe";
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
+
+if (!process.env.STRIPE_SECRET_KEY) {
+  logger.warn('[Stripe] STRIPE_SECRET_KEY not set — payment endpoints will return 503.');
+}
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 
@@ -36,7 +41,7 @@ function isAllowedOrigin(origin: string | undefined): boolean {
 }
 
 async function startServer() {
-  console.log("[Server] Starting with Stripe integration...");
+  logger.info('Starting with Stripe integration...');
   const app = express();
   app.set("trust proxy", 1);
   app.use(cors({
@@ -53,7 +58,7 @@ async function startServer() {
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!sig || !webhookSecret) {
-      console.error("[Stripe] Missing signature or webhook secret");
+      logger.error('Missing Stripe signature or webhook secret');
       return res.status(400).send("Webhook Error: Missing signature or secret");
     }
 
@@ -62,7 +67,7 @@ async function startServer() {
     try {
       event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
     } catch (err: any) {
-      console.error(`[Stripe] Webhook Error: ${err.message}`);
+      logger.error({ err: err.message }, 'Stripe Webhook Error');
       return res.status(400).send(`Webhook Error: ${err.message}`);
     }
 
@@ -73,7 +78,7 @@ async function startServer() {
       const cpAmount = parseInt(session.metadata?.cpAmount || "0", 10);
 
       if (userId && cpAmount > 0) {
-        console.log(`[Stripe] Crediting ${cpAmount} CP to user ${userId}`);
+        logger.info({ userId, cpAmount }, 'Crediting CP to user via Stripe');
         const user = await getUserById(userId);
         if (user) {
           user.cabinetPoints = (user.cabinetPoints ?? 0) + cpAmount;
@@ -110,7 +115,7 @@ async function startServer() {
   // Attach Redis adapter for multi-instance pub/sub (no-op if Redis not configured)
   if (isRedisConfigured && pubClient && subClient) {
     io.adapter(createAdapter(pubClient, subClient));
-    console.log("[Redis] Socket.IO adapter attached");
+    logger.info('Redis Socket.IO adapter attached');
   }
 
   let currentConfig: SystemConfig = await getSystemConfig();
@@ -119,6 +124,26 @@ async function startServer() {
 
   // Restore persisted game rooms from Redis before accepting connections
   await engine.restoreFromRedis();
+
+  app.get('/healthz', async (_req, res) => {
+    const checks: Record<string, boolean> = { redis: false, supabase: false };
+    try {
+      if (pubClient) {
+        await pubClient.ping();
+        checks.redis = true;
+      }
+    } catch (e) {}
+    try {
+      await getSystemConfig();
+      checks.supabase = true;
+    } catch (e) {}
+
+    const ok = checks.supabase; // Supabase is critical for auth/config
+    res.status(ok ? 200 : 503).json({
+      status: ok ? 'ok' : 'degraded',
+      checks
+    });
+  });
 
   registerRoutes(app, io, engine, userSockets, stripe);
 
@@ -194,7 +219,7 @@ async function startServer() {
       });
 
       if (!response.ok) {
-        console.error(`[Proxy] Fetch failed for ${url}: ${response.status} ${response.statusText}`);
+        logger.error({ url, status: response.status, statusText: response.statusText }, 'Proxy fetch failed');
         return res.status(response.status).send(response.statusText);
       }
 
@@ -223,7 +248,7 @@ async function startServer() {
 
       res.send(body);
     } catch (error: any) {
-      console.error(`[Proxy] Error fetching ${url}:`, error.message);
+      logger.error({ url, err: error.message }, 'Proxy error fetching URL');
       res.status(500).send("Error fetching resource");
     }
   });
@@ -254,7 +279,7 @@ async function startServer() {
           "adminResetRoom", "adminDeleteRoom", "adminForceStart", "adminBroadcast"
         ];
         if (throttledEvents.includes(event)) {
-          console.warn(`[SocketRateLimit] Throttling "${event}" from user ${socket.data.userId || "unauth"} (socket ${socket.id})`);
+          logger.warn({ event, userId: socket.data.userId || 'unauth', socketId: socket.id }, 'Throttling socket event due to rate limit');
           return next(new Error("Rate limit exceeded. Please slow down."));
         }
       }
@@ -340,6 +365,15 @@ async function startServer() {
       roomId, name, userId, activeFrame, activePolicyStyle, activeVotingStyle,
       maxPlayers, actionTimer, mode, isSpectator, privacy, inviteCode, hostUserId,
     }) => {
+      // Validation & Sanitisation
+      if (typeof roomId !== 'string' || roomId.length < 1 || roomId.length > 40) return;
+      if (!/^[a-zA-Z0-9 _\-'!?.]+$/.test(roomId)) {
+        socket.emit('error', 'Room name contains invalid characters.');
+        return;
+      }
+
+      const safeMax = Math.max(5, Math.min(10, parseInt(maxPlayers) || 5));
+      const safeTimer = actionTimer === 0 ? 0 : Math.max(30, Math.min(120, parseInt(actionTimer) || 60));
       const user = userId ? await getUserById(userId) : null;
       if (user?.isBanned) {
         socket.emit("error", "Your account has been restricted.");
@@ -356,7 +390,7 @@ async function startServer() {
         }
         // Generating a 4-char invite code if private
         const code = privacy === 'private'
-          ? Math.random().toString(36).substring(2, 6).toUpperCase()
+          ? randomBytes(3).toString('hex').toUpperCase().slice(0, 6)
           : undefined;
         state = {
           roomId,
@@ -379,8 +413,8 @@ async function startServer() {
           log: [`Room ${roomId} created in ${mode || "Ranked"} mode.`],
           presidentIdx: 0,
           lastPresidentIdx: -1,
-          maxPlayers: maxPlayers || 5,
-          actionTimer: actionTimer || 0,
+          maxPlayers: safeMax,
+          actionTimer: safeTimer,
           messages: [],
           round: 1,
           vetoUnlocked: false,
@@ -404,6 +438,7 @@ async function startServer() {
             if (state.rejectedChancellorId === oldId) state.rejectedChancellorId = socket.id;
             if (state.detainedPlayerId === oldId) state.detainedPlayerId = socket.id;
             if (state.lastGovernmentPresidentId === oldId) state.lastGovernmentPresidentId = socket.id;
+            if (state.disconnectedPlayerId === oldId) state.disconnectedPlayerId = socket.id;
             if (state.lastEnactedPolicy && state.lastEnactedPolicy.playerId === oldId) {
               state.lastEnactedPolicy.playerId = socket.id;
             }
@@ -1039,7 +1074,7 @@ async function startServer() {
         setTimeout(() => {
           io.to(roomId).emit("kicked");
           engine.deleteRoom(roomId);
-          console.log(`Admin ${user.username} deleted room ${roomId}`);
+          logger.info({ admin: user.username, roomId }, 'Admin deleted room');
           io.emit("adminBroadcast", {
             message: `Admin closed room: ${roomId}`,
             sender: "System",
@@ -1049,7 +1084,7 @@ async function startServer() {
       } else {
         // Cleanup Redis even if not in memory
         engine.deleteRoom(roomId);
-        console.log(`Admin ${user.username} deleted room ${roomId} (cleanup)`);
+        logger.info({ admin: user.username, roomId }, 'Admin deleted room (cleanup)');
         io.emit("adminBroadcast", {
           message: `Admin closed room: ${roomId}`,
           sender: "System",
@@ -1071,7 +1106,7 @@ async function startServer() {
         sender: user.username,
         timestamp: Date.now()
       });
-      console.log(`Admin ${user.username} broadcast: ${message}`);
+      logger.info({ admin: user.username, message }, 'Admin broadcast');
     });
 
     socket.on("adminUpdateUser", async (data: { userId: string; updates: any }) => {
@@ -1103,7 +1138,7 @@ async function startServer() {
           io.to(targetSocketId).emit("kicked", "Your account has been restricted.");
         }
       }
-      console.log(`Admin ${admin.username} updated user ${targetUser.username}:`, data.updates);
+      logger.info({ admin: admin.username, targetUser: targetUser.username, updates: data.updates }, 'Admin updated user');
     });
 
     socket.on("adminUpdateConfig", async (config: Partial<SystemConfig>) => {
@@ -1113,7 +1148,7 @@ async function startServer() {
 
       currentConfig = await updateSystemConfig(config);
       io.emit("adminConfigUpdate", currentConfig);
-      console.log(`Admin ${admin.username} updated system config:`, config);
+      logger.info({ admin: admin.username, config }, 'Admin updated system config');
 
       if (config.maintenanceMode) {
         io.emit("adminBroadcast", {
@@ -1142,7 +1177,7 @@ async function startServer() {
       if (!admin || !admin.isAdmin) return;
 
       await engine.clearAllRedisRooms();
-      console.log(`Admin ${admin.username} purged all Redis room data`);
+      logger.info({ admin: admin.username }, 'Admin purged all Redis room data');
       socket.emit("adminClearRedisSuccess", "Successfully purged all Redis room state.");
     });
 
@@ -1198,7 +1233,7 @@ async function startServer() {
   }
 
   httpServer.listen(PORT, "0.0.0.0", () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+    logger.info({ port: PORT }, 'Server running');
   });
 }
 

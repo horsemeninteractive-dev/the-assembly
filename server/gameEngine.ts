@@ -1,3 +1,4 @@
+import { logger } from "./logger.ts";
 /**
  * gameEngine.ts — The Assembly Game Engine (Rewrite)
  *
@@ -71,7 +72,7 @@ function addLog(s: GameState, msg: string): void {
  * opponentAvgElo is the average ELO of the opposing team.
  * Returns a signed integer delta (can be negative).
  */
-function computeEloChange(playerElo: number, opponentAvgElo: number, won: boolean, gamesPlayed: number): number {
+export function computeEloChange(playerElo: number, opponentAvgElo: number, won: boolean, gamesPlayed: number): number {
   const K        = gamesPlayed < 30 ? 32 : 20;
   const expected = 1 / (1 + Math.pow(10, (opponentAvgElo - playerElo) / 400));
   return Math.round(K * ((won ? 1 : 0) - expected));
@@ -194,7 +195,7 @@ export class GameEngine {
     if (isRedisConfigured && stateClient) {
       stateClient
         .set(roomKey(roomId), JSON.stringify(state), "EX", ROOM_TTL_SECONDS)
-        .catch(err => console.error(`[Redis] failed to persist room ${roomId}:`, err.message));
+        .catch(err => logger.error({ roomId, err: err.message }, 'Failed to persist room to Redis'));
     }
   }
 
@@ -203,18 +204,26 @@ export class GameEngine {
     this.rooms.delete(roomId);
     if (isRedisConfigured && stateClient) {
       stateClient.del(roomKey(roomId)).catch(err =>
-        console.error(`[Redis] failed to delete room ${roomId}:`, err.message)
+        logger.error({ roomId, err: err.message }, 'Failed to delete room from Redis')
       );
     }
   }
 
-  /** Clear all room keys from Redis. */
+/** Clear all room keys from Redis. */
   public async clearAllRedisRooms(): Promise<void> {
     if (!isRedisConfigured || !stateClient) return;
-    const keys = await stateClient.keys("room:*");
-    if (keys.length > 0) {
-      await stateClient.del(...keys);
-      console.log(`[Redis] Purged ${keys.length} stale room(s).`);
+
+    let cursor = '0';
+    const found: string[] = [];
+    do {
+      const [next, keys] = await stateClient.scan(cursor, 'MATCH', 'room:*', 'COUNT', 100);
+      cursor = next;
+      found.push(...keys);
+    } while (cursor !== '0');
+
+    if (found.length > 0) {
+      await stateClient.del(...found);
+      logger.info({ count: found.length }, 'Purged stale rooms from Redis');
     }
   }
 
@@ -230,7 +239,7 @@ export class GameEngine {
     const keys = await stateClient.keys("room:*");
     if (keys.length === 0) return;
 
-    console.log(`[Redis] restoring ${keys.length} room(s) from Redis...`);
+    logger.info({ count: keys.length }, 'Beginning room restoration from Redis...');
 
     for (const key of keys) {
       const raw = await stateClient.get(key);
@@ -240,7 +249,7 @@ export class GameEngine {
       try {
         state = JSON.parse(raw) as GameState;
       } catch {
-        console.warn(`[Redis] skipping malformed state for key ${key}`);
+        logger.warn({ key }, 'Skipping malformed state from Redis');
         continue;
       }
 
@@ -267,6 +276,12 @@ export class GameEngine {
       if (state.phase !== "Lobby") {
         state.isPaused    = true;
         state.pauseReason = "Server restarted. Waiting for players to reconnect…";
+
+        // Restart pause timer if one was active
+        if (state.disconnectedPlayerId && (state.pauseTimer ?? 0) > 0) {
+          state.pauseTimer = 60; // Reset to 60s to give players a fresh window to reconnect
+          this.startPauseInterval(roomId, state.disconnectedPlayerId);
+        }
       }
 
       this.rooms.set(roomId, state);
@@ -296,7 +311,7 @@ export class GameEngine {
         }
       }
 
-      console.log(`[Redis] restored room ${roomId} (phase: ${state.phase}, players: ${state.players.length})`);
+      logger.info({ roomId, phase: state.phase, playerCount: state.players.length }, 'Restored room from Redis');
     }
   }
 
@@ -447,8 +462,11 @@ export class GameEngine {
 
   /** Human president discards a policy by index. */
   public handlePresidentDiscard(s: GameState, roomId: string, presidentSocketId: string, idx: number): void {
+    if (typeof idx !== 'number' || !Number.isInteger(idx) || idx < 0) return;
     if (s.phase !== "Legislative_President") return;
     if (s.presidentId !== presidentSocketId) return;
+    if (idx >= s.drawnPolicies.length) return;
+    
     const player = s.players.find(p => p.id === presidentSocketId);
     if (!player || !player.isAlive || player.hasActed) return;
     player.hasActed = true;
@@ -476,8 +494,11 @@ export class GameEngine {
 
   /** Human chancellor enacts a policy by index. */
   public handleChancellorPlay(s: GameState, roomId: string, chancellorSocketId: string, idx: number): void {
+    if (typeof idx !== 'number' || !Number.isInteger(idx) || idx < 0) return;
     if (s.phase !== "Legislative_Chancellor") return;
     if (s.chancellorId !== chancellorSocketId) return;
+    if (idx >= s.chancellorPolicies.length) return;
+
     const player = s.players.find(p => p.id === chancellorSocketId);
     if (!player || !player.isAlive || player.hasActed) return;
     player.hasActed = true;
@@ -598,6 +619,7 @@ export class GameEngine {
         wasPresident:            false,
         wasChancellor:           false,
         isAI:                    true,
+        difficulty:              pick(['Casual', 'Normal', 'Elite']) as 'Casual' | 'Normal' | 'Elite',
       });
     }
 
@@ -743,10 +765,10 @@ export class GameEngine {
       const commentator = pick(state.players.filter(p => p.isAI && p.isAlive));
       if (commentator) {
         setTimeout(() => {
-          if (!state.isPaused) {
-            this.postAIChat(state, commentator, CHAT.banter);
-            this.broadcastState(roomId);
-          }
+          const st = this.rooms.get(roomId);
+          if (!st || st.isPaused) return;
+          this.postAIChat(st, commentator, CHAT.banter);
+          this.broadcastState(roomId);
         }, 2000);
       }
     }
@@ -1096,7 +1118,7 @@ export class GameEngine {
   private scheduleAutoDeclarations(s: GameState, roomId: string): void {
     setTimeout(() => {
       const st = this.rooms.get(roomId);
-      if (!st || st.phase !== "Legislative_Chancellor") return;
+      if (!st || st.phase !== "Legislative_Chancellor" || st.isPaused) return;
       this.autoDeclareMissing(st, roomId);
     }, 1500);
   }
@@ -1339,6 +1361,7 @@ export class GameEngine {
           target.isAlive = target.isPresident = target.isChancellor = false;
           target.isPresidentialCandidate = target.isChancellorCandidate = false;
           addLog(s, `${player.name} (Assassin) secretly executed ${target.name}.`);
+          player.assassinKilledId = target.id;
           if (target.role === "Overseer") {
             await this.endGame(s, roomId, "Civil", "OVERSEER ASSASSINATED — CHARTER RESTORED");
             return;
@@ -1752,6 +1775,7 @@ export class GameEngine {
         if (won) user.stats.casualWins = (user.stats.casualWins ?? 0) + 1;
       }
 
+      const eloBeforeCalc = user.stats.elo;
       if (s.mode === "Ranked") {
         user.stats.elo = Math.max(0, user.stats.elo + eloChange);
       }
@@ -1804,7 +1828,6 @@ export class GameEngine {
       user.stats.points = oldIp + totalMatchIp;
 
       const eloAfter      = user.stats.elo;
-      const eloBeforeCalc = eloAfter - eloChange;
       const xpEarned      = totalMatchXp;
       const ipEarned      = totalMatchIp;
       const cpEarned      = achievementCp;
@@ -1944,6 +1967,61 @@ export class GameEngine {
   // Disconnection & Pause
   // ═══════════════════════════════════════════════════════════════════════════
 
+  private startPauseInterval(roomId: string, playerId: string): void {
+    const state = this.rooms.get(roomId);
+    if (!state) return;
+    const player = state.players.find(p => p.id === playerId);
+    if (!player) return;
+
+    player.isDisconnected = true;
+
+    if (state.phase === "Lobby") {
+      addLog(state, `${player.name} disconnected from lobby. They will be removed in 60s if they don't return.`);
+    } else if (state.phase !== "GameOver") {
+      state.isPaused             = true;
+      state.pauseReason          = `${player.name} disconnected. Waiting 60 s for reconnection…`;
+      state.pauseTimer           = 60;
+      state.disconnectedPlayerId = player.id;
+      addLog(state, `${player.name} disconnected. Game paused.`);
+      this.clearActionTimer(roomId);
+      state.actionTimerEnd = undefined;
+    }
+
+    const existing = this.pauseTimers.get(roomId);
+    if (existing) clearInterval(existing);
+
+    const iv = setInterval(() => {
+      const s = this.rooms.get(roomId);
+      if (!s || s.phase === "GameOver" || !player.isDisconnected) {
+        clearInterval(iv);
+        if (this.pauseTimers.get(roomId) === iv) this.pauseTimers.delete(roomId);
+        return;
+      }
+
+      if (s.phase === "Lobby") {
+        if (s.lobbyPauseTimer === undefined) s.lobbyPauseTimer = 60;
+        s.lobbyPauseTimer--;
+        if (s.lobbyPauseTimer <= 0) {
+          clearInterval(iv);
+          s.players = s.players.filter(p => p.id !== player.id);
+          addLog(s, `${player.name} removed from lobby (timeout).`);
+          this.broadcastState(roomId);
+        }
+      } else {
+        if (s.pauseTimer === undefined) s.pauseTimer = 60;
+        s.pauseTimer--;
+        if (s.pauseTimer <= 0) {
+          clearInterval(iv);
+          this.pauseTimers.delete(roomId);
+          this.handlePauseTimeout(roomId);
+        }
+      }
+      this.broadcastState(roomId);
+    }, 1000);
+
+    this.pauseTimers.set(roomId, iv);
+  }
+
   handleLeave(socket: Socket, roomId: string, isIntentional: boolean = false): void {
     const state = this.rooms.get(roomId);
     if (!state) return;
@@ -2004,52 +2082,7 @@ export class GameEngine {
           }
         } else {
           // Unintentional disconnect: Start reconnection timer
-          player.isDisconnected = true;
-          
-          if (state.phase === "Lobby") {
-            addLog(state, `${player.name} disconnected from lobby. They will be removed in 60s if they don't return.`);
-          } else if (state.phase !== "GameOver") {
-            state.isPaused             = true;
-            state.pauseReason          = `${player.name} disconnected. Waiting 60 s for reconnection…`;
-            state.pauseTimer           = 60;
-            state.disconnectedPlayerId = player.id;
-            addLog(state, `${player.name} disconnected. Game paused.`);
-            this.clearActionTimer(roomId);
-            state.actionTimerEnd = undefined;
-          }
-
-          const existing = this.pauseTimers.get(roomId);
-          if (existing) clearInterval(existing);
-
-          const iv = setInterval(() => {
-            const s = this.rooms.get(roomId);
-            if (!s || !player.isDisconnected) { 
-              clearInterval(iv); 
-              if (this.pauseTimers.get(roomId) === iv) this.pauseTimers.delete(roomId); 
-              return; 
-            }
-            
-            if (s.phase === "Lobby") {
-              if (s.lobbyPauseTimer === undefined) s.lobbyPauseTimer = 60;
-              s.lobbyPauseTimer--;
-              if (s.lobbyPauseTimer <= 0) {
-                clearInterval(iv);
-                s.players = s.players.filter(p => p.id !== player.id);
-                addLog(s, `${player.name} removed from lobby (timeout).`);
-                this.broadcastState(roomId);
-              }
-            } else {
-              s.pauseTimer!--;
-              if (s.pauseTimer! <= 0) {
-                clearInterval(iv);
-                this.pauseTimers.delete(roomId);
-                this.handlePauseTimeout(roomId);
-              }
-            }
-            this.broadcastState(roomId);
-          }, 1000);
-
-          this.pauseTimers.set(roomId, iv);
+          this.startPauseInterval(roomId, player.id);
         }
       }
     }
@@ -2217,7 +2250,7 @@ export class GameEngine {
     s.chancellorPolicies  = [...s.drawnPolicies];
     s.chancellorSaw       = [...s.chancellorPolicies];
     s.drawnPolicies       = [];
-    s.isStrategistAction  = undefined as any;
+    s.isStrategistAction  = undefined;
     this.enterPhase(s, roomId, "Legislative_Chancellor");
   }
 
@@ -2413,11 +2446,12 @@ export class GameEngine {
 
     for (const c of commentators) {
       setTimeout(() => {
-        if (state.isPaused) return;
+        const st = this.rooms.get(roomId);
+        if (!st || st.isPaused) return;
         let lines: readonly string[] = CHAT.banter;
 
         if (type === "nomination" && context?.targetId) {
-          const target = state.players.find(p => p.id === context.targetId);
+          const target = st.players.find(p => p.id === context.targetId);
           if (target) {
             if (c.id === target.id) {
               lines = CHAT.defendingSelf;
@@ -2428,10 +2462,10 @@ export class GameEngine {
               else if (susp > 0.55 && !isTeam) lines = CHAT.suspiciousNominee;
               else if (susp < 0.25 || isTeam)  lines = CHAT.praisingCivil;
             }
-            this.postAIChat(state, c, lines, target.name);
+            this.postAIChat(st, c, lines, target.name);
           }
         } else if (type === "failed_vote") {
-          this.postAIChat(state, c, CHAT.governmentFailed);
+          this.postAIChat(st, c, CHAT.governmentFailed);
         }
 
         this.broadcastState(roomId);
