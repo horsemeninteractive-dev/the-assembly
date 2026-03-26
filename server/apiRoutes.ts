@@ -1,6 +1,5 @@
-import { Express, Request, Response } from "express";
+import { Express, Request, Response, NextFunction } from "express";
 import { Server } from "socket.io";
-import { appendFileSync } from "fs";
 import { randomUUID } from "crypto";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
@@ -95,6 +94,20 @@ function htmlEscape(str: string): string {
     .replace(/"/g, "&quot;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;");
+}
+
+async function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  const token = req.headers.authorization?.split(" ")[1];
+  if (!token) return res.status(401).json({ error: "No token" });
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+    const user = await getUserById(decoded.userId);
+    if (!user || !user.isAdmin) return res.status(403).json({ error: "Forbidden" });
+    (req as any).user = user;
+    next();
+  } catch (err) {
+    res.status(401).json({ error: "Invalid token" });
+  }
 }
 
 /** Safely extracts a message from unknown catch values, including axios errors. */
@@ -245,7 +258,7 @@ export function registerRoutes(
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = makeNewUser({ id: randomUUID(), username, email, avatarUrl, password: hashedPassword });
     await saveUser(newUser);
-    const token = jwt.sign({ username }, JWT_SECRET!, { expiresIn: "30d" });
+    const token = jwt.sign({ userId: newUser.id }, JWT_SECRET!, { expiresIn: "30d" });
     const { password: _, ...userWithoutPassword } = newUser as any;
     res.json({ user: userWithoutPassword, token });
   });
@@ -329,8 +342,8 @@ export function registerRoutes(
       }
 
       const token = authHeader.split(" ")[1];
-      const decoded = jwt.verify(token, JWT_SECRET!) as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
 
       if (!user) return res.status(404).json({ error: "User not found" });
 
@@ -365,7 +378,7 @@ export function registerRoutes(
     if (!user || !user.password || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: "Invalid credentials" });
     }
-    const token = jwt.sign({ username }, JWT_SECRET!, { expiresIn: "30d" });
+    const token = jwt.sign({ userId: user.id }, JWT_SECRET!, { expiresIn: "30d" });
     const { password: _, ...userWithoutPassword } = user as any;
     res.json({ user: userWithoutPassword, token });
   });
@@ -374,8 +387,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
       const { password: _, ...userWithoutPassword } = user as any;
       res.json({ user: userWithoutPassword });
@@ -399,8 +412,8 @@ export function registerRoutes(
     }
 
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
 
       if (user.username === newUsername) {
@@ -419,9 +432,8 @@ export function registerRoutes(
       await saveUser(user);
 
       // Re-sign token if needed? For now, the client usually just stores the user object.
-      // But the next auth'd request will use the OLD username in the token.
-      // So we MUST return a new token.
-      const newToken = jwt.sign({ username: newUsername }, JWT_SECRET!, { expiresIn: "30d" });
+      // But we still return a new token to keep patterns consistent.
+      const newToken = jwt.sign({ userId: user.id }, JWT_SECRET!, { expiresIn: "30d" });
 
       const { password: _, ...safe } = user as any;
       res.json({ user: safe, token: newToken });
@@ -439,8 +451,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
       if (!user.claimedRewards.includes("tutorial-complete")) {
         user.claimedRewards.push("tutorial-complete");
@@ -472,8 +484,8 @@ export function registerRoutes(
     const { rewardId, itemId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
       if (user.claimedRewards.includes(rewardId)) {
         return res.status(400).json({ error: "Already claimed" });
@@ -500,8 +512,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
 
       const { pinnedAchievements } = req.body;
@@ -529,8 +541,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
       res.json({ recentlyPlayedWith: user.recentlyPlayedWith ?? [] });
     } catch (_) {
@@ -594,7 +606,7 @@ export function registerRoutes(
         await saveUser(user);
       }
 
-      const token = jwt.sign({ username: user.username }, JWT_SECRET!, { expiresIn: "30d" });
+      const token = jwt.sign({ userId: user.id }, JWT_SECRET!, { expiresIn: "30d" });
       res.send(oauthSuccessPage(user, token, platform));
     } catch (err: unknown) {
       console.error("Google OAuth Error:", getErrorMessage(err));
@@ -636,7 +648,7 @@ export function registerRoutes(
         await saveUser(user);
       }
 
-      const token = jwt.sign({ username: user.username }, JWT_SECRET!, { expiresIn: "30d" });
+      const token = jwt.sign({ userId: user.id }, JWT_SECRET!, { expiresIn: "30d" });
       return { user, token };
   }
 
@@ -742,37 +754,21 @@ export function registerRoutes(
 
   // ── Admin ─────────────────────────────────────────────────────────────────
 
-  app.get("/api/admin/test", async (req, res) => {
+  app.get("/api/admin/test", requireAdmin, async (req, res) => {
     const { data, error } = await db.from("users").select("id, username").limit(5);
     res.json({ data, error, isConfigured });
   });
 
-  app.get("/api/admin/users/search", async (req, res) => {
-    const userId = req.query.adminId as string;
+  app.get("/api/admin/users/search", requireAdmin, async (req, res) => {
+    const admin = (req as any).user;
     const query = req.query.q as string;
-    const logMsg = `[AdminAPI] User Search Request from ${userId} for query: "${query}" at ${new Date().toISOString()}\n`;
-    try { appendFileSync('./admin_debug.log', logMsg); } catch(e) {}
+    console.log(`[AdminAPI] User Search Request from ${admin.id} for query: "${query}" at ${new Date().toISOString()}`);
 
-    if (!userId) return res.status(401).send("Unauthorized");
-    
-    const admin = await getUserById(userId);
-    if (!admin || !admin.isAdmin) {
-      const warnMsg = `[AdminAPI] Unauthorized search attempt by user: ${userId}\n`;
-      try { appendFileSync('./admin_debug.log', warnMsg); } catch(e) {}
-      return res.status(403).send("Forbidden");
-    }
-
-    const users = await searchUsers(query, userId, 20);
+    const users = await searchUsers(query, admin.id, 20);
     res.json(users.map(({ password: _, ...u }) => u));
   });
 
-  app.get("/api/admin/config", async (req, res) => {
-    const userId = req.query.adminId as string;
-    if (!userId) return res.status(401).send("Unauthorized");
-    
-    const admin = await getUserById(userId);
-    if (!admin || !admin.isAdmin) return res.status(403).send("Forbidden");
-
+  app.get("/api/admin/config", requireAdmin, async (req, res) => {
     const config = await getSystemConfig();
     res.json(config);
   });
@@ -811,8 +807,8 @@ export function registerRoutes(
     const { itemId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user    = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user    = await getUserById(decoded.userId);
       if (!user)                                  return res.status(404).json({ error: "User not found" });
       
       const item = DEFAULT_ITEMS.find(i => i.id === itemId);
@@ -847,8 +843,8 @@ export function registerRoutes(
     if (!token) return res.status(401).json({ error: "No token" });
     
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
 
       const pkg = CP_PACKAGES.find(p => p.id === packageId);
@@ -893,8 +889,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
       const friends = await getFriends(user.id);
       const statuses: Record<string, { isOnline: boolean; roomId?: string }> = {};
@@ -924,8 +920,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
       const pending = await getPendingFriendRequests(user.id);
       res.json({ pending });
@@ -942,8 +938,8 @@ export function registerRoutes(
     if (!token) return res.status(401).json({ error: "No token" });
     if (!query || query.length < 2) return res.json({ users: [] });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const currentUser = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const currentUser = await getUserById(decoded.userId);
       if (!currentUser) return res.status(404).json({ error: "User not found" });
       const results = await searchUsers(query, currentUser.id);
       // Attach isFriend status to each result
@@ -962,8 +958,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
       const friends = await getFriends(user.id);
       res.json({ friends });
@@ -977,8 +973,8 @@ export function registerRoutes(
     const { targetUserId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
       await sendFriendRequest(user.id, targetUserId);
       res.json({ success: true });
@@ -992,8 +988,8 @@ export function registerRoutes(
     const { targetUserId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
       await acceptFriendRequest(user.id, targetUserId);
       res.json({ success: true });
@@ -1006,8 +1002,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const currentUser = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const currentUser = await getUserById(decoded.userId);
       if (!currentUser) return res.status(404).json({ error: "User not found" });
       
       const user = await getUserById(req.params.userId);
@@ -1026,8 +1022,8 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(" ")[1];
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
       await removeFriend(user.id, req.params.targetUserId);
       res.json({ success: true });
@@ -1041,8 +1037,8 @@ export function registerRoutes(
     const { roomId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
       
       const friendSocketId = userSockets.get(req.params.friendId);
@@ -1060,8 +1056,8 @@ export function registerRoutes(
     const { frameId, policyStyle, votingStyle, music, soundPack, backgroundId } = req.body;
     if (!token) return res.status(401).json({ error: "No token" });
     try {
-      const decoded = jwt.verify(token, JWT_SECRET!) as unknown as { username: string };
-      const user    = await getUser(decoded.username);
+      const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string };
+      const user    = await getUserById(decoded.userId);
       if (!user) return res.status(404).json({ error: "User not found" });
 
       const PASS_ITEM_LEVELS: { [key: string]: number } = {

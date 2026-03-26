@@ -62,6 +62,7 @@ function pick<T>(arr: T[]): T | undefined {
 
 function addLog(s: GameState, msg: string): void {
   s.log.push(msg);
+  if (s.log.length > 50) s.log.shift();
 }
 
 /**
@@ -733,6 +734,7 @@ export class GameEngine {
       type:   "round_separator",
       round:  state.round,
     });
+    if (state.messages.length > 50) state.messages.shift();
 
     ensureDeckHas(state, 4);
 
@@ -1946,6 +1948,17 @@ export class GameEngine {
     const state = this.rooms.get(roomId);
     if (!state) return;
 
+    const spectator = state.spectators.find(s => s.id === socket.id);
+    const queued    = (state.spectatorQueue ?? []).find(q => q.id === socket.id);
+
+    // Clean up spectators and queue
+    state.spectators = state.spectators.filter(s => s.id !== socket.id);
+    state.spectatorQueue = (state.spectatorQueue ?? []).filter(q => q.id !== socket.id);
+
+    if (spectator || queued) {
+      addLog(state, `${spectator?.name || queued?.name || "A user"} left the room.`);
+    }
+
     const player = state.players.find(p => p.id === socket.id);
     if (player) {
       if (!player.isAI && (!player.isDisconnected || isIntentional)) {
@@ -2039,12 +2052,6 @@ export class GameEngine {
           this.pauseTimers.set(roomId, iv);
         }
       }
-    }
-
-    const spectator = state.spectators.find(s => s.id === socket.id);
-    if (spectator) {
-      state.spectators = state.spectators.filter(s => s.id !== socket.id);
-      addLog(state, `${spectator.name} (Spectator) left.`);
     }
 
     socket.leave(roomId);

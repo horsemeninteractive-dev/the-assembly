@@ -229,6 +229,41 @@ async function startServer() {
   });
 
   io.on("connection", (socket) => {
+    // Rate limiter: 10 events per second (Token Bucket)
+    socket.use(([event, ...args]: any[], next: (err?: Error) => void) => {
+      if (event === "disconnect") return next();
+      
+      const now = Date.now();
+      const CAPACITY = 10;
+      const REFILL_RATE = 10; // tokens per second
+      
+      const last = socket.data.lastRateLimitCheck || now;
+      const tokens = socket.data.tokens ?? CAPACITY;
+      
+      const elapsed = now - last;
+      const regained = (elapsed / 1000) * REFILL_RATE;
+      const currentTokens = Math.min(CAPACITY, tokens + regained);
+      
+      if (currentTokens < 1) {
+        const throttledEvents = [
+          "sendMessage", "vote", "nominateChancellor", "useTitleAbility", 
+          "discardPolicy", "enactPolicy", "veto", "playAgain", "joinRoom",
+          "userConnected", "leaveRoom", "startGame", "hostStartGame",
+          "toggleReady", "kickPlayer", "toggleLock", "updateMediaState",
+          "joinQueue", "leaveQueue", "addAI", "removeAI",
+          "adminResetRoom", "adminDeleteRoom", "adminForceStart", "adminBroadcast"
+        ];
+        if (throttledEvents.includes(event)) {
+          console.warn(`[SocketRateLimit] Throttling "${event}" from user ${socket.data.userId || "unauth"} (socket ${socket.id})`);
+          return next(new Error("Rate limit exceeded. Please slow down."));
+        }
+      }
+      
+      socket.data.tokens = currentTokens - 1;
+      socket.data.lastRateLimitCheck = now;
+      next();
+    });
+
     const getRoom = (): string | undefined =>
       Array.from(socket.rooms).find(r => r !== socket.id);
 
@@ -369,7 +404,6 @@ async function startServer() {
             if (state.rejectedChancellorId === oldId) state.rejectedChancellorId = socket.id;
             if (state.detainedPlayerId === oldId) state.detainedPlayerId = socket.id;
             if (state.lastGovernmentPresidentId === oldId) state.lastGovernmentPresidentId = socket.id;
-            if (state.lastExecutiveActionStateCount === oldId as any) state.lastExecutiveActionStateCount = socket.id as any; // Edge case check
             if (state.lastEnactedPolicy && state.lastEnactedPolicy.playerId === oldId) {
               state.lastEnactedPolicy.playerId = socket.id;
             }
@@ -412,6 +446,7 @@ async function startServer() {
             state.pauseReason = undefined;
             state.pauseTimer = undefined;
             state.log.push(`${existingPlayer.name} reconnected.`);
+            if (state.log.length > 50) state.log.shift();
             
             // Join room BEFORE broadcast so the client receives the update
             socket.join(roomId);
@@ -727,6 +762,7 @@ async function startServer() {
       if (state.vetoUnlocked) {
         state.vetoRequested = true;
         state.log.push(`${player.name} (Chancellor) requested a Veto.`);
+        if (state.log.length > 50) state.log.shift();
         engine.broadcastState(roomId);
         engine.processAITurns(roomId);
       }
@@ -761,6 +797,7 @@ async function startServer() {
           const pres = state.players[state.presidentIdx];
           const chan = state.players.find(p => p.id === state.chancellorId);
           state.log.push(`DEBUG: Phase: ${state.phase}, PresIdx: ${state.presidentIdx}, Pres: ${pres?.name}, Chan: ${chan?.name}`);
+          if (state.log.length > 50) state.log.shift();
           engine.broadcastState(roomId);
         }
         return;
@@ -829,6 +866,9 @@ async function startServer() {
         vetoUnlocked: false,
         vetoRequested: false,
         previousVotes: undefined,
+        handlerSwapPending: undefined,
+        handlerSwapPositions: undefined,
+        isStrategistAction: undefined,
       });
 
       state.players = state.players.filter(p => !p.isAI && !p.isDisconnected);
@@ -850,6 +890,7 @@ async function startServer() {
         p.stateEnactments = 0;
         p.civilEnactments = 0;
         p.isProvenNotOverseer = false;
+        p.alliances = undefined;
       });
 
       // Drain the spectator queue into the lobby as players (up to maxPlayers)
@@ -913,6 +954,7 @@ async function startServer() {
       // Remove from room
       state.players = state.players.filter(p => p.id !== targetSocketId);
       state.log.push(`${target.name} was removed by the host.`);
+      if (state.log.length > 50) state.log.shift();
       io.to(targetSocketId).emit("kicked");
       engine.broadcastState(roomId);
     });
@@ -926,6 +968,7 @@ async function startServer() {
       if (!host || host.id !== socket.id) return;
       state.isLocked = !state.isLocked;
       state.log.push(`Room ${state.isLocked ? "locked" : "unlocked"} by host.`);
+      if (state.log.length > 50) state.log.shift();
       engine.broadcastState(roomId);
     });
 
@@ -946,6 +989,7 @@ async function startServer() {
         return;
       }
       state.log.push("Host started the game.");
+      if (state.log.length > 50) state.log.shift();
       if (state.mode === 'Ranked') {
         engine.startGame(roomId);
       } else {
@@ -988,14 +1032,29 @@ async function startServer() {
       const state = engine.rooms.get(roomId);
       if (state) {
         state.log.push("This room has been terminated by an administrator.");
+        if (state.log.length > 50) state.log.shift();
         engine.broadcastState(roomId);
         
         // Give players a moment to see the message before closing
         setTimeout(() => {
           io.to(roomId).emit("kicked");
-          engine.rooms.delete(roomId);
+          engine.deleteRoom(roomId);
           console.log(`Admin ${user.username} deleted room ${roomId}`);
+          io.emit("adminBroadcast", {
+            message: `Admin closed room: ${roomId}`,
+            sender: "System",
+            timestamp: Date.now()
+          });
         }, 2000);
+      } else {
+        // Cleanup Redis even if not in memory
+        engine.deleteRoom(roomId);
+        console.log(`Admin ${user.username} deleted room ${roomId} (cleanup)`);
+        io.emit("adminBroadcast", {
+          message: `Admin closed room: ${roomId}`,
+          sender: "System",
+          timestamp: Date.now()
+        });
       }
     });
 
@@ -1076,19 +1135,6 @@ async function startServer() {
       }
     });
 
-    socket.on("adminDeleteRoom", async (roomId: string) => {
-      if (!socket.data.userId) return;
-      const admin = await getUserById(socket.data.userId);
-      if (!admin || !admin.isAdmin) return;
-
-      engine.deleteRoom(roomId);
-      console.log(`Admin ${admin.username} deleted room ${roomId}`);
-      io.emit("adminBroadcast", {
-        message: `Admin closed room: ${roomId}`,
-        sender: "System",
-        timestamp: Date.now()
-      });
-    });
 
     socket.on("adminClearRedis", async () => {
       if (!socket.data.userId) return;
@@ -1103,22 +1149,19 @@ async function startServer() {
     socket.on("disconnect", async () => {
       if (socket.data.userId) {
         const userId = socket.data.userId;
-        userSockets.delete(userId);
-        const friends = await getFriends(userId);
-        for (const friend of friends) {
-          const friendSocketId = userSockets.get(friend.id);
-          if (friendSocketId) {
-            io.to(friendSocketId).emit("userStatusChanged", { userId, isOnline: false });
+        if (userSockets.get(userId) === socket.id) {
+          userSockets.delete(userId);
+          const friends = await getFriends(userId);
+          for (const friend of friends) {
+            const friendSocketId = userSockets.get(friend.id);
+            if (friendSocketId) {
+              io.to(friendSocketId).emit("userStatusChanged", { userId, isOnline: false });
+            }
           }
         }
       }
       engine.rooms.forEach((state, roomId) => {
-        if (state.players.find(p => p.id === socket.id)) {
-          engine.handleLeave(socket, roomId);
-        }
-        // Clean up spectators and queue on disconnect
-        state.spectators = state.spectators.filter(s => s.id !== socket.id);
-        state.spectatorQueue = (state.spectatorQueue ?? []).filter(q => q.id !== socket.id);
+        engine.handleLeave(socket, roomId);
       });
     });
   });

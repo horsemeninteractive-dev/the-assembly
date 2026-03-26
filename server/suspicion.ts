@@ -140,6 +140,7 @@ export function updateSuspicionFromDeclarations(state: GameState): void {
       if (presDecl.playerId !== ai.id) nudge(ai, presDecl.playerId, 2.0);
       if (chanDecl.playerId !== ai.id) nudge(ai, chanDecl.playerId, 2.0);
       state.log.push(`[Suspicion] Inconsistent declarations: ${presDecl.playerName} vs ${chanDecl.playerName}.`);
+      if (state.log.length > 50) state.log.shift();
     } else {
       // Consistent — modest trust boost
       if (presDecl.playerId !== ai.id) nudge(ai, presDecl.playerId, 0.88);
