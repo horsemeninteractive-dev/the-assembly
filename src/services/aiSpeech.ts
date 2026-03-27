@@ -121,6 +121,7 @@ export const speakAiMessage = async (
   text: string,
   aiName: string,
   profile: VoiceProfile,
+  volume: number,
   onStart: () => void,
   onEnd: () => void
 ) => {
@@ -135,7 +136,7 @@ export const speakAiMessage = async (
         lang: 'en-US',
         rate: profile.rate,
         pitch: profile.pitch,
-        volume: 1.0,
+        volume: Math.min(1, volume),
         category: 'ambient',
       });
     } catch (err) {
@@ -160,6 +161,7 @@ export const speakAiMessage = async (
   if (profile.voice) utterance.voice = profile.voice;
   utterance.pitch = profile.pitch;
   utterance.rate = profile.rate;
+  utterance.volume = volume;
 
   utterance.onstart = onStart;
   utterance.onend = onEnd;

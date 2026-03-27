@@ -219,6 +219,9 @@ export default function App() {
   const [soundVolume, setSoundVolume] = useState(() =>
     parseInt(localStorage.getItem('soundVolume') || '50')
   );
+  const [ttsVolume, setTtsVolume] = useState(() =>
+    parseInt(localStorage.getItem('ttsVolume') || '50')
+  );
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ttsVoice, setTtsVoice] = useState<string>(localStorage.getItem('ttsVoice') || '');
   const [ttsEngine, setTtsEngine] = useState<string>(
@@ -241,6 +244,7 @@ export default function App() {
     localStorage.setItem('isSoundOn', String(isSoundOn));
     localStorage.setItem('musicVolume', String(musicVolume));
     localStorage.setItem('soundVolume', String(soundVolume));
+    localStorage.setItem('ttsVolume', String(ttsVolume));
     localStorage.setItem('ttsVoice', ttsVoice);
     localStorage.setItem('ttsEngine', ttsEngine);
     localStorage.setItem('isAiVoiceEnabled', String(isAiVoiceEnabled));
@@ -251,6 +255,7 @@ export default function App() {
     isSoundOn,
     musicVolume,
     soundVolume,
+    ttsVolume,
     ttsVoice,
     isAiVoiceEnabled,
     uiScaleSetting,
@@ -269,7 +274,7 @@ export default function App() {
       const text = `${data.role} power used`;
       aiSpeech.speak(text, {
         voice: ttsVoice,
-        volume: Math.min(1, (soundVolume * 1.5) / 100),
+        volume: ttsVolume / 100,
       });
     };
 
@@ -715,6 +720,8 @@ export default function App() {
                     setMusicVolume,
                     soundVolume,
                     setSoundVolume,
+                    ttsVolume,
+                    setTtsVolume,
                     isFullscreen,
                     setIsFullscreen,
                     ttsVoice,
@@ -770,6 +777,7 @@ export default function App() {
                 updateAvailable={updateAvailable}
                 playSound={playSound}
                 soundVolume={soundVolume}
+                ttsVolume={ttsVolume}
                 ttsVoice={ttsVoice}
                 ttsEngine={ttsEngine}
                 isAiVoiceEnabled={isAiVoiceEnabled}
@@ -793,6 +801,8 @@ export default function App() {
                     setMusicVolume,
                     soundVolume,
                     setSoundVolume,
+                    ttsVolume,
+                    setTtsVolume,
                     isFullscreen,
                     setIsFullscreen,
                     ttsVoice,

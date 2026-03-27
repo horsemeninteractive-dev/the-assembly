@@ -47,6 +47,7 @@ interface GameRoomProps {
   updateAvailable: boolean;
   playSound: (soundKey: string) => void;
   soundVolume: number;
+  ttsVolume: number;
   ttsVoice: string;
   ttsEngine: string;
   isAiVoiceEnabled: boolean;
@@ -68,16 +69,20 @@ export const GameRoom = ({
   updateAvailable,
   playSound,
   soundVolume,
+  ttsVolume,
   ttsVoice,
   ttsEngine,
   isAiVoiceEnabled,
   uiScaleSetting,
 }: GameRoomProps) => {
-  const me = gameState.players.find((p) => p.id === socket.id);
+  const me = gameState.players.find((p) => p.socketId === socket.id);
   const isSpectator = !me && gameState.spectators.some((s) => s.id === socket.id);
   const [inQueue, setInQueue] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const uiScale = useScaling(containerRef, { multiplier: uiScaleSetting });
+
+  // Add this inside the component to check against sound settings
+  const isSoundOn = localStorage.getItem('isSoundOn') !== 'false';
 
   // ── UI panels ────────────────────────────────────────────────────────────
   const [isLogOpen, setIsLogOpen] = useState(false);
@@ -347,9 +352,10 @@ export const GameRoom = ({
   const prevAliveCount = useRef(0);
 
   const speak = (text: string) => {
+    if (!isSoundOn) return;
     aiSpeech.speak(text, {
       voice: ttsVoice,
-      volume: soundVolume / 100,
+      volume: ttsVolume / 100,
       rate: 0.9,
       pitch: 0.8,
     });
@@ -457,12 +463,13 @@ export const GameRoom = ({
           lastMessage.text,
           sender.name,
           profile,
+          ttsVolume / 100, // Added ttsVolume
           () => setSpeakingPlayers((prev4) => ({ ...prev4, [sender.id]: true })),
           () => setSpeakingPlayers((prev4) => ({ ...prev4, [sender.id]: false }))
         );
       }
     }
-  }, [gameState.messages.length, isAiVoiceEnabled, ttsEngine, soundVolume]);
+  }, [gameState.messages.length, isAiVoiceEnabled, ttsEngine, soundVolume, ttsVolume]); // Added ttsVolume to dependency array
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStreams, setRemoteStreams] = useState<Record<string, MediaStream>>({});
   const [speakingPlayers, setSpeakingPlayers] = useState<Record<string, boolean>>({});
@@ -492,7 +499,7 @@ export const GameRoom = ({
       let isRunning = true;
       const check = () => {
         if (!isRunning) return;
-        const isLocal = playerId === socket.id;
+        const isLocal = me && playerId === me.id;
         const peerExists = !!peersRef.current[playerId];
         if (!isLocal && !peerExists) {
           isRunning = false;
@@ -605,7 +612,10 @@ export const GameRoom = ({
         .forEach((track) => addTrackToPeer(pc, track, localStreamRef.current!));
     }
     pc.onicecandidate = ({ candidate }) => {
-      if (candidate) socket.emit('signal', { to: peerId, from: socket.id!, signal: { candidate } });
+      const target = gameState.players.find((p) => p.id === peerId);
+      if (candidate && target?.socketId) {
+        socket.emit('signal', { to: target.socketId, from: socket.id!, signal: { candidate } });
+      }
     };
 
     pc.ontrack = ({ track }) => {
@@ -654,12 +664,15 @@ export const GameRoom = ({
       try {
         meta.makingOffer = true;
         await pc.setLocalDescription(); // browser auto-creates offer
-        debugLog(`[WebRTC] offer sent to peer=${peerId.slice(0, 6)}`);
+        const target = gameState.players.find((p) => p.id === peerId);
+      if (target?.socketId) {
+        debugLog(`[WebRTC] offer/renegotiate for target=${target.socketId.slice(0, 6)}`);
         socket.emit('signal', {
-          to: peerId,
+          to: target.socketId,
           from: socket.id!,
           signal: { sdp: pc.localDescription },
         });
+      }
       } catch (err) {
         debugError('onnegotiationneeded error', err);
       } finally {
@@ -690,7 +703,7 @@ export const GameRoom = ({
     if (!socket.id) return;
     const activeIds = new Set(
       gameState.players
-        .filter((p) => p.id !== socket.id && !p.isDisconnected && !p.isAI)
+        .filter((p) => p.socketId !== socket.id && !p.isDisconnected && !p.isAI)
         .map((p) => p.id)
     );
     Object.keys(peersRef.current).forEach((peerId) => {
@@ -702,7 +715,7 @@ export const GameRoom = ({
   useEffect(() => {
     if (!socket.id) return;
     gameState.players.forEach((p) => {
-      if (p.id === socket.id || p.isDisconnected || p.isAI) return;
+      if (p.socketId === socket.id || p.isDisconnected || p.isAI) return;
       createPeerRef.current(p.id);
     });
   }, [gameState.players, socket.id]);
@@ -710,8 +723,12 @@ export const GameRoom = ({
   // ── Signal handler (perfect negotiation) ──────────────────────────────────
   useEffect(() => {
     const handleSignal = async ({ from, signal }: { from: string; signal: any }) => {
-      const pc = peersRef.current[from] ?? createPeerRef.current(from);
-      const meta = peerMetaRef.current[from];
+      const p = gameState.players.find((pl) => pl.socketId === from);
+      if (!p) return;
+      const peerId = p.id;
+
+      const pc = peersRef.current[peerId] ?? createPeerRef.current(peerId);
+      const meta = peerMetaRef.current[peerId];
       if (!meta) return;
 
       try {
@@ -771,10 +788,10 @@ export const GameRoom = ({
   }, [me?.isAlive]);
 
   useEffect(() => {
-    if ((isVoiceActive || isVideoActive) && socket.id && localStream) {
-      setupSpeakingDetection(localStream, socket.id);
+    if ((isVoiceActive || isVideoActive) && me?.id && localStream) {
+      setupSpeakingDetection(localStream, me.id);
     }
-  }, [isVoiceActive, isVideoActive, localStream]);
+  }, [isVoiceActive, isVideoActive, localStream, me?.id]);
 
   useEffect(() => {
     localStreamRef.current = localStream;
@@ -1015,7 +1032,7 @@ export const GameRoom = ({
           <GameOverModal
             gameState={gameState}
             privateInfo={privateInfo}
-            myId={socket.id}
+            myId={me?.id}
             postMatchResult={postMatchResult}
             onPlayAgain={onPlayAgain}
             onLeave={onLeaveRoom}

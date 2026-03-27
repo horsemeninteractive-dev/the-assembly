@@ -63,6 +63,7 @@ export interface PlayerCardProps {
   speakingPlayers: Record<string, boolean>;
   playSound: (key: string) => void;
   setSelectedPlayerId: (id: string | null) => void;
+  me: Player | undefined;
 }
 
 export const PlayerCard = React.memo(
@@ -81,6 +82,7 @@ export const PlayerCard = React.memo(
     speakingPlayers,
     playSound,
     setSelectedPlayerId,
+    me,
   }: PlayerCardProps) => {
     const prevVote = gameState.previousVotes?.[p.id];
     const spectatorRole = isSpectator ? gameState.spectatorRoles?.[p.id] : undefined;
@@ -168,6 +170,12 @@ export const PlayerCard = React.memo(
 
         {/* Declaration Indicators */}
         {(() => {
+          // Only show declarations on cards once BOTH have declared
+          const bothDeclared =
+            gameState.declarations.some((d) => d.type === 'President') &&
+            gameState.declarations.some((d) => d.type === 'Chancellor');
+          if (!bothDeclared) return null;
+
           const playerDecls = gameState.declarations.filter((d) => d.playerId === p.id);
           const presDecl = playerDecls.find((d) => d.type === 'President');
           const chanDecl = playerDecls.find((d) => d.type === 'Chancellor');
@@ -382,7 +390,7 @@ export const PlayerCard = React.memo(
                   p.isAlive ? 'text-primary/90' : 'text-ghost'
                 )}
               >
-                {p.name.replace(' (AI)', '')} {p.id === socket.id && '(You)'}
+                {p.name.replace(' (AI)', '')} {isMe && '(You)'}
               </div>
 
               {/* Desktop badges */}
@@ -469,7 +477,7 @@ export const PlayerCard = React.memo(
         {/* Nominate overlay */}
         {gameState.phase === 'Nominate_Chancellor' &&
           isPresidentialCandidate &&
-          p.id !== socket.id &&
+          !isMe &&
           p.isAlive &&
           (() => {
             const aliveCount = gameState.players.filter((pl) => pl.isAlive).length;
@@ -495,8 +503,9 @@ export const PlayerCard = React.memo(
 
         {/* Title Role Targets (Assassin & Interdictor) */}
         {gameState.titlePrompt &&
-          gameState.titlePrompt.playerId === socket.id &&
-          p.id !== socket.id &&
+          me &&
+          gameState.titlePrompt.playerId === me.id &&
+          !isMe &&
           p.isAlive &&
           (() => {
             if (gameState.titlePrompt.role === 'Assassin') {
@@ -539,7 +548,7 @@ export const PlayerCard = React.memo(
         {/* Executive action overlay */}
         {gameState.phase === 'Executive_Action' &&
           isPresident &&
-          p.id !== socket.id &&
+          !isMe &&
           p.isAlive && (
             <button
               onClick={(e) => {
@@ -554,7 +563,7 @@ export const PlayerCard = React.memo(
           )}
 
         {/* Host kick overlay — lobby only */}
-        {isHost && gameState.phase === 'Lobby' && p.id !== socket.id && !p.isAI && (
+        {isHost && gameState.phase === 'Lobby' && !isMe && !p.isAI && (
           <button
             onClick={(e) => {
               e.stopPropagation();

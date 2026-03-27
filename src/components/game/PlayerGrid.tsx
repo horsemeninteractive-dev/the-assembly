@@ -60,8 +60,8 @@ export const PlayerGrid = ({
       >
         {gameState.players.map((p, index) => {
           if (!p) return null;
-          const isMe = p.id === socket.id;
-          const stream = isMe ? localStream : remoteStreams[p.id];
+          const isMe = p.socketId === socket.id;
+          const stream = isMe ? localStream : remoteStreams[p.socketId];
           return (
             <PlayerCard
               key={p.id}
@@ -79,6 +79,7 @@ export const PlayerGrid = ({
               speakingPlayers={speakingPlayers}
               playSound={playSound}
               setSelectedPlayerId={setSelectedPlayerId}
+              me={me}
             />
           );
         })}

@@ -778,7 +778,11 @@ async function startServer() {
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state) return;
-      engine.nominateChancellor(state, roomId, chancellorId, socket.id);
+
+      const me = state.players.find((p) => p.socketId === socket.id);
+      if (!me) return;
+
+      engine.nominateChancellor(state, roomId, chancellorId, me.id);
     });
 
     socket.on('vote', (vote) => {
@@ -816,7 +820,11 @@ async function startServer() {
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state) return;
-      engine.handlePresidentDiscard(state, roomId, socket.id, idx);
+
+      const me = state.players.find((p) => p.socketId === socket.id);
+      if (!me) return;
+
+      engine.handlePresidentDiscard(state, roomId, me.id, idx);
     });
 
     socket.on('chancellorPlay', (idx) => {
@@ -824,7 +832,11 @@ async function startServer() {
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state) return;
-      engine.handleChancellorPlay(state, roomId, socket.id, idx);
+
+      const me = state.players.find((p) => p.socketId === socket.id);
+      if (!me) return;
+
+      engine.handleChancellorPlay(state, roomId, me.id, idx);
     });
 
     socket.on('declarePolicies', (data) => {
@@ -872,7 +884,11 @@ async function startServer() {
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state) return;
-      await engine.handleExecutiveAction(state, roomId, targetId, socket.id);
+
+      const me = state.players.find((p) => p.socketId === socket.id);
+      if (!me) return;
+
+      await engine.handleExecutiveAction(state, roomId, targetId, me.id);
     });
 
     socket.on('useTitleAbility', async (abilityData) => {

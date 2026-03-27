@@ -59,6 +59,8 @@ interface ProfileProps {
     setMusicVolume: React.Dispatch<React.SetStateAction<number>>;
     soundVolume: number;
     setSoundVolume: React.Dispatch<React.SetStateAction<number>>;
+    ttsVolume: number;
+    setTtsVolume: React.Dispatch<React.SetStateAction<number>>;
     isFullscreen: boolean;
     setIsFullscreen: React.Dispatch<React.SetStateAction<boolean>>;
     ttsVoice: string;
@@ -291,6 +293,8 @@ export const Profile: React.FC<ProfileProps> = ({
     setMusicVolume,
     soundVolume,
     setSoundVolume,
+    ttsVolume,
+    setTtsVolume,
     isFullscreen,
     setIsFullscreen,
     ttsVoice,
@@ -1658,6 +1662,17 @@ export const Profile: React.FC<ProfileProps> = ({
                         max="100"
                         value={soundVolume}
                         onChange={(e) => setSoundVolume(parseInt(e.target.value))}
+                        className="w-full accent-red-900"
+                      />
+                    </div>
+                    <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
+                      <span className="text-sm font-mono text-primary">TTS Volume</span>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={ttsVolume}
+                        onChange={(e) => setTtsVolume(parseInt(e.target.value))}
                         className="w-full accent-red-900"
                       />
                     </div>

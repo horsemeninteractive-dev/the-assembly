@@ -533,15 +533,15 @@ export class GameEngine {
   public handlePresidentDiscard(
     s: GameState,
     roomId: string,
-    presidentSocketId: string,
+    presidentId: string,
     idx: number
   ): void {
     if (typeof idx !== 'number' || !Number.isInteger(idx) || idx < 0) return;
     if (s.phase !== 'Legislative_President') return;
-    if (s.presidentId !== presidentSocketId) return;
+    if (s.presidentId !== presidentId) return;
     if (idx >= s.drawnPolicies.length) return;
 
-    const player = s.players.find((p) => p.id === presidentSocketId);
+    const player = s.players.find((p) => p.id === presidentId);
     if (!player || !player.isAlive || player.hasActed) return;
     player.hasActed = true;
 
@@ -572,15 +572,15 @@ export class GameEngine {
   public handleChancellorPlay(
     s: GameState,
     roomId: string,
-    chancellorSocketId: string,
+    chancellorId: string,
     idx: number
   ): void {
     if (typeof idx !== 'number' || !Number.isInteger(idx) || idx < 0) return;
     if (s.phase !== 'Legislative_Chancellor') return;
-    if (s.chancellorId !== chancellorSocketId) return;
+    if (s.chancellorId !== chancellorId) return;
     if (idx >= s.chancellorPolicies.length) return;
 
-    const player = s.players.find((p) => p.id === chancellorSocketId);
+    const player = s.players.find((p) => p.id === chancellorId);
     if (!player || !player.isAlive || player.hasActed) return;
     player.hasActed = true;
 
@@ -595,7 +595,7 @@ export class GameEngine {
     s.chancellorPolicies = [];
     // Do NOT restart the timer here — phase stays Legislative_Chancellor during
     // the animation window; restarting would create a stale misfire.
-    this.enactPolicy(s, roomId, played, false, chancellorSocketId);
+    this.enactPolicy(s, roomId, played, false, chancellorId);
     this.broadcastState(roomId);
   }
 
@@ -965,14 +965,14 @@ export class GameEngine {
     s: GameState,
     roomId: string,
     chancellorId: string,
-    presidentSocketId: string
+    presidentId: string
   ): void {
     // Reject if a title ability is still pending or the phase is wrong
     if (s.titlePrompt) return;
     if (s.phase !== 'Nominate_Chancellor') return;
 
     const president = s.players[s.presidentIdx];
-    if (president.id !== presidentSocketId || !president.isAlive || president.hasActed) return;
+    if (president.id !== presidentId || !president.isAlive || president.hasActed) return;
     president.hasActed = true;
 
     const chancellor = s.players.find((p) => p.id === chancellorId);
@@ -980,7 +980,7 @@ export class GameEngine {
 
     if (s.rejectedChancellorId === chancellor.id) {
       this.io
-        .to(presidentSocketId)
+        .to(president.socketId)
         .emit(
           'error',
           'This player was rejected by the Broker and cannot be nominated again this round.'
@@ -990,7 +990,7 @@ export class GameEngine {
     }
     if (s.detainedPlayerId === chancellor.id) {
       this.io
-        .to(presidentSocketId)
+        .to(president.socketId)
         .emit('error', 'This player is detained by the Interdictor and cannot be nominated.');
       president.hasActed = false;
       return;
@@ -998,7 +998,7 @@ export class GameEngine {
 
     const alive = s.players.filter((p) => p.isAlive).length;
     if (chancellor.wasChancellor || (alive > 5 && chancellor.wasPresident)) {
-      this.io.to(presidentSocketId).emit('error', 'Player is ineligible due to term limits.');
+      this.io.to(president.socketId).emit('error', 'Player is ineligible due to term limits.');
       president.hasActed = false;
       return;
     }
@@ -1382,26 +1382,6 @@ export class GameEngine {
       timestamp: Date.now(),
     });
 
-    const verb = type === 'President' ? 'passed' : 'received';
-    const drewStr = type === 'President' ? ` (drew ${drewCiv}C/${drewSta}S)` : '';
-    addLog(s, `${player.name} (${type}) declared ${verb} ${civ}C/${sta}S.${drewStr}`);
-
-    if (player.isAI && enacted === 'State' && Math.random() > 0.4) {
-      setTimeout(() => {
-        if (s.isPaused) return;
-        const lines =
-          type === 'Chancellor'
-            ? player.role === 'Civil'
-              ? CHAT.chanCivilStateEnacted
-              : CHAT.chanStateStateEnacted
-            : player.role === 'Civil'
-              ? CHAT.presCivilStateEnacted
-              : CHAT.presStateStateEnacted;
-        this.postAIChat(s, player, lines);
-        this.broadcastState(roomId);
-      }, 1200);
-    }
-
     this.broadcastState(roomId);
 
     const presDecl = s.declarations.some((d) => d.type === 'President');
@@ -1415,6 +1395,38 @@ export class GameEngine {
     if (!s.lastEnactedPolicy) return;
 
     updateSuspicionFromDeclarations(s);
+
+    const presFull = s.declarations.find((d) => d.type === 'President');
+    if (presFull) {
+      const verb = 'passed';
+      const drewStr = ` (drew ${presFull.drewCiv}C/${presFull.drewSta}S)`;
+      addLog(s, `${presFull.playerName} (President) declared ${verb} ${presFull.civ}C/${presFull.sta}S.${drewStr}`);
+    }
+
+    const chanFull = s.declarations.find((d) => d.type === 'Chancellor');
+    if (chanFull) {
+      const verb = 'received';
+      addLog(s, `${chanFull.playerName} (Chancellor) declared ${verb} ${chanFull.civ}C/${chanFull.sta}S.`);
+    }
+
+    // AI Banter — only once both have declared
+    const bothAI = s.players.find(p => p.isPresident)?.isAI && s.players.find(p => p.isChancellor)?.isAI;
+    if (!bothAI && s.lastEnactedPolicy?.type === 'State' && Math.random() > 0.4) {
+      const p = s.players.find(pl => pl.isPresident);
+      const c = s.players.find(pl => pl.isChancellor);
+      const speaker = p?.isAI ? p : c?.isAI ? c : null;
+      if (speaker) {
+        setTimeout(() => {
+          if (s.isPaused) return;
+          const type = speaker.isPresident ? 'President' : 'Chancellor';
+          const lines = type === 'Chancellor'
+            ? speaker.role === 'Civil' ? CHAT.chanCivilStateEnacted : CHAT.chanStateStateEnacted
+            : speaker.role === 'Civil' ? CHAT.presCivilStateEnacted : CHAT.presStateStateEnacted;
+          this.postAIChat(s, speaker, lines);
+          this.broadcastState(roomId);
+        }, 1200);
+      }
+    }
 
     if (!s.lastEnactedPolicy.historyCaptured) {
       this.captureRoundHistory(s, s.lastEnactedPolicy.type, false);
@@ -1735,10 +1747,10 @@ export class GameEngine {
 
       if (action === 'PolicyPeek') {
         const top3 = s.deck.slice(0, 3);
-        if (s.presidentId) {
-          this.io.to(s.presidentId).emit('policyPeekResult', top3);
-          const pres = s.players.find((p) => p.id === s.presidentId);
-          addLog(s, `${pres?.name ?? 'President'} previewed the top 3 directives.`);
+        const pres = s.players.find((p) => p.id === s.presidentId);
+        if (pres?.socketId) {
+          this.io.to(pres.socketId).emit('policyPeekResult', top3);
+          addLog(s, `${pres.name} previewed the top 3 directives.`);
         }
         this.nextRound(s, roomId, true);
         return;
@@ -1755,12 +1767,12 @@ export class GameEngine {
     s: GameState,
     roomId: string,
     targetId: string,
-    presidentSocketId?: string
+    presidentId?: string
   ): Promise<void> {
-    if (presidentSocketId) {
+    if (presidentId) {
       if (s.phase !== 'Executive_Action') return;
-      if (s.presidentId !== presidentSocketId) return;
-      const player = s.players.find((p) => p.id === presidentSocketId);
+      if (s.presidentId !== presidentId) return;
+      const player = s.players.find((p) => p.id === presidentId);
       if (!player || !player.isAlive || player.hasActed) return;
       player.hasActed = true;
     }
@@ -1841,12 +1853,13 @@ export class GameEngine {
     const result = target.role === 'Civil' ? 'Civil' : 'State';
 
     if (s.presidentId) {
-      this.io
-        .to(s.presidentId)
-        .emit('investigationResult', { targetName: target.name, role: result });
-      updateSuspicionFromInvestigation(s, s.presidentId, target.id, result);
-
       const pres = s.players.find((p) => p.id === s.presidentId);
+      if (pres?.socketId) {
+        this.io
+          .to(pres.socketId)
+          .emit('investigationResult', { targetName: target.name, role: result });
+        updateSuspicionFromInvestigation(s, s.presidentId, target.id, result);
+      }
       if (pres?.isAI && Math.random() > 0.3) {
         setTimeout(() => {
           if (!s.isPaused) {
@@ -2344,7 +2357,7 @@ export class GameEngine {
       addLog(state, `${spectator?.name || queued?.name || 'A user'} left the room.`);
     }
 
-    const player = state.players.find((p) => p.id === socket.id);
+    const player = state.players.find((p) => p.socketId === socket.id);
     if (player) {
       if (!player.isAI && (!player.isDisconnected || isIntentional)) {
         if (isIntentional) {
