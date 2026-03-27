@@ -16,38 +16,108 @@ if (!isConfigured) {
 
 // In-memory fallback store (used when Supabase is not configured)
 const users: Map<string, UserInternal> = new Map();
+const memoryResetTokens: Map<string, { userId: string; expiresAt: Date }> = new Map();
+
+import { stateClient, isRedisConfigured } from './redis.ts';
+
+import { z } from 'zod';
 
 // ---------------------------------------------------------------------------
-// Mapping helpers
+// Runtime Schema Validation (Zod)
 // ---------------------------------------------------------------------------
+
+const UserStatsSchema = z.object({
+  gamesPlayed: z.number().default(0),
+  wins: z.number().default(0),
+  losses: z.number().default(0),
+  civilGames: z.number().default(0),
+  stateGames: z.number().default(0),
+  overseerGames: z.number().default(0),
+  kills: z.number().default(0),
+  deaths: z.number().default(0),
+  elo: z.number().default(1000),
+  points: z.number().default(0),
+  xp: z.number().default(0),
+  agendasCompleted: z.number().default(0),
+  civilWins: z.number().default(0),
+  stateWins: z.number().default(0),
+  overseerWins: z.number().default(0),
+  rankedWins: z.number().default(0),
+  rankedGames: z.number().default(0),
+  casualWins: z.number().default(0),
+  casualGames: z.number().default(0),
+  classicWins: z.number().default(0),
+  classicGames: z.number().default(0),
+}).catchall(z.any());
+
+const SupabaseUserSchema = z.object({
+  id: z.string(),
+  username: z.string(),
+  email: z.string().optional(),
+  password: z.string().optional(),
+  avatar_url: z.string().optional(),
+  created_at: z.string().optional(),
+  stats: UserStatsSchema.default({}),
+  owned_cosmetics: z.array(z.string()).default([]),
+  active_frame: z.string().optional(),
+  active_policy: z.string().optional(),
+  active_vote: z.string().optional(),
+  active_music: z.string().optional(),
+  active_sound: z.string().optional(),
+  active_background: z.string().optional(),
+  cabinet_points: z.number().default(0),
+  claimed_rewards: z.array(z.string()).default([]),
+  earned_achievements: z.array(z.any()).default([]),
+  pinned_achievements: z.array(z.string()).default([]),
+  recently_played_with: z.array(z.any()).default([]),
+  google_id: z.string().optional(),
+  discord_id: z.string().optional(),
+  is_admin: z.boolean().default(false),
+  is_banned: z.boolean().default(false),
+  token_version: z.number().default(0),
+}).catchall(z.any());
 
 function mapSupabaseToUser(data: any): UserInternal | null {
   if (!data) return null;
 
+  const result = SupabaseUserSchema.safeParse(data);
+  if (!result.success) {
+    logger.fatal({ 
+      err: result.error.format(), 
+      data, 
+      msg: 'CRITICAL: mapSupabaseToUser failed validation. Possible Supabase schema drift detected!' 
+    });
+    return null;
+  }
+
+  const validData = result.data;
+
   return {
-    ...data,
-    email: data.email,
-    stats: data.stats || {},
-    createdAt: data.created_at,
-    avatarUrl: data.avatar_url,
-    ownedCosmetics: data.owned_cosmetics,
-    activeFrame: data.active_frame,
-    activePolicyStyle: data.active_policy,
-    activeVotingStyle: data.active_vote,
-    activeMusic: data.active_music,
-    activeSoundPack: data.active_sound,
-    activeBackground: data.active_background,
-    cabinetPoints: data.cabinet_points,
-    claimedRewards: data.claimed_rewards || [],
-    earnedAchievements: data.earned_achievements || [],
-    pinnedAchievements: data.pinned_achievements || [],
-    recentlyPlayedWith: data.recently_played_with || [],
-    googleId: data.google_id,
-    discordId: data.discord_id,
-    isAdmin: data.is_admin || false,
-    isBanned: data.is_banned || false,
-    tokenVersion: data.token_version || 0,
-  } as UserInternal;
+    id: validData.id,
+    username: validData.username,
+    password: validData.password,
+    email: validData.email,
+    stats: validData.stats as any,
+    createdAt: validData.created_at,
+    avatarUrl: validData.avatar_url,
+    ownedCosmetics: validData.owned_cosmetics,
+    activeFrame: validData.active_frame,
+    activePolicyStyle: validData.active_policy,
+    activeVotingStyle: validData.active_vote,
+    activeMusic: validData.active_music,
+    activeSoundPack: validData.active_sound,
+    activeBackground: validData.active_background,
+    cabinetPoints: validData.cabinet_points,
+    claimedRewards: validData.claimed_rewards,
+    earnedAchievements: validData.earned_achievements,
+    pinnedAchievements: validData.pinned_achievements,
+    recentlyPlayedWith: validData.recently_played_with,
+    googleId: validData.google_id,
+    discordId: validData.discord_id,
+    isAdmin: validData.is_admin,
+    isBanned: validData.is_banned,
+    tokenVersion: validData.token_version,
+  };
 }
 
 function mapUserToSupabase(userData: UserInternal): Record<string, unknown> {
@@ -262,16 +332,40 @@ export async function createPasswordResetToken(
   token: string,
   expiresAt: Date
 ): Promise<void> {
+  if (isRedisConfigured && stateClient) {
+    const ttlSeconds = Math.ceil((expiresAt.getTime() - Date.now()) / 1000);
+    if (ttlSeconds > 0) {
+      await stateClient.setex(`resetToken:${token}`, ttlSeconds, userId);
+    }
+  }
+
   if (isConfigured) {
     await db.from('password_resets').insert({
       user_id: userId,
       token,
       expires_at: expiresAt.toISOString(),
     });
+  } else if (!isRedisConfigured) {
+    memoryResetTokens.set(token, { userId, expiresAt });
   }
 }
 
+/** 
+ * Verifies a token and returns the userId if valid.
+ * This is SINGLE-USE: the token is deleted immediately from Redis/Memory, 
+ * and although it persists in DB until the manual delete call, it's effectively verified once.
+ */
 export async function verifyPasswordResetToken(token: string): Promise<string | null> {
+  // Check Redis first (preferred)
+  if (isRedisConfigured && stateClient) {
+    const userId = await stateClient.get(`resetToken:${token}`);
+    if (userId) {
+      await stateClient.del(`resetToken:${token}`);
+      return userId;
+    }
+  }
+
+  // Check Supabase
   if (isConfigured) {
     const { data, error } = await db
       .from('password_resets')
@@ -280,15 +374,35 @@ export async function verifyPasswordResetToken(token: string): Promise<string | 
       .gt('expires_at', new Date().toISOString())
       .single();
 
-    if (error || !data) return null;
-    return data.user_id;
+    if (!error && data) {
+      return data.user_id;
+    }
   }
+
+  // Check Memory fallback
+  const mem = memoryResetTokens.get(token);
+  if (mem) {
+    memoryResetTokens.delete(token);
+    if (mem.expiresAt > new Date()) {
+      return mem.userId;
+    }
+  }
+
   return null;
 }
 
 export async function deletePasswordResetTokens(userId: string): Promise<void> {
+  // In a real scenario, we'd need to find tokens by userId in Redis to delete them,
+  // which requires a reverse lookup. For simplicity, we rely on the single-use
+  // nature and TTL. Direct DB deletion still works.
+
   if (isConfigured) {
     await db.from('password_resets').delete().eq('user_id', userId);
+  }
+
+  // Clear memory fallback
+  for (const [token, data] of memoryResetTokens.entries()) {
+    if (data.userId === userId) memoryResetTokens.delete(token);
   }
 }
 

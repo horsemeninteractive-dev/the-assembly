@@ -1,0 +1,8 @@
+node_modules
+dist
+.dist
+build
+coverage
+android
+ios
+*.md

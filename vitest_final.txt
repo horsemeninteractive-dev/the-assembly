@@ -1,0 +1,106 @@
+﻿
+[1m[46m RUN [49m[22m [36mv4.1.1 [39m[90mC:/Users/aeryt/Documents/The Assembly/Dev/main/the-assembly[39m
+
+[90mstdout[2m | server/tests/gameEngine.integration.test.ts
+[22m[39m[dotenv@17.3.1] injecting env (15) from .env -- tip: ÔÜÖ´©Å  write to custom object with { processEnv: myObject }
+
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mPhase Transitions[2m > [22mnominateChancellor transitions to Voting (no Broker)[32m 5[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mPhase Transitions[2m > [22mnominateChancellor rejects ineligible chancellor (wasChancellor)[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mPhase Transitions[2m > [22mpassed election transitions to Legislative_President[32m 3[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mPhase Transitions[2m > [22mpresident discard transitions to Legislative_Chancellor[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mPhase Transitions[2m > [22mchancellor play enacts policy and resets electionTracker[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mPhase Transitions[2m > [22mfailed election increments electionTracker[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mPhase Transitions[2m > [22melectionTracker = 3 triggers chaos policy enactment[32m 1[2mms[22m[39m
+ [31m├ù[39m server/tests/gameEngine.integration.test.ts[2m > [22mTimer Expiry Paths[2m > [22mNominate_Chancellor timer auto-nominates an eligible player[32m 26[2mms[22m[39m
+[31m   ÔåÆ expected undefined to be defined[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mTimer Expiry Paths[2m > [22mVoting timer auto-casts votes for abstaining players[32m 8[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mTimer Expiry Paths[2m > [22mLegislative_President timer auto-discards a policy[32m 2[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mTimer Expiry Paths[2m > [22mLegislative_Chancellor timer auto-enacts a policy[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mTitle Role Abilities[2m > [22mAssassin kills target when ability is used[32m 1[2mms[22m[39m
+{"severity":"INFO","time":"2026-03-27T06:11:31.928Z","pid":23320,"hostname":"EpiKStation","msg":"[Redis] connected"}
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mTitle Role Abilities[2m > [22mAssassin ending game immediately when targeting Overseer[32m 128[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mTitle Role Abilities[2m > [22mStrategist draws 4 policies when ability is used[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mTitle Role Abilities[2m > [22mStrategist drawing normal 3 when ability is declined[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mTitle Role Abilities[2m > [22mBroker rejects chancellor candidate and forces re-nomination[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mTitle Role Abilities[2m > [22mInterdictor detains target for the round[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mTitle Role Abilities[2m > [22mHandler swaps next two presidents in presidential order[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mTitle Role Abilities[2m > [22mAuditor peeks at the discard pile (no target needed)[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mExecutive Actions[2m > [22mExecution kills the target player[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mExecutive Actions[2m > [22mExecution targeting Overseer ends the game (Civil win)[32m 74[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mExecutive Actions[2m > [22mInvestigate emits investigationResult to president socket[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mExecutive Actions[2m > [22mInvestigate returns Civil for Civil-role players[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mExecutive Actions[2m > [22mSpecialElection sets the target as next president[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mVictory Conditions[2m > [22mCivil wins when 5 Civil directives are enacted[32m 2[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mVictory Conditions[2m > [22mState wins when 6 State directives are enacted[32m 2[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mVictory Conditions[2m > [22mOverseer elected chancellor after 3 State directives causes State win[32m 2[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mPresidential Rotation[2m > [22mpresidency advances to the next alive player each round[32m 1[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mPresidential Rotation[2m > [22mpresidency skips dead players in rotation[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mEligibility Guards[2m > [22mgetEligibleChancellors excludes detainedPlayerId[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mEligibility Guards[2m > [22mgetEligibleChancellors excludes rejectedChancellorId[32m 0[2mms[22m[39m
+ [32mÔ£ô[39m server/tests/gameEngine.integration.test.ts[2m > [22mEligibility Guards[2m > [22mgetEligibleChancellors excludes wasPresident when >= 6 alive players[32m 0[2mms[22m[39m
+node.exe : 
+At line:1 char:1
++ & "C:\Program 
+Files\nodejs/node.exe" 
+"C:\Program 
+Files\nodejs/node_mo ...
++ ~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~
+    + CategoryInfo           
+   : NotSpecified: (:String  
+  ) [], RemoteException
+    + FullyQualifiedErrorId  
+   : NativeCommandError
+ 
+[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[3
+9m[1m[41m Failed Tests 1 [
+49m[22m[31mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»[39m
+
+[41m[1m FAIL [22m[49m ser
+ver/tests/gameEngine.integrat
+ion.test.ts[2m > [22mTimer 
+Expiry Paths[2m > 
+[22mNominate_Chancellor 
+timer auto-nominates an 
+eligible player
+[31m[1mAssertionError[22m:
+ expected undefined to be 
+defined[39m
+[36m [2mÔØ»[22m server/tes
+ts/gameEngine.integration.tes
+t.ts:[2m342:23[22m[39m
+    [90m340|[39m     // 
+One of the eligible players 
+should now be nominated 
+chancellor ÔÇª
+    [90m341|[39m     const 
+nominated = 
+state.players.find((p) => 
+p.isChancellorCandidatÔÇª
+    [90m342|[39m     [34me
+xpect[39m(nominated)[33m.[
+39m[34mtoBeDefined[39m()[3
+3m;[39m
+    [90m   |[39m           
+            [31m^[39m
+    [90m343|[39m     [34me
+xpect[39m(nominated[33m![3
+9m[33m.[39mid)[33m.[39mno
+t[33m.[39m[34mtoBe[39m(pl
+ayers[[34m0[39m][33m.[39m
+id)[33m;[39m
+    [90m344|[39m
+
+[31m[2mÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ
+»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»Ô
+Ä»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»ÔÄ»[1/1]Ô
+Ä»[22m[39m
+
+
+[2m Test Files [22m [1m[31m1 failed[39m[22m[90m (1)[39m
+[2m      Tests [22m [1m[31m1 failed[39m[22m[2m | [22m[1m[32m31 passed[39m[22m[90m (32)[39m
+[2m   Start at [22m 06:11:31
+[2m   Duration [22m 849ms[2m (transform 198ms, setup 0ms, import 390ms, tests 267ms, environment 0ms)[22m
+
