@@ -12,7 +12,7 @@ import { InviteModal } from './components/game/modals/InviteModal';
 import { FriendRequestModal } from './components/game/modals/FriendRequestModal';
 import { TutorialModal } from './components/TutorialModal';
 import { MUSIC_TRACKS, SOUND_PACKS } from './lib/audio';
-import { DiscordSDK } from "@discord/embedded-app-sdk";
+import { DiscordSDK } from '@discord/embedded-app-sdk';
 import { discordSdk, setupDiscordSdk } from './lib/discord';
 import { DISCORD_CLIENT_ID } from './constants';
 import { CLIENT_VERSION } from './sharedConstants';
@@ -44,15 +44,25 @@ export default function App() {
   });
   const [isMobile, setIsMobile] = useState(() => {
     if (typeof window === 'undefined') return false;
-    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(
+      navigator.userAgent
+    );
   });
-  const [pendingInvite, setPendingInvite] = useState<{ fromUsername: string; roomId: string } | null>(null);
+  const [pendingInvite, setPendingInvite] = useState<{
+    fromUsername: string;
+    roomId: string;
+  } | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
-  const [pendingFriendRequest, setPendingFriendRequest] = useState<{ fromUserId: string; fromUsername: string } | null>(null);
-  const [adminBroadcast, setAdminBroadcast] = useState<{ message: string; sender: string } | null>(null);
+  const [pendingFriendRequest, setPendingFriendRequest] = useState<{
+    fromUserId: string;
+    fromUsername: string;
+  } | null>(null);
+  const [adminBroadcast, setAdminBroadcast] = useState<{ message: string; sender: string } | null>(
+    null
+  );
 
   const handleDiscordAutoJoin = (roomId: string, currentUser: User) => {
-    console.log("Auto-joining Discord instance room:", roomId);
+    console.log('Auto-joining Discord instance room:', roomId);
     socket.emit('joinRoom', {
       roomId,
       name: currentUser.username,
@@ -63,7 +73,7 @@ export default function App() {
       maxPlayers: 10,
       actionTimer: 60,
       mode: 'Casual',
-      privacy: 'public'
+      privacy: 'public',
     });
   };
 
@@ -71,11 +81,16 @@ export default function App() {
     const init = async () => {
       try {
         setLoading(true);
-        console.log(`App initialization started [${CLIENT_VERSION}]. Initial detection - isDiscord:`, isDiscord, "isMobile:", isMobile);
-        
+        console.log(
+          `App initialization started [${CLIENT_VERSION}]. Initial detection - isDiscord:`,
+          isDiscord,
+          'isMobile:',
+          isMobile
+        );
+
         await setupDiscordSdk();
         const instanceId = discordSdk?.instanceId;
-        console.log("Discord SDK setup complete. instanceId:", instanceId);
+        console.log('Discord SDK setup complete. instanceId:', instanceId);
 
         let currentUser: User | null = null;
         let currentToken: string | null = localStorage.getItem('token');
@@ -83,19 +98,19 @@ export default function App() {
         // 1. Try Discord Auto-Login first if we are in Discord
         if (instanceId) {
           setIsDiscord(true);
-          console.log("Discord instance detected, attempting auto-login...");
+          console.log('Discord instance detected, attempting auto-login...');
           try {
             const clientId = DISCORD_CLIENT_ID;
-            if (!clientId) throw new Error("Discord client ID not set");
-            
+            if (!clientId) throw new Error('Discord client ID not set');
+
             const { code } = await discordSdk!.commands.authorize({
               client_id: clientId,
-              response_type: "code",
-              state: "",
-              prompt: "none",
-              scope: ["identify", "guilds"],
+              response_type: 'code',
+              state: '',
+              prompt: 'none',
+              scope: ['identify', 'guilds'],
             });
-            console.log("Discord authorize success, exchanging code...");
+            console.log('Discord authorize success, exchanging code...');
             const response = await fetch(apiUrl('/api/auth/discord/callback'), {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -106,34 +121,40 @@ export default function App() {
               currentUser = data.user;
               currentToken = data.token;
               localStorage.setItem('token', data.token);
-              console.log("Discord auto-login success for user:", currentUser?.username);
+              console.log('Discord auto-login success for user:', currentUser?.username);
             } else {
-              const errData = await response.json().catch(() => ({ error: 'Unknown server error' }));
-              console.error("Discord callback failed:", errData);
+              const errData = await response
+                .json()
+                .catch(() => ({ error: 'Unknown server error' }));
+              console.error('Discord callback failed:', errData);
             }
           } catch (err) {
-            console.error("Discord auto-login access_denied usually means user needs to authorize manually.");
+            console.error(
+              'Discord auto-login access_denied usually means user needs to authorize manually.'
+            );
           }
         }
 
         // 2. Fallback: Restore session from token
         if (!currentUser && currentToken) {
-          console.log("Restoring session from local token...");
+          console.log('Restoring session from local token...');
           try {
-            const res = await fetch(apiUrl('/api/me'), { headers: { Authorization: `Bearer ${currentToken}` } });
+            const res = await fetch(apiUrl('/api/me'), {
+              headers: { Authorization: `Bearer ${currentToken}` },
+            });
             if (res.ok) {
               const data = await res.json();
               if (data.user) {
                 currentUser = data.user;
-                console.log("Session restored for user:", currentUser!.username);
+                console.log('Session restored for user:', currentUser!.username);
               }
             } else {
-              console.warn("Session token invalid or expired, clearing.");
+              console.warn('Session token invalid or expired, clearing.');
               currentToken = null;
               localStorage.removeItem('token');
             }
           } catch (err) {
-            console.error("Session restore API failed:", err);
+            console.error('Session restore API failed:', err);
           }
         }
 
@@ -145,7 +166,7 @@ export default function App() {
 
           // If in Discord, auto-join room and bypass "Enter" screen
           if (instanceId) {
-            console.log("Bypassing splash screen for Discord auto-join.");
+            console.log('Bypassing splash screen for Discord auto-join.');
             setIsInteracted(true);
             handleDiscordAutoJoin(instanceId.slice(0, 8), currentUser);
 
@@ -163,10 +184,10 @@ export default function App() {
             }
           }
         } else {
-          console.log("No user session found after initialization.");
+          console.log('No user session found after initialization.');
         }
       } catch (err) {
-        console.error("Critical initialization failure:", err);
+        console.error('Critical initialization failure:', err);
       } finally {
         setLoading(false);
       }
@@ -192,14 +213,26 @@ export default function App() {
   // Audio & Settings State
   const [isMusicOn, setIsMusicOn] = useState(() => localStorage.getItem('isMusicOn') !== 'false');
   const [isSoundOn, setIsSoundOn] = useState(() => localStorage.getItem('isSoundOn') !== 'false');
-  const [musicVolume, setMusicVolume] = useState(() => parseInt(localStorage.getItem('musicVolume') || '50'));
-  const [soundVolume, setSoundVolume] = useState(() => parseInt(localStorage.getItem('soundVolume') || '50'));
+  const [musicVolume, setMusicVolume] = useState(() =>
+    parseInt(localStorage.getItem('musicVolume') || '50')
+  );
+  const [soundVolume, setSoundVolume] = useState(() =>
+    parseInt(localStorage.getItem('soundVolume') || '50')
+  );
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [ttsVoice, setTtsVoice] = useState<string>(localStorage.getItem('ttsVoice') || '');
-  const [ttsEngine, setTtsEngine] = useState<string>(localStorage.getItem('ttsEngine') || 'browser');
-  const [isAiVoiceEnabled, setIsAiVoiceEnabled] = useState(() => localStorage.getItem('isAiVoiceEnabled') !== 'false');
-  const [uiScaleSetting, setUiScaleSetting] = useState(() => parseFloat(localStorage.getItem('uiScaleSetting') || '1'));
-  const [isLightMode, setIsLightMode] = useState(() => localStorage.getItem('isLightMode') === 'true');
+  const [ttsEngine, setTtsEngine] = useState<string>(
+    localStorage.getItem('ttsEngine') || 'browser'
+  );
+  const [isAiVoiceEnabled, setIsAiVoiceEnabled] = useState(
+    () => localStorage.getItem('isAiVoiceEnabled') !== 'false'
+  );
+  const [uiScaleSetting, setUiScaleSetting] = useState(() =>
+    parseFloat(localStorage.getItem('uiScaleSetting') || '1')
+  );
+  const [isLightMode, setIsLightMode] = useState(
+    () => localStorage.getItem('isLightMode') === 'true'
+  );
   const musicAudioRef = useRef<HTMLAudioElement | null>(null);
 
   // Persist settings
@@ -213,7 +246,16 @@ export default function App() {
     localStorage.setItem('isAiVoiceEnabled', String(isAiVoiceEnabled));
     localStorage.setItem('uiScaleSetting', String(uiScaleSetting));
     localStorage.setItem('isLightMode', String(isLightMode));
-  }, [isMusicOn, isSoundOn, musicVolume, soundVolume, ttsVoice, isAiVoiceEnabled, uiScaleSetting, isLightMode]);
+  }, [
+    isMusicOn,
+    isSoundOn,
+    musicVolume,
+    soundVolume,
+    ttsVoice,
+    isAiVoiceEnabled,
+    uiScaleSetting,
+    isLightMode,
+  ]);
 
   // Apply theme to document root so portals (ReactDOM.createPortal) inherit it
   useEffect(() => {
@@ -225,9 +267,9 @@ export default function App() {
     const handlePowerUsed = async (data: { role: string }) => {
       if (!isSoundOn) return;
       const text = `${data.role} power used`;
-      aiSpeech.speak(text, { 
-        voice: ttsVoice, 
-        volume: Math.min(1, (soundVolume * 1.5) / 100) 
+      aiSpeech.speak(text, {
+        voice: ttsVoice,
+        volume: Math.min(1, (soundVolume * 1.5) / 100),
       });
     };
 
@@ -255,7 +297,7 @@ export default function App() {
     }
 
     musicAudioRef.current.volume = musicVolume / 100;
-    musicAudioRef.current.play().catch(() => { });
+    musicAudioRef.current.play().catch(() => {});
 
     return () => {
       musicAudioRef.current?.pause();
@@ -269,14 +311,14 @@ export default function App() {
     if (!url) return;
     const audio = new Audio(url);
     audio.volume = soundVolume / 100;
-    audio.play().catch(() => { });
+    audio.play().catch(() => {});
   };
 
   const playMusic = (trackKey: string) => {
     if (!musicAudioRef.current) return;
     const url = getProxiedUrl(MUSIC_TRACKS[trackKey] || MUSIC_TRACKS['music-ambient']);
     musicAudioRef.current.src = url;
-    musicAudioRef.current.play().catch(() => { });
+    musicAudioRef.current.play().catch(() => {});
   };
 
   const stopMusic = () => {
@@ -293,13 +335,14 @@ export default function App() {
         if (data.version && data.version !== 'dev' && data.version !== CLIENT_VERSION) {
           setUpdateAvailable(true);
         }
-      } catch { /* silently ignore */ }
+      } catch {
+        /* silently ignore */
+      }
     };
     check();
     const interval = setInterval(check, 60_000);
     return () => clearInterval(interval);
   }, []);
-
 
   // OAuth redirect token — web (URL params on mount)
   useEffect(() => {
@@ -314,12 +357,14 @@ export default function App() {
           handleAuthSuccess(userData, urlToken);
           window.history.replaceState({}, document.title, window.location.pathname);
         }
-      } catch (e) { console.error('Failed to parse user from URL', e); }
+      } catch (e) {
+        console.error('Failed to parse user from URL', e);
+      }
     }
   }, []);
 
   // OAuth redirect token — Android (Capacitor deep link)
-  // When the server redirects to intent:// after Google/Discord OAuth, 
+  // When the server redirects to intent:// after Google/Discord OAuth,
   // Capacitor fires this event on Android.
   useEffect(() => {
     let listenerHandle: any;
@@ -333,17 +378,25 @@ export default function App() {
           const userData = JSON.parse(decodeURIComponent(urlUser));
           handleAuthSuccess(userData, urlToken);
         }
-      } catch (e) { console.error('Capacitor appUrlOpen parse failed', e); }
-    }).then(handle => { listenerHandle = handle; });
+      } catch (e) {
+        console.error('Capacitor appUrlOpen parse failed', e);
+      }
+    }).then((handle) => {
+      listenerHandle = handle;
+    });
 
     // Status Bar config for Native
     if (Capacitor.isNativePlatform()) {
       try {
         StatusBar.hide();
-      } catch (e) { console.warn('Status bar config failed', e); }
+      } catch (e) {
+        console.warn('Status bar config failed', e);
+      }
     }
 
-    return () => { listenerHandle?.remove(); };
+    return () => {
+      listenerHandle?.remove();
+    };
   }, []);
 
   // Socket listeners
@@ -376,11 +429,16 @@ export default function App() {
         if (res.ok) {
           const userData = await res.json();
           if (userData?.user) {
-            setPendingFriendRequest({ fromUserId: data.fromUserId, fromUsername: userData.user.username });
+            setPendingFriendRequest({
+              fromUserId: data.fromUserId,
+              fromUsername: userData.user.username,
+            });
             playSound('notification');
           }
         }
-      } catch { /* non-critical */ }
+      } catch {
+        /* non-critical */
+      }
     });
     socket.on('adminBroadcast', (data: { message: string; sender: string }) => {
       setAdminBroadcast(data);
@@ -406,17 +464,24 @@ export default function App() {
     socket.emit('userConnected', { userId: userData.id, token: authToken });
     try {
       if (document.documentElement.requestFullscreen) {
-        document.documentElement.requestFullscreen()
+        document.documentElement
+          .requestFullscreen()
           .then(() => setIsInteracted(true))
           .catch(() => setIsInteracted(false));
       }
-    } catch { setIsInteracted(false); }
+    } catch {
+      setIsInteracted(false);
+    }
   };
 
   const handleEnterAssembly = () => {
     setIsInteracted(true);
-    try { document.documentElement.requestFullscreen?.().catch(() => { }); } catch { /* ignore */ }
-    
+    try {
+      document.documentElement.requestFullscreen?.().catch(() => {});
+    } catch {
+      /* ignore */
+    }
+
     // Explicitly check for Discord instance to trigger room join if bypass didn't happen
     const instanceId = discordSdk?.instanceId;
     if (instanceId && user) {
@@ -426,7 +491,12 @@ export default function App() {
 
   // Trigger tutorial once the player has entered the assembly for the first time
   useEffect(() => {
-    if (isInteracted && user && user.stats.gamesPlayed === 0 && !user.claimedRewards.includes('tutorial-complete')) {
+    if (
+      isInteracted &&
+      user &&
+      user.stats.gamesPlayed === 0 &&
+      !user.claimedRewards.includes('tutorial-complete')
+    ) {
       setShowTutorial(true);
     }
   }, [isInteracted, user?.id]);
@@ -441,10 +511,14 @@ export default function App() {
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
         });
         // Refresh user to get updated claimedRewards
-        const res = await fetch(apiUrl('/api/me'), { headers: { Authorization: `Bearer ${token}` } });
+        const res = await fetch(apiUrl('/api/me'), {
+          headers: { Authorization: `Bearer ${token}` },
+        });
         const data = await res.json();
         if (data.user) setUser(data.user);
-      } catch { /* non-critical */ }
+      } catch {
+        /* non-critical */
+      }
     }
   };
 
@@ -457,13 +531,29 @@ export default function App() {
     setGameState(null);
   };
 
-  const handleJoinRoom = (roomId: string, maxPlayers?: number, actionTimer?: number, mode?: 'Casual' | 'Ranked' | 'Classic', isSpectator?: boolean, privacy?: RoomPrivacy, inviteCode?: string) => {
+  const handleJoinRoom = (
+    roomId: string,
+    maxPlayers?: number,
+    actionTimer?: number,
+    mode?: 'Casual' | 'Ranked' | 'Classic',
+    isSpectator?: boolean,
+    privacy?: RoomPrivacy,
+    inviteCode?: string
+  ) => {
     if (user) {
       socket.emit('joinRoom', {
-        roomId, name: user.username, userId: user.id,
-        activeFrame: user.activeFrame, activePolicyStyle: user.activePolicyStyle,
+        roomId,
+        name: user.username,
+        userId: user.id,
+        activeFrame: user.activeFrame,
+        activePolicyStyle: user.activePolicyStyle,
         activeVotingStyle: user.activeVotingStyle,
-        maxPlayers, actionTimer, mode, isSpectator, privacy, inviteCode,
+        maxPlayers,
+        actionTimer,
+        mode,
+        isSpectator,
+        privacy,
+        inviteCode,
       });
       // Do NOT set joined=true here — wait for the server's gameStateUpdate
       // confirmation. setJoined(true) happens in the gameStateUpdate listener.
@@ -480,8 +570,8 @@ export default function App() {
 
     if (token) {
       fetch(apiUrl('/api/me'), { headers: { Authorization: `Bearer ${token}` } })
-        .then(res => res.json())
-        .then(data => {
+        .then((res) => res.json())
+        .then((data) => {
           if (data.user) setUser(data.user);
           if (safeOnComplete) safeOnComplete();
         })
@@ -496,19 +586,20 @@ export default function App() {
   return (
     <div
       className={cn(
-        "h-[100dvh] bg-base flex flex-col bg-texture relative overflow-hidden",
-        isDiscord && isMobile ? "pt-12" : "",
-        user?.activeBackground === 'bg-nebula-void' && "bg-nebula-void"
+        'h-[100dvh] bg-base flex flex-col bg-texture relative overflow-hidden',
+        isDiscord && isMobile ? 'pt-12' : '',
+        user?.activeBackground === 'bg-nebula-void' && 'bg-nebula-void'
       )}
-      data-theme={isLightMode ? "light" : "dark"}
+      data-theme={isLightMode ? 'light' : 'dark'}
       style={{
-        backgroundImage: user?.activeBackground === 'bg-nebula-void' 
-          ? 'none' 
-          : `url("${getProxiedUrl(getBackgroundTexture(user?.activeBackground))}")`
+        backgroundImage:
+          user?.activeBackground === 'bg-nebula-void'
+            ? 'none'
+            : `url("${getProxiedUrl(getBackgroundTexture(user?.activeBackground))}")`,
       }}
     >
       <div className="absolute inset-0 pointer-events-none bg-vignette z-[5] flex items-center justify-center" />
-      
+
       <div className="relative z-10 flex flex-col h-full w-full">
         <UpdateBanner visible={updateAvailable} />
 
@@ -555,14 +646,25 @@ export default function App() {
                 className="w-full max-w-md bg-surface border border-subtle rounded-3xl p-8 shadow-2xl text-center"
               >
                 <div className="w-20 h-20 bg-elevated rounded-2xl flex items-center justify-center border border-white/40 mx-auto mb-6 overflow-hidden">
-                  <img src={getProxiedUrl("https://storage.googleapis.com/secretchancellor/SC.png")} alt="The Assembly Logo" className="w-full h-full object-contain p-2" referrerPolicy="no-referrer" />
+                  <img
+                    src={getProxiedUrl('https://storage.googleapis.com/secretchancellor/SC.png')}
+                    alt="The Assembly Logo"
+                    className="w-full h-full object-contain p-2"
+                    referrerPolicy="no-referrer"
+                  />
                 </div>
-                <h2 className="text-3xl font-thematic text-primary tracking-wide uppercase mb-2">Welcome, {user.username}</h2>
+                <h2 className="text-3xl font-thematic text-primary tracking-wide uppercase mb-2">
+                  Welcome, {user.username}
+                </h2>
                 <div className="space-y-4 mb-8">
                   <p className="text-tertiary text-xs font-serif italic leading-relaxed px-4">
-                    "The old world ended with The Crisis. Now, only The Assembly stands between us and total collapse. Will you defend the Civil Charter, or will you build the new State?"
+                    "The old world ended with The Crisis. Now, only The Assembly stands between us
+                    and total collapse. Will you defend the Civil Charter, or will you build the new
+                    State?"
                   </p>
-                  <p className="text-muted text-[10px] font-mono uppercase tracking-[0.2em]">The Assembly awaits your assessment.</p>
+                  <p className="text-muted text-[10px] font-mono uppercase tracking-[0.2em]">
+                    The Assembly awaits your assessment.
+                  </p>
                 </div>
                 <button
                   onClick={handleEnterAssembly}
@@ -596,31 +698,50 @@ export default function App() {
                   user={user}
                   token={token!}
                   onClose={() => setIsProfileOpen(false)}
-                  onOpenPurchase={() => { setIsProfileOpen(false); setIsPurchaseModalOpen(true); }}
+                  onOpenPurchase={() => {
+                    setIsProfileOpen(false);
+                    setIsPurchaseModalOpen(true);
+                  }}
                   onUpdateUser={setUser}
                   playSound={playSound}
                   playMusic={playMusic}
                   stopMusic={stopMusic}
                   settings={{
-                    isMusicOn, setIsMusicOn,
-                    isSoundOn, setIsSoundOn,
-                    musicVolume, setMusicVolume,
-                    soundVolume, setSoundVolume,
-                    isFullscreen, setIsFullscreen,
-                    ttsVoice, setTtsVoice,
-                    ttsEngine, setTtsEngine,
-                    isAiVoiceEnabled, setIsAiVoiceEnabled,
-                    uiScaleSetting, setUiScaleSetting,
-                    isLightMode, setIsLightMode
+                    isMusicOn,
+                    setIsMusicOn,
+                    isSoundOn,
+                    setIsSoundOn,
+                    musicVolume,
+                    setMusicVolume,
+                    soundVolume,
+                    setSoundVolume,
+                    isFullscreen,
+                    setIsFullscreen,
+                    ttsVoice,
+                    setTtsVoice,
+                    ttsEngine,
+                    setTtsEngine,
+                    isAiVoiceEnabled,
+                    setIsAiVoiceEnabled,
+                    uiScaleSetting,
+                    setUiScaleSetting,
+                    isLightMode,
+                    setIsLightMode,
                   }}
-                  onJoinRoom={(roomId) => { setIsProfileOpen(false); handleJoinRoom(roomId); }}
+                  onJoinRoom={(roomId) => {
+                    setIsProfileOpen(false);
+                    handleJoinRoom(roomId);
+                  }}
                 />
               )}
               {pendingInvite && (
                 <InviteModal
                   inviterName={pendingInvite.fromUsername}
                   roomId={pendingInvite.roomId}
-                  onAccept={() => { handleJoinRoom(pendingInvite.roomId); setPendingInvite(null); }}
+                  onAccept={() => {
+                    handleJoinRoom(pendingInvite.roomId);
+                    setPendingInvite(null);
+                  }}
                   onReject={() => setPendingInvite(null)}
                 />
               )}
@@ -664,44 +785,69 @@ export default function App() {
                   playMusic={playMusic}
                   stopMusic={stopMusic}
                   settings={{
-                    isMusicOn, setIsMusicOn,
-                    isSoundOn, setIsSoundOn,
-                    musicVolume, setMusicVolume,
-                    soundVolume, setSoundVolume,
-                    isFullscreen, setIsFullscreen,
-                    ttsVoice, setTtsVoice,
-                    ttsEngine, setTtsEngine,
-                    isAiVoiceEnabled, setIsAiVoiceEnabled,
-                    uiScaleSetting, setUiScaleSetting,
-                    isLightMode, setIsLightMode
+                    isMusicOn,
+                    setIsMusicOn,
+                    isSoundOn,
+                    setIsSoundOn,
+                    musicVolume,
+                    setMusicVolume,
+                    soundVolume,
+                    setSoundVolume,
+                    isFullscreen,
+                    setIsFullscreen,
+                    ttsVoice,
+                    setTtsVoice,
+                    ttsEngine,
+                    setTtsEngine,
+                    isAiVoiceEnabled,
+                    setIsAiVoiceEnabled,
+                    uiScaleSetting,
+                    setUiScaleSetting,
+                    isLightMode,
+                    setIsLightMode,
                   }}
                   roomId={gameState?.roomId}
                   mode={gameState?.mode}
-                  onOpenPurchase={() => { setIsProfileOpen(false); setIsPurchaseModalOpen(true); }}
-                  onJoinRoom={(roomId) => { setIsProfileOpen(false); handleLeaveRoom(() => handleJoinRoom(roomId)); }}
+                  onOpenPurchase={() => {
+                    setIsProfileOpen(false);
+                    setIsPurchaseModalOpen(true);
+                  }}
+                  onJoinRoom={(roomId) => {
+                    setIsProfileOpen(false);
+                    handleLeaveRoom(() => handleJoinRoom(roomId));
+                  }}
                 />
               )}
               {pendingInvite && (
                 <InviteModal
                   inviterName={pendingInvite.fromUsername}
                   roomId={pendingInvite.roomId}
-                  onAccept={() => { handleLeaveRoom(() => handleJoinRoom(pendingInvite.roomId)); setPendingInvite(null); }}
+                  onAccept={() => {
+                    handleLeaveRoom(() => handleJoinRoom(pendingInvite.roomId));
+                    setPendingInvite(null);
+                  }}
                   onReject={() => setPendingInvite(null)}
                 />
               )}
             </motion.div>
           )}
         </AnimatePresence>
-        <PurchaseCPModal 
-          isOpen={isPurchaseModalOpen} 
-          onClose={() => { playSound('modal_close'); setIsPurchaseModalOpen(false); }} 
+        <PurchaseCPModal
+          isOpen={isPurchaseModalOpen}
+          onClose={() => {
+            playSound('modal_close');
+            setIsPurchaseModalOpen(false);
+          }}
           token={token || ''}
           playSound={playSound}
         />
         <TutorialModal
           isOpen={showTutorial}
           onComplete={handleTutorialComplete}
-          onSkip={() => { setShowTutorial(false); handleTutorialComplete(); }}
+          onSkip={() => {
+            setShowTutorial(false);
+            handleTutorialComplete();
+          }}
         />
         {pendingFriendRequest && (
           <FriendRequestModal
@@ -729,11 +875,22 @@ export default function App() {
                 </div>
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-yellow-500/70">System Announcement</span>
-                    <button onClick={() => setAdminBroadcast(null)} className="text-yellow-500/50 hover:text-yellow-500"><X className="w-4 h-4" /></button>
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] text-yellow-500/70">
+                      System Announcement
+                    </span>
+                    <button
+                      onClick={() => setAdminBroadcast(null)}
+                      className="text-yellow-500/50 hover:text-yellow-500"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
-                  <p className="text-sm font-serif italic mb-2 leading-relaxed">"{adminBroadcast.message}"</p>
-                  <div className="text-[9px] font-mono text-yellow-500/50 uppercase tracking-widest text-right">— {adminBroadcast.sender}</div>
+                  <p className="text-sm font-serif italic mb-2 leading-relaxed">
+                    "{adminBroadcast.message}"
+                  </p>
+                  <div className="text-[9px] font-mono text-yellow-500/50 uppercase tracking-widest text-right">
+                    — {adminBroadcast.sender}
+                  </div>
                 </div>
               </div>
             </motion.div>

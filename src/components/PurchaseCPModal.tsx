@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import { X, Zap, Loader2, CreditCard, ChevronRight, ShoppingBag } from 'lucide-react';
 import { cn, apiUrl } from '../lib/utils';
 
@@ -11,13 +11,43 @@ interface PurchaseCPModalProps {
 }
 
 const CP_PACKAGES = [
-  { id: "starter", name: "Starter Bundle", cp: 500, price: "$4.99", description: "Perfect for your first few cosmetic unlocks." },
-  { id: "pro", name: "Pro Pack", cp: 1200, price: "$9.99", description: "Most popular. Great value for serious players.", popular: true },
-  { id: "elite", name: "Elite Vault", cp: 3000, price: "$19.99", description: "Build your collection fast with this elite stash." },
-  { id: "master", name: "Assembly Master", cp: 10000, price: "$49.99", description: "The ultimate reserve for true masters of the Assembly." },
+  {
+    id: 'starter',
+    name: 'Starter Bundle',
+    cp: 500,
+    price: '$4.99',
+    description: 'Perfect for your first few cosmetic unlocks.',
+  },
+  {
+    id: 'pro',
+    name: 'Pro Pack',
+    cp: 1200,
+    price: '$9.99',
+    description: 'Most popular. Great value for serious players.',
+    popular: true,
+  },
+  {
+    id: 'elite',
+    name: 'Elite Vault',
+    cp: 3000,
+    price: '$19.99',
+    description: 'Build your collection fast with this elite stash.',
+  },
+  {
+    id: 'master',
+    name: 'Assembly Master',
+    cp: 10000,
+    price: '$49.99',
+    description: 'The ultimate reserve for true masters of the Assembly.',
+  },
 ];
 
-export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({ isOpen, onClose, token, playSound }) => {
+export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({
+  isOpen,
+  onClose,
+  token,
+  playSound,
+}) => {
   const [isLoading, setIsLoading] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -31,7 +61,7 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({ isOpen, onClos
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ packageId }),
       });
@@ -66,7 +96,7 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({ isOpen, onClos
             onClick={onClose}
             className="absolute inset-0 bg-backdrop-heavy backdrop-blur-md"
           />
-          
+
           <motion.div
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -80,11 +110,15 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({ isOpen, onClos
                   <Zap className="w-6 h-6 text-purple-500" />
                 </div>
                 <div>
-                  <h2 className="text-xl font-thematic text-primary tracking-wide uppercase">Acquire Cabinet Points</h2>
-                  <p className="text-xs text-muted font-mono tracking-widest uppercase mt-0.5">Secure Transaction via Stripe</p>
+                  <h2 className="text-xl font-thematic text-primary tracking-wide uppercase">
+                    Acquire Cabinet Points
+                  </h2>
+                  <p className="text-xs text-muted font-mono tracking-widest uppercase mt-0.5">
+                    Secure Transaction via Stripe
+                  </p>
                 </div>
               </div>
-              <button 
+              <button
                 onClick={onClose}
                 className="p-2 text-ghost hover:text-white transition-colors"
               >
@@ -107,11 +141,11 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({ isOpen, onClos
                     onClick={() => handlePurchase(pkg.id)}
                     disabled={!!isLoading}
                     className={cn(
-                      "relative group p-6 rounded-3xl border text-left transition-all duration-300 overflow-hidden",
-                      isLoading === pkg.id 
-                        ? "border-purple-500 bg-purple-900/10" 
-                        : "border-subtle bg-card hover:border-purple-500/50 hover:bg-elevated",
-                      pkg.popular && "border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.05)]"
+                      'relative group p-6 rounded-3xl border text-left transition-all duration-300 overflow-hidden',
+                      isLoading === pkg.id
+                        ? 'border-purple-500 bg-purple-900/10'
+                        : 'border-subtle bg-card hover:border-purple-500/50 hover:bg-elevated',
+                      pkg.popular && 'border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.05)]'
                     )}
                   >
                     {pkg.popular && (
@@ -122,11 +156,20 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({ isOpen, onClos
 
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-10 h-10 rounded-lg bg-surface flex items-center justify-center border border-subtle group-hover:border-purple-500/30 transition-colors">
-                        <Zap className={cn("w-5 h-5", pkg.popular ? "text-purple-400" : "text-purple-500")} />
+                        <Zap
+                          className={cn(
+                            'w-5 h-5',
+                            pkg.popular ? 'text-purple-400' : 'text-purple-500'
+                          )}
+                        />
                       </div>
                       <div className="flex flex-col">
-                        <span className="text-2xl font-thematic text-primary tracking-wide leading-none">{pkg.cp.toLocaleString()} CP</span>
-                        <span className="text-[10px] font-mono text-muted uppercase tracking-widest mt-1">{pkg.name}</span>
+                        <span className="text-2xl font-thematic text-primary tracking-wide leading-none">
+                          {pkg.cp.toLocaleString()} CP
+                        </span>
+                        <span className="text-[10px] font-mono text-muted uppercase tracking-widest mt-1">
+                          {pkg.name}
+                        </span>
                       </div>
                     </div>
 
@@ -136,12 +179,14 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({ isOpen, onClos
 
                     <div className="flex items-center justify-between">
                       <span className="text-xl font-mono font-bold text-primary">{pkg.price}</span>
-                      <div className={cn(
-                        "w-10 h-10 rounded-xl flex items-center justify-center transition-all",
-                        isLoading === pkg.id 
-                          ? "bg-purple-500 text-black" 
-                          : "bg-surface border border-subtle text-muted group-hover:bg-purple-900/20 group-hover:border-purple-500/30 group-hover:text-purple-400"
-                      )}>
+                      <div
+                        className={cn(
+                          'w-10 h-10 rounded-xl flex items-center justify-center transition-all',
+                          isLoading === pkg.id
+                            ? 'bg-purple-500 text-black'
+                            : 'bg-surface border border-subtle text-muted group-hover:bg-purple-900/20 group-hover:border-purple-500/30 group-hover:text-purple-400'
+                        )}
+                      >
                         {isLoading === pkg.id ? (
                           <Loader2 className="w-5 h-5 animate-spin" />
                         ) : (
@@ -162,20 +207,25 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({ isOpen, onClos
                   <CreditCard className="w-6 h-6" />
                 </div>
                 <div className="flex-1">
-                  <p className="text-[11px] font-mono text-primary uppercase tracking-widest mb-1">Encrypted Payment</p>
+                  <p className="text-[11px] font-mono text-primary uppercase tracking-widest mb-1">
+                    Encrypted Payment
+                  </p>
                   <p className="text-[10px] text-faint font-sans leading-relaxed">
-                    Your payment information is processed securely by Stripe. We do not store your credit card details.
+                    Your payment information is processed securely by Stripe. We do not store your
+                    credit card details.
                   </p>
                 </div>
                 <div className="flex items-center gap-1.5 grayscale opacity-50 contrast-125">
-                  <span className="text-[10px] font-bold tracking-tighter text-white bg-[#635BFF] px-2 py-1 rounded">stripe</span>
+                  <span className="text-[10px] font-bold tracking-tighter text-white bg-[#635BFF] px-2 py-1 rounded">
+                    stripe
+                  </span>
                 </div>
               </div>
             </div>
 
             {/* Footer */}
             <div className="p-4 bg-elevated/30 text-center border-t border-subtle">
-              <button 
+              <button
                 onClick={onClose}
                 className="text-xs font-mono text-ghost hover:text-muted uppercase tracking-widest"
               >

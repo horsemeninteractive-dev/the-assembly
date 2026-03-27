@@ -1,8 +1,18 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence } from 'motion/react';
 import {
-  ChevronRight, ChevronLeft, X, Scale, Eye, Target,
-  Vote, FileText, Zap, Crown, Shield, CheckCircle
+  ChevronRight,
+  ChevronLeft,
+  X,
+  Scale,
+  Eye,
+  Target,
+  Vote,
+  FileText,
+  Zap,
+  Crown,
+  Shield,
+  CheckCircle,
 } from 'lucide-react';
 import { OverseerIcon } from './icons';
 import { cn } from '../lib/utils';
@@ -32,14 +42,22 @@ const STEPS: TutorialStep[] = [
     content: (
       <div className="space-y-4">
         <p className="text-secondary leading-relaxed">
-          The world ended with <span className="text-primary font-medium">The Crisis</span>. What remains is The Assembly — a council of delegates trying to govern the ruins.
+          The world ended with <span className="text-primary font-medium">The Crisis</span>. What
+          remains is The Assembly — a council of delegates trying to govern the ruins.
         </p>
         <p className="text-secondary leading-relaxed">
-          But not everyone wants to restore order. Some want to build a new State — and one among them, the <span className="text-red-400 font-medium">Overseer</span>, is waiting to seize total power.
+          But not everyone wants to restore order. Some want to build a new State — and one among
+          them, the <span className="text-red-400 font-medium">Overseer</span>, is waiting to seize
+          total power.
         </p>
         <div className="bg-card rounded-xl p-4 border border-default">
-          <p className="text-tertiary text-sm font-mono uppercase tracking-widest mb-2">The Assembly is</p>
-          <p className="text-primary text-sm leading-relaxed">A <strong>social deduction game</strong> for 5–10 players. You are given a secret role. Use it, lie with it, or die by it.</p>
+          <p className="text-tertiary text-sm font-mono uppercase tracking-widest mb-2">
+            The Assembly is
+          </p>
+          <p className="text-primary text-sm leading-relaxed">
+            A <strong>social deduction game</strong> for 5–10 players. You are given a secret role.
+            Use it, lie with it, or die by it.
+          </p>
         </div>
       </div>
     ),
@@ -55,22 +73,38 @@ const STEPS: TutorialStep[] = [
         <div className="bg-blue-900/20 border border-blue-500/30 rounded-xl p-4 flex gap-4 items-start">
           <Scale className="w-6 h-6 text-blue-400 shrink-0 mt-0.5" />
           <div>
-            <div className="text-blue-400 font-bold uppercase tracking-wider text-sm mb-1">Civil</div>
-            <p className="text-secondary text-sm leading-relaxed">The majority faction. You know nothing about who else is Civil. Enact <strong>5 Civil directives</strong> to win — or execute the Overseer.</p>
+            <div className="text-blue-400 font-bold uppercase tracking-wider text-sm mb-1">
+              Civil
+            </div>
+            <p className="text-secondary text-sm leading-relaxed">
+              The majority faction. You know nothing about who else is Civil. Enact{' '}
+              <strong>5 Civil directives</strong> to win — or execute the Overseer.
+            </p>
           </div>
         </div>
         <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-4 flex gap-4 items-start">
           <Eye className="w-6 h-6 text-red-400 shrink-0 mt-0.5" />
           <div>
-            <div className="text-red-400 font-bold uppercase tracking-wider text-sm mb-1">State</div>
-            <p className="text-secondary text-sm leading-relaxed">The minority faction. You know who your allies are. Enact <strong>6 State directives</strong> to win — or get the Overseer elected Chancellor.</p>
+            <div className="text-red-400 font-bold uppercase tracking-wider text-sm mb-1">
+              State
+            </div>
+            <p className="text-secondary text-sm leading-relaxed">
+              The minority faction. You know who your allies are. Enact{' '}
+              <strong>6 State directives</strong> to win — or get the Overseer elected Chancellor.
+            </p>
           </div>
         </div>
         <div className="bg-red-900/30 border border-red-600/50 rounded-xl p-4 flex gap-4 items-start">
           <OverseerIcon className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
           <div>
-            <div className="text-red-500 font-bold uppercase tracking-wider text-sm mb-1">The Overseer</div>
-            <p className="text-secondary text-sm leading-relaxed">A State agent. You win if State wins. If you are <strong>elected Chancellor after 3 State directives</strong>, the game ends immediately.</p>
+            <div className="text-red-500 font-bold uppercase tracking-wider text-sm mb-1">
+              The Overseer
+            </div>
+            <p className="text-secondary text-sm leading-relaxed">
+              A State agent. You win if State wins. If you are{' '}
+              <strong>elected Chancellor after 3 State directives</strong>, the game ends
+              immediately.
+            </p>
           </div>
         </div>
       </div>
@@ -85,11 +119,27 @@ const STEPS: TutorialStep[] = [
     content: (
       <div className="space-y-3">
         {[
-          { num: '1', label: 'Presidential Nomination', desc: 'The current President nominates a Chancellor candidate. The presidential role rotates each round.' },
-          { num: '2', label: 'Assembly Vote', desc: 'All living players vote AYE or NAY on the proposed government. Majority AYE passes it.' },
-          { num: '3', label: 'Legislative Session', desc: 'The President draws 3 policy cards, discards 1, and passes 2 to the Chancellor. The Chancellor enacts one.' },
-          { num: '4', label: 'Declarations', desc: 'Both President and Chancellor publicly declare what cards they saw and passed. This is how trust is built — or broken.' },
-        ].map(step => (
+          {
+            num: '1',
+            label: 'Presidential Nomination',
+            desc: 'The current President nominates a Chancellor candidate. The presidential role rotates each round.',
+          },
+          {
+            num: '2',
+            label: 'Assembly Vote',
+            desc: 'All living players vote AYE or NAY on the proposed government. Majority AYE passes it.',
+          },
+          {
+            num: '3',
+            label: 'Legislative Session',
+            desc: 'The President draws 3 policy cards, discards 1, and passes 2 to the Chancellor. The Chancellor enacts one.',
+          },
+          {
+            num: '4',
+            label: 'Declarations',
+            desc: 'Both President and Chancellor publicly declare what cards they saw and passed. This is how trust is built — or broken.',
+          },
+        ].map((step) => (
           <div key={step.num} className="flex gap-3 items-start">
             <div className="w-7 h-7 rounded-full bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center shrink-0">
               <span className="text-yellow-400 text-xs font-bold">{step.num}</span>
@@ -101,7 +151,10 @@ const STEPS: TutorialStep[] = [
           </div>
         ))}
         <div className="bg-card rounded-xl p-3 border border-default mt-2">
-          <p className="text-muted text-xs font-mono">If 3 elections fail in a row, a <span className="text-orange-400">chaos policy</span> is drawn automatically and enacted without a vote.</p>
+          <p className="text-muted text-xs font-mono">
+            If 3 elections fail in a row, a <span className="text-orange-400">chaos policy</span> is
+            drawn automatically and enacted without a vote.
+          </p>
         </div>
       </div>
     ),
@@ -115,7 +168,8 @@ const STEPS: TutorialStep[] = [
     content: (
       <div className="space-y-4">
         <p className="text-secondary leading-relaxed text-sm">
-          Votes are <strong className="text-primary">simultaneous and hidden</strong> until revealed. You can't see how others voted before you cast yours.
+          Votes are <strong className="text-primary">simultaneous and hidden</strong> until
+          revealed. You can't see how others voted before you cast yours.
         </p>
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-xl p-3 text-center">
@@ -128,11 +182,19 @@ const STEPS: TutorialStep[] = [
           </div>
         </div>
         <div className="bg-card rounded-xl p-4 border border-default space-y-2">
-          <div className="text-tertiary text-xs font-mono uppercase tracking-widest">Declarations</div>
+          <div className="text-tertiary text-xs font-mono uppercase tracking-widest">
+            Declarations
+          </div>
           <p className="text-secondary text-sm leading-relaxed">
-            After a policy is enacted, the President and Chancellor publicly declare what cards they drew and passed. These claims can be <span className="text-yellow-400">true or false</span> — the table must decide who to believe.
+            After a policy is enacted, the President and Chancellor publicly declare what cards they
+            drew and passed. These claims can be{' '}
+            <span className="text-yellow-400">true or false</span> — the table must decide who to
+            believe.
           </p>
-          <p className="text-muted text-xs italic">Contradictions between the President's and Chancellor's declarations are your most important clue.</p>
+          <p className="text-muted text-xs italic">
+            Contradictions between the President's and Chancellor's declarations are your most
+            important clue.
+          </p>
         </div>
       </div>
     ),
@@ -146,15 +208,28 @@ const STEPS: TutorialStep[] = [
     content: (
       <div className="space-y-3">
         <p className="text-secondary text-sm leading-relaxed">
-          Each time a State directive is enacted, the President may unlock a special executive power. These grow more dangerous as State advances.
+          Each time a State directive is enacted, the President may unlock a special executive
+          power. These grow more dangerous as State advances.
         </p>
         {[
           { name: 'Policy Peek', desc: 'See the top 3 cards in the draw pile.' },
-          { name: 'Investigate', desc: 'Learn whether a player is Civil or State (not who specifically).' },
-          { name: 'Special Election', desc: 'Choose who will be the next President, skipping normal rotation.' },
-          { name: 'Execution', desc: 'Permanently eliminate a player. If it\'s the Overseer, Civil wins instantly.' },
-        ].map(action => (
-          <div key={action.name} className="flex gap-3 items-start bg-card rounded-lg p-3 border border-default">
+          {
+            name: 'Investigate',
+            desc: 'Learn whether a player is Civil or State (not who specifically).',
+          },
+          {
+            name: 'Special Election',
+            desc: 'Choose who will be the next President, skipping normal rotation.',
+          },
+          {
+            name: 'Execution',
+            desc: "Permanently eliminate a player. If it's the Overseer, Civil wins instantly.",
+          },
+        ].map((action) => (
+          <div
+            key={action.name}
+            className="flex gap-3 items-start bg-card rounded-lg p-3 border border-default"
+          >
             <Zap className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
             <div>
               <div className="text-orange-400 text-sm font-medium">{action.name}</div>
@@ -162,7 +237,10 @@ const STEPS: TutorialStep[] = [
             </div>
           </div>
         ))}
-        <p className="text-faint text-xs italic">Executive actions are given to the current President and must be used before the next round begins.</p>
+        <p className="text-faint text-xs italic">
+          Executive actions are given to the current President and must be used before the next
+          round begins.
+        </p>
       </div>
     ),
   },
@@ -175,17 +253,39 @@ const STEPS: TutorialStep[] = [
     content: (
       <div className="space-y-3">
         <p className="text-secondary text-sm leading-relaxed">
-          At the start of each game, some players are secretly assigned a <span className="text-yellow-400 font-medium">Title Role</span> — a one-time ability that fires at a specific moment.
+          At the start of each game, some players are secretly assigned a{' '}
+          <span className="text-yellow-400 font-medium">Title Role</span> — a one-time ability that
+          fires at a specific moment.
         </p>
         <div className="grid grid-cols-1 gap-2">
           {[
-            { name: 'Interdictor', when: 'Start of round', desc: 'Detain a player, blocking them from voting or being Chancellor.' },
-            { name: 'Broker', when: 'After nomination', desc: 'Veto the Chancellor nomination, forcing a re-nomination.' },
-            { name: 'Strategist', when: 'Legislative session', desc: 'Draw 4 policies instead of 3 as President.' },
-            { name: 'Auditor', when: 'After enactment', desc: 'Peek at the last 3 discarded policies.' },
+            {
+              name: 'Interdictor',
+              when: 'Start of round',
+              desc: 'Detain a player, blocking them from voting or being Chancellor.',
+            },
+            {
+              name: 'Broker',
+              when: 'After nomination',
+              desc: 'Veto the Chancellor nomination, forcing a re-nomination.',
+            },
+            {
+              name: 'Strategist',
+              when: 'Legislative session',
+              desc: 'Draw 4 policies instead of 3 as President.',
+            },
+            {
+              name: 'Auditor',
+              when: 'After enactment',
+              desc: 'Peek at the last 3 discarded policies.',
+            },
             { name: 'Assassin', when: 'After enactment', desc: 'Secretly execute another player.' },
-            { name: 'Handler', when: 'After enactment', desc: 'Swap the next two players in the presidential rotation.' },
-          ].map(role => (
+            {
+              name: 'Handler',
+              when: 'After enactment',
+              desc: 'Swap the next two players in the presidential rotation.',
+            },
+          ].map((role) => (
             <div key={role.name} className="flex gap-3 items-start">
               <div className="w-2 h-2 rounded-full bg-yellow-500/50 shrink-0 mt-1.5" />
               <div>
@@ -196,7 +296,9 @@ const STEPS: TutorialStep[] = [
             </div>
           ))}
         </div>
-        <p className="text-faint text-xs italic">Title abilities are single-use. Check your Dossier to see if you have one.</p>
+        <p className="text-faint text-xs italic">
+          Title abilities are single-use. Check your Dossier to see if you have one.
+        </p>
       </div>
     ),
   },
@@ -209,17 +311,21 @@ const STEPS: TutorialStep[] = [
     content: (
       <div className="space-y-4">
         <p className="text-secondary text-sm leading-relaxed">
-          Every player is secretly assigned a <span className="text-emerald-400 font-medium">Personal Agenda</span> — a hidden objective that earns bonus XP and IP if completed, regardless of whether your faction wins or loses.
+          Every player is secretly assigned a{' '}
+          <span className="text-emerald-400 font-medium">Personal Agenda</span> — a hidden objective
+          that earns bonus XP and IP if completed, regardless of whether your faction wins or loses.
         </p>
         <div className="bg-emerald-900/15 border border-emerald-500/25 rounded-xl p-4 space-y-2">
-          <div className="text-emerald-400 text-xs font-mono uppercase tracking-widest">Example Agendas</div>
+          <div className="text-emerald-400 text-xs font-mono uppercase tracking-widest">
+            Example Agendas
+          </div>
           <div className="space-y-2 text-sm">
             {[
               'Vote Nay in at least 3 rounds',
               'Be nominated as Chancellor at least twice',
               'The game must end before round (player count + 3)',
               'No chaos policy is enacted during the game',
-            ].map(a => (
+            ].map((a) => (
               <div key={a} className="flex gap-2 items-start text-secondary">
                 <CheckCircle className="w-3.5 h-3.5 text-emerald-500/50 shrink-0 mt-0.5" />
                 <span>{a}</span>
@@ -229,10 +335,14 @@ const STEPS: TutorialStep[] = [
         </div>
         <div className="bg-card rounded-xl p-3 border border-default">
           <p className="text-muted text-xs leading-relaxed">
-            Completing your agenda awards <span className="text-emerald-400">+100 XP</span> and bonus IP — the same as winning with your faction. Win <em>and</em> complete your agenda for double rewards.
+            Completing your agenda awards <span className="text-emerald-400">+100 XP</span> and
+            bonus IP — the same as winning with your faction. Win <em>and</em> complete your agenda
+            for double rewards.
           </p>
         </div>
-        <p className="text-faint text-xs italic">Your agenda is visible in your Dossier at all times. Others can't see it.</p>
+        <p className="text-faint text-xs italic">
+          Your agenda is visible in your Dossier at all times. Others can't see it.
+        </p>
       </div>
     ),
   },
@@ -247,13 +357,13 @@ const STEPS: TutorialStep[] = [
         {[
           {
             heading: 'Civil players: trust nobody',
-            body: 'You outnumber State but you don\'t know who they are. Contradictory declarations, suspicious nominations, and patterns in voting are your only clues.',
+            body: "You outnumber State but you don't know who they are. Contradictory declarations, suspicious nominations, and patterns in voting are your only clues.",
             color: 'text-blue-400',
             bg: 'bg-blue-900/10 border-blue-500/20',
           },
           {
             heading: 'State players: coordinate carefully',
-            body: 'You know your allies but can\'t communicate openly. Coordinate through nominations, declarations, and subtle voting patterns — without being obvious.',
+            body: "You know your allies but can't communicate openly. Coordinate through nominations, declarations, and subtle voting patterns — without being obvious.",
             color: 'text-red-400',
             bg: 'bg-red-900/10 border-red-500/20',
           },
@@ -269,7 +379,7 @@ const STEPS: TutorialStep[] = [
             color: 'text-purple-400',
             bg: 'bg-purple-900/10 border-purple-500/20',
           },
-        ].map(tip => (
+        ].map((tip) => (
           <div key={tip.heading} className={cn('rounded-xl p-3 border', tip.bg)}>
             <div className={cn('text-sm font-medium mb-1', tip.color)}>{tip.heading}</div>
             <p className="text-tertiary text-xs leading-relaxed">{tip.body}</p>
@@ -290,13 +400,16 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete
 
   const goNext = () => {
     setDirection(1);
-    if (isLast) { onComplete(); return; }
-    setStep(s => s + 1);
+    if (isLast) {
+      onComplete();
+      return;
+    }
+    setStep((s) => s + 1);
   };
 
   const goPrev = () => {
     setDirection(-1);
-    setStep(s => s - 1);
+    setStep((s) => s - 1);
   };
 
   return (
@@ -320,7 +433,12 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete
               <div className="flex items-center gap-3">
                 <div className="text-muted">{current.icon}</div>
                 <div>
-                  <div className={cn('text-lg font-thematic tracking-wide uppercase leading-none', current.accentColor)}>
+                  <div
+                    className={cn(
+                      'text-lg font-thematic tracking-wide uppercase leading-none',
+                      current.accentColor
+                    )}
+                  >
                     {current.title}
                   </div>
                   {current.subtitle && (
@@ -358,7 +476,10 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete
                 {STEPS.map((_, i) => (
                   <button
                     key={i}
-                    onClick={() => { setDirection(i > step ? 1 : -1); setStep(i); }}
+                    onClick={() => {
+                      setDirection(i > step ? 1 : -1);
+                      setStep(i);
+                    }}
                     className={cn(
                       'rounded-full transition-all',
                       i === step ? 'w-6 h-1.5 bg-white' : 'w-1.5 h-1.5 bg-subtle hover:bg-strong'
@@ -388,9 +509,13 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete
                   )}
                 >
                   {isLast ? (
-                    <><CheckCircle className="w-4 h-4" /> Enter the Assembly</>
+                    <>
+                      <CheckCircle className="w-4 h-4" /> Enter the Assembly
+                    </>
                   ) : (
-                    <>Next <ChevronRight className="w-4 h-4" /></>
+                    <>
+                      Next <ChevronRight className="w-4 h-4" />
+                    </>
                   )}
                 </button>
               </div>

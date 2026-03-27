@@ -13,7 +13,8 @@
  * in-memory-only mode (single-instance, no persistence across restarts).
  */
 
-import Redis from "ioredis";
+import Redis from 'ioredis';
+import { logger } from './logger.ts';
 
 const REDIS_URL = process.env.REDIS_URL;
 
@@ -28,13 +29,13 @@ function createClient(): Redis | null {
     enableReadyCheck: true,
     lazyConnect: false,
   });
-  client.on("error", (err) => console.error("[Redis] error:", err.message));
-  client.on("connect", () => console.log("[Redis] connected"));
+  client.on('error', (err) => logger.error({ err: err.message }, '[Redis] error'));
+  client.on('connect', () => logger.info('[Redis] connected'));
   return client;
 }
 
-export const pubClient   = createClient();
-export const subClient   = pubClient?.duplicate() ?? null;
+export const pubClient = createClient();
+export const subClient = pubClient?.duplicate() ?? null;
 export const stateClient = pubClient?.duplicate() ?? null;
 
 /** Redis key for a room's GameState */

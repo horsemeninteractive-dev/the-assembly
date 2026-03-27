@@ -35,8 +35,8 @@ describe('Game Logic Pure Functions', () => {
     it('creates a deck with exactly 6 Civil and 11 State policies', () => {
       const deck = createDeck();
       expect(deck).toHaveLength(17);
-      expect(deck.filter(p => p === 'Civil')).toHaveLength(6);
-      expect(deck.filter(p => p === 'State')).toHaveLength(11);
+      expect(deck.filter((p) => p === 'Civil')).toHaveLength(6);
+      expect(deck.filter((p) => p === 'State')).toHaveLength(11);
     });
   });
 
@@ -54,18 +54,19 @@ describe('Game Logic Pure Functions', () => {
       it(`assigns correct roles for ${n} players`, () => {
         const roles = assignRoles(n);
         expect(roles).toHaveLength(n);
-        expect(roles.filter(r => r === 'Civil')).toHaveLength(civil);
-        expect(roles.filter(r => r === 'State')).toHaveLength(state);
-        expect(roles.filter(r => r === 'Overseer')).toHaveLength(overseer);
+        expect(roles.filter((r) => r === 'Civil')).toHaveLength(civil);
+        expect(roles.filter((r) => r === 'State')).toHaveLength(state);
+        expect(roles.filter((r) => r === 'Overseer')).toHaveLength(overseer);
       });
     });
   });
 
   describe('getExecutiveAction', () => {
-    const mockState = (numPlayers: number, stateDirectives: number): GameState => ({
-      players: Array(numPlayers).fill({}),
-      stateDirectives,
-    } as GameState);
+    const mockState = (numPlayers: number, stateDirectives: number): GameState =>
+      ({
+        players: Array(numPlayers).fill({}),
+        stateDirectives,
+      }) as GameState;
 
     it('returns PolicyPeek for 3rd State directive (5-6 players)', () => {
       expect(getExecutiveAction(mockState(5, 3))).toBe('PolicyPeek');
@@ -88,7 +89,7 @@ describe('Game Logic Pure Functions', () => {
     });
 
     it('returns Execution for 4th and 5th items for all counts', () => {
-      [5, 8, 10].forEach(n => {
+      [5, 8, 10].forEach((n) => {
         expect(getExecutiveAction(mockState(n, 4))).toBe('Execution');
         expect(getExecutiveAction(mockState(n, 5))).toBe('Execution');
       });

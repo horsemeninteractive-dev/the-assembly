@@ -3,8 +3,8 @@ import { Emoji, EmojiStyle } from 'emoji-picker-react';
 
 const charToUnified = (char: string) =>
   Array.from(char)
-    .map(c => c.codePointAt(0)!.toString(16))
-    .filter(hex => hex !== 'fe0f')
+    .map((c) => c.codePointAt(0)!.toString(16))
+    .filter((hex) => hex !== 'fe0f')
     .join('-');
 
 export const EmojiRenderer = ({ text }: { text: string }) => {

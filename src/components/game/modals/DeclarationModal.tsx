@@ -18,10 +18,18 @@ interface DeclarationModalProps {
 }
 
 export const DeclarationModal = ({
-  show, declarationType,
-  declCiv, declSta, declDrawCiv, declDrawSta,
-  setDeclCiv, setDeclSta, setDeclDrawCiv, setDeclDrawSta,
-  onSubmit, playSound
+  show,
+  declarationType,
+  declCiv,
+  declSta,
+  declDrawCiv,
+  declDrawSta,
+  setDeclCiv,
+  setDeclSta,
+  setDeclDrawCiv,
+  setDeclDrawSta,
+  onSubmit,
+  playSound,
 }: DeclarationModalProps) => (
   <AnimatePresence>
     {show && declarationType && (
@@ -39,9 +47,15 @@ export const DeclarationModal = ({
           className="max-w-sm w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl p-8 space-y-6"
         >
           <div className="text-center space-y-2">
-            <h3 className="text-[10px] uppercase tracking-[0.2em] text-muted font-mono">Directive Declaration</h3>
-            <p className="text-xl font-thematic text-primary tracking-wide uppercase">What will you declare?</p>
-            <p className="text-[10px] text-ghost italic">You may report truthfully or mislead the Assembly.</p>
+            <h3 className="text-[10px] uppercase tracking-[0.2em] text-muted font-mono">
+              Directive Declaration
+            </h3>
+            <p className="text-xl font-thematic text-primary tracking-wide uppercase">
+              What will you declare?
+            </p>
+            <p className="text-[10px] text-ghost italic">
+              You may report truthfully or mislead the Assembly.
+            </p>
           </div>
 
           <div className="space-y-5">
@@ -52,11 +66,14 @@ export const DeclarationModal = ({
                   What you drew <span className="normal-case text-ghost">(3 cards)</span>
                 </label>
                 <div className="flex gap-2">
-                  {[0, 1, 2, 3].map(n => (
+                  {[0, 1, 2, 3].map((n) => (
                     <button
                       key={n}
                       onMouseEnter={() => playSound('hover')}
-                      onClick={() => { setDeclDrawCiv(n); setDeclDrawSta(3 - n); }}
+                      onClick={() => {
+                        setDeclDrawCiv(n);
+                        setDeclDrawSta(3 - n);
+                      }}
                       className={cn(
                         'flex-1 py-3 rounded-xl border transition-all font-mono text-sm',
                         declDrawCiv === n
@@ -69,7 +86,8 @@ export const DeclarationModal = ({
                   ))}
                 </div>
                 <div className="text-[9px] text-center text-faint font-mono">
-                  Drew: <span className="text-blue-400">{declDrawCiv} Civil</span> / <span className="text-red-500">{declDrawSta} State</span>
+                  Drew: <span className="text-blue-400">{declDrawCiv} Civil</span> /{' '}
+                  <span className="text-red-500">{declDrawSta} State</span>
                 </div>
               </div>
             )}
@@ -77,16 +95,25 @@ export const DeclarationModal = ({
             {/* Passed (president) or Received (chancellor) — 2 cards */}
             <div className="space-y-2">
               <label className="text-[10px] uppercase tracking-widest text-muted font-mono ml-1">
-                {declarationType === 'President'
-                  ? <span>What you passed <span className="normal-case text-ghost">(2 cards)</span></span>
-                  : <span>What you received <span className="normal-case text-ghost">(2 cards)</span></span>}
+                {declarationType === 'President' ? (
+                  <span>
+                    What you passed <span className="normal-case text-ghost">(2 cards)</span>
+                  </span>
+                ) : (
+                  <span>
+                    What you received <span className="normal-case text-ghost">(2 cards)</span>
+                  </span>
+                )}
               </label>
               <div className="flex gap-2">
-                {[0, 1, 2].map(n => (
+                {[0, 1, 2].map((n) => (
                   <button
                     key={n}
                     onMouseEnter={() => playSound('hover')}
-                    onClick={() => { setDeclCiv(n); setDeclSta(2 - n); }}
+                    onClick={() => {
+                      setDeclCiv(n);
+                      setDeclSta(2 - n);
+                    }}
                     className={cn(
                       'flex-1 py-3 rounded-xl border transition-all font-mono text-sm',
                       declCiv === n

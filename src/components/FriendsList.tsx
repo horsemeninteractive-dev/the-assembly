@@ -6,8 +6,16 @@ import { getFrameStyles } from '../lib/cosmetics';
 import { getLevelFromXp } from '../lib/xp';
 import { getRankTier, getRankLabel } from '../lib/ranks';
 import {
-  UserPlus, Users, Gamepad2, UserMinus, Search, Check,
-  X, Clock, ChevronRight, History,
+  UserPlus,
+  Users,
+  Gamepad2,
+  UserMinus,
+  Search,
+  Check,
+  X,
+  Clock,
+  ChevronRight,
+  History,
 } from 'lucide-react';
 
 interface FriendsListProps {
@@ -39,18 +47,33 @@ const PlayerCard: React.FC<{
     <div className="flex items-center gap-3 p-3 bg-elevated rounded-2xl border border-subtle hover:border-default transition-colors">
       <div className="relative shrink-0">
         <div className="w-10 h-10 rounded-xl bg-card border border-default overflow-hidden relative">
-          {player.avatarUrl
-            ? <img src={getProxiedUrl(player.avatarUrl)} alt={player.username} className="w-full h-full object-cover" />
-            : <div className="w-full h-full flex items-center justify-center text-faint text-sm font-mono">{player.username.charAt(0).toUpperCase()}</div>}
+          {player.avatarUrl ? (
+            <img
+              src={getProxiedUrl(player.avatarUrl)}
+              alt={player.username}
+              className="w-full h-full object-cover"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-faint text-sm font-mono">
+              {player.username.charAt(0).toUpperCase()}
+            </div>
+          )}
           {player.activeFrame && (
-            <div className={cn('absolute inset-0 rounded-xl pointer-events-none', getFrameStyles(player.activeFrame))} />
+            <div
+              className={cn(
+                'absolute inset-0 rounded-xl pointer-events-none',
+                getFrameStyles(player.activeFrame)
+              )}
+            />
           )}
         </div>
         {isOnline !== undefined && (
-          <div className={cn(
-            'absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-deep',
-            isOnline ? 'bg-emerald-500' : 'bg-muted-bg'
-          )} />
+          <div
+            className={cn(
+              'absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-deep',
+              isOnline ? 'bg-emerald-500' : 'bg-muted-bg'
+            )}
+          />
         )}
       </div>
       <div className="flex-1 min-w-0">
@@ -62,8 +85,12 @@ const PlayerCard: React.FC<{
           <div className="text-[10px] font-mono text-muted truncate mt-0.5">{statusLine}</div>
         ) : (
           <div className="flex items-center gap-1.5 mt-0.5">
-            <span className="text-[10px] leading-none">{getRankTier(player.stats?.elo ?? 1000).icon}</span>
-            <span className={cn('text-[10px] font-mono', getRankTier(player.stats?.elo ?? 1000).color)}>
+            <span className="text-[10px] leading-none">
+              {getRankTier(player.stats?.elo ?? 1000).icon}
+            </span>
+            <span
+              className={cn('text-[10px] font-mono', getRankTier(player.stats?.elo ?? 1000).color)}
+            >
               {getRankLabel(player.stats?.elo ?? 1000)}
             </span>
             <span className="text-[10px] font-mono text-faint">· {player.stats?.elo ?? 1000}</span>
@@ -76,7 +103,12 @@ const PlayerCard: React.FC<{
 };
 
 export const FriendsList: React.FC<FriendsListProps> = ({
-  user, token, playSound, roomId, onJoinRoom, mode,
+  user,
+  token,
+  playSound,
+  roomId,
+  onJoinRoom,
+  mode,
 }) => {
   const [friends, setFriends] = useState<FriendWithStatus[]>([]);
   const [pending, setPending] = useState<User[]>([]);
@@ -94,20 +126,31 @@ export const FriendsList: React.FC<FriendsListProps> = ({
   const fetchAll = async () => {
     try {
       const [friendsRes, statusRes, pendingRes] = await Promise.all([
-        fetch(apiUrl('/api/friends'),         { headers: { Authorization: `Bearer ${token}` } }),
-        fetch(apiUrl('/api/friends/status'),  { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(apiUrl('/api/friends'), { headers: { Authorization: `Bearer ${token}` } }),
+        fetch(apiUrl('/api/friends/status'), { headers: { Authorization: `Bearer ${token}` } }),
         fetch(apiUrl('/api/friends/pending'), { headers: { Authorization: `Bearer ${token}` } }),
       ]);
       let friendsData: User[] = [];
-      if (friendsRes.ok) { const d = await friendsRes.json(); friendsData = d.friends ?? []; }
+      if (friendsRes.ok) {
+        const d = await friendsRes.json();
+        friendsData = d.friends ?? [];
+      }
       let onlineMap: Record<string, { isOnline: boolean; roomId?: string }> = {};
-      if (statusRes.ok) { const d = await statusRes.json(); onlineMap = d.statuses ?? {}; }
-      if (pendingRes.ok) { const d = await pendingRes.json(); setPending(d.pending ?? []); }
-      setFriends(friendsData.map(f => ({
-        ...f,
-        isOnline: !!onlineMap[f.id]?.isOnline,
-        currentRoomId: onlineMap[f.id]?.roomId,
-      })));
+      if (statusRes.ok) {
+        const d = await statusRes.json();
+        onlineMap = d.statuses ?? {};
+      }
+      if (pendingRes.ok) {
+        const d = await pendingRes.json();
+        setPending(d.pending ?? []);
+      }
+      setFriends(
+        friendsData.map((f) => ({
+          ...f,
+          isOnline: !!onlineMap[f.id]?.isOnline,
+          currentRoomId: onlineMap[f.id]?.roomId,
+        }))
+      );
     } catch (err) {
       console.error('Failed to fetch friends', err);
     } finally {
@@ -117,12 +160,28 @@ export const FriendsList: React.FC<FriendsListProps> = ({
 
   useEffect(() => {
     fetchAll();
-    socket.on('friendRequestAccepted', () => { fetchAll(); playSound('notification'); });
-    socket.on('userStatusChanged', ({ userId, isOnline, roomId: fRoomId }: { userId: string; isOnline: boolean; roomId?: string }) => {
-      setFriends(prev => prev.map(f =>
-        f.id === userId ? { ...f, isOnline, currentRoomId: isOnline ? fRoomId : undefined } : f
-      ));
+    socket.on('friendRequestAccepted', () => {
+      fetchAll();
+      playSound('notification');
     });
+    socket.on(
+      'userStatusChanged',
+      ({
+        userId,
+        isOnline,
+        roomId: fRoomId,
+      }: {
+        userId: string;
+        isOnline: boolean;
+        roomId?: string;
+      }) => {
+        setFriends((prev) =>
+          prev.map((f) =>
+            f.id === userId ? { ...f, isOnline, currentRoomId: isOnline ? fRoomId : undefined } : f
+          )
+        );
+      }
+    );
     socket.on('userUpdate', (updatedUser: User) => {
       if (updatedUser.id === user.id && updatedUser.recentlyPlayedWith) {
         setRecentlyPlayed(updatedUser.recentlyPlayedWith);
@@ -137,46 +196,65 @@ export const FriendsList: React.FC<FriendsListProps> = ({
 
   useEffect(() => {
     if (searchDebounce.current) clearTimeout(searchDebounce.current);
-    if (searchQuery.length < 2) { setSearchResults([]); return; }
+    if (searchQuery.length < 2) {
+      setSearchResults([]);
+      return;
+    }
     setSearchLoading(true);
     searchDebounce.current = setTimeout(async () => {
       try {
         const res = await fetch(apiUrl(`/api/users/search?q=${encodeURIComponent(searchQuery)}`), {
           headers: { Authorization: `Bearer ${token}` },
         });
-        if (res.ok) { const d = await res.json(); setSearchResults(d.users ?? []); }
-      } catch { /* non-critical */ }
-      finally { setSearchLoading(false); }
+        if (res.ok) {
+          const d = await res.json();
+          setSearchResults(d.users ?? []);
+        }
+      } catch {
+        /* non-critical */
+      } finally {
+        setSearchLoading(false);
+      }
     }, 350);
   }, [searchQuery, token]);
 
   const sendRequest = (targetId: string) => {
     playSound('click');
     socket.emit('sendFriendRequest', targetId);
-    setSentRequests(prev => new Set(prev).add(targetId));
+    setSentRequests((prev) => new Set(prev).add(targetId));
   };
 
   const acceptRequest = (fromUserId: string) => {
     playSound('click');
     socket.emit('acceptFriendRequest', fromUserId);
-    setPending(prev => prev.filter(p => p.id !== fromUserId));
+    setPending((prev) => prev.filter((p) => p.id !== fromUserId));
     setTimeout(fetchAll, 500);
   };
 
   const declineRequest = async (fromUserId: string) => {
     playSound('click');
     try {
-      await fetch(apiUrl(`/api/friends/${fromUserId}`), { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
-      setPending(prev => prev.filter(p => p.id !== fromUserId));
-    } catch { /* non-critical */ }
+      await fetch(apiUrl(`/api/friends/${fromUserId}`), {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setPending((prev) => prev.filter((p) => p.id !== fromUserId));
+    } catch {
+      /* non-critical */
+    }
   };
 
   const removeFriend = async (friendId: string) => {
     playSound('click');
     try {
-      await fetch(apiUrl(`/api/friends/${friendId}`), { method: 'DELETE', headers: { Authorization: `Bearer ${token}` } });
-      setFriends(prev => prev.filter(f => f.id !== friendId));
-    } catch { /* non-critical */ }
+      await fetch(apiUrl(`/api/friends/${friendId}`), {
+        method: 'DELETE',
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setFriends((prev) => prev.filter((f) => f.id !== friendId));
+    } catch {
+      /* non-critical */
+    }
   };
 
   const inviteFriend = async (friendId: string) => {
@@ -187,11 +265,13 @@ export const FriendsList: React.FC<FriendsListProps> = ({
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({ roomId }),
       });
-    } catch { /* non-critical */ }
+    } catch {
+      /* non-critical */
+    }
   };
 
-  const onlineFriends  = friends.filter(f => f.isOnline);
-  const offlineFriends = friends.filter(f => !f.isOnline);
+  const onlineFriends = friends.filter((f) => f.isOnline);
+  const offlineFriends = friends.filter((f) => !f.isOnline);
 
   return (
     <div className="space-y-4">
@@ -202,14 +282,23 @@ export const FriendsList: React.FC<FriendsListProps> = ({
           <input
             type="text"
             value={searchQuery}
-            onChange={e => { setSearchQuery(e.target.value); setActiveSection('search'); }}
-            onFocus={() => { if (searchQuery.length >= 2) setActiveSection('search'); }}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setActiveSection('search');
+            }}
+            onFocus={() => {
+              if (searchQuery.length >= 2) setActiveSection('search');
+            }}
             placeholder="Search players by username…"
             className="w-full bg-elevated border border-subtle rounded-xl py-2.5 pl-9 pr-8 text-sm text-primary placeholder-ghost font-mono focus:outline-none focus:border-strong transition-colors"
           />
           {searchQuery && (
             <button
-              onClick={() => { setSearchQuery(''); setSearchResults([]); setActiveSection('friends'); }}
+              onClick={() => {
+                setSearchQuery('');
+                setSearchResults([]);
+                setActiveSection('friends');
+              }}
               className="absolute right-3 top-1/2 -translate-y-1/2 text-faint hover:text-white"
             >
               <X className="w-3.5 h-3.5" />
@@ -218,7 +307,11 @@ export const FriendsList: React.FC<FriendsListProps> = ({
         </div>
         {searchQuery && (
           <button
-            onClick={() => { setSearchQuery(''); setSearchResults([]); setActiveSection('friends'); }}
+            onClick={() => {
+              setSearchQuery('');
+              setSearchResults([]);
+              setActiveSection('friends');
+            }}
             className="px-3 rounded-xl border border-subtle bg-elevated text-muted text-xs font-mono uppercase tracking-widest hover:text-white transition-colors"
           >
             Friends
@@ -230,37 +323,45 @@ export const FriendsList: React.FC<FriendsListProps> = ({
       {activeSection === 'search' && (
         <div className="space-y-2">
           {searchQuery.length < 2 ? (
-            <p className="text-ghost text-xs font-mono text-center py-6">Type at least 2 characters to search</p>
+            <p className="text-ghost text-xs font-mono text-center py-6">
+              Type at least 2 characters to search
+            </p>
           ) : searchLoading ? (
             <p className="text-ghost text-xs font-mono text-center py-6">Searching…</p>
           ) : searchResults.length === 0 ? (
-            <p className="text-ghost text-xs font-mono text-center py-6">No players found for "{searchQuery}"</p>
-          ) : searchResults.map(result => {
-            const alreadySent = sentRequests.has(result.id);
-            return (
-              <PlayerCard
-                key={result.id}
-                player={result}
-                actions={
-                  result.isFriend ? (
-                    <span className="text-[10px] text-emerald-400 font-mono uppercase tracking-widest px-2">Friends</span>
-                  ) : alreadySent ? (
-                    <span className="text-[10px] text-faint font-mono uppercase tracking-widest px-2 flex items-center gap-1">
-                      <Clock className="w-3 h-3" /> Sent
-                    </span>
-                  ) : (
-                    <button
-                      onClick={() => sendRequest(result.id)}
-                      className="p-2 rounded-lg bg-card hover:bg-red-900/30 text-muted hover:text-red-400 transition-colors border border-default hover:border-red-900/50"
-                      title="Send friend request"
-                    >
-                      <UserPlus className="w-4 h-4" />
-                    </button>
-                  )
-                }
-              />
-            );
-          })}
+            <p className="text-ghost text-xs font-mono text-center py-6">
+              No players found for "{searchQuery}"
+            </p>
+          ) : (
+            searchResults.map((result) => {
+              const alreadySent = sentRequests.has(result.id);
+              return (
+                <PlayerCard
+                  key={result.id}
+                  player={result}
+                  actions={
+                    result.isFriend ? (
+                      <span className="text-[10px] text-emerald-400 font-mono uppercase tracking-widest px-2">
+                        Friends
+                      </span>
+                    ) : alreadySent ? (
+                      <span className="text-[10px] text-faint font-mono uppercase tracking-widest px-2 flex items-center gap-1">
+                        <Clock className="w-3 h-3" /> Sent
+                      </span>
+                    ) : (
+                      <button
+                        onClick={() => sendRequest(result.id)}
+                        className="p-2 rounded-lg bg-card hover:bg-red-900/30 text-muted hover:text-red-400 transition-colors border border-default hover:border-red-900/50"
+                        title="Send friend request"
+                      >
+                        <UserPlus className="w-4 h-4" />
+                      </button>
+                    )
+                  }
+                />
+              );
+            })
+          )}
         </div>
       )}
 
@@ -274,7 +375,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                 <Clock className="w-3 h-3" />
                 Pending Requests ({pending.length})
               </div>
-              {pending.map(requester => (
+              {pending.map((requester) => (
                 <PlayerCard
                   key={requester.id}
                   player={requester}
@@ -308,7 +409,9 @@ export const FriendsList: React.FC<FriendsListProps> = ({
             <div className="text-center py-8 space-y-2">
               <Users className="w-8 h-8 text-whisper mx-auto" />
               <p className="text-ghost text-xs font-mono">No friends yet.</p>
-              <p className="text-whisper text-xs">Search for players above or add someone from a game.</p>
+              <p className="text-whisper text-xs">
+                Search for players above or add someone from a game.
+              </p>
             </div>
           ) : (
             <>
@@ -318,8 +421,8 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                     <div className="w-2 h-2 rounded-full bg-emerald-500" />
                     Online ({onlineFriends.length})
                   </div>
-                  {onlineFriends.map(friend => {
-                    const canJoin   = !!friend.currentRoomId && !!onJoinRoom;
+                  {onlineFriends.map((friend) => {
+                    const canJoin = !!friend.currentRoomId && !!onJoinRoom;
                     const canInvite = !!roomId && mode !== 'Ranked';
                     return (
                       <PlayerCard
@@ -327,15 +430,22 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                         player={friend}
                         isOnline
                         statusLine={
-                          friend.currentRoomId
-                            ? <span className="text-emerald-400">In game · {friend.currentRoomId}</span>
-                            : <span className="text-emerald-400">In lobby</span>
+                          friend.currentRoomId ? (
+                            <span className="text-emerald-400">
+                              In game · {friend.currentRoomId}
+                            </span>
+                          ) : (
+                            <span className="text-emerald-400">In lobby</span>
+                          )
                         }
                         actions={
                           <>
                             {canJoin && (
                               <button
-                                onClick={() => { playSound('click'); onJoinRoom!(friend.currentRoomId!); }}
+                                onClick={() => {
+                                  playSound('click');
+                                  onJoinRoom!(friend.currentRoomId!);
+                                }}
                                 className="p-2 rounded-lg bg-emerald-900/20 hover:bg-emerald-900/40 text-emerald-400 transition-colors border border-emerald-900/40"
                                 title="Join their game"
                               >
@@ -372,7 +482,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                     <div className="w-2 h-2 rounded-full bg-muted-bg" />
                     Offline ({offlineFriends.length})
                   </div>
-                  {offlineFriends.map(friend => (
+                  {offlineFriends.map((friend) => (
                     <PlayerCard
                       key={friend.id}
                       player={friend}
@@ -400,16 +510,16 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                 <History className="w-3 h-3" />
                 Recently Played With
               </div>
-              {recentlyPlayed.slice(0, 5).map(entry => {
-                const isFriendAlready = friends.some(f => f.id === entry.userId);
+              {recentlyPlayed.slice(0, 5).map((entry) => {
+                const isFriendAlready = friends.some((f) => f.id === entry.userId);
                 const alreadySent = sentRequests.has(entry.userId);
                 const timeAgo = (() => {
                   const diff = Date.now() - new Date(entry.lastPlayedAt).getTime();
-                  const mins  = Math.floor(diff / 60000);
+                  const mins = Math.floor(diff / 60000);
                   const hours = Math.floor(diff / 3600000);
-                  const days  = Math.floor(diff / 86400000);
-                  if (mins  < 60)  return `${mins}m ago`;
-                  if (hours < 24)  return `${hours}h ago`;
+                  const days = Math.floor(diff / 86400000);
+                  if (mins < 60) return `${mins}m ago`;
+                  if (hours < 24) return `${hours}h ago`;
                   return `${days}d ago`;
                 })();
 
@@ -420,20 +530,37 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                   >
                     <div className="relative shrink-0">
                       <div className="w-10 h-10 rounded-xl bg-card border border-default overflow-hidden relative">
-                        {entry.avatarUrl
-                          ? <img src={getProxiedUrl(entry.avatarUrl)} alt={entry.username} className="w-full h-full object-cover" />
-                          : <div className="w-full h-full flex items-center justify-center text-faint text-sm font-mono">{entry.username.charAt(0).toUpperCase()}</div>}
+                        {entry.avatarUrl ? (
+                          <img
+                            src={getProxiedUrl(entry.avatarUrl)}
+                            alt={entry.username}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center text-faint text-sm font-mono">
+                            {entry.username.charAt(0).toUpperCase()}
+                          </div>
+                        )}
                         {entry.activeFrame && (
-                          <div className={cn('absolute inset-0 rounded-xl pointer-events-none', getFrameStyles(entry.activeFrame))} />
+                          <div
+                            className={cn(
+                              'absolute inset-0 rounded-xl pointer-events-none',
+                              getFrameStyles(entry.activeFrame)
+                            )}
+                          />
                         )}
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="font-mono text-sm text-primary truncate">{entry.username}</span>
+                        <span className="font-mono text-sm text-primary truncate">
+                          {entry.username}
+                        </span>
                       </div>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <span className="text-[10px] leading-none">{getRankTier(entry.elo).icon}</span>
+                        <span className="text-[10px] leading-none">
+                          {getRankTier(entry.elo).icon}
+                        </span>
                         <span className={cn('text-[10px] font-mono', getRankTier(entry.elo).color)}>
                           {getRankLabel(entry.elo)}
                         </span>
@@ -442,7 +569,9 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                     </div>
                     <div className="flex items-center gap-1 shrink-0">
                       {isFriendAlready ? (
-                        <span className="text-[10px] text-emerald-400 font-mono uppercase tracking-widest px-2">Friends</span>
+                        <span className="text-[10px] text-emerald-400 font-mono uppercase tracking-widest px-2">
+                          Friends
+                        </span>
                       ) : alreadySent ? (
                         <span className="text-[10px] text-faint font-mono uppercase tracking-widest px-2 flex items-center gap-1">
                           <Clock className="w-3 h-3" /> Sent
@@ -462,7 +591,6 @@ export const FriendsList: React.FC<FriendsListProps> = ({
               })}
             </div>
           )}
-
         </div>
       )}
     </div>

@@ -1,15 +1,21 @@
 export type Role = 'Civil' | 'State' | 'Overseer';
-export type TitleRole = 'Assassin' | 'Strategist' | 'Broker' | 'Handler' | 'Auditor' | 'Interdictor';
+export type TitleRole =
+  | 'Assassin'
+  | 'Strategist'
+  | 'Broker'
+  | 'Handler'
+  | 'Auditor'
+  | 'Interdictor';
 
 /** Typed payloads for each title ability action. */
 export type TitleAbilityData =
   | { use: false }
-  | { use: true; role: "Assassin";    targetId: string }
-  | { use: true; role: "Strategist" }
-  | { use: true; role: "Broker" }
-  | { use: true; role: "Handler" }
-  | { use: true; role: "Auditor" }
-  | { use: true; role: "Interdictor"; targetId: string };
+  | { use: true; role: 'Assassin'; targetId: string }
+  | { use: true; role: 'Strategist' }
+  | { use: true; role: 'Broker' }
+  | { use: true; role: 'Handler' }
+  | { use: true; role: 'Auditor' }
+  | { use: true; role: 'Interdictor'; targetId: string };
 
 export type PersonalAgendaId =
   | 'chaos_agent'
@@ -51,26 +57,31 @@ export interface PrivateInfo {
 export type Policy = 'Civil' | 'State';
 
 export type TitlePromptContext =
-  | { role: 'Auditor';     discardPile: Policy[] }
+  | { role: 'Auditor'; discardPile: Policy[] }
   | { role: 'Assassin' }
   | { role: 'Strategist' }
   | { role: 'Broker' }
   | { role: 'Handler' }
   | { role: 'Interdictor' };
-export type GamePhase = 
-  | 'Lobby' 
-  | 'Nominate_Chancellor' 
+export type GamePhase =
+  | 'Lobby'
+  | 'Nominate_Chancellor'
   | 'Nomination_Review'
-  | 'Voting' 
-  | 'Voting_Reveal' 
-  | 'Legislative_President' 
-  | 'Legislative_Chancellor' 
-  | 'Auditor_Action' 
-  | 'Assassin_Action' 
-  | 'Handler_Action' 
-  | 'Executive_Action' 
+  | 'Voting'
+  | 'Voting_Reveal'
+  | 'Legislative_President'
+  | 'Legislative_Chancellor'
+  | 'Auditor_Action'
+  | 'Assassin_Action'
+  | 'Handler_Action'
+  | 'Executive_Action'
   | 'GameOver';
-export type ExecutiveAction = 'Investigate' | 'SpecialElection' | 'Execution' | 'PolicyPeek' | 'None';
+export type ExecutiveAction =
+  | 'Investigate'
+  | 'SpecialElection'
+  | 'Execution'
+  | 'PolicyPeek'
+  | 'None';
 export type GameMode = 'Casual' | 'Ranked' | 'Classic';
 
 export interface Achievement {
@@ -115,7 +126,7 @@ export interface UserStats {
 export interface MatchSummary {
   id: string;
   userId: string;
-  playedAt: string;          // ISO timestamp
+  playedAt: string; // ISO timestamp
   roomName: string;
   mode: GameMode;
   playerCount: number;
@@ -138,7 +149,7 @@ export interface PostMatchResult {
   won: boolean;
   mode: GameMode;
   role: Role;
-  eloChange: number;        // +20 / -20 / 0 (0 for casual)
+  eloChange: number; // +20 / -20 / 0 (0 for casual)
   eloBefore: number;
   eloAfter: number;
   roomAverageElo: number;
@@ -264,12 +275,22 @@ export interface GameState {
   roomId: string;
   players: Player[];
   spectators: { id: string; name: string; avatarUrl?: string }[];
-  spectatorQueue: { id: string; name: string; userId?: string; avatarUrl?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string }[];
-  spectatorRoles?: { [playerId: string]: { role: string; titleRole?: string; agendaName?: string } };
+  spectatorQueue: {
+    id: string;
+    name: string;
+    userId?: string;
+    avatarUrl?: string;
+    activeFrame?: string;
+    activePolicyStyle?: string;
+    activeVotingStyle?: string;
+  }[];
+  spectatorRoles?: {
+    [playerId: string]: { role: string; titleRole?: string; agendaName?: string };
+  };
   privacy: RoomPrivacy;
-  inviteCode?: string;      // only set when privacy === 'private'
-  hostUserId?: string;      // userId of the room creator
-  isLocked?: boolean;       // host has locked the room — no new joins
+  inviteCode?: string; // only set when privacy === 'private'
+  hostUserId?: string; // userId of the room creator
+  isLocked?: boolean; // host has locked the room — no new joins
   mode: GameMode;
   phase: GamePhase;
   civilDirectives: number;
@@ -285,7 +306,7 @@ export interface GameState {
   winReason?: string;
   presidentIdx: number;
   lastPresidentIdx: number;
-  handlerSwapPending?: number;            // countdown: 3=i2 next, 2=i1 next, 1=i3 next (revert before advancing)
+  handlerSwapPending?: number; // countdown: 3=i2 next, 2=i1 next, 1=i3 next (revert before advancing)
   handlerSwapPositions?: [number, number]; // the two presidentialOrder positions to swap back
   chancellorId?: string;
   presidentId?: string;
@@ -294,16 +315,22 @@ export interface GameState {
   maxPlayers: number;
   actionTimer: number;
   actionTimerEnd?: number;
-  messages: { 
-    sender: string; 
-    text: string; 
-    timestamp: number; 
+  messages: {
+    sender: string;
+    text: string;
+    timestamp: number;
     type?: 'text' | 'declaration' | 'round_separator' | 'failed_election';
     declaration?: { civ: number; sta: number; type: 'President' | 'Chancellor' };
     round?: number;
   }[];
   investigationResult?: { targetName: string; role: Role };
-  lastEnactedPolicy?: { type: Policy; timestamp: number; playerId?: string; historyCaptured?: boolean; trackerReady?: boolean };
+  lastEnactedPolicy?: {
+    type: Policy;
+    timestamp: number;
+    playerId?: string;
+    historyCaptured?: boolean;
+    trackerReady?: boolean;
+  };
   round: number;
   presidentialOrder?: string[];
   rejectedChancellorId?: string;
@@ -315,14 +342,14 @@ export interface GameState {
   chancellorSaw?: Policy[];
   presidentTimedOut?: boolean;
   chancellorTimedOut?: boolean;
-  declarations: { 
-    playerId: string; 
-    playerName: string; 
-    civ: number;      // what was passed (president) or received (chancellor)
+  declarations: {
+    playerId: string;
+    playerName: string;
+    civ: number; // what was passed (president) or received (chancellor)
     sta: number;
     drewCiv?: number; // president only: what they drew (3-card hand)
     drewSta?: number;
-    type: 'President' | 'Chancellor'; 
+    type: 'President' | 'Chancellor';
     timestamp: number;
   }[];
   isPaused?: boolean;
@@ -367,7 +394,10 @@ export interface GameState {
 export interface ServerToClientEvents {
   gameStateUpdate: (state: GameState) => void;
   error: (message: string) => void;
-  privateInfo: (info: { role: Role; stateAgents?: { id: string; name: string; role: Role }[] }) => void;
+  privateInfo: (info: {
+    role: Role;
+    stateAgents?: { id: string; name: string; role: Role }[];
+  }) => void;
   investigationResult: (result: { targetName: string; role: Role }) => void;
   policyPeekResult: (policies: Policy[]) => void;
   voiceData: (data: { sender: string; data: ArrayBuffer }) => void;
@@ -389,8 +419,21 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-  userConnected: (data: { userId: string, token: string }) => void;
-  joinRoom: (data: { roomId: string; name: string; userId?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string; maxPlayers?: number; actionTimer?: number; mode?: GameMode; isSpectator?: boolean; privacy?: RoomPrivacy; inviteCode?: string }) => void;
+  userConnected: (data: { userId: string; token: string }) => void;
+  joinRoom: (data: {
+    roomId: string;
+    name: string;
+    userId?: string;
+    activeFrame?: string;
+    activePolicyStyle?: string;
+    activeVotingStyle?: string;
+    maxPlayers?: number;
+    actionTimer?: number;
+    mode?: GameMode;
+    isSpectator?: boolean;
+    privacy?: RoomPrivacy;
+    inviteCode?: string;
+  }) => void;
   leaveRoom: () => void;
   playAgain: () => void;
   startGame: () => void;
@@ -403,14 +446,29 @@ export interface ClientToServerEvents {
   performExecutiveAction: (targetId: string) => void;
   useTitleAbility: (abilityData: TitleAbilityData) => void;
   sendMessage: (message: string) => void;
-  declarePolicies: (data: { civ: number; sta: number; drewCiv?: number; drewSta?: number; type: 'President' | 'Chancellor' } | null) => void;
+  declarePolicies: (
+    data: {
+      civ: number;
+      sta: number;
+      drewCiv?: number;
+      drewSta?: number;
+      type: 'President' | 'Chancellor';
+    } | null
+  ) => void;
   vetoRequest: () => void;
   vetoResponse: (agree: boolean) => void;
   voiceData: (data: ArrayBuffer) => void;
   signal: (data: { to: string; signal: any; from: string }) => void;
   sendFriendRequest: (targetUserId: string) => void;
   acceptFriendRequest: (targetUserId: string) => void;
-  joinQueue: (data: { name: string; userId?: string; avatarUrl?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string }) => void;
+  joinQueue: (data: {
+    name: string;
+    userId?: string;
+    avatarUrl?: string;
+    activeFrame?: string;
+    activePolicyStyle?: string;
+    activeVotingStyle?: string;
+  }) => void;
   leaveQueue: () => void;
   kickPlayer: (playerId: string) => void;
   toggleLock: () => void;
@@ -418,7 +476,10 @@ export interface ClientToServerEvents {
   updateMediaState: (data: { isMicOn: boolean; isCamOn: boolean }) => void;
   adminDeleteRoom: (roomId: string) => void;
   adminBroadcast: (message: string) => void;
-  adminUpdateUser: (data: { userId: string; updates: Partial<UserStats> & { isBanned?: boolean; cabinetPoints?: number } }) => void;
+  adminUpdateUser: (data: {
+    userId: string;
+    updates: Partial<UserStats> & { isBanned?: boolean; cabinetPoints?: number };
+  }) => void;
   adminUpdateConfig: (config: Partial<SystemConfig>) => void;
   adminGetChatLogs: (roomId: string) => void;
   adminClearRedis: () => void;

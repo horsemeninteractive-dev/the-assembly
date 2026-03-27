@@ -1,9 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { socket } from '../socket';
-import { GameState, Player, Role, Policy, User, PrivateInfo, PostMatchResult } from '../types';
+import { GameState, Role, Policy, User, PrivateInfo, PostMatchResult } from '../types';
 import { getBackgroundTexture } from '../lib/cosmetics';
 import { cn, getProxiedUrl } from '../lib/utils';
 import * as aiSpeech from '../services/aiSpeech';
+
+const debugLog = (...args: any[]) => {
+  if (import.meta.env.DEV) console.log(...args);
+};
+const debugError = (...args: any[]) => {
+  if (import.meta.env.DEV) console.error(...args);
+};
 
 import { GameHeader } from './game/GameHeader';
 import { PolicyTracks } from './game/PolicyTracks';
@@ -46,15 +53,27 @@ interface GameRoomProps {
 }
 
 export const GameRoom = ({
-  gameState, privateInfo, user, token,
-  onLeaveRoom, onPlayAgain, onOpenProfile, onJoinRoom,
-  setUser, setGameState, setPrivateInfo,
+  gameState,
+  privateInfo,
+  user,
+  token,
+  onLeaveRoom,
+  onPlayAgain,
+  onOpenProfile,
+  onJoinRoom,
+  setUser,
+  setGameState,
+  setPrivateInfo,
   updateAvailable,
-  playSound, soundVolume, ttsVoice, ttsEngine, isAiVoiceEnabled,
-  uiScaleSetting
+  playSound,
+  soundVolume,
+  ttsVoice,
+  ttsEngine,
+  isAiVoiceEnabled,
+  uiScaleSetting,
 }: GameRoomProps) => {
-  const me = gameState.players.find(p => p.id === socket.id);
-  const isSpectator = !me && gameState.spectators.some(s => s.id === socket.id);
+  const me = gameState.players.find((p) => p.id === socket.id);
+  const isSpectator = !me && gameState.spectators.some((s) => s.id === socket.id);
   const [inQueue, setInQueue] = useState(false);
   const [uiScale, setUiScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -64,23 +83,23 @@ export const GameRoom = ({
       if (!containerRef.current) return;
       const h = containerRef.current.clientHeight;
       const w = containerRef.current.clientWidth;
-      
+
       // Target height is around 850px for full desktop experience
       // Target width is around 1200px
       const scaleH = h / 850;
       const scaleW = w / 1200;
-      
+
       // On mobile we don't want to scale down too much as it's already small
       const isMobile = w < 640;
       const autoScale = isMobile ? 1 : Math.min(scaleH, scaleW, 1);
       const finalScale = autoScale * uiScaleSetting;
       setUiScale(Math.max(0.4, Math.min(finalScale, 2)));
     };
-    
+
     const observer = new ResizeObserver(handleResize);
     if (containerRef.current) observer.observe(containerRef.current);
     handleResize();
-    
+
     window.addEventListener('resize', handleResize);
     return () => {
       observer.disconnect();
@@ -103,9 +122,14 @@ export const GameRoom = ({
   const chatGhostRef = useRef<HTMLDivElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
 
-  const hasNewMessages = !isChatOpen && gameState.messages
-    .slice(lastSeenMessageCount)
-    .some(m => m.type !== 'round_separator' && m.type !== 'declaration' && m.type !== 'failed_election');
+  const hasNewMessages =
+    !isChatOpen &&
+    gameState.messages
+      .slice(lastSeenMessageCount)
+      .some(
+        (m) =>
+          m.type !== 'round_separator' && m.type !== 'declaration' && m.type !== 'failed_election'
+      );
 
   useEffect(() => {
     if (isChatOpen) setLastSeenMessageCount(gameState.messages.length);
@@ -114,7 +138,13 @@ export const GameRoom = ({
   // Auto-open dossier at the start of the game (Round 1)
   const hasAutoOpenedDossier = useRef(false);
   useEffect(() => {
-    if (!isSpectator && gameState.round === 1 && gameState.phase !== 'Lobby' && gameState.phase !== 'GameOver' && !hasAutoOpenedDossier.current) {
+    if (
+      !isSpectator &&
+      gameState.round === 1 &&
+      gameState.phase !== 'Lobby' &&
+      gameState.phase !== 'GameOver' &&
+      !hasAutoOpenedDossier.current
+    ) {
       setIsDossierOpen(true);
       hasAutoOpenedDossier.current = true;
     }
@@ -174,7 +204,10 @@ export const GameRoom = ({
   // ── Modals ───────────────────────────────────────────────────────────────
   const [peekedPolicies, setPeekedPolicies] = useState<Policy[] | null>(null);
   const [peekTitle, setPeekTitle] = useState<string | undefined>(undefined);
-  const [investigationResult, setInvestigationResult] = useState<{ targetName: string; role: Role } | null>(null);
+  const [investigationResult, setInvestigationResult] = useState<{
+    targetName: string;
+    role: Role;
+  } | null>(null);
   const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 
   useEffect(() => {
@@ -209,16 +242,17 @@ export const GameRoom = ({
   const [declDrawSta, setDeclDrawSta] = useState(3);
   const [showPolicyAnim, setShowPolicyAnim] = useState(false);
 
-
   const showPolicyAnimRef = useRef(false);
   const pendingDeclarationRef = useRef<'President' | 'Chancellor' | null>(null);
   const chancellorSinceRef = useRef<number>(0);
   const wasChancellorRef = useRef(false);
   // Separate refs for each role's declaration prompt — avoids key collision bugs
-  const presidentPromptedForRef = useRef<string>('');   // policyKey we already prompted president for
-  const chancellorPromptedForRef = useRef<string>('');  // policyKey we already prompted chancellor for
+  const presidentPromptedForRef = useRef<string>(''); // policyKey we already prompted president for
+  const chancellorPromptedForRef = useRef<string>(''); // policyKey we already prompted chancellor for
 
-  useEffect(() => { showPolicyAnimRef.current = showPolicyAnim; }, [showPolicyAnim]);
+  useEffect(() => {
+    showPolicyAnimRef.current = showPolicyAnim;
+  }, [showPolicyAnim]);
 
   // Track the initial policy broadcast (trackerReady=false) separately for animation
   const lastSeenPolicyIdRef = useRef<string>('');
@@ -246,9 +280,13 @@ export const GameRoom = ({
       pendingDeclarationRef.current = null;
       setDeclarationType(type);
       if (type === 'President') {
-        setDeclCiv(0); setDeclSta(2); setDeclDrawCiv(0); setDeclDrawSta(3);
+        setDeclCiv(0);
+        setDeclSta(2);
+        setDeclDrawCiv(0);
+        setDeclDrawSta(3);
       } else {
-        setDeclCiv(0); setDeclSta(2);
+        setDeclCiv(0);
+        setDeclSta(2);
       }
       setShowDeclarationUI(true);
     }
@@ -256,7 +294,7 @@ export const GameRoom = ({
 
   useEffect(() => {
     if (!me) return;
-    const alreadyDeclared = gameState.declarations.some(d => d.playerId === socket.id);
+    const alreadyDeclared = gameState.declarations.some((d) => d.playerId === socket.id);
     if (alreadyDeclared || gameState.phase === 'GameOver') {
       pendingDeclarationRef.current = null;
       setShowDeclarationUI(false);
@@ -281,9 +319,10 @@ export const GameRoom = ({
     }
 
     // Chancellor: prompt once per policy, but only after president has declared
-    const presidentDeclared = gameState.declarations.some(d => d.type === 'President');
+    const presidentDeclared = gameState.declarations.some((d) => d.type === 'President');
     if (me.isChancellor && presidentDeclared && chancellorPromptedForRef.current !== policyKey) {
-      const policyEnactedThisTerm = (gameState.lastEnactedPolicy?.timestamp ?? 0) > chancellorSinceRef.current;
+      const policyEnactedThisTerm =
+        (gameState.lastEnactedPolicy?.timestamp ?? 0) > chancellorSinceRef.current;
       if (policyEnactedThisTerm) {
         chancellorPromptedForRef.current = policyKey;
         needed = 'Chancellor';
@@ -295,17 +334,20 @@ export const GameRoom = ({
         pendingDeclarationRef.current = null;
         setDeclarationType(needed);
         if (needed === 'President') {
-          setDeclCiv(0); setDeclSta(2); setDeclDrawCiv(0); setDeclDrawSta(3);
+          setDeclCiv(0);
+          setDeclSta(2);
+          setDeclDrawCiv(0);
+          setDeclDrawSta(3);
         } else {
-          setDeclCiv(0); setDeclSta(2);
+          setDeclCiv(0);
+          setDeclSta(2);
         }
         setShowDeclarationUI(true);
       } else {
         pendingDeclarationRef.current = needed;
       }
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameState.lastEnactedPolicy?.trackerReady, gameState.lastEnactedPolicy?.timestamp, gameState.declarations?.length, gameState.phase, showPolicyAnim]);
+  }, [me, gameState.declarations, gameState.lastEnactedPolicy, gameState.phase, showPolicyAnim]);
 
   const handleSubmitDeclaration = () => {
     if (!declarationType) return;
@@ -321,7 +363,7 @@ export const GameRoom = ({
   // ── Timer tick ───────────────────────────────────────────────────────────
   const [, setTick] = useState(0);
   useEffect(() => {
-    const interval = setInterval(() => setTick(t => t + 1), 1000);
+    const interval = setInterval(() => setTick((t) => t + 1), 1000);
     return () => clearInterval(interval);
   }, []);
 
@@ -333,25 +375,29 @@ export const GameRoom = ({
   const prevAliveCount = useRef(0);
 
   const speak = (text: string) => {
-    aiSpeech.speak(text, { 
+    aiSpeech.speak(text, {
       voice: ttsVoice,
       volume: soundVolume / 100,
       rate: 0.9,
-      pitch: 0.8
+      pitch: 0.8,
     });
   };
 
   useEffect(() => {
-    const currentVotes = gameState.players.filter(p => p.vote).length;
+    const currentVotes = gameState.players.filter((p) => p.vote).length;
     if (currentVotes > prevVotes.current && me && !me.vote) playSound('click');
     prevVotes.current = currentVotes;
 
-    const currentAliveCount = gameState.players.filter(p => p.isAlive).length;
-    if (prevAliveCount.current > 0 && currentAliveCount < prevAliveCount.current) playSound('death');
+    const currentAliveCount = gameState.players.filter((p) => p.isAlive).length;
+    if (prevAliveCount.current > 0 && currentAliveCount < prevAliveCount.current)
+      playSound('death');
     prevAliveCount.current = currentAliveCount;
 
-    if ((prevPhase.current === 'Voting' || prevPhase.current === 'Voting_Reveal') && 
-        gameState.phase !== 'Voting' && gameState.phase !== 'Voting_Reveal') {
+    if (
+      (prevPhase.current === 'Voting' || prevPhase.current === 'Voting_Reveal') &&
+      gameState.phase !== 'Voting' &&
+      gameState.phase !== 'Voting_Reveal'
+    ) {
       if (gameState.phase === 'Legislative_President') playSound('election_passed');
       else if (gameState.phase === 'Nominate_Chancellor') playSound('election_failed');
     }
@@ -371,35 +417,57 @@ export const GameRoom = ({
 
   // ── Panel sound effects ──────────────────────────────────────────────────
   const prevPanelsState = useRef({
-    isLogOpen, isChatOpen, isHistoryOpen, isDossierOpen, isReferenceOpen,
+    isLogOpen,
+    isChatOpen,
+    isHistoryOpen,
+    isDossierOpen,
+    isReferenceOpen,
     isPeekOpen: !!peekedPolicies,
     isInvestigationOpen: !!investigationResult,
     isDeclarationOpen: showDeclarationUI,
-    isProfileOpen: !!selectedPlayerId
+    isProfileOpen: !!selectedPlayerId,
   });
 
   useEffect(() => {
     const current = {
-      isLogOpen, isChatOpen, isHistoryOpen, isDossierOpen, isReferenceOpen,
+      isLogOpen,
+      isChatOpen,
+      isHistoryOpen,
+      isDossierOpen,
+      isReferenceOpen,
       isPeekOpen: !!peekedPolicies,
       isInvestigationOpen: !!investigationResult,
       isDeclarationOpen: showDeclarationUI,
-      isProfileOpen: !!selectedPlayerId
+      isProfileOpen: !!selectedPlayerId,
     };
 
-    const opened = Object.keys(current).some(k => (current as any)[k] && !(prevPanelsState.current as any)[k]);
-    const closed = Object.keys(current).some(k => !(current as any)[k] && (prevPanelsState.current as any)[k]);
+    const opened = Object.keys(current).some(
+      (k) => (current as any)[k] && !(prevPanelsState.current as any)[k]
+    );
+    const closed = Object.keys(current).some(
+      (k) => !(current as any)[k] && (prevPanelsState.current as any)[k]
+    );
 
     if (opened) playSound('modal_open');
     else if (closed) playSound('modal_close');
 
     prevPanelsState.current = current;
-  }, [isLogOpen, isChatOpen, isHistoryOpen, isDossierOpen, isReferenceOpen, peekedPolicies, investigationResult, showDeclarationUI, selectedPlayerId]);
+  }, [
+    isLogOpen,
+    isChatOpen,
+    isHistoryOpen,
+    isDossierOpen,
+    isReferenceOpen,
+    peekedPolicies,
+    investigationResult,
+    showDeclarationUI,
+    selectedPlayerId,
+  ]);
 
   // ── Voice chat ───────────────────────────────────────────────────────────
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [isVideoActive, setIsVideoActive] = useState(false);
-  
+
   useEffect(() => {
     aiSpeech.initVoices();
   }, []);
@@ -408,17 +476,17 @@ export const GameRoom = ({
     if (!isAiVoiceEnabled) return;
     const lastMessage = gameState.messages[gameState.messages.length - 1];
     if (!lastMessage) return;
-    
-    const sender = gameState.players.find(p => p.name === lastMessage.sender);
+
+    const sender = gameState.players.find((p) => p.name === lastMessage.sender);
     if (sender && sender.isAI) {
       const profile = aiSpeech.getVoiceProfileForAi(sender.name);
       if (profile) {
         aiSpeech.speakAiMessage(
-          lastMessage.text, 
-          sender.name, 
+          lastMessage.text,
+          sender.name,
           profile,
-          () => setSpeakingPlayers(prev4 => ({ ...prev4, [sender.id]: true })),
-          () => setSpeakingPlayers(prev4 => ({ ...prev4, [sender.id]: false }))
+          () => setSpeakingPlayers((prev4) => ({ ...prev4, [sender.id]: true })),
+          () => setSpeakingPlayers((prev4) => ({ ...prev4, [sender.id]: false }))
         );
       }
     }
@@ -438,10 +506,10 @@ export const GameRoom = ({
       }
       const context = audioContextRef.current;
       if (context.state === 'suspended') await context.resume();
-      
+
       const audioTrack = stream.getAudioTracks()[0];
       if (!audioTrack) return;
-      
+
       const source = context.createMediaStreamSource(new MediaStream([audioTrack]));
       const analyser = context.createAnalyser();
       analyser.fftSize = 512;
@@ -454,22 +522,27 @@ export const GameRoom = ({
         if (!isRunning) return;
         const isLocal = playerId === socket.id;
         const peerExists = !!peersRef.current[playerId];
-        if (!isLocal && !peerExists) { isRunning = false; source.disconnect(); analyser.disconnect(); return; }
+        if (!isLocal && !peerExists) {
+          isRunning = false;
+          source.disconnect();
+          analyser.disconnect();
+          return;
+        }
         analyser.getByteFrequencyData(dataArray);
         let sum = 0;
         for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
         if (sum / bufferLength > 10) {
-          setSpeakingPlayers(prev => ({ ...prev, [playerId]: true }));
+          setSpeakingPlayers((prev) => ({ ...prev, [playerId]: true }));
           if (speakingTimers.current[playerId]) clearTimeout(speakingTimers.current[playerId]);
           speakingTimers.current[playerId] = setTimeout(() => {
-            setSpeakingPlayers(prev => ({ ...prev, [playerId]: false }));
+            setSpeakingPlayers((prev) => ({ ...prev, [playerId]: false }));
           }, 400);
         }
         requestAnimationFrame(check);
       };
       check();
     } catch (err) {
-      console.error('Voice detection error:', err);
+      debugError('Voice detection error:', err);
     }
   };
 
@@ -498,12 +571,16 @@ export const GameRoom = ({
   const destroyPeer = (peerId: string) => {
     const pc = peersRef.current[peerId];
     if (pc) {
-      try { pc.close(); } catch (e) { }
+      try {
+        pc.close();
+      } catch (e) {}
       delete peersRef.current[peerId];
     }
     delete peerMetaRef.current[peerId];
-    setRemoteStreams(prev => {
-      const next = { ...prev }; delete next[peerId]; return next;
+    setRemoteStreams((prev) => {
+      const next = { ...prev };
+      delete next[peerId];
+      return next;
     });
   };
 
@@ -515,11 +592,18 @@ export const GameRoom = ({
   // Removes any existing sender for this kind first — including null-tracked senders
   // left by removeTrack — so we never accumulate stale transceivers.
   const addTrackToPeer = (pc: RTCPeerConnection, track: MediaStreamTrack, stream: MediaStream) => {
-    console.log(`[WebRTC] addTrackToPeer kind=${track.kind} | senders=[${pc.getSenders().map(s => s.track?.kind ?? `null(was ${senderKindMap.current.get(s) ?? '?'})`).join(', ')}] | sigState=${pc.signalingState}`);
-    pc.getSenders().forEach(s => {
+    debugLog(
+      `[WebRTC] addTrackToPeer kind=${track.kind} | senders=[${pc
+        .getSenders()
+        .map((s) => s.track?.kind ?? `null(was ${senderKindMap.current.get(s) ?? '?'})`)
+        .join(', ')}] | sigState=${pc.signalingState}`
+    );
+    pc.getSenders().forEach((s) => {
       const kind = s.track?.kind ?? senderKindMap.current.get(s);
       if (kind === track.kind) {
-        try { pc.removeTrack(s); } catch (e) { }
+        try {
+          pc.removeTrack(s);
+        } catch (e) {}
       }
     });
     const sender = pc.addTrack(track, stream); // fires onnegotiationneeded
@@ -537,38 +621,46 @@ export const GameRoom = ({
     peersRef.current[peerId] = pc;
 
     // Seed an empty stream so the video tile renders immediately
-    setRemoteStreams(prev => ({ ...prev, [peerId]: new MediaStream() }));
+    setRemoteStreams((prev) => ({ ...prev, [peerId]: new MediaStream() }));
 
     // Add whatever local tracks we already have. If we have none yet (camera
     // not on), this is a no-op and onnegotiationneeded won't fire — that's
     // fine; the remote side will offer when they add their tracks, and we'll
     // answer. When we turn our camera on later, addTrack fires onnegotiationneeded.
     if (localStreamRef.current) {
-      localStreamRef.current.getTracks().forEach(track => addTrackToPeer(pc, track, localStreamRef.current!));
+      localStreamRef.current
+        .getTracks()
+        .forEach((track) => addTrackToPeer(pc, track, localStreamRef.current!));
     }
     pc.onicecandidate = ({ candidate }) => {
       if (candidate) socket.emit('signal', { to: peerId, from: socket.id!, signal: { candidate } });
     };
 
     pc.ontrack = ({ track }) => {
-      console.log(`[WebRTC] ontrack peer=${peerId.slice(0,6)} kind=${track.kind} readyState=${track.readyState} muted=${track.muted}`);
-      setRemoteStreams(prev => {
+      debugLog(
+        `[WebRTC] ontrack peer=${peerId.slice(0, 6)} kind=${track.kind} readyState=${track.readyState} muted=${track.muted}`
+      );
+      setRemoteStreams((prev) => {
         const existing = prev[peerId] || new MediaStream();
         // Replace any existing track of the same kind rather than accumulating.
         // Accumulated stale tracks cause hasVideo to return true for ended tracks,
         // and the video element gets confused about which track to render.
-        const otherTracks = existing.getTracks().filter(t => t.kind !== track.kind);
+        const otherTracks = existing.getTracks().filter((t) => t.kind !== track.kind);
         const next = new MediaStream([...otherTracks, track]);
         return { ...prev, [peerId]: next };
       });
 
       track.onended = () => {
-        console.log(`[WebRTC] track ended peer=${peerId.slice(0,6)} kind=${track.kind}`);
-        setRemoteStreams(prev => {
+        debugLog(`[WebRTC] track ended peer=${peerId.slice(0, 6)} kind=${track.kind}`);
+        setRemoteStreams((prev) => {
           const st = prev[peerId];
           if (!st) return prev;
-          const active = st.getTracks().filter(t => t !== track);
-          if (active.length === 0) { const n = { ...prev }; delete n[peerId]; return n; }
+          const active = st.getTracks().filter((t) => t !== track);
+          if (active.length === 0) {
+            const n = { ...prev };
+            delete n[peerId];
+            return n;
+          }
           return { ...prev, [peerId]: new MediaStream(active) };
         });
       };
@@ -584,23 +676,31 @@ export const GameRoom = ({
     pc.onnegotiationneeded = async () => {
       const meta = peerMetaRef.current[peerId];
       if (!meta) return;
-      console.log(`[WebRTC] onnegotiationneeded peer=${peerId.slice(0,6)} sigState=${pc.signalingState} makingOffer=${meta.makingOffer}`);
+      debugLog(
+        `[WebRTC] onnegotiationneeded peer=${peerId.slice(0, 6)} sigState=${pc.signalingState} makingOffer=${meta.makingOffer}`
+      );
       try {
         meta.makingOffer = true;
         await pc.setLocalDescription(); // browser auto-creates offer
-        console.log(`[WebRTC] offer sent to peer=${peerId.slice(0,6)}`);
-        socket.emit('signal', { to: peerId, from: socket.id!, signal: { sdp: pc.localDescription } });
+        debugLog(`[WebRTC] offer sent to peer=${peerId.slice(0, 6)}`);
+        socket.emit('signal', {
+          to: peerId,
+          from: socket.id!,
+          signal: { sdp: pc.localDescription },
+        });
       } catch (err) {
-        console.error('onnegotiationneeded error', err);
+        debugError('onnegotiationneeded error', err);
       } finally {
         meta.makingOffer = false;
       }
     };
 
     pc.oniceconnectionstatechange = () => {
-      console.log(`[WebRTC] ICE state peer=${peerId.slice(0,6)} => ${pc.iceConnectionState}`);
+      debugLog(`[WebRTC] ICE state peer=${peerId.slice(0, 6)} => ${pc.iceConnectionState}`);
       if (pc.iceConnectionState === 'failed' || pc.iceConnectionState === 'closed') {
-        console.log(`[WebRTC] ICE ${pc.iceConnectionState} — destroying and recreating peer=${peerId.slice(0,6)}`);
+        debugLog(
+          `[WebRTC] ICE ${pc.iceConnectionState} — destroying and recreating peer=${peerId.slice(0, 6)}`
+        );
         destroyPeer(peerId);
         createPeerRef.current(peerId);
       }
@@ -618,10 +718,10 @@ export const GameRoom = ({
     if (!socket.id) return;
     const activeIds = new Set(
       gameState.players
-        .filter(p => p.id !== socket.id && !p.isDisconnected && !p.isAI)
-        .map(p => p.id)
+        .filter((p) => p.id !== socket.id && !p.isDisconnected && !p.isAI)
+        .map((p) => p.id)
     );
-    Object.keys(peersRef.current).forEach(peerId => {
+    Object.keys(peersRef.current).forEach((peerId) => {
       if (!activeIds.has(peerId)) destroyPeer(peerId);
     });
   }, [gameState.players, socket.id]);
@@ -629,7 +729,7 @@ export const GameRoom = ({
   // ── Mesh: ensure a peer connection exists for every active player ──────────
   useEffect(() => {
     if (!socket.id) return;
-    gameState.players.forEach(p => {
+    gameState.players.forEach((p) => {
       if (p.id === socket.id || p.isDisconnected || p.isAI) return;
       createPeerRef.current(p.id);
     });
@@ -644,16 +744,20 @@ export const GameRoom = ({
 
       try {
         if (signal.sdp) {
-          console.log(`[WebRTC] signal sdp type=${signal.sdp.type} from=${from.slice(0,6)} | sigState=${pc.signalingState} makingOffer=${meta.makingOffer} polite=${meta.polite}`);
+          debugLog(
+            `[WebRTC] signal sdp type=${signal.sdp.type} from=${from.slice(0, 6)} | sigState=${pc.signalingState} makingOffer=${meta.makingOffer} polite=${meta.polite}`
+          );
           const offerCollision =
-            signal.sdp.type === 'offer' &&
-            (meta.makingOffer || pc.signalingState !== 'stable');
+            signal.sdp.type === 'offer' && (meta.makingOffer || pc.signalingState !== 'stable');
 
           const ignoreOffer = !meta.polite && offerCollision;
-          if (ignoreOffer) { console.log(`[WebRTC] ignoring offer (impolite collision)`); return; }
+          if (ignoreOffer) {
+            debugLog(`[WebRTC] ignoring offer (impolite collision)`);
+            return;
+          }
 
           if (offerCollision) {
-            console.log(`[WebRTC] rollback (polite collision)`);
+            debugLog(`[WebRTC] rollback (polite collision)`);
             await pc.setLocalDescription({ type: 'rollback' });
           }
 
@@ -661,23 +765,29 @@ export const GameRoom = ({
 
           if (signal.sdp.type === 'offer') {
             await pc.setLocalDescription(); // auto-creates answer
-            console.log(`[WebRTC] answer sent to from=${from.slice(0,6)}`);
-            socket.emit('signal', { to: from, from: socket.id!, signal: { sdp: pc.localDescription } });
+            debugLog(`[WebRTC] answer sent to from=${from.slice(0, 6)}`);
+            socket.emit('signal', {
+              to: from,
+              from: socket.id!,
+              signal: { sdp: pc.localDescription },
+            });
           }
         } else if (signal.candidate) {
           try {
             await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
           } catch (e) {
-            if (!meta.makingOffer) console.error('ICE error', e);
+            if (!meta.makingOffer) debugError('ICE error', e);
           }
         }
       } catch (e) {
-        console.error('Signal error:', e);
+        debugError('Signal error:', e);
       }
     };
 
     socket.on('signal', handleSignal);
-    return () => { socket.off('signal', handleSignal); };
+    return () => {
+      socket.off('signal', handleSignal);
+    };
   }, []);
 
   // ── Media toggle ───────────────────────────────────────────────────────────
@@ -702,43 +812,55 @@ export const GameRoom = ({
     socket.emit('updateMediaState', { isMicOn: isVoiceActive, isCamOn: isVideoActive });
 
     if (isVoiceActive || isVideoActive) {
-      console.log(`[WebRTC] getUserMedia audio=${isVoiceActive} video=${isVideoActive}`);
-      navigator.mediaDevices.getUserMedia({ audio: isVoiceActive, video: isVideoActive })
-        .then(stream => {
+      debugLog(`[WebRTC] getUserMedia audio=${isVoiceActive} video=${isVideoActive}`);
+      navigator.mediaDevices
+        .getUserMedia({ audio: isVoiceActive, video: isVideoActive })
+        .then((stream) => {
           const oldStream = localStreamRef.current;
-          console.log(`[WebRTC] got stream tracks=${stream.getTracks().map(t => t.kind).join(',')} | hadStream=${!!oldStream} | peers=${Object.keys(peersRef.current).length}`);
+          debugLog(
+            `[WebRTC] got stream tracks=${stream
+              .getTracks()
+              .map((t) => t.kind)
+              .join(
+                ','
+              )} | hadStream=${!!oldStream} | peers=${Object.keys(peersRef.current).length}`
+          );
 
           // Sync ref immediately before peer operations
           localStreamRef.current = stream;
           setLocalStream(stream);
 
-          (Object.entries(peersRef.current) as [string, RTCPeerConnection][]).forEach(([peerId, pc]) => {
-            stream.getTracks().forEach(track => {
-              const existingSender = pc.getSenders().find(s => s.track?.kind === track.kind);
-              if (existingSender) {
-                // Sender already exists with a live track — just swap to the new track.
-                console.log(`[WebRTC] replaceTrack kind=${track.kind} peer=${peerId.slice(0,6)}`);
-                existingSender.replaceTrack(track);
-                senderKindMap.current.set(existingSender, track.kind);
-              } else {
-                // No sender for this kind — fresh addTrack fires onnegotiationneeded.
-                console.log(`[WebRTC] addTrack kind=${track.kind} peer=${peerId.slice(0,6)}`);
-                addTrackToPeer(pc, track, stream);
-              }
-            });
-          });
+          (Object.entries(peersRef.current) as [string, RTCPeerConnection][]).forEach(
+            ([peerId, pc]) => {
+              stream.getTracks().forEach((track) => {
+                const existingSender = pc.getSenders().find((s) => s.track?.kind === track.kind);
+                if (existingSender) {
+                  // Sender already exists with a live track — just swap to the new track.
+                  debugLog(`[WebRTC] replaceTrack kind=${track.kind} peer=${peerId.slice(0, 6)}`);
+                  existingSender.replaceTrack(track);
+                  senderKindMap.current.set(existingSender, track.kind);
+                } else {
+                  // No sender for this kind — fresh addTrack fires onnegotiationneeded.
+                  debugLog(`[WebRTC] addTrack kind=${track.kind} peer=${peerId.slice(0, 6)}`);
+                  addTrackToPeer(pc, track, stream);
+                }
+              });
+            }
+          );
 
           // Stop old tracks AFTER new ones are in place
-          if (oldStream) oldStream.getTracks().forEach(t => t.stop());
+          if (oldStream) oldStream.getTracks().forEach((t) => t.stop());
         })
-        .catch(err => {
-          console.error('Media error:', err);
+        .catch((err) => {
+          debugError('Media error:', err);
           setIsVoiceActive(false);
           setIsVideoActive(false);
         });
     } else if (localStream) {
-      console.log(`[WebRTC] turning off media — removing our senders, keeping peer connections alive | peers=${Object.keys(peersRef.current).length}`);
-      localStream.getTracks().forEach(t => t.stop());
+      debugLog(
+        `[WebRTC] turning off media — removing our senders, keeping peer connections alive | peers=${Object.keys(peersRef.current).length}`
+      );
+      localStream.getTracks().forEach((t) => t.stop());
       localStreamRef.current = null;
       setLocalStream(null);
       // Only remove OUR senders from each PC — do NOT destroy the peer connection.
@@ -746,9 +868,11 @@ export const GameRoom = ({
       // video feed. By just removing our senders, the inbound tracks (their video)
       // stay intact. On re-enable, addTrackToPeer removes any stale null senders
       // before calling addTrack, so the PC stays clean.
-      (Object.values(peersRef.current) as RTCPeerConnection[]).forEach(pc => {
-        pc.getSenders().forEach(s => {
-          try { pc.removeTrack(s); } catch (e) { }
+      (Object.values(peersRef.current) as RTCPeerConnection[]).forEach((pc) => {
+        pc.getSenders().forEach((s) => {
+          try {
+            pc.removeTrack(s);
+          } catch (e) {}
         });
       });
     }
@@ -757,7 +881,7 @@ export const GameRoom = ({
   useEffect(() => {
     return () => {
       if (localStreamRef.current) {
-        localStreamRef.current.getTracks().forEach(t => t.stop());
+        localStreamRef.current.getTracks().forEach((t) => t.stop());
       }
     };
   }, []);
@@ -779,19 +903,31 @@ export const GameRoom = ({
         privateInfo={privateInfo}
         hasNewMessages={hasNewMessages}
         tick={0}
-        onOpenChat={() => { playSound('click'); setIsChatOpen(true); }}
-        onOpenHistory={() => { playSound('click'); setIsHistoryOpen(true); }}
-        onOpenDossier={() => { playSound('click'); setIsDossierOpen(true); }}
-        onOpenReference={() => { playSound('click'); setIsReferenceOpen(true); }}
+        onOpenChat={() => {
+          playSound('click');
+          setIsChatOpen(true);
+        }}
+        onOpenHistory={() => {
+          playSound('click');
+          setIsHistoryOpen(true);
+        }}
+        onOpenDossier={() => {
+          playSound('click');
+          setIsDossierOpen(true);
+        }}
+        onOpenReference={() => {
+          playSound('click');
+          setIsReferenceOpen(true);
+        }}
         onOpenProfile={onOpenProfile}
         onLeaveRoom={onLeaveRoom}
         playSound={playSound}
       />
 
       <main className="relative overflow-hidden w-full h-full">
-        <div 
+        <div
           className="absolute top-0 left-0 flex flex-col origin-top-left transition-all duration-300"
-          style={{ 
+          style={{
             transform: `scale(${uiScale})`,
             width: `${100 / uiScale}%`,
             height: `${100 / uiScale}%`,
@@ -820,8 +956,12 @@ export const GameRoom = ({
               <div className="px-[2vw] py-[1.5vh] bg-white/5 border-b border-subtle flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="w-2 h-2 rounded-full bg-purple-500 animate-pulse" />
-                  <span className="text-responsive-xs font-mono text-purple-400 uppercase tracking-[0.2em]">Spectating</span>
-                  <span className="text-responsive-xs font-mono text-faint">— You can see all roles</span>
+                  <span className="text-responsive-xs font-mono text-purple-400 uppercase tracking-[0.2em]">
+                    Spectating
+                  </span>
+                  <span className="text-responsive-xs font-mono text-faint">
+                    — You can see all roles
+                  </span>
                 </div>
                 <button
                   onClick={onLeaveRoom}
@@ -834,7 +974,9 @@ export const GameRoom = ({
               <div className="px-[2vw] py-[1.5vh] flex items-center justify-between gap-4">
                 <div className="flex-1 min-w-0">
                   {gameState.phase === 'GameOver' ? (
-                    <p className="text-responsive-xs font-mono text-secondary">Game over — the next game is being set up.</p>
+                    <p className="text-responsive-xs font-mono text-secondary">
+                      Game over — the next game is being set up.
+                    </p>
                   ) : (
                     <p className="text-responsive-xs font-mono text-secondary">
                       {gameState.spectatorQueue?.length
@@ -845,7 +987,11 @@ export const GameRoom = ({
                 </div>
                 {inQueue ? (
                   <button
-                    onClick={() => { socket.emit('leaveQueue'); setInQueue(false); playSound('click'); }}
+                    onClick={() => {
+                      socket.emit('leaveQueue');
+                      setInQueue(false);
+                      playSound('click');
+                    }}
                     className="px-4 py-2 rounded-xl text-responsive-xs font-mono uppercase tracking-widest border border-red-900/50 bg-red-900/20 text-red-400 hover:bg-red-900/30 transition-all shrink-0"
                   >
                     Leave Queue
@@ -877,7 +1023,10 @@ export const GameRoom = ({
               me={me}
               user={user}
               showDebug={showDebug}
-              onOpenLog={() => { playSound('click'); setIsLogOpen(true); }}
+              onOpenLog={() => {
+                playSound('click');
+                setIsLogOpen(true);
+              }}
               onPlayAgain={onPlayAgain}
               onLeaveRoom={onLeaveRoom}
               playSound={playSound}
@@ -955,7 +1104,10 @@ export const GameRoom = ({
       <PolicyPeekModal
         policies={peekedPolicies}
         title={peekTitle}
-        onClose={() => { setPeekedPolicies(null); setPeekTitle(undefined); }}
+        onClose={() => {
+          setPeekedPolicies(null);
+          setPeekTitle(undefined);
+        }}
         playSound={playSound}
       />
       <DossierModal

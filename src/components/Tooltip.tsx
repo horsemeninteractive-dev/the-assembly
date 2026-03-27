@@ -51,7 +51,7 @@ export const Tooltip = ({ content, children, className, position = 'bottom' }: T
   };
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="relative inline-block"
       onMouseEnter={show}
@@ -61,11 +61,13 @@ export const Tooltip = ({ content, children, className, position = 'bottom' }: T
     >
       {children}
       {isVisible && (
-        <div className={cn(
-          "absolute z-[100] px-2 py-1 bg-surface border border-default rounded-lg shadow-2xl pointer-events-none transition-opacity duration-200 min-w-[80px] text-center",
-          positionClasses[position],
-          className
-        )}>
+        <div
+          className={cn(
+            'absolute z-[100] px-2 py-1 bg-surface border border-default rounded-lg shadow-2xl pointer-events-none transition-opacity duration-200 min-w-[80px] text-center',
+            positionClasses[position],
+            className
+          )}
+        >
           <div className="text-[10px] font-mono text-primary uppercase tracking-wider whitespace-nowrap">
             {content}
           </div>

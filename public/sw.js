@@ -4,7 +4,7 @@ const ASSETS_TO_CACHE = [
   '/index.html',
   '/manifest.json',
   '/pwa-192x192.png',
-  '/pwa-512x512.png'
+  '/pwa-512x512.png',
 ];
 
 self.addEventListener('install', (event) => {
@@ -29,24 +29,19 @@ self.addEventListener('activate', (event) => {
             }
           })
         );
-      })
+      }),
     ])
   );
 });
 
-const networkFirstPaths = [
-  '/manifest.json'
-];
+const networkFirstPaths = ['/manifest.json'];
 
 // NEVER cache the index.html or root to ensure we always get latest hashed assets
-const skipCachePaths = [
-  '/',
-  '/index.html'
-];
+const skipCachePaths = ['/', '/index.html'];
 
 self.addEventListener('fetch', (event) => {
   const url = new URL(event.request.url);
-  
+
   if (skipCachePaths.includes(url.pathname)) {
     event.respondWith(fetch(event.request));
     return;

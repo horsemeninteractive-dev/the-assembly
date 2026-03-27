@@ -19,12 +19,16 @@ export const PauseOverlay = ({ gameState }: PauseOverlayProps) => (
         <div className="w-20 h-20 bg-yellow-900/20 rounded-3xl flex items-center justify-center border border-yellow-500/30 mb-6 animate-pulse">
           <AlertTriangle className="w-10 h-10 text-yellow-500" />
         </div>
-        <h2 className="text-3xl font-thematic text-primary tracking-widest uppercase mb-2">Assembly Paused</h2>
+        <h2 className="text-3xl font-thematic text-primary tracking-widest uppercase mb-2">
+          Assembly Paused
+        </h2>
         <p className="text-sm font-mono text-yellow-500/70 uppercase tracking-widest mb-8 max-w-md">
           {gameState.pauseReason || 'A player has disconnected. Waiting for reconnection...'}
         </p>
         <div className="flex flex-col items-center gap-4">
-          <div className="text-6xl font-thematic text-primary tabular-nums">{gameState.pauseTimer}s</div>
+          <div className="text-6xl font-thematic text-primary tabular-nums">
+            {gameState.pauseTimer}s
+          </div>
           <div className="w-48 h-1 bg-card rounded-full overflow-hidden">
             <motion.div
               initial={{ width: '100%' }}

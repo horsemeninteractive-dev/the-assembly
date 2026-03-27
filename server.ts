@@ -1,23 +1,34 @@
-import { logger } from "./server/logger.ts";
-import express from "express";
-import cors from "cors";
-import path from "path";
-import { createServer } from "http";
-import { Server } from "socket.io";
-import { createAdapter } from "@socket.io/redis-adapter";
-import { createServer as createViteServer } from "vite";
-import { randomUUID, randomBytes } from "crypto";
+import { logger } from './server/logger.ts';
+import express from 'express';
+import helmet from 'helmet';
+import cors from 'cors';
+import path from 'path';
+import { createServer } from 'http';
+import { Server } from 'socket.io';
+import { createAdapter } from '@socket.io/redis-adapter';
+import { createServer as createViteServer } from 'vite';
+import { randomUUID, randomBytes, createHash } from 'crypto';
+import fs from 'fs';
 
-import { User, GameState, Player } from "./src/types.ts";
-import { createDeck } from "./server/utils.ts";
-import { GameEngine } from "./server/gameEngine.ts";
-import { registerRoutes, validateToken } from "./server/apiRoutes.ts";
-import { getUserById, sendFriendRequest, acceptFriendRequest, getFriends, isFriend, getSystemConfig, updateSystemConfig, saveUser } from "./server/supabaseService.ts";
-import { pubClient, subClient, isRedisConfigured } from "./server/redis.ts";
-import { SystemConfig } from "./src/types.ts";
-import Stripe from "stripe";
+import { User, GameState, Player } from './src/types.ts';
+import { createDeck } from './server/utils.ts';
+import { GameEngine } from './server/gameEngine.ts';
+import { registerRoutes, validateToken } from './server/apiRoutes.ts';
+import {
+  getUserById,
+  sendFriendRequest,
+  acceptFriendRequest,
+  getFriends,
+  isFriend,
+  getSystemConfig,
+  updateSystemConfig,
+  saveUser,
+} from './server/supabaseService.ts';
+import { pubClient, subClient, isRedisConfigured } from './server/redis.ts';
+import { SystemConfig } from './src/types.ts';
+import Stripe from 'stripe';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "");
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
 if (!process.env.STRIPE_SECRET_KEY) {
   logger.warn('[Stripe] STRIPE_SECRET_KEY not set — payment endpoints will return 503.');
@@ -33,10 +44,10 @@ function isAllowedOrigin(origin: string | undefined): boolean {
   if (!origin) return false;
   const explicit = [
     process.env.APP_URL,
-    "https://theassembly.web.app",
-    "http://localhost:3000",
-    "http://localhost",
-    "capacitor://localhost"
+    'https://theassembly.web.app',
+    'http://localhost:3000',
+    'http://localhost',
+    'capacitor://localhost',
   ].filter(Boolean);
   return explicit.includes(origin) || CLOUD_RUN_PATTERN.test(origin);
 }
@@ -46,24 +57,60 @@ let io: Server;
 
 async function startServer() {
   logger.info('Starting with Stripe integration...');
+
+  // Generate CSP hashes from index.html for production
+  let prodScriptHashes = '';
+  if (process.env.NODE_ENV === 'production') {
+    try {
+      const htmlPath = path.resolve('dist', 'index.html');
+      if (fs.existsSync(htmlPath)) {
+        const html = fs.readFileSync(htmlPath, 'utf8');
+        const scriptRegex = /<script\b[^>]*>([\s\S]*?)<\/script>/gi;
+        let match;
+        const hashes: string[] = [];
+        while ((match = scriptRegex.exec(html)) !== null) {
+          if (match[1] && match[1].trim() !== '') {
+            const hash = createHash('sha256').update(match[1]).digest('base64');
+            hashes.push(`'sha256-${hash}'`);
+          }
+        }
+        if (hashes.length > 0) {
+          prodScriptHashes = ' ' + hashes.join(' ');
+        }
+      }
+    } catch (err: any) {
+      logger.error({ err: err.message }, 'Failed to parse index.html for CSP hashes');
+    }
+  }
+
   const app = express();
-  app.set("trust proxy", 1);
-  app.use(cors({
-    origin: (origin, callback) => {
-      // Allow requests with no origin (server-to-server, curl, Postman)
-      if (!origin || isAllowedOrigin(origin)) return callback(null, true);
-      callback(new Error(`CORS: origin '${origin}' not allowed`));
-    },
-  }));
+  app.use(
+    helmet({
+      contentSecurityPolicy: false,
+      crossOriginEmbedderPolicy: false,
+      crossOriginOpenerPolicy: false,
+      crossOriginResourcePolicy: false,
+    })
+  );
+  app.set('trust proxy', 1);
+  app.use(
+    cors({
+      origin: (origin, callback) => {
+        // Allow requests with no origin (server-to-server, curl, Postman)
+        if (!origin || isAllowedOrigin(origin)) return callback(null, true);
+        callback(new Error(`CORS: origin '${origin}' not allowed`));
+      },
+    })
+  );
 
   // Stripe webhook must be placed BEFORE express.json() to get the raw body
-  app.post("/api/webhook/stripe", express.raw({ type: "application/json" }), async (req, res) => {
-    const sig = req.headers["stripe-signature"];
+  app.post('/api/webhook/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+    const sig = req.headers['stripe-signature'];
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
     if (!sig || !webhookSecret) {
       logger.error('Missing Stripe signature or webhook secret');
-      return res.status(400).send("Webhook Error: Missing signature or secret");
+      return res.status(400).send('Webhook Error: Missing signature or secret');
     }
 
     let event: Stripe.Event;
@@ -76,23 +123,23 @@ async function startServer() {
     }
 
     // Handle the event
-    if (event.type === "checkout.session.completed") {
+    if (event.type === 'checkout.session.completed') {
       const session = event.data.object as Stripe.Checkout.Session;
       const userId = session.metadata?.userId;
-      const cpAmount = parseInt(session.metadata?.cpAmount || "0", 10);
+      const cpAmount = parseInt(session.metadata?.cpAmount || '0', 10);
 
       if (userId && cpAmount > 0) {
         logger.info({ userId, cpAmount }, 'Crediting CP to user via Stripe');
         const user = await getUserById(userId);
         if (user) {
           user.cabinetPoints = (user.cabinetPoints ?? 0) + cpAmount;
-          const { saveUser } = await import("./server/supabaseService.ts");
+          const { saveUser } = await import('./server/supabaseService.ts');
           await saveUser(user);
-          
+
           // Notify the user via socket if they are online
           const socketId = userSockets.get(userId);
           if (socketId) {
-            io.to(socketId).emit("userUpdate", user);
+            io.to(socketId).emit('userUpdate', user);
           }
         }
       }
@@ -112,7 +159,7 @@ async function startServer() {
         if (!origin || isAllowedOrigin(origin)) return callback(null, true);
         callback(new Error(`CORS: origin '${origin}' not allowed`));
       },
-      methods: ["GET", "POST"],
+      methods: ['GET', 'POST'],
     },
   });
 
@@ -149,7 +196,7 @@ async function startServer() {
     const ok = checks.supabase; // Supabase is critical for auth/config
     res.status(ok ? 200 : 503).json({
       status: ok ? 'ok' : 'degraded',
-      checks
+      checks,
     });
   });
 
@@ -158,31 +205,40 @@ async function startServer() {
   // Add headers for Discord Activity media permissions
   app.use((req, res, next) => {
     // Explicitly allow microphone, camera, and display-capture for Discord Activity
-    res.setHeader("Permissions-Policy", "microphone=*, camera=*, display-capture=*, speaker-selection=*, autoplay=*, text-to-speech=*, screen-wake-lock=*");
+    res.setHeader(
+      'Permissions-Policy',
+      'microphone=*, camera=*, display-capture=*, speaker-selection=*, autoplay=*, text-to-speech=*, screen-wake-lock=*'
+    );
+
+    const isProd = process.env.NODE_ENV === 'production';
+    const scriptSrc = isProd
+      ? `'self'${prodScriptHashes} https://*.discord.com`
+      : `'self' 'unsafe-inline' 'unsafe-eval' https://*.discord.com`;
 
     // Comprehensive CSP for Discord Activity environment
-    res.setHeader("Content-Security-Policy",
+    res.setHeader(
+      'Content-Security-Policy',
       "default-src 'self' https://*.discord.com https://*.discordapp.io; " +
-      "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://*.discord.com; " +
-      "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-      "font-src 'self' data: https://fonts.gstatic.com; " +
-      "img-src 'self' data: blob: *; " +
-      "media-src 'self' blob: data: *; " +
-      "connect-src 'self' *; " +
-      "frame-ancestors 'self' https://discord.com https://*.discord.com https://*.discordapp.io;"
+        `script-src ${scriptSrc}; ` +
+        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
+        "font-src 'self' data: https://fonts.gstatic.com; " +
+        "img-src 'self' data: blob: *; " +
+        "media-src 'self' blob: data: *; " +
+        "connect-src 'self' *; " +
+        "frame-ancestors 'self' https://discord.com https://*.discord.com https://*.discordapp.io;"
     );
 
     // Headers for cross-origin isolation (needed for some media features)
-    res.setHeader("Cross-Origin-Embedder-Policy", "credentialless");
-    res.setHeader("Cross-Origin-Opener-Policy", "same-origin");
+    res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
 
     next();
   });
 
   // Proxy route for external assets to bypass Discord's strict CSP
-  app.get("/proxy", async (req, res) => {
+  app.get('/proxy', async (req, res) => {
     const url = req.query.url as string;
-    if (!url) return res.status(400).send("URL is required");
+    if (!url) return res.status(400).send('URL is required');
 
     try {
       // Enforce HTTPS — block file://, http://, and other non-HTTPS schemes
@@ -191,10 +247,10 @@ async function startServer() {
       try {
         parsedUrl = new URL(url);
       } catch {
-        return res.status(400).send("Invalid URL");
+        return res.status(400).send('Invalid URL');
       }
-      if (parsedUrl.protocol !== "https:") {
-        return res.status(403).send("Only HTTPS URLs are allowed");
+      if (parsedUrl.protocol !== 'https:') {
+        return res.status(403).send('Only HTTPS URLs are allowed');
       }
 
       // Exact hostname match — endsWith() is vulnerable to subdomain spoofing
@@ -212,39 +268,43 @@ async function startServer() {
         'discord.com',
         'fonts.googleapis.com',
         'fonts.gstatic.com',
-        'lh3.googleusercontent.com'
+        'lh3.googleusercontent.com',
       ]);
 
       if (!allowedHostnames.has(parsedUrl.hostname)) {
-        return res.status(403).send("Domain not allowed");
+        return res.status(403).send('Domain not allowed');
       }
 
       const response = await fetch(url, {
         headers: {
-          'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-        }
+          'User-Agent':
+            'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
+        },
       });
 
       if (!response.ok) {
-        logger.error({ url, status: response.status, statusText: response.statusText }, 'Proxy fetch failed');
+        logger.error(
+          { url, status: response.status, statusText: response.statusText },
+          'Proxy fetch failed'
+        );
         return res.status(response.status).send(response.statusText);
       }
 
-      const contentType = response.headers.get("content-type");
-      if (contentType) res.setHeader("Content-Type", contentType);
+      const contentType = response.headers.get('content-type');
+      if (contentType) res.setHeader('Content-Type', contentType);
 
       // Add CORP header to allow proxied assets in cross-origin isolated environments
-      res.setHeader("Cross-Origin-Resource-Policy", "cross-origin");
-      res.setHeader("Access-Control-Allow-Origin", "*");
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+      res.setHeader('Access-Control-Allow-Origin', '*');
 
       // Set cache headers for better performance
-      res.setHeader("Cache-Control", "public, max-age=31536000");
+      res.setHeader('Cache-Control', 'public, max-age=31536000');
 
       const arrayBuffer = await response.arrayBuffer();
       let body = Buffer.from(arrayBuffer);
 
       // If it's a CSS file from Google Fonts, rewrite URLs to go through the proxy
-      if (contentType && contentType.includes("text/css") && url.includes("fonts.googleapis.com")) {
+      if (contentType && contentType.includes('text/css') && url.includes('fonts.googleapis.com')) {
         let css = body.toString();
         // Replace url(https://fonts.gstatic.com/...) with url(/proxy?url=https%3A%2F%2Ffonts.gstatic.com%2F...)
         css = css.replace(/url\((https:\/\/fonts\.gstatic\.com\/[^)]+)\)/g, (match, fontUrl) => {
@@ -256,59 +316,80 @@ async function startServer() {
       res.send(body);
     } catch (error: any) {
       logger.error({ url, err: error.message }, 'Proxy error fetching URL');
-      res.status(500).send("Error fetching resource");
+      res.status(500).send('Error fetching resource');
     }
   });
 
-  io.on("connection", (socket) => {
+  io.on('connection', (socket) => {
     // Rate limiter: 10 events per second (Token Bucket)
     socket.use(([event, ...args]: any[], next: (err?: Error) => void) => {
-      if (event === "disconnect") return next();
-      
+      if (event === 'disconnect') return next();
+
       const now = Date.now();
       const CAPACITY = 10;
       const REFILL_RATE = 10; // tokens per second
-      
+
       const last = socket.data.lastRateLimitCheck || now;
       const tokens = socket.data.tokens ?? CAPACITY;
-      
+
       const elapsed = now - last;
       const regained = (elapsed / 1000) * REFILL_RATE;
       const currentTokens = Math.min(CAPACITY, tokens + regained);
-      
+
       if (currentTokens < 1) {
         const throttledEvents = [
-          "sendMessage", "vote", "nominateChancellor", "useTitleAbility", 
-          "discardPolicy", "enactPolicy", "veto", "playAgain", "joinRoom",
-          "userConnected", "leaveRoom", "startGame", "hostStartGame",
-          "toggleReady", "kickPlayer", "toggleLock", "updateMediaState",
-          "joinQueue", "leaveQueue", "addAI", "removeAI",
-          "adminResetRoom", "adminDeleteRoom", "adminForceStart", "adminBroadcast"
+          'sendMessage',
+          'vote',
+          'nominateChancellor',
+          'useTitleAbility',
+          'discardPolicy',
+          'enactPolicy',
+          'veto',
+          'playAgain',
+          'joinRoom',
+          'userConnected',
+          'leaveRoom',
+          'startGame',
+          'hostStartGame',
+          'toggleReady',
+          'kickPlayer',
+          'toggleLock',
+          'updateMediaState',
+          'joinQueue',
+          'leaveQueue',
+          'addAI',
+          'removeAI',
+          'adminResetRoom',
+          'adminDeleteRoom',
+          'adminForceStart',
+          'adminBroadcast',
         ];
         if (throttledEvents.includes(event)) {
-          logger.warn({ event, userId: socket.data.userId || 'unauth', socketId: socket.id }, 'Throttling socket event due to rate limit');
-          return next(new Error("Rate limit exceeded. Please slow down."));
+          logger.warn(
+            { event, userId: socket.data.userId || 'unauth', socketId: socket.id },
+            'Throttling socket event due to rate limit'
+          );
+          return next(new Error('Rate limit exceeded. Please slow down.'));
         }
       }
-      
+
       socket.data.tokens = currentTokens - 1;
       socket.data.lastRateLimitCheck = now;
       next();
     });
 
-    const getRoom = (): string | undefined =>
-      Array.from(socket.rooms).find(r => r !== socket.id);
+    const getRoom = (): string | undefined => Array.from(socket.rooms).find((r) => r !== socket.id);
 
     const drainSpectatorQueue = (state: GameState, roomId: string) => {
       if (!state.spectatorQueue) state.spectatorQueue = [];
       const queue = state.spectatorQueue;
       const drained: typeof state.spectatorQueue = [];
-      
+
       for (const queued of queue) {
         if (state.players.length >= state.maxPlayers) break;
-        
+
         // Move from spectators list to players list
-        state.spectators = state.spectators.filter(s => s.id !== queued.id);
+        state.spectators = state.spectators.filter((s) => s.id !== queued.id);
         state.players.push({
           id: queued.id,
           name: queued.name,
@@ -331,24 +412,24 @@ async function startServer() {
         });
         drained.push(queued);
         // Notify the queued player that they've joined
-        io.to(queued.id).emit("queueDrained");
+        io.to(queued.id).emit('queueDrained');
       }
-      
-      state.spectatorQueue = queue.filter(q => !drained.find(d => d.id === q.id));
+
+      state.spectatorQueue = queue.filter((q) => !drained.find((d) => d.id === q.id));
       if (drained.length > 0) {
         engine.broadcastState(roomId);
       }
     };
 
-    socket.on("userConnected", async ({ userId, token }: { userId: string, token: string }) => {
+    socket.on('userConnected', async ({ userId, token }: { userId: string; token: string }) => {
       const user = await validateToken(token);
       if (!user || user.id !== userId) {
-        socket.emit("error", "Unauthorized: User ID mismatch or invalid token.");
+        socket.emit('error', 'Unauthorized: User ID mismatch or invalid token.');
         socket.disconnect();
         return;
       }
       if (user?.isBanned) {
-        socket.emit("error", "Your account has been restricted.");
+        socket.emit('error', 'Your account has been restricted.');
         socket.disconnect();
         return;
       }
@@ -362,285 +443,323 @@ async function startServer() {
           // Find which room the friend is in (if any)
           let friendRoomId: string | undefined;
           for (const [rId, state] of engine.rooms.entries()) {
-            if (state.players.some(p => p.userId === friend.id && !p.isDisconnected)) {
+            if (state.players.some((p) => p.userId === friend.id && !p.isDisconnected)) {
               friendRoomId = rId;
               break;
             }
           }
-          io.to(friendSocketId).emit("userStatusChanged", { userId, isOnline: true });
-          socket.emit("userStatusChanged", { userId: friend.id, isOnline: true, roomId: friendRoomId });
+          io.to(friendSocketId).emit('userStatusChanged', { userId, isOnline: true });
+          socket.emit('userStatusChanged', {
+            userId: friend.id,
+            isOnline: true,
+            roomId: friendRoomId,
+          });
         }
       }
     });
 
-    socket.on("joinRoom", async ({
-      roomId, name: rawName, userId, activeFrame, activePolicyStyle, activeVotingStyle,
-      maxPlayers, actionTimer, mode, isSpectator, privacy, inviteCode, hostUserId,
-    }) => {
-      // Validation & Sanitisation
-      if (typeof roomId !== 'string' || roomId.length < 1 || roomId.length > 40) return;
-      if (typeof rawName !== 'string') return;
-      if (userId && userId !== socket.data.userId) {
-        socket.emit("error", "Unauthorized: User ID mismatch.");
-        return;
-      }
-      const name = rawName.replace(/<[^>]*>/g, "").replace(/\0/g, "").substring(0, 32);
-      if (!/^[a-zA-Z0-9 _\-'!?.]+$/.test(roomId)) {
-        socket.emit('error', 'Room name contains invalid characters.');
-        return;
-      }
-
-      const safeMax = Math.max(5, Math.min(10, parseInt(maxPlayers) || 5));
-      const safeTimer = actionTimer === 0 ? 0 : Math.max(30, Math.min(120, parseInt(actionTimer) || 60));
-      const user = userId ? await getUserById(userId) : null;
-      if (user?.isBanned) {
-        socket.emit("error", "Your account has been restricted.");
-        socket.disconnect();
-        return;
-      }
-
-      let state = engine.rooms.get(roomId);
-      if (!state && engine.rooms.size >= MAX_ROOM_CAPACITY) {
-        socket.emit('error', 'Server at capacity. Too many active rooms.');
-        return;
-      }
-
-      if (!state) {
-        if (currentConfig.maintenanceMode && !user?.isAdmin) {
-          socket.emit("error", "The server is currently undergoing maintenance. New rooms cannot be created at this time.");
-          return;
-        }
-        // Generating a 4-char invite code if private
-        const code = privacy === 'private'
-          ? randomBytes(3).toString('hex').toUpperCase().slice(0, 6)
-          : undefined;
-        state = {
-          roomId,
-          players: [],
-          spectators: [],
-          spectatorQueue: [],
-          privacy: privacy || 'public',
-          inviteCode: code,
-          hostUserId: userId,
-          mode: mode || "Ranked",
-          phase: "Lobby",
-          civilDirectives: 0,
-          stateDirectives: 0,
-          electionTracker: 0,
-          deck: createDeck(),
-          discard: [],
-          drawnPolicies: [],
-          chancellorPolicies: [],
-          currentExecutiveAction: "None",
-          log: [`Room ${roomId} created in ${mode || "Ranked"} mode.`],
-          presidentIdx: 0,
-          lastPresidentIdx: -1,
-          maxPlayers: safeMax,
-          actionTimer: safeTimer,
-          messages: [],
-          round: 1,
-          vetoUnlocked: false,
-          vetoRequested: false,
-          declarations: [],
-        };
-        engine.rooms.set(roomId, state);
-      } else {
-        // Room exists — check reconnect FIRST before any privacy gate
-        // (disconnected player rejoining should never be blocked by privacy)
-        if (!isSpectator && state.phase !== "Lobby") {
-          const existingPlayer = state.players.find(p => p.userId === userId && !p.isAI);
-          if (existingPlayer) {
-            const oldId = existingPlayer.id;
-            existingPlayer.id = socket.id;
-            existingPlayer.isDisconnected = false;
-
-            // Comprehensive ID re-mapping across all GameState fields
-            if (state.presidentId === oldId) state.presidentId = socket.id;
-            if (state.chancellorId === oldId) state.chancellorId = socket.id;
-            if (state.rejectedChancellorId === oldId) state.rejectedChancellorId = socket.id;
-            if (state.detainedPlayerId === oldId) state.detainedPlayerId = socket.id;
-            if (state.lastGovernmentPresidentId === oldId) state.lastGovernmentPresidentId = socket.id;
-            if (state.disconnectedPlayerId === oldId) state.disconnectedPlayerId = socket.id;
-            if (state.lastEnactedPolicy && state.lastEnactedPolicy.playerId === oldId) {
-              state.lastEnactedPolicy.playerId = socket.id;
-            }
-
-            if (state.presidentialOrder) {
-              state.presidentialOrder = state.presidentialOrder.map(id => id === oldId ? socket.id : id);
-            }
-
-            if (state.titlePrompt && state.titlePrompt.playerId === oldId) {
-              state.titlePrompt.playerId = socket.id;
-            }
-
-            if (state.previousVotes) {
-              if (state.previousVotes[oldId]) {
-                state.previousVotes[socket.id] = state.previousVotes[oldId];
-                delete state.previousVotes[oldId];
-              }
-            }
-
-            if (state.lastGovernmentVotes) {
-              if (state.lastGovernmentVotes[oldId]) {
-                state.lastGovernmentVotes[socket.id] = state.lastGovernmentVotes[oldId];
-                delete state.lastGovernmentVotes[oldId];
-              }
-            }
-
-            state.declarations.forEach(d => {
-              if (d.playerId === oldId) d.playerId = socket.id;
-            });
-
-            state.roundHistory?.forEach(rh => {
-              if (rh.presidentId === oldId) rh.presidentId = socket.id;
-              if (rh.chancellorId === oldId) rh.chancellorId = socket.id;
-              rh.votes.forEach(v => {
-                if (v.playerId === oldId) v.playerId = socket.id;
-              });
-            });
-
-            state.isPaused = false;
-            state.pauseReason = undefined;
-            state.pauseTimer = undefined;
-            state.log.push(`${existingPlayer.name} reconnected.`);
-            if (state.log.length > 50) state.log.shift();
-            
-            // Join room BEFORE broadcast so the client receives the update
-            socket.join(roomId);
-            engine.broadcastState(roomId);
-            socket.to(roomId).emit("peerJoined", socket.id);
-            return;
-          }
-        }
-
-        // Lobby-phase reconnect: player refreshed tab or briefly disconnected
-        if (!isSpectator && state.phase === "Lobby" && userId) {
-          const existingLobbyPlayer = state.players.find(p => p.userId === userId && !p.isAI);
-          if (existingLobbyPlayer) {
-            existingLobbyPlayer.id = socket.id;
-            existingLobbyPlayer.name = name; // refresh display name too
-            socket.join(roomId);
-            state.log.push(`${name} rejoined the lobby.`);
-            engine.broadcastState(roomId);
-            socket.to(roomId).emit("peerJoined", socket.id);
-            return;
-          }
-        }
-
-        // Enforce privacy — applies to both players and spectators
-        if (state.privacy === 'private') {
-          if (state.inviteCode && inviteCode?.toUpperCase() !== state.inviteCode) {
-            socket.emit("error", "Invalid invite code.");
-            return;
-          }
-        } else if (state.privacy === 'friends') {
-          if (state.hostUserId && userId && state.hostUserId !== userId) {
-            const areFriends = await isFriend(state.hostUserId, userId);
-            if (!areFriends) {
-              socket.emit("error", isSpectator ? "You must be friends with the host to spectate this room." : "This room is friends only.");
-              return;
-            }
-          }
-        }
-      }
-
-      if (isSpectator) {
-        let avatarUrl: string | undefined;
-        if (userId) {
-          const user = await getUserById(userId);
-          if (user) avatarUrl = user.avatarUrl;
-        }
-        state.spectators.push({ id: socket.id, name, avatarUrl });
-        socket.join(roomId);
-        engine.broadcastState(roomId);
-        return;
-      }
-
-      if (state.phase !== "Lobby") {
-        socket.emit("error", "Game already in progress.");
-        return;
-      }
-
-      if (state.isLocked && userId !== state.hostUserId) {
-        socket.emit("error", "This room is locked.");
-        return;
-      }
-
-      if (state.players.length >= state.maxPlayers) {
-        socket.emit("error", "Room full.");
-        return;
-      }
-
-      let avatarUrl: string | undefined;
-      if (userId) {
-        socket.data.userId = userId;
-        userSockets.set(userId, socket.id);
-        const friends = await getFriends(userId);
-        for (const friend of friends) {
-          const friendSocketId = userSockets.get(friend.id);
-          if (friendSocketId) {
-            io.to(friendSocketId).emit("userStatusChanged", { userId, isOnline: true, roomId });
-            let friendRoomId: string | undefined;
-            for (const [rId, state] of engine.rooms.entries()) {
-              if (state.players.some(p => p.userId === friend.id && !p.isDisconnected)) {
-                friendRoomId = rId;
-                break;
-              }
-            }
-            socket.emit("userStatusChanged", { userId: friend.id, isOnline: true, roomId: friendRoomId });
-          }
-        }
-        const user = await getUserById(userId);
-        if (user) avatarUrl = user.avatarUrl;
-      }
-
-      const player: Player = {
-        id: socket.id,
-        name,
+    socket.on(
+      'joinRoom',
+      async ({
+        roomId,
+        name: rawName,
         userId,
-        avatarUrl,
         activeFrame,
         activePolicyStyle,
         activeVotingStyle,
-        isAlive: true,
-        isPresidentialCandidate: false,
-        isChancellorCandidate: false,
-        isPresident: false,
-        isChancellor: false,
-        wasPresident: false,
-        wasChancellor: false,
-        isReady: false,
-        isAI: false,
-      };
+        maxPlayers,
+        actionTimer,
+        mode,
+        isSpectator,
+        privacy,
+        inviteCode,
+        hostUserId,
+      }) => {
+        // Validation & Sanitisation
+        if (typeof roomId !== 'string' || roomId.length < 1 || roomId.length > 40) return;
+        if (typeof rawName !== 'string') return;
+        if (userId && userId !== socket.data.userId) {
+          socket.emit('error', 'Unauthorized: User ID mismatch.');
+          return;
+        }
+        const name = rawName
+          .replace(/<[^>]*>/g, '')
+          .replace(/\0/g, '')
+          .substring(0, 32);
+        if (!/^[a-zA-Z0-9 _\-'!?.]+$/.test(roomId)) {
+          socket.emit('error', 'Room name contains invalid characters.');
+          return;
+        }
 
-      state.players.push(player);
-      socket.join(roomId);
-      state.log.push(`${name} joined the lobby.`);
-      socket.to(roomId).emit("peerJoined", socket.id);
-      engine.broadcastState(roomId);
-    });
+        const safeMax = Math.max(5, Math.min(10, parseInt(maxPlayers) || 5));
+        const safeTimer =
+          actionTimer === 0 ? 0 : Math.max(30, Math.min(120, parseInt(actionTimer) || 60));
+        const user = userId ? await getUserById(userId) : null;
+        if (user?.isBanned) {
+          socket.emit('error', 'Your account has been restricted.');
+          socket.disconnect();
+          return;
+        }
 
-    socket.on("toggleReady", () => {
+        let state = engine.rooms.get(roomId);
+        if (!state && engine.rooms.size >= MAX_ROOM_CAPACITY) {
+          socket.emit('error', 'Server at capacity. Too many active rooms.');
+          return;
+        }
+
+        if (!state) {
+          if (currentConfig.maintenanceMode && !user?.isAdmin) {
+            socket.emit(
+              'error',
+              'The server is currently undergoing maintenance. New rooms cannot be created at this time.'
+            );
+            return;
+          }
+          // Generating a 4-char invite code if private
+          const code =
+            privacy === 'private'
+              ? randomBytes(3).toString('hex').toUpperCase().slice(0, 6)
+              : undefined;
+          state = {
+            roomId,
+            players: [],
+            spectators: [],
+            spectatorQueue: [],
+            privacy: privacy || 'public',
+            inviteCode: code,
+            hostUserId: userId,
+            mode: mode || 'Ranked',
+            phase: 'Lobby',
+            civilDirectives: 0,
+            stateDirectives: 0,
+            electionTracker: 0,
+            deck: createDeck(),
+            discard: [],
+            drawnPolicies: [],
+            chancellorPolicies: [],
+            currentExecutiveAction: 'None',
+            log: [`Room ${roomId} created in ${mode || 'Ranked'} mode.`],
+            presidentIdx: 0,
+            lastPresidentIdx: -1,
+            maxPlayers: safeMax,
+            actionTimer: safeTimer,
+            messages: [],
+            round: 1,
+            vetoUnlocked: false,
+            vetoRequested: false,
+            declarations: [],
+          };
+          engine.rooms.set(roomId, state);
+        } else {
+          // Room exists — check reconnect FIRST before any privacy gate
+          // (disconnected player rejoining should never be blocked by privacy)
+          if (!isSpectator && state.phase !== 'Lobby') {
+            const existingPlayer = state.players.find((p) => p.userId === userId && !p.isAI);
+            if (existingPlayer) {
+              const oldId = existingPlayer.id;
+              existingPlayer.id = socket.id;
+              existingPlayer.isDisconnected = false;
+
+              // Comprehensive ID re-mapping across all GameState fields
+              if (state.presidentId === oldId) state.presidentId = socket.id;
+              if (state.chancellorId === oldId) state.chancellorId = socket.id;
+              if (state.rejectedChancellorId === oldId) state.rejectedChancellorId = socket.id;
+              if (state.detainedPlayerId === oldId) state.detainedPlayerId = socket.id;
+              if (state.lastGovernmentPresidentId === oldId)
+                state.lastGovernmentPresidentId = socket.id;
+              if (state.disconnectedPlayerId === oldId) state.disconnectedPlayerId = socket.id;
+              if (state.lastEnactedPolicy && state.lastEnactedPolicy.playerId === oldId) {
+                state.lastEnactedPolicy.playerId = socket.id;
+              }
+
+              if (state.presidentialOrder) {
+                state.presidentialOrder = state.presidentialOrder.map((id) =>
+                  id === oldId ? socket.id : id
+                );
+              }
+
+              if (state.titlePrompt && state.titlePrompt.playerId === oldId) {
+                state.titlePrompt.playerId = socket.id;
+              }
+
+              if (state.previousVotes) {
+                if (state.previousVotes[oldId]) {
+                  state.previousVotes[socket.id] = state.previousVotes[oldId];
+                  delete state.previousVotes[oldId];
+                }
+              }
+
+              if (state.lastGovernmentVotes) {
+                if (state.lastGovernmentVotes[oldId]) {
+                  state.lastGovernmentVotes[socket.id] = state.lastGovernmentVotes[oldId];
+                  delete state.lastGovernmentVotes[oldId];
+                }
+              }
+
+              state.declarations.forEach((d) => {
+                if (d.playerId === oldId) d.playerId = socket.id;
+              });
+
+              state.roundHistory?.forEach((rh) => {
+                if (rh.presidentId === oldId) rh.presidentId = socket.id;
+                if (rh.chancellorId === oldId) rh.chancellorId = socket.id;
+                rh.votes.forEach((v) => {
+                  if (v.playerId === oldId) v.playerId = socket.id;
+                });
+              });
+
+              state.isPaused = false;
+              state.pauseReason = undefined;
+              state.pauseTimer = undefined;
+              state.log.push(`${existingPlayer.name} reconnected.`);
+              if (state.log.length > 50) state.log.shift();
+
+              // Join room BEFORE broadcast so the client receives the update
+              socket.join(roomId);
+              engine.broadcastState(roomId);
+              socket.to(roomId).emit('peerJoined', socket.id);
+              return;
+            }
+          }
+
+          // Lobby-phase reconnect: player refreshed tab or briefly disconnected
+          if (!isSpectator && state.phase === 'Lobby' && userId) {
+            const existingLobbyPlayer = state.players.find((p) => p.userId === userId && !p.isAI);
+            if (existingLobbyPlayer) {
+              existingLobbyPlayer.id = socket.id;
+              existingLobbyPlayer.name = name; // refresh display name too
+              socket.join(roomId);
+              state.log.push(`${name} rejoined the lobby.`);
+              engine.broadcastState(roomId);
+              socket.to(roomId).emit('peerJoined', socket.id);
+              return;
+            }
+          }
+
+          // Enforce privacy — applies to both players and spectators
+          if (state.privacy === 'private') {
+            if (state.inviteCode && inviteCode?.toUpperCase() !== state.inviteCode) {
+              socket.emit('error', 'Invalid invite code.');
+              return;
+            }
+          } else if (state.privacy === 'friends') {
+            if (state.hostUserId && userId && state.hostUserId !== userId) {
+              const areFriends = await isFriend(state.hostUserId, userId);
+              if (!areFriends) {
+                socket.emit(
+                  'error',
+                  isSpectator
+                    ? 'You must be friends with the host to spectate this room.'
+                    : 'This room is friends only.'
+                );
+                return;
+              }
+            }
+          }
+        }
+
+        if (isSpectator) {
+          let avatarUrl: string | undefined;
+          if (userId) {
+            const user = await getUserById(userId);
+            if (user) avatarUrl = user.avatarUrl;
+          }
+          state.spectators.push({ id: socket.id, name, avatarUrl });
+          socket.join(roomId);
+          engine.broadcastState(roomId);
+          return;
+        }
+
+        if (state.phase !== 'Lobby') {
+          socket.emit('error', 'Game already in progress.');
+          return;
+        }
+
+        if (state.isLocked && userId !== state.hostUserId) {
+          socket.emit('error', 'This room is locked.');
+          return;
+        }
+
+        if (state.players.length >= state.maxPlayers) {
+          socket.emit('error', 'Room full.');
+          return;
+        }
+
+        let avatarUrl: string | undefined;
+        if (userId) {
+          socket.data.userId = userId;
+          userSockets.set(userId, socket.id);
+          const friends = await getFriends(userId);
+          for (const friend of friends) {
+            const friendSocketId = userSockets.get(friend.id);
+            if (friendSocketId) {
+              io.to(friendSocketId).emit('userStatusChanged', { userId, isOnline: true, roomId });
+              let friendRoomId: string | undefined;
+              for (const [rId, state] of engine.rooms.entries()) {
+                if (state.players.some((p) => p.userId === friend.id && !p.isDisconnected)) {
+                  friendRoomId = rId;
+                  break;
+                }
+              }
+              socket.emit('userStatusChanged', {
+                userId: friend.id,
+                isOnline: true,
+                roomId: friendRoomId,
+              });
+            }
+          }
+          const user = await getUserById(userId);
+          if (user) avatarUrl = user.avatarUrl;
+        }
+
+        const player: Player = {
+          id: socket.id,
+          name,
+          userId,
+          avatarUrl,
+          activeFrame,
+          activePolicyStyle,
+          activeVotingStyle,
+          isAlive: true,
+          isPresidentialCandidate: false,
+          isChancellorCandidate: false,
+          isPresident: false,
+          isChancellor: false,
+          wasPresident: false,
+          wasChancellor: false,
+          isReady: false,
+          isAI: false,
+        };
+
+        state.players.push(player);
+        socket.join(roomId);
+        state.log.push(`${name} joined the lobby.`);
+        socket.to(roomId).emit('peerJoined', socket.id);
+        engine.broadcastState(roomId);
+      }
+    );
+
+    socket.on('toggleReady', () => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      if (!state || state.phase !== "Lobby") return;
+      if (!state || state.phase !== 'Lobby') return;
 
-      const player = state.players.find(p => p.id === socket.id);
+      const player = state.players.find((p) => p.id === socket.id);
       if (!player) return;
 
       player.isReady = !player.isReady;
-      state.log.push(`${player.name} is ${player.isReady ? "Ready" : "Not Ready"}.`);
+      state.log.push(`${player.name} is ${player.isReady ? 'Ready' : 'Not Ready'}.`);
 
-      const humanPlayers = state.players.filter(p => !p.isAI);
+      const humanPlayers = state.players.filter((p) => !p.isAI);
       if (state.mode === 'Ranked' && humanPlayers.length < 5) {
-        state.log.push("Need at least 5 players to ready up.");
+        state.log.push('Need at least 5 players to ready up.');
         engine.broadcastState(roomId);
         return;
       }
 
-      if (humanPlayers.every(p => p.isReady) && humanPlayers.length >= 1) {
-        state.log.push("All human players ready! Starting game...");
+      if (humanPlayers.every((p) => p.isReady) && humanPlayers.length >= 1) {
+        state.log.push('All human players ready! Starting game...');
         if (state.mode === 'Ranked') {
           engine.startGame(roomId);
         } else {
@@ -651,48 +770,48 @@ async function startServer() {
       engine.broadcastState(roomId);
     });
 
-    socket.on("startLobbyTimer", () => {
+    socket.on('startLobbyTimer', () => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      if (!state || state.phase !== "Lobby") return;
+      if (!state || state.phase !== 'Lobby') return;
 
       state.lobbyTimer = 30;
       state.isTimerActive = true;
       engine.broadcastState(roomId);
     });
 
-    socket.on("startGame", () => {
+    socket.on('startGame', () => {
       const roomId = getRoom();
       if (!roomId) return;
       engine.startGame(roomId);
     });
 
-    socket.on("signal", ({ to, signal }) => {
-      io.to(to).emit("signal", { from: socket.id, signal });
+    socket.on('signal', ({ to, signal }) => {
+      io.to(to).emit('signal', { from: socket.id, signal });
     });
 
-    socket.on("sendFriendRequest", async (targetUserId) => {
+    socket.on('sendFriendRequest', async (targetUserId) => {
       const userId = socket.data.userId;
       if (!userId) return;
       await sendFriendRequest(userId, targetUserId);
       const targetSocketId = userSockets.get(targetUserId);
       if (targetSocketId) {
-        io.to(targetSocketId).emit("friendRequestReceived", { fromUserId: userId });
+        io.to(targetSocketId).emit('friendRequestReceived', { fromUserId: userId });
       }
     });
 
-    socket.on("acceptFriendRequest", async (targetUserId) => {
+    socket.on('acceptFriendRequest', async (targetUserId) => {
       const userId = socket.data.userId;
       if (!userId) return;
       await acceptFriendRequest(userId, targetUserId);
       const targetSocketId = userSockets.get(targetUserId);
       if (targetSocketId) {
-        io.to(targetSocketId).emit("friendRequestAccepted", { fromUserId: userId });
+        io.to(targetSocketId).emit('friendRequestAccepted', { fromUserId: userId });
       }
     });
 
-    socket.on("nominateChancellor", (chancellorId) => {
+    socket.on('nominateChancellor', (chancellorId) => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -700,26 +819,29 @@ async function startServer() {
       engine.nominateChancellor(state, roomId, chancellorId, socket.id);
     });
 
-    socket.on("vote", (vote) => {
-      if (vote !== "Aye" && vote !== "Nay") return;
+    socket.on('vote', (vote) => {
+      if (vote !== 'Aye' && vote !== 'Nay') return;
 
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      if (!state || state.phase !== "Voting") return;
+      if (!state || state.phase !== 'Voting') return;
 
-      const player = state.players.find(p => p.id === socket.id);
+      const player = state.players.find((p) => p.id === socket.id);
       if (!player || !player.isAlive || player.hasActed) return;
 
       if (state.detainedPlayerId === player.id) {
-        socket.emit("error", "You are detained by the Interdictor and cannot vote this round.");
+        socket.emit('error', 'You are detained by the Interdictor and cannot vote this round.');
         return;
       }
 
       player.hasActed = true;
       player.vote = vote;
 
-      if (state.players.filter(p => p.isAlive && p.id !== state.detainedPlayerId && !p.vote).length === 0) {
+      if (
+        state.players.filter((p) => p.isAlive && p.id !== state.detainedPlayerId && !p.vote)
+          .length === 0
+      ) {
         engine.handleVoteResult(state, roomId);
       } else {
         engine.broadcastState(roomId);
@@ -727,7 +849,7 @@ async function startServer() {
       }
     });
 
-    socket.on("presidentDiscard", (idx) => {
+    socket.on('presidentDiscard', (idx) => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -735,7 +857,7 @@ async function startServer() {
       engine.handlePresidentDiscard(state, roomId, socket.id, idx);
     });
 
-    socket.on("chancellorPlay", (idx) => {
+    socket.on('chancellorPlay', (idx) => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -743,22 +865,22 @@ async function startServer() {
       engine.handleChancellorPlay(state, roomId, socket.id, idx);
     });
 
-    socket.on("declarePolicies", (data) => {
+    socket.on('declarePolicies', (data) => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state) return;
 
-      const player = state.players.find(p => p.id === socket.id);
+      const player = state.players.find((p) => p.id === socket.id);
       if (!player) return;
 
       if (data) {
         const alreadyDeclared = state.declarations.some(
-          d => d.playerId === player.id && d.type === data.type
+          (d) => d.playerId === player.id && d.type === data.type
         );
         if (alreadyDeclared) return;
 
-        state.declarations = state.declarations.filter(d => d.type !== data.type);
+        state.declarations = state.declarations.filter((d) => d.type !== data.type);
 
         state.declarations.push({
           playerId: player.id,
@@ -770,9 +892,10 @@ async function startServer() {
           timestamp: Date.now(),
         });
         const passedOrReceived = data.type === 'President' ? 'passed' : 'received';
-        const drewStr = data.type === 'President' && data.drewCiv !== undefined
-          ? ` (drew ${data.drewCiv}C/${data.drewSta}S)`
-          : '';
+        const drewStr =
+          data.type === 'President' && data.drewCiv !== undefined
+            ? ` (drew ${data.drewCiv}C/${data.drewSta}S)`
+            : '';
         state.log.push(
           `${player.name} (${data.type}) declared ${passedOrReceived} ${data.civ} Civil and ${data.sta} State directives.${drewStr}`
         );
@@ -782,7 +905,7 @@ async function startServer() {
       engine.checkRoundEnd(state, roomId);
     });
 
-    socket.on("performExecutiveAction", async (targetId) => {
+    socket.on('performExecutiveAction', async (targetId) => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -790,7 +913,7 @@ async function startServer() {
       await engine.handleExecutiveAction(state, roomId, targetId, socket.id);
     });
 
-    socket.on("useTitleAbility", async (abilityData) => {
+    socket.on('useTitleAbility', async (abilityData) => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -798,13 +921,13 @@ async function startServer() {
       await engine.handleTitleAbility(state, roomId, abilityData);
     });
 
-    socket.on("vetoRequest", () => {
+    socket.on('vetoRequest', () => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      if (!state || state.phase !== "Legislative_Chancellor") return;
+      if (!state || state.phase !== 'Legislative_Chancellor') return;
 
-      const player = state.players.find(p => p.id === socket.id);
+      const player = state.players.find((p) => p.id === socket.id);
       if (!player || !player.isChancellor || !player.isAlive || player.hasActed) return;
       player.hasActed = true;
 
@@ -817,42 +940,34 @@ async function startServer() {
       }
     });
 
-    socket.on("vetoResponse", (agree) => {
+    socket.on('vetoResponse', (agree) => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state || !state.vetoRequested) return;
 
-      const player = state.players.find(p => p.id === socket.id);
+      const player = state.players.find((p) => p.id === socket.id);
       if (!player || !player.isPresident || !player.isAlive || player.hasActed) return;
       player.hasActed = true;
 
       engine.handleVetoResponse(state, roomId, player, agree);
     });
 
-    socket.on("sendMessage", (text) => {
-      if (typeof text !== "string") return;
+    socket.on('sendMessage', (text) => {
+      if (typeof text !== 'string') return;
 
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state) return;
 
-      const player = state.players.find(p => p.id === socket.id);
+      const player = state.players.find((p) => p.id === socket.id);
       if (!player) return;
 
-      if (text.startsWith('/debug')) {
-        if (process.env.NODE_ENV !== 'production') {
-          const pres = state.players[state.presidentIdx];
-          const chan = state.players.find(p => p.id === state.chancellorId);
-          state.log.push(`DEBUG: Phase: ${state.phase}, PresIdx: ${state.presidentIdx}, Pres: ${pres?.name}, Chan: ${chan?.name}`);
-          if (state.log.length > 50) state.log.shift();
-          engine.broadcastState(roomId);
-        }
-        return;
-      }
-
-      const sanitized = text.replace(/<[^>]*>/g, "").replace(/\0/g, "").trim();
+      const sanitized = text
+        .replace(/<[^>]*>/g, '')
+        .replace(/\0/g, '')
+        .trim();
       if (sanitized.length === 0 || sanitized.length > 300) return;
 
       state.messages.push({ sender: player.name, text: sanitized, timestamp: Date.now() });
@@ -860,14 +975,14 @@ async function startServer() {
       engine.broadcastState(roomId);
     });
 
-    socket.on("playAgain", () => {
+    socket.on('playAgain', () => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      if (!state || state.phase !== "GameOver") return;
+      if (!state || state.phase !== 'GameOver') return;
 
       Object.assign(state, {
-        phase: "Lobby",
+        phase: 'Lobby',
         civilDirectives: 0,
         stateDirectives: 0,
         electionTracker: 0,
@@ -875,7 +990,7 @@ async function startServer() {
         discard: [],
         drawnPolicies: [],
         chancellorPolicies: [],
-        currentExecutiveAction: "None",
+        currentExecutiveAction: 'None',
         log: [`Game reset in room ${roomId}.`],
         presidentIdx: 0,
         lastPresidentIdx: -1,
@@ -914,8 +1029,8 @@ async function startServer() {
         isStrategistAction: undefined,
       });
 
-      state.players = state.players.filter(p => !p.isAI && !p.isDisconnected);
-      state.players.forEach(p => {
+      state.players = state.players.filter((p) => !p.isAI && !p.isDisconnected);
+      state.players.forEach((p) => {
         p.role = undefined;
         p.titleRole = undefined;
         p.titleUsed = false;
@@ -940,83 +1055,96 @@ async function startServer() {
       engine.broadcastState(roomId);
     });
 
-    socket.on("joinQueue", (data: { name: string; userId?: string; avatarUrl?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string }) => {
-      const roomId = getRoom();
-      if (!roomId) return;
-      const state = engine.rooms.get(roomId);
-      if (!state) return;
-      if (!state.spectators.find(s => s.id === socket.id)) return;
-      if (state.spectatorQueue.find(q => q.id === socket.id)) return;
-      state.spectatorQueue.push({ 
-        id: socket.id, 
-        name: (data.name || "").replace(/<[^>]*>/g, "").replace(/\0/g, "").substring(0, 32), 
-        userId: data.userId, 
-        avatarUrl: data.avatarUrl,
-        activeFrame: data.activeFrame, 
-        activePolicyStyle: data.activePolicyStyle, 
-        activeVotingStyle: data.activeVotingStyle 
-      });
-      
-      if (state.phase === "Lobby") {
-        drainSpectatorQueue(state, roomId);
+    socket.on(
+      'joinQueue',
+      (data: {
+        name: string;
+        userId?: string;
+        avatarUrl?: string;
+        activeFrame?: string;
+        activePolicyStyle?: string;
+        activeVotingStyle?: string;
+      }) => {
+        const roomId = getRoom();
+        if (!roomId) return;
+        const state = engine.rooms.get(roomId);
+        if (!state) return;
+        if (!state.spectators.find((s) => s.id === socket.id)) return;
+        if (state.spectatorQueue.find((q) => q.id === socket.id)) return;
+        state.spectatorQueue.push({
+          id: socket.id,
+          name: (data.name || '')
+            .replace(/<[^>]*>/g, '')
+            .replace(/\0/g, '')
+            .substring(0, 32),
+          userId: data.userId,
+          avatarUrl: data.avatarUrl,
+          activeFrame: data.activeFrame,
+          activePolicyStyle: data.activePolicyStyle,
+          activeVotingStyle: data.activeVotingStyle,
+        });
+
+        if (state.phase === 'Lobby') {
+          drainSpectatorQueue(state, roomId);
+        }
+        engine.broadcastState(roomId);
       }
-      engine.broadcastState(roomId);
-    });
+    );
 
-    socket.on("leaveQueue", () => {
+    socket.on('leaveQueue', () => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state) return;
-      state.spectatorQueue = state.spectatorQueue.filter(q => q.id !== socket.id);
+      state.spectatorQueue = state.spectatorQueue.filter((q) => q.id !== socket.id);
       engine.broadcastState(roomId);
     });
 
-    socket.on("kickPlayer", (targetSocketId: string) => {
+    socket.on('kickPlayer', (targetSocketId: string) => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state) return;
-      const host = state.players.find(p => p.userId === state.hostUserId);
+      const host = state.players.find((p) => p.userId === state.hostUserId);
       if (!host || host.id !== socket.id) return;
       if (targetSocketId === socket.id) return;
-      const target = state.players.find(p => p.id === targetSocketId);
+      const target = state.players.find((p) => p.id === targetSocketId);
       if (!target) return;
-      state.players = state.players.filter(p => p.id !== targetSocketId);
+      state.players = state.players.filter((p) => p.id !== targetSocketId);
       state.log.push(`${target.name} was removed by the host.`);
-      io.to(targetSocketId).emit("kicked");
+      io.to(targetSocketId).emit('kicked');
       engine.broadcastState(roomId);
     });
 
-    socket.on("toggleLock", () => {
+    socket.on('toggleLock', () => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      if (!state || state.phase !== "Lobby") return;
-      const host = state.players.find(p => p.userId === state.hostUserId);
+      if (!state || state.phase !== 'Lobby') return;
+      const host = state.players.find((p) => p.userId === state.hostUserId);
       if (!host || host.id !== socket.id) return;
       state.isLocked = !state.isLocked;
-      state.log.push(`Room ${state.isLocked ? "locked" : "unlocked"} by host.`);
+      state.log.push(`Room ${state.isLocked ? 'locked' : 'unlocked'} by host.`);
       engine.broadcastState(roomId);
     });
 
-    socket.on("hostStartGame", () => {
+    socket.on('hostStartGame', () => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      if (!state || state.phase !== "Lobby") return;
-      const host = state.players.find(p => p.userId === state.hostUserId);
+      if (!state || state.phase !== 'Lobby') return;
+      const host = state.players.find((p) => p.userId === state.hostUserId);
       if (!host || host.id !== socket.id) return;
-      const humanPlayers = state.players.filter(p => !p.isAI);
+      const humanPlayers = state.players.filter((p) => !p.isAI);
       if (state.mode === 'Ranked' && humanPlayers.length < 5) {
-        socket.emit("error", "Need at least 5 players to start a ranked game.");
+        socket.emit('error', 'Need at least 5 players to start a ranked game.');
         return;
       }
       if (humanPlayers.length < 1) {
-        socket.emit("error", "Need at least 1 player to start.");
+        socket.emit('error', 'Need at least 1 player to start.');
         return;
       }
-      state.log.push("Host started the game.");
+      state.log.push('Host started the game.');
       if (state.mode === 'Ranked') {
         engine.startGame(roomId);
       } else {
@@ -1025,19 +1153,19 @@ async function startServer() {
       engine.broadcastState(roomId);
     });
 
-    socket.on("leaveRoom", () => {
+    socket.on('leaveRoom', () => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       engine.handleLeave(socket, roomId, true);
-      if (state && (state.phase === "Lobby" || state.phase === "GameOver")) {
+      if (state && (state.phase === 'Lobby' || state.phase === 'GameOver')) {
         drainSpectatorQueue(state, roomId);
       }
     });
 
-    socket.on("updateMediaState", ({ isMicOn, isCamOn }) => {
+    socket.on('updateMediaState', ({ isMicOn, isCamOn }) => {
       engine.rooms.forEach((state, roomId) => {
-        const player = state.players.find(p => p.id === socket.id);
+        const player = state.players.find((p) => p.id === socket.id);
         if (player) {
           player.isMicOn = isMicOn;
           player.isCamOn = isCamOn;
@@ -1046,20 +1174,24 @@ async function startServer() {
       });
     });
 
-    socket.on("adminDeleteRoom", async (roomId: string) => {
+    socket.on('adminDeleteRoom', async (roomId: string) => {
       if (!socket.data.userId) return;
       const user = await getUserById(socket.data.userId);
       if (!user || !user.isAdmin) return;
 
       const state = engine.rooms.get(roomId);
       if (state) {
-        state.log.push("This room has been terminated by an administrator.");
+        state.log.push('This room has been terminated by an administrator.');
         engine.broadcastState(roomId);
         setTimeout(() => {
-          io.to(roomId).emit("kicked");
+          io.to(roomId).emit('kicked');
           engine.deleteRoom(roomId);
           logger.info({ admin: user.username, roomId }, 'Admin deleted room');
-          io.emit("adminBroadcast", { message: `Admin closed room: ${roomId}`, sender: "System", timestamp: Date.now() });
+          io.emit('adminBroadcast', {
+            message: `Admin closed room: ${roomId}`,
+            sender: 'System',
+            timestamp: Date.now(),
+          });
         }, 2000);
       } else {
         engine.deleteRoom(roomId);
@@ -1067,15 +1199,15 @@ async function startServer() {
       }
     });
 
-    socket.on("adminBroadcast", async (message: string) => {
+    socket.on('adminBroadcast', async (message: string) => {
       if (!socket.data.userId) return;
       const user = await getUserById(socket.data.userId);
       if (!user || !user.isAdmin) return;
-      io.emit("adminBroadcast", { message, sender: user.username, timestamp: Date.now() });
+      io.emit('adminBroadcast', { message, sender: user.username, timestamp: Date.now() });
       logger.info({ admin: user.username, message }, 'Admin broadcast');
     });
 
-    socket.on("adminUpdateUser", async (data: { userId: string; updates: any }) => {
+    socket.on('adminUpdateUser', async (data: { userId: string; updates: any }) => {
       if (!socket.data.userId) return;
       const admin = await getUserById(socket.data.userId);
       if (!admin || !admin.isAdmin) return;
@@ -1084,34 +1216,36 @@ async function startServer() {
       if (!targetUser) return;
 
       if (data.updates.stats) targetUser.stats = { ...targetUser.stats, ...data.updates.stats };
-      if (typeof data.updates.cabinetPoints === 'number') targetUser.cabinetPoints = data.updates.cabinetPoints;
+      if (typeof data.updates.cabinetPoints === 'number')
+        targetUser.cabinetPoints = data.updates.cabinetPoints;
       if (typeof data.updates.isBanned === 'boolean') targetUser.isBanned = data.updates.isBanned;
 
       await saveUser(targetUser);
       const targetSocketId = userSockets.get(data.userId);
       if (targetSocketId) {
-        io.to(targetSocketId).emit("userUpdate", targetUser);
-        if (targetUser.isBanned) io.to(targetSocketId).emit("kicked", "Your account has been restricted.");
+        io.to(targetSocketId).emit('userUpdate', targetUser);
+        if (targetUser.isBanned)
+          io.to(targetSocketId).emit('kicked', 'Your account has been restricted.');
       }
     });
 
-    socket.on("adminUpdateConfig", async (config: Partial<SystemConfig>) => {
+    socket.on('adminUpdateConfig', async (config: Partial<SystemConfig>) => {
       if (!socket.data.userId) return;
       const admin = await getUserById(socket.data.userId);
       if (!admin || !admin.isAdmin) return;
       currentConfig = await updateSystemConfig(config);
-      io.emit("adminConfigUpdate", currentConfig);
+      io.emit('adminConfigUpdate', currentConfig);
     });
 
-    socket.on("adminClearRedis", async () => {
+    socket.on('adminClearRedis', async () => {
       if (!socket.data.userId) return;
       const admin = await getUserById(socket.data.userId);
       if (!admin || !admin.isAdmin) return;
       await engine.clearAllRedisRooms();
-      socket.emit("adminClearRedisSuccess", "Successfully purged all Redis room state.");
+      socket.emit('adminClearRedisSuccess', 'Successfully purged all Redis room state.');
     });
 
-    socket.on("disconnect", async () => {
+    socket.on('disconnect', async () => {
       if (socket.data.userId) {
         const userId = socket.data.userId;
         if (userSockets.get(userId) === socket.id) {
@@ -1119,7 +1253,8 @@ async function startServer() {
           const friends = await getFriends(userId);
           for (const friend of friends) {
             const friendSocketId = userSockets.get(friend.id);
-            if (friendSocketId) io.to(friendSocketId).emit("userStatusChanged", { userId, isOnline: false });
+            if (friendSocketId)
+              io.to(friendSocketId).emit('userStatusChanged', { userId, isOnline: false });
           }
         }
       }
@@ -1129,46 +1264,57 @@ async function startServer() {
     });
   });
 
-  if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({ server: { middlewareMode: true }, appType: "spa" });
+  if (process.env.NODE_ENV !== 'production') {
+    const vite = await createViteServer({ server: { middlewareMode: true }, appType: 'spa' });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static("dist", {
-      setHeaders: (res, filePath) => {
-        if (filePath.includes(path.join("dist", "assets"))) res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
-        else if (filePath.endsWith("index.html") || filePath.endsWith("sw.js") || filePath.endsWith("manifest.json")) res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-      }
-    }));
-    app.get("*", (_req, res) => {
-      res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-      res.sendFile(path.resolve("dist", "index.html"));
+    app.use(
+      express.static('dist', {
+        setHeaders: (res, filePath) => {
+          if (filePath.includes(path.join('dist', 'assets')))
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+          else if (
+            filePath.endsWith('index.html') ||
+            filePath.endsWith('sw.js') ||
+            filePath.endsWith('manifest.json')
+          )
+            res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        },
+      })
+    );
+    app.get('*', (_req, res) => {
+      res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+      res.sendFile(path.resolve('dist', 'index.html'));
     });
   }
 
-  httpServer.listen(PORT, "0.0.0.0", () => {
-    logger.info({ port: PORT }, "Server running");
+  httpServer.listen(PORT, '0.0.0.0', () => {
+    logger.info({ port: PORT }, 'Server running');
   });
 }
 
-process.on("SIGTERM", gracefulShutdown);
-process.on("SIGINT", gracefulShutdown);
+process.on('SIGTERM', gracefulShutdown);
+process.on('SIGINT', gracefulShutdown);
 
 async function gracefulShutdown() {
-  logger.info("Termination signal received: starting graceful shutdown");
+  logger.info('Termination signal received: starting graceful shutdown');
   if (io) {
-    io.emit("serverRestarting", "Server is undergoing maintenance or starting a new version. Reconnecting in 5s!");
+    io.emit(
+      'serverRestarting',
+      'Server is undergoing maintenance or starting a new version. Reconnecting in 5s!'
+    );
     io.close();
   }
   if (httpServer) {
     httpServer.close(() => {
-      logger.info("HTTP server closed");
+      logger.info('HTTP server closed');
       process.exit(0);
     });
   } else {
     process.exit(0);
   }
   setTimeout(() => {
-    logger.warn("Graceful shutdown timed out, forcing exit");
+    logger.warn('Graceful shutdown timed out, forcing exit');
     process.exit(1);
   }, 10000);
 }

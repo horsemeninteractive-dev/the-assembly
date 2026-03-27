@@ -1,6 +1,17 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { MessageSquare, LogOut, BookOpen, Scale, Eye, Mic, MicOff, User as UserIcon, HelpCircle, Lock } from 'lucide-react';
+import {
+  MessageSquare,
+  LogOut,
+  BookOpen,
+  Scale,
+  Eye,
+  Mic,
+  MicOff,
+  User as UserIcon,
+  HelpCircle,
+  Lock,
+} from 'lucide-react';
 import { Tooltip } from '../Tooltip';
 import { GameState, Player, Role, PrivateInfo } from '../../types';
 import { OverseerIcon } from '../icons';
@@ -25,9 +36,19 @@ interface GameHeaderProps {
 }
 
 export const GameHeader = ({
-  gameState, me, socketId, user, privateInfo,
-  hasNewMessages, tick,
-  onOpenChat, onOpenHistory, onOpenDossier, onOpenProfile, onOpenReference, onLeaveRoom,
+  gameState,
+  me,
+  socketId,
+  user,
+  privateInfo,
+  hasNewMessages,
+  tick,
+  onOpenChat,
+  onOpenHistory,
+  onOpenDossier,
+  onOpenProfile,
+  onOpenReference,
+  onLeaveRoom,
   playSound,
 }: GameHeaderProps) => {
   const timerRemaining = gameState.actionTimerEnd
@@ -35,7 +56,7 @@ export const GameHeader = ({
     : null;
 
   return (
-    <motion.header 
+    <motion.header
       initial={{ y: -50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 200, damping: 20 }}
@@ -44,21 +65,22 @@ export const GameHeader = ({
       <div className="flex items-center gap-[1vw] sm:gap-[2vw]">
         <div className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] bg-elevated rounded-xl flex items-center justify-center border border-white/40 shrink-0 overflow-hidden">
           <img
-            src={getProxiedUrl("https://storage.googleapis.com/secretchancellor/SC.png")}
+            src={getProxiedUrl('https://storage.googleapis.com/secretchancellor/SC.png')}
             alt="The Assembly Logo"
             className="w-full h-full object-contain p-1"
             referrerPolicy="no-referrer"
           />
         </div>
-          <div className="flex flex-col min-w-0">
-          <div className="font-thematic text-responsive-sm sm:text-responsive-xl text-primary tracking-wide leading-none truncate">The Assembly</div>
+        <div className="flex flex-col min-w-0">
+          <div className="font-thematic text-responsive-sm sm:text-responsive-xl text-primary tracking-wide leading-none truncate">
+            The Assembly
+          </div>
           <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5 sm:mt-1 flex-wrap">
             <span className="text-responsive-xs font-mono text-ghost uppercase tracking-[0.1em] sm:tracking-[0.2em] truncate">
               {gameState.roomId}
             </span>
             <span className="text-responsive-xs font-mono text-red-500/50 uppercase tracking-[0.1em] sm:tracking-[0.2em] flex items-center gap-1 shrink-0">
-              <div className="w-1 h-1 rounded-full bg-red-500/50" />
-              R{gameState.round}
+              <div className="w-1 h-1 rounded-full bg-red-500/50" />R{gameState.round}
             </span>
             {timerRemaining !== null && (
               <span className="text-responsive-xs font-mono text-yellow-500 uppercase tracking-[0.1em] sm:tracking-[0.2em] flex items-center gap-1 ml-1 sm:ml-2 shrink-0">
@@ -82,7 +104,10 @@ export const GameHeader = ({
         {/* Chat */}
         <Tooltip content="Open Chat">
           <button
-            onClick={() => { playSound('click'); onOpenChat(); }}
+            onClick={() => {
+              playSound('click');
+              onOpenChat();
+            }}
             className="p-[1vh] sm:p-[1.2vh] rounded-xl border border-default bg-card text-muted hover:text-white transition-all relative"
           >
             <MessageSquare className="w-[1.8vh] h-[1.8vh] sm:w-[2vh] sm:h-[2vh]" />
@@ -96,12 +121,17 @@ export const GameHeader = ({
         {gameState.roundHistory && gameState.roundHistory.length > 0 && (
           <Tooltip content="Round History">
             <button
-              onClick={() => { playSound('click'); onOpenHistory(); }}
+              onClick={() => {
+                playSound('click');
+                onOpenHistory();
+              }}
               className="p-[1vh] sm:p-[1.2vh] rounded-xl border border-default bg-card text-muted hover:text-white transition-all relative"
             >
               <BookOpen className="w-[1.8vh] h-[1.8vh] sm:w-[2vh] sm:h-[2vh]" />
               <span className="absolute -top-1 -right-1 w-3.5 h-3.5 bg-yellow-500 rounded-full border border-deep flex items-center justify-center">
-                <span className="text-[7px] font-bold text-black leading-none">{gameState.roundHistory.length}</span>
+                <span className="text-[7px] font-bold text-black leading-none">
+                  {gameState.roundHistory.length}
+                </span>
               </span>
             </button>
           </Tooltip>
@@ -111,7 +141,10 @@ export const GameHeader = ({
         {gameState.phase !== 'Lobby' && gameState.phase !== 'GameOver' && (
           <Tooltip content="Phase Reference">
             <button
-              onClick={() => { playSound('click'); onOpenReference(); }}
+              onClick={() => {
+                playSound('click');
+                onOpenReference();
+              }}
               className="p-[1vh] sm:p-[1.2vh] rounded-xl border border-default bg-card text-muted hover:text-blue-400 hover:border-blue-900/50 transition-all"
             >
               <HelpCircle className="w-[1.8vh] h-[1.8vh] sm:w-[2vh] sm:h-[2vh]" />
@@ -123,7 +156,10 @@ export const GameHeader = ({
         {gameState.phase !== 'Lobby' && (
           <Tooltip content="Your Dossier">
             <button
-              onClick={() => { playSound('click'); onOpenDossier(); }}
+              onClick={() => {
+                playSound('click');
+                onOpenDossier();
+              }}
               className={cn(
                 'p-[1vh] sm:p-[1.2vh] rounded-xl border transition-all',
                 privateInfo
@@ -138,7 +174,12 @@ export const GameHeader = ({
               ) : privateInfo?.role === 'Overseer' ? (
                 <OverseerIcon className="w-[1.8vh] h-[1.8vh] sm:w-[2vh] sm:h-[2vh] text-red-500" />
               ) : (
-                <Eye className={cn('w-[1.8vh] h-[1.8vh] sm:w-[2vh] sm:h-[2vh]', privateInfo ? 'text-red-500' : 'text-muted')} />
+                <Eye
+                  className={cn(
+                    'w-[1.8vh] h-[1.8vh] sm:w-[2vh] sm:h-[2vh]',
+                    privateInfo ? 'text-red-500' : 'text-muted'
+                  )}
+                />
               )}
             </button>
           </Tooltip>
@@ -147,14 +188,28 @@ export const GameHeader = ({
         {/* Profile */}
         <Tooltip content="My Profile">
           <button
-            onClick={() => { playSound('click'); onOpenProfile(); }}
+            onClick={() => {
+              playSound('click');
+              onOpenProfile();
+            }}
             className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] rounded-xl bg-card border border-default flex items-center justify-center hover:border-red-900/50 transition-colors relative shrink-0"
           >
-            {user?.avatarUrl
-              ? <img src={getProxiedUrl(user.avatarUrl)} alt={user.username} className="w-full h-full object-cover rounded-xl" />
-              : <UserIcon className="w-[1.8vh] h-[1.8vh] sm:w-[2vh] sm:h-[2vh] text-muted" />}
+            {user?.avatarUrl ? (
+              <img
+                src={getProxiedUrl(user.avatarUrl)}
+                alt={user.username}
+                className="w-full h-full object-cover rounded-xl"
+              />
+            ) : (
+              <UserIcon className="w-[1.8vh] h-[1.8vh] sm:w-[2vh] sm:h-[2vh] text-muted" />
+            )}
             {user?.activeFrame && (
-              <div className={cn('absolute inset-0 rounded-xl pointer-events-none', getFrameStyles(user.activeFrame))} />
+              <div
+                className={cn(
+                  'absolute inset-0 rounded-xl pointer-events-none',
+                  getFrameStyles(user.activeFrame)
+                )}
+              />
             )}
           </button>
         </Tooltip>

@@ -40,10 +40,7 @@ export const getTotalXpForLevel = (targetLevel: number): number => {
   return total;
 };
 
-export const calculateXpGain = (stats: {
-  win: boolean;
-  kills: number;
-}): number => {
+export const calculateXpGain = (stats: { win: boolean; kills: number }): number => {
   let xp = 50; // Base for playing
   if (stats.win) xp += 100;
   xp += stats.kills * 50;

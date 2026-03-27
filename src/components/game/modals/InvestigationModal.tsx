@@ -27,20 +27,28 @@ export const InvestigationModal = ({ result, onClose, playSound }: Investigation
           className="max-w-sm w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl p-8 text-center space-y-6"
         >
           <div className="w-16 h-16 bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto border border-yellow-900/50">
-            {result.role === 'Civil'
-              ? <Scale className="w-8 h-8 text-blue-400" />
-              : <Eye className="w-8 h-8 text-red-500" />}
+            {result.role === 'Civil' ? (
+              <Scale className="w-8 h-8 text-blue-400" />
+            ) : (
+              <Eye className="w-8 h-8 text-red-500" />
+            )}
           </div>
           <div className="space-y-2">
-            <h3 className="text-[10px] uppercase tracking-[0.2em] text-muted font-mono">Investigation Result</h3>
-            <p className="text-xl font-serif italic text-primary">{result.targetName.replace(' (AI)', '')} is a:</p>
+            <h3 className="text-[10px] uppercase tracking-[0.2em] text-muted font-mono">
+              Investigation Result
+            </h3>
+            <p className="text-xl font-serif italic text-primary">
+              {result.targetName.replace(' (AI)', '')} is a:
+            </p>
           </div>
-          <div className={cn(
-            'text-4xl font-serif italic py-4 rounded-2xl border-2',
-            result.role === 'Civil'
-              ? 'bg-blue-900/10 border-blue-500/30 text-blue-400'
-              : 'bg-red-900/10 border-red-500/30 text-red-500'
-          )}>
+          <div
+            className={cn(
+              'text-4xl font-serif italic py-4 rounded-2xl border-2',
+              result.role === 'Civil'
+                ? 'bg-blue-900/10 border-blue-500/30 text-blue-400'
+                : 'bg-red-900/10 border-red-500/30 text-red-500'
+            )}
+          >
             {result.role === 'Civil' ? 'CIVIL' : 'STATE'}
           </div>
           <button

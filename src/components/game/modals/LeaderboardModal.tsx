@@ -15,10 +15,25 @@ type ModeTab = 'Overall' | 'Ranked' | 'Casual' | 'Classic';
 type StatTab = 'Win%' | 'Games' | 'Wins' | 'ELO';
 
 const MODE_TABS: { id: ModeTab; label: string; color: string; activeBg: string }[] = [
-  { id: 'Overall', label: 'Overall',  color: 'text-white',       activeBg: 'bg-zinc-700 border-zinc-500' },
-  { id: 'Ranked',  label: 'Ranked',   color: 'text-yellow-400',  activeBg: 'bg-yellow-900/40 border-yellow-600/60' },
-  { id: 'Casual',  label: 'Casual',   color: 'text-blue-400',    activeBg: 'bg-blue-900/40 border-blue-600/60' },
-  { id: 'Classic', label: 'Classic',  color: 'text-emerald-400', activeBg: 'bg-emerald-900/40 border-emerald-600/60' },
+  { id: 'Overall', label: 'Overall', color: 'text-white', activeBg: 'bg-zinc-700 border-zinc-500' },
+  {
+    id: 'Ranked',
+    label: 'Ranked',
+    color: 'text-yellow-400',
+    activeBg: 'bg-yellow-900/40 border-yellow-600/60',
+  },
+  {
+    id: 'Casual',
+    label: 'Casual',
+    color: 'text-blue-400',
+    activeBg: 'bg-blue-900/40 border-blue-600/60',
+  },
+  {
+    id: 'Classic',
+    label: 'Classic',
+    color: 'text-emerald-400',
+    activeBg: 'bg-emerald-900/40 border-emerald-600/60',
+  },
 ];
 
 const positionDisplay = (index: number) => {
@@ -30,7 +45,10 @@ const positionDisplay = (index: number) => {
 
 export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
   const [boards, setBoards] = useState<Record<string, any[]>>({
-    overall: [], ranked: [], casual: [], classic: [],
+    overall: [],
+    ranked: [],
+    casual: [],
+    classic: [],
   });
   const [loading, setLoading] = useState(true);
   const [modeTab, setModeTab] = useState<ModeTab>('Overall');
@@ -38,8 +56,11 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
 
   useEffect(() => {
     fetch(apiUrl('/api/leaderboard'))
-      .then(res => res.json())
-      .then(data => { setBoards(data); setLoading(false); })
+      .then((res) => res.json())
+      .then((data) => {
+        setBoards(data);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   }, []);
 
@@ -60,7 +81,8 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
   const getStatValue = (u: any, stat: StatTab): number => {
     const mode = modeTab.toLowerCase();
     switch (stat) {
-      case 'ELO':   return u.stats?.elo ?? 1000;
+      case 'ELO':
+        return u.stats?.elo ?? 1000;
       case 'Wins':
         if (modeTab === 'Overall') return u.stats?.wins ?? 0;
         return u.stats?.[`${mode}Wins`] ?? 0;
@@ -68,32 +90,35 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
         if (modeTab === 'Overall') return u.stats?.gamesPlayed ?? 0;
         return u.stats?.[`${mode}Games`] ?? 0;
       case 'Win%': {
-        const wins  = modeTab === 'Overall' ? (u.stats?.wins ?? 0)        : (u.stats?.[`${mode}Wins`]  ?? 0);
-        const games = modeTab === 'Overall' ? (u.stats?.gamesPlayed ?? 0) : (u.stats?.[`${mode}Games`] ?? 0);
+        const wins = modeTab === 'Overall' ? (u.stats?.wins ?? 0) : (u.stats?.[`${mode}Wins`] ?? 0);
+        const games =
+          modeTab === 'Overall' ? (u.stats?.gamesPlayed ?? 0) : (u.stats?.[`${mode}Games`] ?? 0);
         return games > 0 ? (wins / games) * 100 : 0;
       }
     }
   };
 
-  const sortedData = [...rawData].sort((a, b) => getStatValue(b, statTab) - getStatValue(a, statTab));
-  const currentUserRank = sortedData.findIndex(u => u.id === user.id) + 1;
-  const currentUserData = sortedData.find(u => u.id === user.id);
+  const sortedData = [...rawData].sort(
+    (a, b) => getStatValue(b, statTab) - getStatValue(a, statTab)
+  );
+  const currentUserRank = sortedData.findIndex((u) => u.id === user.id) + 1;
+  const currentUserData = sortedData.find((u) => u.id === user.id);
 
   const formatStat = (u: any, stat: StatTab) => {
     const val = getStatValue(u, stat);
     if (stat === 'Win%') return `${val.toFixed(1)}%`;
-    if (stat === 'ELO')  return val.toString();
+    if (stat === 'ELO') return val.toString();
     return val.toString();
   };
 
   const statColor = (stat: StatTab) => {
-    if (stat === 'ELO')   return 'text-yellow-400';
-    if (stat === 'Win%')  return 'text-emerald-400';
-    if (stat === 'Wins')  return 'text-blue-400';
+    if (stat === 'ELO') return 'text-yellow-400';
+    if (stat === 'Win%') return 'text-emerald-400';
+    if (stat === 'Wins') return 'text-blue-400';
     return 'text-purple-400';
   };
 
-  const activeModeConfig = MODE_TABS.find(m => m.id === modeTab)!;
+  const activeModeConfig = MODE_TABS.find((m) => m.id === modeTab)!;
 
   return (
     <div className="fixed inset-0 bg-backdrop flex items-center justify-center z-50 p-4">
@@ -115,7 +140,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
 
         {/* Mode Tabs (tier 1) */}
         <div className="flex gap-1 p-1 bg-elevated rounded-xl border border-subtle mb-3">
-          {MODE_TABS.map(tab => (
+          {MODE_TABS.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setModeTab(tab.id)}
@@ -133,7 +158,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
 
         {/* Stat Tabs (tier 2) */}
         <div className="flex gap-3 border-b border-default mb-3">
-          {availableStats.map(stat => (
+          {availableStats.map((stat) => (
             <button
               key={stat}
               onClick={() => setStatTab(stat)}
@@ -164,73 +189,105 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
           {loading ? (
             <div className="text-center text-muted py-10 font-mono text-sm">Loading...</div>
           ) : sortedData.length === 0 ? (
-            <div className="text-center text-muted py-10 font-mono text-xs">No data yet. Play some {modeTab} games!</div>
-          ) : sortedData.map((u, i) => {
-            const tier = getRankTier(u.stats?.elo ?? 1000);
-            const isMe = u.id === user.id;
-            return (
-              <div
-                key={u.id}
-                className={cn(
-                  'flex items-center gap-3 p-3 rounded-xl border transition-colors',
-                  isMe ? 'bg-red-900/10 border-red-900/50' : 'bg-card border-subtle hover:border-default'
-                )}
-              >
-                <div className="w-8 text-center font-mono text-muted text-sm shrink-0">
-                  {positionDisplay(i)}
-                </div>
-
-                {/* Avatar + Name */}
-                <div className="flex items-center gap-2 flex-1 min-w-0">
-                  {u.avatarUrl && (
-                    <img
-                      src={getProxiedUrl(u.avatarUrl)}
-                      alt={u.username}
-                      className="w-6 h-6 rounded-lg object-cover shrink-0 border border-default"
-                    />
+            <div className="text-center text-muted py-10 font-mono text-xs">
+              No data yet. Play some {modeTab} games!
+            </div>
+          ) : (
+            sortedData.map((u, i) => {
+              const tier = getRankTier(u.stats?.elo ?? 1000);
+              const isMe = u.id === user.id;
+              return (
+                <div
+                  key={u.id}
+                  className={cn(
+                    'flex items-center gap-3 p-3 rounded-xl border transition-colors',
+                    isMe
+                      ? 'bg-red-900/10 border-red-900/50'
+                      : 'bg-card border-subtle hover:border-default'
                   )}
-                  <div className="min-w-0">
-                    <div className="font-medium text-primary text-sm truncate">{u.username}</div>
-                    {isMe && <div className="text-[9px] font-mono text-faint uppercase tracking-widest">You</div>}
+                >
+                  <div className="w-8 text-center font-mono text-muted text-sm shrink-0">
+                    {positionDisplay(i)}
                   </div>
-                </div>
 
-                {/* Stat value */}
-                {statTab === 'ELO' ? (
-                  <div className="flex items-center gap-1.5 shrink-0">
-                    <span className="text-sm leading-none">{tier.icon}</span>
-                    <div className="text-right">
-                      <div className={cn('text-xs font-mono font-bold', tier.color)}>
-                        {getRankLabel(u.stats?.elo ?? 1000)}
-                      </div>
-                      <div className="text-[9px] font-mono text-faint">{u.stats?.elo ?? 1000}</div>
+                  {/* Avatar + Name */}
+                  <div className="flex items-center gap-2 flex-1 min-w-0">
+                    {u.avatarUrl && (
+                      <img
+                        src={getProxiedUrl(u.avatarUrl)}
+                        alt={u.username}
+                        className="w-6 h-6 rounded-lg object-cover shrink-0 border border-default"
+                      />
+                    )}
+                    <div className="min-w-0">
+                      <div className="font-medium text-primary text-sm truncate">{u.username}</div>
+                      {isMe && (
+                        <div className="text-[9px] font-mono text-faint uppercase tracking-widest">
+                          You
+                        </div>
+                      )}
                     </div>
                   </div>
-                ) : (
-                  <div className={cn('font-mono text-right text-sm w-16 shrink-0', statColor(statTab))}>
-                    {formatStat(u, statTab)}
-                  </div>
-                )}
-              </div>
-            );
-          })}
+
+                  {/* Stat value */}
+                  {statTab === 'ELO' ? (
+                    <div className="flex items-center gap-1.5 shrink-0">
+                      <span className="text-sm leading-none">{tier.icon}</span>
+                      <div className="text-right">
+                        <div className={cn('text-xs font-mono font-bold', tier.color)}>
+                          {getRankLabel(u.stats?.elo ?? 1000)}
+                        </div>
+                        <div className="text-[9px] font-mono text-faint">
+                          {u.stats?.elo ?? 1000}
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div
+                      className={cn(
+                        'font-mono text-right text-sm w-16 shrink-0',
+                        statColor(statTab)
+                      )}
+                    >
+                      {formatStat(u, statTab)}
+                    </div>
+                  )}
+                </div>
+              );
+            })
+          )}
         </div>
 
         {/* Your rank footer */}
         {currentUserData && (
           <div className="pt-3 border-t border-default">
-            <div className="text-[10px] uppercase tracking-widest text-muted font-mono mb-2">Your Position</div>
+            <div className="text-[10px] uppercase tracking-widest text-muted font-mono mb-2">
+              Your Position
+            </div>
             <div className="flex items-center gap-3 p-3 bg-card rounded-xl border border-red-900/40">
-              <div className="w-8 text-center font-mono text-muted text-sm shrink-0">#{currentUserRank}</div>
-              <div className="flex-1 font-medium text-primary truncate text-sm">{currentUserData.username}</div>
+              <div className="w-8 text-center font-mono text-muted text-sm shrink-0">
+                #{currentUserRank}
+              </div>
+              <div className="flex-1 font-medium text-primary truncate text-sm">
+                {currentUserData.username}
+              </div>
               {statTab === 'ELO' ? (
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="text-sm">{getRankTier(currentUserData.stats?.elo ?? 1000).icon}</span>
+                  <span className="text-sm">
+                    {getRankTier(currentUserData.stats?.elo ?? 1000).icon}
+                  </span>
                   <div className="text-right">
-                    <div className={cn('text-xs font-mono font-bold', getRankTier(currentUserData.stats?.elo ?? 1000).color)}>
+                    <div
+                      className={cn(
+                        'text-xs font-mono font-bold',
+                        getRankTier(currentUserData.stats?.elo ?? 1000).color
+                      )}
+                    >
                       {getRankLabel(currentUserData.stats?.elo ?? 1000)}
                     </div>
-                    <div className="text-[9px] font-mono text-faint">{currentUserData.stats?.elo ?? 1000}</div>
+                    <div className="text-[9px] font-mono text-faint">
+                      {currentUserData.stats?.elo ?? 1000}
+                    </div>
                   </div>
                 </div>
               ) : (

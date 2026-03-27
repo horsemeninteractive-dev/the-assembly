@@ -12,31 +12,40 @@
     <link rel="apple-touch-icon" href="/pwa-192x192.png" />
     <link rel="icon" type="image/png" href="/pwa-192x192.png" />
     <link rel="shortcut icon" href="/pwa-192x192.png" />
-    
+
     <!-- Self-healing script to fix White Screen errors -->
     <script>
-      window.addEventListener('error', function(e) {
-        // Detect script errors or failed asset loads
-        if (e.target.tagName === 'SCRIPT' || (e.message && e.message.toLowerCase().includes('script error'))) {
-          console.error('Asset load error detected. Clearing cache and reloading...');
-          try {
-            if ('serviceWorker' in navigator) {
-              navigator.serviceWorker.getRegistrations().then(function(regs) {
-                for(var i=0; i<regs.length; i++) regs[i].unregister();
-              });
+      window.addEventListener(
+        'error',
+        function (e) {
+          // Detect script errors or failed asset loads
+          if (
+            e.target.tagName === 'SCRIPT' ||
+            (e.message && e.message.toLowerCase().includes('script error'))
+          ) {
+            console.error('Asset load error detected. Clearing cache and reloading...');
+            try {
+              if ('serviceWorker' in navigator) {
+                navigator.serviceWorker.getRegistrations().then(function (regs) {
+                  for (var i = 0; i < regs.length; i++) regs[i].unregister();
+                });
+              }
+              if (window.caches) {
+                caches.keys().then(function (names) {
+                  for (var i = 0; i < names.length; i++) caches.delete(names[i]);
+                });
+              }
+              // Force reload from server, skipping cache
+              setTimeout(function () {
+                window.location.reload(true);
+              }, 500);
+            } catch (err) {
+              window.location.reload(true);
             }
-            if (window.caches) {
-              caches.keys().then(function(names) {
-                for (var i=0; i<names.length; i++) caches.delete(names[i]);
-              });
-            }
-            // Force reload from server, skipping cache
-            setTimeout(function() { window.location.reload(true); }, 500);
-          } catch (err) {
-            window.location.reload(true);
           }
-        }
-      }, true);
+        },
+        true
+      );
     </script>
   </head>
   <body>
@@ -44,4 +53,3 @@
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>
-

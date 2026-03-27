@@ -20,5 +20,5 @@ export const storage = {
     } catch (e) {
       console.warn('localStorage.removeItem failed:', e);
     }
-  }
+  },
 };

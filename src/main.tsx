@@ -1,5 +1,5 @@
-import {StrictMode} from 'react';
-import {createRoot} from 'react-dom/client';
+import { StrictMode } from 'react';
+import { createRoot } from 'react-dom/client';
 import { Capacitor } from '@capacitor/core';
 import App from './App.tsx';
 import './index.css';
@@ -35,26 +35,29 @@ window.onerror = (message, source, lineno, colno, error) => {
 try {
   if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-      navigator.serviceWorker.register('/sw.js').then(registration => {
-        console.log('SW registered:', registration);
+      navigator.serviceWorker
+        .register('/sw.js')
+        .then((registration) => {
+          console.log('SW registered:', registration);
 
-        // Force an update check on every load
-        registration.update();
+          // Force an update check on every load
+          registration.update();
 
-        registration.onupdatefound = () => {
-          const newWorker = registration.installing;
-          if (newWorker) {
-            newWorker.onstatechange = () => {
-              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                console.log('New SW version installed, reloading...');
-                window.location.reload();
-              }
-            };
-          }
-        };
-      }).catch(error => {
-        console.log('SW registration failed:', error);
-      });
+          registration.onupdatefound = () => {
+            const newWorker = registration.installing;
+            if (newWorker) {
+              newWorker.onstatechange = () => {
+                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                  console.log('New SW version installed, reloading...');
+                  window.location.reload();
+                }
+              };
+            }
+          };
+        })
+        .catch((error) => {
+          console.log('SW registration failed:', error);
+        });
     });
 
     // Handle the case where the new SW takes over
@@ -74,5 +77,5 @@ try {
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <App />
-  </StrictMode>,
+  </StrictMode>
 );

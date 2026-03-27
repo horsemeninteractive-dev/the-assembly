@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
 // Server-side achievement evaluator
 // ---------------------------------------------------------------------------
-import { ACHIEVEMENT_DEFS } from "../src/lib/achievements.ts";
-import type { GameState, Player, UserInternal } from "../src/types";
+import { ACHIEVEMENT_DEFS } from '../src/lib/achievements.ts';
+import type { GameState, Player, UserInternal } from '../src/types';
 
 export interface AchievementContext {
   /** User record AFTER stats have been incremented for this game */
@@ -96,11 +96,11 @@ export function checkAchievements(ctx: AchievementContext): string[] {
   if (s.round >= 12) grant('long_game');
 
   // landslide: any round in this game had unanimous Aye votes
-  if (s.roundHistory?.some(r =>
-    !r.failed &&
-    r.votes.length > 0 &&
-    r.votes.every(v => v.vote === 'Aye')
-  )) {
+  if (
+    s.roundHistory?.some(
+      (r) => !r.failed && r.votes.length > 0 && r.votes.every((v) => v.vote === 'Aye')
+    )
+  ) {
     grant('landslide');
   }
 

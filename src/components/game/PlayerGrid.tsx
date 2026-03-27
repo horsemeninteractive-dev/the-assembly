@@ -23,30 +23,44 @@ interface PlayerGridProps {
 }
 
 export const PlayerGrid = ({
-  gameState, me, speakingPlayers, playSound, token,
-  selectedPlayerId, setSelectedPlayerId,
-  localStream, remoteStreams, isVideoActive, isSpectator = false, isHost = false,
+  gameState,
+  me,
+  speakingPlayers,
+  playSound,
+  token,
+  selectedPlayerId,
+  setSelectedPlayerId,
+  localStream,
+  remoteStreams,
+  isVideoActive,
+  isSpectator = false,
+  isHost = false,
 }: PlayerGridProps) => {
   const isPresidentialCandidate = !!me?.isPresidentialCandidate;
-  const isPresident             = !!me?.isPresident;
-  const isManyPlayers           = gameState.players.length > 6;
+  const isPresident = !!me?.isPresident;
+  const isManyPlayers = gameState.players.length > 6;
 
   return (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0, scale: 0.98 }}
       animate={{ opacity: 1, scale: 1 }}
       transition={{ delay: 0.2, duration: 0.4, ease: 'easeOut' }}
       className="flex-1 p-[1vh] sm:p-[1.5vh] min-h-0 overflow-hidden"
     >
-      <div className={cn(
-        'grid gap-[1vh] sm:gap-[1.5vh] h-full grid-cols-2',
-        gameState.players.length <= 6 ? 'grid-rows-3' :
-        gameState.players.length <= 8 ? 'grid-rows-4' : 'grid-rows-5',
-        'sm:grid-cols-5 sm:grid-rows-2'
-      )}>
+      <div
+        className={cn(
+          'grid gap-[1vh] sm:gap-[1.5vh] h-full grid-cols-2',
+          gameState.players.length <= 6
+            ? 'grid-rows-3'
+            : gameState.players.length <= 8
+              ? 'grid-rows-4'
+              : 'grid-rows-5',
+          'sm:grid-cols-5 sm:grid-rows-2'
+        )}
+      >
         {gameState.players.map((p, index) => {
           if (!p) return null;
-          const isMe   = p.id === socket.id;
+          const isMe = p.id === socket.id;
           const stream = isMe ? localStream : remoteStreams[p.id];
           return (
             <PlayerCard

@@ -9,16 +9,20 @@ interface FriendRequestModalProps {
   onDeny: () => void;
 }
 
-export const FriendRequestModal: React.FC<FriendRequestModalProps> = ({ fromUsername, onAccept, onDeny }) => {
+export const FriendRequestModal: React.FC<FriendRequestModalProps> = ({
+  fromUsername,
+  onAccept,
+  onDeny,
+}) => {
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
         className="absolute inset-0 bg-backdrop backdrop-blur-sm"
       />
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className="relative w-full max-w-xs bg-surface border border-subtle rounded-2xl p-6 shadow-2xl text-primary"
@@ -34,13 +38,13 @@ export const FriendRequestModal: React.FC<FriendRequestModalProps> = ({ fromUser
             </p>
           </div>
           <div className="flex gap-3 w-full mt-2">
-            <button 
+            <button
               onClick={onDeny}
               className="flex-1 py-2 rounded-lg bg-card hover:bg-subtle text-xs font-mono uppercase tracking-widest transition-colors"
             >
               Deny
             </button>
-            <button 
+            <button
               onClick={onAccept}
               className="flex-1 py-2 rounded-lg bg-red-900 hover:bg-red-800 text-xs font-mono uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
             >

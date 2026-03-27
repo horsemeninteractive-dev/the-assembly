@@ -9,10 +9,15 @@ interface InviteModalProps {
   onReject: () => void;
 }
 
-export const InviteModal: React.FC<InviteModalProps> = ({ inviterName, roomId, onAccept, onReject }) => {
+export const InviteModal: React.FC<InviteModalProps> = ({
+  inviterName,
+  roomId,
+  onAccept,
+  onReject,
+}) => {
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-backdrop backdrop-blur-sm">
-      <motion.div 
+      <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
         className="bg-surface border border-subtle rounded-2xl p-6 shadow-2xl text-primary max-w-sm w-full"
@@ -29,13 +34,13 @@ export const InviteModal: React.FC<InviteModalProps> = ({ inviterName, roomId, o
           {inviterName} has invited you to join their game room: {roomId}
         </p>
         <div className="flex gap-3">
-          <button 
+          <button
             onClick={onReject}
             className="flex-1 py-2 bg-card hover:bg-subtle rounded-lg text-sm font-mono uppercase"
           >
             Reject
           </button>
-          <button 
+          <button
             onClick={onAccept}
             className="flex-1 py-2 bg-red-900 hover:bg-red-800 rounded-lg text-sm font-mono uppercase"
           >

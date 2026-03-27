@@ -1,4 +1,4 @@
-import { GameState, Player, Policy } from "../src/types.ts";
+import { GameState, Player, Policy } from '../src/types.ts';
 
 // =============================================================================
 // BAYESIAN SUSPICION MODEL
@@ -37,16 +37,16 @@ export function initializeSuspicion(state: GameState): void {
   const numState = n <= 6 ? 2 : n <= 8 ? 3 : 4; // includes Overseer
   const prior = numState / n;
 
-  for (const ai of state.players.filter(p => p.isAI)) {
+  for (const ai of state.players.filter((p) => p.isAI)) {
     ai.suspicion = {};
     ai.stateEnactments = 0;
     for (const target of state.players) {
       if (target.id === ai.id) continue;
-      if (ai.role === "Civil") {
+      if (ai.role === 'Civil') {
         ai.suspicion[target.id] = logOdds(prior);
       } else {
         // State / Overseer know everyone's alignment
-        const isStateTeam = target.role === "State" || target.role === "Overseer";
+        const isStateTeam = target.role === 'State' || target.role === 'Overseer';
         ai.suspicion[target.id] = logOdds(isStateTeam ? 0.97 : 0.03);
       }
     }
@@ -73,28 +73,28 @@ export function updateSuspicionFromPolicy(state: GameState, policy: Policy): voi
   const chanId = state.lastGovernmentChancellorId;
   if (!votes) return;
 
-  for (const ai of state.players.filter(p => p.isAI && p.role === "Civil")) {
+  for (const ai of state.players.filter((p) => p.isAI && p.role === 'Civil')) {
     if (!ai.suspicion) continue;
 
     // Voting evidence: P(Aye|State)/P(Aye|Civil)
     for (const [pid, v] of Object.entries(votes)) {
       if (pid === ai.id) continue;
-      if (policy === "State") {
-        nudge(ai, pid, v === "Aye" ? 1.78 : 0.56);
+      if (policy === 'State') {
+        nudge(ai, pid, v === 'Aye' ? 1.78 : 0.56);
       } else {
-        nudge(ai, pid, v === "Aye" ? 0.71 : 1.40);
+        nudge(ai, pid, v === 'Aye' ? 0.71 : 1.4);
       }
     }
 
     // Government members are stronger signals than plain votes
     // Chancellor blame model: Chancellor gets more blame/credit than President
     if (presId && presId !== ai.id) {
-      nudge(ai, presId, policy === "State" ? 1.4 : 0.75);
+      nudge(ai, presId, policy === 'State' ? 1.4 : 0.75);
     }
     if (chanId && chanId !== ai.id) {
-      nudge(ai, chanId, policy === "State" ? 2.8 : 0.45);
-      const chan = state.players.find(p => p.id === chanId);
-      if (chan && policy === "State") {
+      nudge(ai, chanId, policy === 'State' ? 2.8 : 0.45);
+      const chan = state.players.find((p) => p.id === chanId);
+      if (chan && policy === 'State') {
         chan.stateEnactments = (chan.stateEnactments ?? 0) + 1;
       }
     }
@@ -102,16 +102,16 @@ export function updateSuspicionFromPolicy(state: GameState, policy: Policy): voi
 }
 
 export function updateSuspicionFromPolicyExpectation(state: GameState, policy: Policy): void {
-  const presDecl = state.declarations.find(d => d.type === "President");
+  const presDecl = state.declarations.find((d) => d.type === 'President');
   if (!presDecl || presDecl.drewSta === undefined) return;
 
   // Policy Expectation Signal: President plays state policy when civil likely
   const expectedStateProb = presDecl.drewSta / 3;
-  const actualOutcome = policy === "State" ? 1 : 0;
-  
+  const actualOutcome = policy === 'State' ? 1 : 0;
+
   // If President drew 3 Civil, playing State is highly suspicious, but give benefit of doubt for noise
-  if (presDecl.drewSta === 0 && policy === "State") {
-    for (const ai of state.players.filter(p => p.isAI && p.role === "Civil")) {
+  if (presDecl.drewSta === 0 && policy === 'State') {
+    for (const ai of state.players.filter((p) => p.isAI && p.role === 'Civil')) {
       if (presDecl.playerId !== ai.id) nudge(ai, presDecl.playerId, 3.5);
     }
   }
@@ -125,21 +125,23 @@ export function updateSuspicionFromPolicyExpectation(state: GameState, policy: P
  * Consistent iff: chanDecl.sta <= presDecl.sta  AND  presDecl.sta - chanDecl.sta <= 1
  */
 export function updateSuspicionFromDeclarations(state: GameState): void {
-  const presDecl = state.declarations.find(d => d.type === "President");
-  const chanDecl = state.declarations.find(d => d.type === "Chancellor");
+  const presDecl = state.declarations.find((d) => d.type === 'President');
+  const chanDecl = state.declarations.find((d) => d.type === 'Chancellor');
   if (!presDecl || !chanDecl) return;
 
   const gap = presDecl.sta - chanDecl.sta;
   const inconsistent = chanDecl.sta > presDecl.sta || gap > 1;
 
-  for (const ai of state.players.filter(p => p.isAI && p.role === "Civil")) {
+  for (const ai of state.players.filter((p) => p.isAI && p.role === 'Civil')) {
     if (!ai.suspicion) continue;
 
     if (inconsistent) {
       // Definite lie — raise both by LR ≈ 2.0
       if (presDecl.playerId !== ai.id) nudge(ai, presDecl.playerId, 2.0);
       if (chanDecl.playerId !== ai.id) nudge(ai, chanDecl.playerId, 2.0);
-      state.log.push(`[Suspicion] Inconsistent declarations: ${presDecl.playerName} vs ${chanDecl.playerName}.`);
+      state.log.push(
+        `[Suspicion] Inconsistent declarations: ${presDecl.playerName} vs ${chanDecl.playerName}.`
+      );
       if (state.log.length > 50) state.log.shift();
     } else {
       // Consistent — modest trust boost
@@ -161,12 +163,12 @@ export function updateSuspicionFromInvestigation(
   state: GameState,
   investigatorId: string,
   targetId: string,
-  result: "Civil" | "State"
+  result: 'Civil' | 'State'
 ): void {
-  for (const ai of state.players.filter(p => p.isAI && p.role === "Civil")) {
+  for (const ai of state.players.filter((p) => p.isAI && p.role === 'Civil')) {
     if (!ai.suspicion) continue;
-    if (targetId !== ai.id) nudge(ai, targetId, result === "State" ? 10.0 : 0.08);
-    if (investigatorId !== ai.id) nudge(ai, investigatorId, result === "State" ? 0.85 : 0.88);
+    if (targetId !== ai.id) nudge(ai, targetId, result === 'State' ? 10.0 : 0.08);
+    if (investigatorId !== ai.id) nudge(ai, investigatorId, result === 'State' ? 0.85 : 0.88);
   }
 }
 
@@ -179,10 +181,10 @@ export function updateSuspicionFromNomination(
   presidentId: string,
   chancellorId: string
 ): void {
-  for (const ai of state.players.filter(p => p.isAI && p.role === "Civil")) {
+  for (const ai of state.players.filter((p) => p.isAI && p.role === 'Civil')) {
     if (!ai.suspicion) continue;
     const chanSusp = getSuspicion(ai, chancellorId);
-    if (chanSusp > 0.60 && presidentId !== ai.id) {
+    if (chanSusp > 0.6 && presidentId !== ai.id) {
       nudge(ai, presidentId, 1.0 + chanSusp);
     }
     if (chancellorId !== ai.id) {
