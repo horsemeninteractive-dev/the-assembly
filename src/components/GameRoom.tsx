@@ -30,6 +30,7 @@ import { DossierModal } from './game/modals/DossierModal';
 import { DeclarationModal } from './game/modals/DeclarationModal';
 import { PlayerProfileModal } from './game/modals/PlayerProfileModal';
 import { GameReferencePanel } from './game/GameReferencePanel';
+import { useScaling } from '../hooks/useScaling';
 
 interface GameRoomProps {
   gameState: GameState;
@@ -75,37 +76,8 @@ export const GameRoom = ({
   const me = gameState.players.find((p) => p.id === socket.id);
   const isSpectator = !me && gameState.spectators.some((s) => s.id === socket.id);
   const [inQueue, setInQueue] = useState(false);
-  const [uiScale, setUiScale] = useState(1);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const handleResize = () => {
-      if (!containerRef.current) return;
-      const h = containerRef.current.clientHeight;
-      const w = containerRef.current.clientWidth;
-
-      // Target height is around 850px for full desktop experience
-      // Target width is around 1200px
-      const scaleH = h / 850;
-      const scaleW = w / 1200;
-
-      // On mobile we don't want to scale down too much as it's already small
-      const isMobile = w < 640;
-      const autoScale = isMobile ? 1 : Math.min(scaleH, scaleW, 1);
-      const finalScale = autoScale * uiScaleSetting;
-      setUiScale(Math.max(0.4, Math.min(finalScale, 2)));
-    };
-
-    const observer = new ResizeObserver(handleResize);
-    if (containerRef.current) observer.observe(containerRef.current);
-    handleResize();
-
-    window.addEventListener('resize', handleResize);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener('resize', handleResize);
-    };
-  }, [uiScaleSetting]);
+  const uiScale = useScaling(containerRef, { multiplier: uiScaleSetting });
 
   // ── UI panels ────────────────────────────────────────────────────────────
   const [isLogOpen, setIsLogOpen] = useState(false);

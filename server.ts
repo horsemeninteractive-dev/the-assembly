@@ -83,13 +83,29 @@ async function startServer() {
     }
   }
 
+  const isProd = process.env.NODE_ENV === 'production';
+  const scriptSrc = isProd
+    ? ["'self'", ...prodScriptHashes.trim().split(' ').filter(Boolean), 'https://*.discord.com']
+    : ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://*.discord.com'];
+
   const app = express();
   app.use(
     helmet({
-      contentSecurityPolicy: false,
-      crossOriginEmbedderPolicy: false,
-      crossOriginOpenerPolicy: false,
-      crossOriginResourcePolicy: false,
+      contentSecurityPolicy: {
+        directives: {
+          defaultSrc: ["'self'", 'https://*.discord.com', 'https://*.discordapp.io'],
+          scriptSrc,
+          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+          fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
+          imgSrc: ["'self'", 'data:', 'blob:', '*'],
+          mediaSrc: ["'self'", 'blob:', 'data:', '*'],
+          connectSrc: ["'self'", '*'],
+          frameAncestors: ["'self'", 'https://discord.com', 'https://*.discord.com', 'https://*.discordapp.io'],
+        },
+      },
+      crossOriginEmbedderPolicy: { policy: 'credentialless' },
+      crossOriginOpenerPolicy: { policy: 'same-origin' },
+      crossOriginResourcePolicy: { policy: 'cross-origin' },
     })
   );
   app.set('trust proxy', 1);
@@ -210,28 +226,6 @@ async function startServer() {
       'microphone=*, camera=*, display-capture=*, speaker-selection=*, autoplay=*, text-to-speech=*, screen-wake-lock=*'
     );
 
-    const isProd = process.env.NODE_ENV === 'production';
-    const scriptSrc = isProd
-      ? `'self'${prodScriptHashes} https://*.discord.com`
-      : `'self' 'unsafe-inline' 'unsafe-eval' https://*.discord.com`;
-
-    // Comprehensive CSP for Discord Activity environment
-    res.setHeader(
-      'Content-Security-Policy',
-      "default-src 'self' https://*.discord.com https://*.discordapp.io; " +
-        `script-src ${scriptSrc}; ` +
-        "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; " +
-        "font-src 'self' data: https://fonts.gstatic.com; " +
-        "img-src 'self' data: blob: *; " +
-        "media-src 'self' blob: data: *; " +
-        "connect-src 'self' *; " +
-        "frame-ancestors 'self' https://discord.com https://*.discord.com https://*.discordapp.io;"
-    );
-
-    // Headers for cross-origin isolation (needed for some media features)
-    res.setHeader('Cross-Origin-Embedder-Policy', 'credentialless');
-    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin');
-
     next();
   });
 
@@ -321,60 +315,73 @@ async function startServer() {
   });
 
   io.on('connection', (socket) => {
-    // Rate limiter: 10 events per second (Token Bucket)
+    const GAME_ACTIONS = [
+      'userConnected',
+      'joinRoom',
+      'toggleReady',
+      'startLobbyTimer',
+      'startGame',
+      'signal',
+      'sendFriendRequest',
+      'acceptFriendRequest',
+      'nominateChancellor',
+      'vote',
+      'presidentDiscard',
+      'chancellorPlay',
+      'declarePolicies',
+      'performExecutiveAction',
+      'useTitleAbility',
+      'vetoRequest',
+      'vetoResponse',
+      'playAgain',
+      'joinQueue',
+      'leaveQueue',
+      'kickPlayer',
+      'toggleLock',
+      'hostStartGame',
+      'leaveRoom',
+      'updateMediaState',
+      'adminDeleteRoom',
+      'adminBroadcast',
+      'adminUpdateUser',
+      'adminUpdateConfig',
+      'adminClearRedis',
+    ];
+
     socket.use(([event, ...args]: any[], next: (err?: Error) => void) => {
       if (event === 'disconnect') return next();
 
       const now = Date.now();
-      const CAPACITY = 10;
-      const REFILL_RATE = 10; // tokens per second
+      const isChat = event === 'sendMessage';
+      const isGameAction = GAME_ACTIONS.includes(event);
 
-      const last = socket.data.lastRateLimitCheck || now;
-      const tokens = socket.data.tokens ?? CAPACITY;
+      if (!isChat && !isGameAction) return next();
+
+      // Bucket configs
+      const CAPACITY = isChat ? 5 : 10;
+      const REFILL_RATE = isChat ? 1 : 5; // tokens per second
+
+      // State keys
+      const lastKey = isChat ? 'lastChatLimitCheck' : 'lastGameLimitCheck';
+      const tokenKey = isChat ? 'chatTokens' : 'gameTokens';
+
+      const last = (socket.data as any)[lastKey] || now;
+      const tokens = (socket.data as any)[tokenKey] ?? CAPACITY;
 
       const elapsed = now - last;
       const regained = (elapsed / 1000) * REFILL_RATE;
       const currentTokens = Math.min(CAPACITY, tokens + regained);
 
       if (currentTokens < 1) {
-        const throttledEvents = [
-          'sendMessage',
-          'vote',
-          'nominateChancellor',
-          'useTitleAbility',
-          'discardPolicy',
-          'enactPolicy',
-          'veto',
-          'playAgain',
-          'joinRoom',
-          'userConnected',
-          'leaveRoom',
-          'startGame',
-          'hostStartGame',
-          'toggleReady',
-          'kickPlayer',
-          'toggleLock',
-          'updateMediaState',
-          'joinQueue',
-          'leaveQueue',
-          'addAI',
-          'removeAI',
-          'adminResetRoom',
-          'adminDeleteRoom',
-          'adminForceStart',
-          'adminBroadcast',
-        ];
-        if (throttledEvents.includes(event)) {
-          logger.warn(
-            { event, userId: socket.data.userId || 'unauth', socketId: socket.id },
-            'Throttling socket event due to rate limit'
-          );
-          return next(new Error('Rate limit exceeded. Please slow down.'));
-        }
+        logger.warn(
+          { event, userId: (socket.data as any).userId || 'unauth', socketId: socket.id },
+          `Throttling ${isChat ? 'chat' : 'game action'} event due to rate limit`
+        );
+        return next(new Error('Rate limit exceeded. Please slow down.'));
       }
 
-      socket.data.tokens = currentTokens - 1;
-      socket.data.lastRateLimitCheck = now;
+      (socket.data as any)[tokenKey] = currentTokens - 1;
+      (socket.data as any)[lastKey] = now;
       next();
     });
 
@@ -390,8 +397,9 @@ async function startServer() {
 
         // Move from spectators list to players list
         state.spectators = state.spectators.filter((s) => s.id !== queued.id);
-        state.players.push({
-          id: queued.id,
+        const player: Player = {
+          id: randomUUID(),
+          socketId: queued.id,
           name: queued.name,
           userId: queued.userId,
           avatarUrl: queued.avatarUrl,
@@ -409,7 +417,8 @@ async function startServer() {
           hasActed: false,
           stateEnactments: 0,
           civilEnactments: 0,
-        });
+        };
+        state.players.push(player);
         drained.push(queued);
         // Notify the queued player that they've joined
         io.to(queued.id).emit('queueDrained');
@@ -473,7 +482,6 @@ async function startServer() {
         isSpectator,
         privacy,
         inviteCode,
-        hostUserId,
       }) => {
         // Validation & Sanitisation
         if (typeof roomId !== 'string' || roomId.length < 1 || roomId.length > 40) return;
@@ -491,9 +499,9 @@ async function startServer() {
           return;
         }
 
-        const safeMax = Math.max(5, Math.min(10, parseInt(maxPlayers) || 5));
+        const safeMax = Math.max(5, Math.min(10, maxPlayers || 5));
         const safeTimer =
-          actionTimer === 0 ? 0 : Math.max(30, Math.min(120, parseInt(actionTimer) || 60));
+          actionTimer === 0 ? 0 : Math.max(30, Math.min(120, actionTimer || 60));
         const user = userId ? await getUserById(userId) : null;
         if (user?.isBanned) {
           socket.emit('error', 'Your account has been restricted.');
@@ -556,57 +564,8 @@ async function startServer() {
           if (!isSpectator && state.phase !== 'Lobby') {
             const existingPlayer = state.players.find((p) => p.userId === userId && !p.isAI);
             if (existingPlayer) {
-              const oldId = existingPlayer.id;
-              existingPlayer.id = socket.id;
+              existingPlayer.socketId = socket.id;
               existingPlayer.isDisconnected = false;
-
-              // Comprehensive ID re-mapping across all GameState fields
-              if (state.presidentId === oldId) state.presidentId = socket.id;
-              if (state.chancellorId === oldId) state.chancellorId = socket.id;
-              if (state.rejectedChancellorId === oldId) state.rejectedChancellorId = socket.id;
-              if (state.detainedPlayerId === oldId) state.detainedPlayerId = socket.id;
-              if (state.lastGovernmentPresidentId === oldId)
-                state.lastGovernmentPresidentId = socket.id;
-              if (state.disconnectedPlayerId === oldId) state.disconnectedPlayerId = socket.id;
-              if (state.lastEnactedPolicy && state.lastEnactedPolicy.playerId === oldId) {
-                state.lastEnactedPolicy.playerId = socket.id;
-              }
-
-              if (state.presidentialOrder) {
-                state.presidentialOrder = state.presidentialOrder.map((id) =>
-                  id === oldId ? socket.id : id
-                );
-              }
-
-              if (state.titlePrompt && state.titlePrompt.playerId === oldId) {
-                state.titlePrompt.playerId = socket.id;
-              }
-
-              if (state.previousVotes) {
-                if (state.previousVotes[oldId]) {
-                  state.previousVotes[socket.id] = state.previousVotes[oldId];
-                  delete state.previousVotes[oldId];
-                }
-              }
-
-              if (state.lastGovernmentVotes) {
-                if (state.lastGovernmentVotes[oldId]) {
-                  state.lastGovernmentVotes[socket.id] = state.lastGovernmentVotes[oldId];
-                  delete state.lastGovernmentVotes[oldId];
-                }
-              }
-
-              state.declarations.forEach((d) => {
-                if (d.playerId === oldId) d.playerId = socket.id;
-              });
-
-              state.roundHistory?.forEach((rh) => {
-                if (rh.presidentId === oldId) rh.presidentId = socket.id;
-                if (rh.chancellorId === oldId) rh.chancellorId = socket.id;
-                rh.votes.forEach((v) => {
-                  if (v.playerId === oldId) v.playerId = socket.id;
-                });
-              });
 
               state.isPaused = false;
               state.pauseReason = undefined;
@@ -626,7 +585,7 @@ async function startServer() {
           if (!isSpectator && state.phase === 'Lobby' && userId) {
             const existingLobbyPlayer = state.players.find((p) => p.userId === userId && !p.isAI);
             if (existingLobbyPlayer) {
-              existingLobbyPlayer.id = socket.id;
+              existingLobbyPlayer.socketId = socket.id;
               existingLobbyPlayer.name = name; // refresh display name too
               socket.join(roomId);
               state.log.push(`${name} rejoined the lobby.`);
@@ -713,7 +672,8 @@ async function startServer() {
         }
 
         const player: Player = {
-          id: socket.id,
+          id: randomUUID(),
+          socketId: socket.id,
           name,
           userId,
           avatarUrl,
@@ -729,6 +689,8 @@ async function startServer() {
           wasChancellor: false,
           isReady: false,
           isAI: false,
+          stateEnactments: 0,
+          civilEnactments: 0,
         };
 
         state.players.push(player);
@@ -745,7 +707,7 @@ async function startServer() {
       const state = engine.rooms.get(roomId);
       if (!state || state.phase !== 'Lobby') return;
 
-      const player = state.players.find((p) => p.id === socket.id);
+      const player = state.players.find((p) => p.socketId === socket.id);
       if (!player) return;
 
       player.isReady = !player.isReady;
@@ -827,7 +789,7 @@ async function startServer() {
       const state = engine.rooms.get(roomId);
       if (!state || state.phase !== 'Voting') return;
 
-      const player = state.players.find((p) => p.id === socket.id);
+      const player = state.players.find((p) => p.socketId === socket.id);
       if (!player || !player.isAlive || player.hasActed) return;
 
       if (state.detainedPlayerId === player.id) {
@@ -871,7 +833,7 @@ async function startServer() {
       const state = engine.rooms.get(roomId);
       if (!state) return;
 
-      const player = state.players.find((p) => p.id === socket.id);
+      const player = state.players.find((p) => p.socketId === socket.id);
       if (!player) return;
 
       if (data) {
@@ -917,7 +879,9 @@ async function startServer() {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      if (!state || !state.titlePrompt || state.titlePrompt.playerId !== socket.id) return;
+      if (!state) return;
+      const player = state.players.find((p) => p.socketId === socket.id);
+      if (!state.titlePrompt || !player || state.titlePrompt.playerId !== player.id) return;
       await engine.handleTitleAbility(state, roomId, abilityData);
     });
 
@@ -927,7 +891,7 @@ async function startServer() {
       const state = engine.rooms.get(roomId);
       if (!state || state.phase !== 'Legislative_Chancellor') return;
 
-      const player = state.players.find((p) => p.id === socket.id);
+      const player = state.players.find((p) => p.socketId === socket.id);
       if (!player || !player.isChancellor || !player.isAlive || player.hasActed) return;
       player.hasActed = true;
 
@@ -946,7 +910,7 @@ async function startServer() {
       const state = engine.rooms.get(roomId);
       if (!state || !state.vetoRequested) return;
 
-      const player = state.players.find((p) => p.id === socket.id);
+      const player = state.players.find((p) => p.socketId === socket.id);
       if (!player || !player.isPresident || !player.isAlive || player.hasActed) return;
       player.hasActed = true;
 
@@ -961,8 +925,16 @@ async function startServer() {
       const state = engine.rooms.get(roomId);
       if (!state) return;
 
-      const player = state.players.find((p) => p.id === socket.id);
+      const player = state.players.find((p) => p.socketId === socket.id);
       if (!player) return;
+
+      const now = Date.now();
+      const lastChat = (socket.data as any).lastChatTimestamp || 0;
+      if (now - lastChat < 1000) {
+        socket.emit('error', 'Please wait before sending another message.');
+        return;
+      }
+      (socket.data as any).lastChatTimestamp = now;
 
       const sanitized = text
         .replace(/<[^>]*>/g, '')
@@ -1106,7 +1078,7 @@ async function startServer() {
       const state = engine.rooms.get(roomId);
       if (!state) return;
       const host = state.players.find((p) => p.userId === state.hostUserId);
-      if (!host || host.id !== socket.id) return;
+      if (!host || host.socketId !== socket.id) return;
       if (targetSocketId === socket.id) return;
       const target = state.players.find((p) => p.id === targetSocketId);
       if (!target) return;
@@ -1122,7 +1094,7 @@ async function startServer() {
       const state = engine.rooms.get(roomId);
       if (!state || state.phase !== 'Lobby') return;
       const host = state.players.find((p) => p.userId === state.hostUserId);
-      if (!host || host.id !== socket.id) return;
+      if (!host || host.socketId !== socket.id) return;
       state.isLocked = !state.isLocked;
       state.log.push(`Room ${state.isLocked ? 'locked' : 'unlocked'} by host.`);
       engine.broadcastState(roomId);
@@ -1134,7 +1106,7 @@ async function startServer() {
       const state = engine.rooms.get(roomId);
       if (!state || state.phase !== 'Lobby') return;
       const host = state.players.find((p) => p.userId === state.hostUserId);
-      if (!host || host.id !== socket.id) return;
+      if (!host || host.socketId !== socket.id) return;
       const humanPlayers = state.players.filter((p) => !p.isAI);
       if (state.mode === 'Ranked' && humanPlayers.length < 5) {
         socket.emit('error', 'Need at least 5 players to start a ranked game.');
@@ -1165,7 +1137,7 @@ async function startServer() {
 
     socket.on('updateMediaState', ({ isMicOn, isCamOn }) => {
       engine.rooms.forEach((state, roomId) => {
-        const player = state.players.find((p) => p.id === socket.id);
+        const player = state.players.find((p) => p.socketId === socket.id);
         if (player) {
           player.isMicOn = isMicOn;
           player.isCamOn = isCamOn;

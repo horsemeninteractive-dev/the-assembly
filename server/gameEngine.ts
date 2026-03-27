@@ -157,7 +157,7 @@ export class GameEngine {
       // At game over the full hand history is revealed for post-game analysis.
       const seeAllCards = isAdmin || isSpectator || isGameOver;
 
-      const player = state.players.find((pl) => pl.id === socketId);
+      const player = state.players.find((pl) => pl.socketId === socketId);
       const isPresident = player?.isPresident === true;
       const isChancellor = player?.isChancellor === true;
 
@@ -173,7 +173,7 @@ export class GameEngine {
         if (isAdmin || isSpectator) return { ...rest, role, titleRole, personalAgenda };
 
         // Active players see ONLY their own secret info
-        if (p.id === socketId) return { ...rest, role, titleRole, personalAgenda };
+        if (p.socketId === socketId) return { ...rest, role, titleRole, personalAgenda };
 
         // Otherwise, hide secret info
         return rest;
@@ -344,7 +344,7 @@ export class GameEngine {
       // Restart action timer with remaining duration if one was live.
       // If the timer already expired while the server was down, fire
       // the expiry handler immediately via a zero-delay timeout.
-      if (state.actionTimerEnd !== undefined && !state.isPaused) {
+      if (state.actionTimerEnd !== undefined) {
         const remaining = state.actionTimerEnd - Date.now();
         if (remaining > 0) {
           const handle = setTimeout(async () => {
@@ -359,7 +359,7 @@ export class GameEngine {
           // Expired while server was down — handle on next tick
           setTimeout(async () => {
             const s = this.rooms.get(roomId);
-            if (!s || s.phase === 'Lobby' || s.phase === 'GameOver' || s.isPaused) return;
+            if (!s || s.phase === 'Lobby' || s.phase === 'GameOver') return;
             s.actionTimerEnd = undefined;
             await this.onActionTimerExpired(s, roomId);
           }, 0);
@@ -459,7 +459,9 @@ export class GameEngine {
       case 'Legislative_President': {
         const president = s.players.find((p) => p.isPresident);
         if (president && s.drawnPolicies.length > 0) {
-          s.presidentSaw = [...s.drawnPolicies];
+          if (!s.presidentSaw || s.presidentSaw.length === 0) {
+            s.presidentSaw = [...s.drawnPolicies];
+          }
           while (s.drawnPolicies.length > 2) {
             const i = Math.floor(Math.random() * s.drawnPolicies.length);
             s.discard.push(s.drawnPolicies.splice(i, 1)[0]);
@@ -546,7 +548,9 @@ export class GameEngine {
     // Guard: timer may have already auto-discarded and cleared the hand
     if (s.drawnPolicies.length === 0) return;
 
-    s.presidentSaw = [...s.drawnPolicies];
+    if (!s.presidentSaw || s.presidentSaw.length === 0) {
+      s.presidentSaw = [...s.drawnPolicies];
+    }
     const discarded = s.drawnPolicies.splice(idx, 1)[0];
     if (!discarded) return;
     s.discard.push(discarded);
@@ -681,8 +685,10 @@ export class GameEngine {
 
     while (state.players.length < state.maxPlayers && available.length > 0) {
       const bot = available.splice(Math.floor(Math.random() * available.length), 1)[0];
+      const id = `ai-${randomUUID()}`;
       state.players.push({
-        id: `ai-${randomUUID()}`,
+        id,
+        socketId: id, // AI bots serve as their own socket target (though never used for emission)
         name: `${bot.name} (AI)`,
         avatarUrl: bot.avatarUrl,
         personality: bot.personality,
@@ -695,6 +701,8 @@ export class GameEngine {
         wasChancellor: false,
         isAI: true,
         difficulty: pick(['Casual', 'Normal', 'Elite']) as 'Casual' | 'Normal' | 'Elite',
+        stateEnactments: 0,
+        civilEnactments: 0,
       });
     }
 
@@ -1646,7 +1654,7 @@ export class GameEngine {
 
       case 'Auditor': {
         const last3 = s.discard.slice(-3);
-        this.io.to(player.id).emit('policyPeekResult', last3);
+        this.io.to(player.socketId).emit('policyPeekResult', last3);
         addLog(s, `${player.name} (Auditor) peeked at the discard pile.`);
         this.continuePostRoundAfter(s, roomId, 'Auditor');
         break;
@@ -1956,9 +1964,6 @@ export class GameEngine {
     }
 
     const validUsers = Array.from(userMap.values());
-    const roomAverageElo = validUsers.length
-      ? Math.round(validUsers.reduce((sum, u) => sum + u.stats.elo, 0) / validUsers.length)
-      : 1000;
 
     const now = new Date().toISOString();
 
@@ -1975,6 +1980,7 @@ export class GameEngine {
       agendaCompleted: boolean;
       agendaName: string | undefined;
       newAchievementIds: string[];
+      opponentAverageElo: number;
       matchRecord: Parameters<typeof saveMatchResult>[0];
     };
     const results: PlayerResult[] = [];
@@ -2124,6 +2130,7 @@ export class GameEngine {
           ? (AGENDA_MAP.get(p.personalAgenda)?.name ?? undefined)
           : undefined,
         newAchievementIds,
+        opponentAverageElo: opponentAvgElo,
         matchRecord: {
           id: randomUUID(),
           userId: p.userId!,
@@ -2184,16 +2191,18 @@ export class GameEngine {
     // ── Socket emissions (after saves so clients receive final state) ──────
     for (const r of results) {
       const { password: _, ...safe } = r.user;
-      this.io.to(r.playerId).emit('userUpdate', safe);
-      this.io.to(r.playerId).emit('postMatchResult', {
-        won: r.won,
-        mode: s.mode,
-        role: s.players.find((p) => p.id === r.playerId)?.role,
-        eloChange: r.eloChange,
-        eloBefore: r.eloBeforeCalc,
-        eloAfter: r.user.stats.elo,
-        roomAverageElo,
-        xpEarned: r.xpEarned,
+      const player = s.players.find((p) => p.id === r.playerId);
+      if (player) {
+        this.io.to(player.socketId).emit('userUpdate', safe);
+        this.io.to(player.socketId).emit('postMatchResult', {
+          won: r.won,
+          mode: s.mode,
+          role: player.role,
+          eloChange: r.eloChange,
+          eloBefore: r.eloBeforeCalc,
+          eloAfter: r.user.stats.elo,
+          opponentAverageElo: r.opponentAverageElo,
+          xpEarned: r.xpEarned,
         ipEarned: r.ipEarned,
         agendaName: r.agendaName,
         agendaCompleted: r.agendaCompleted,
@@ -2204,6 +2213,7 @@ export class GameEngine {
       });
     }
   }
+}
 
   // ═══════════════════════════════════════════════════════════════════════════
   // Round History
@@ -2563,7 +2573,9 @@ export class GameEngine {
     const president = s.players.find((p) => p.isPresident);
     if (!president?.isAI || s.drawnPolicies.length === 0) return;
 
-    s.presidentSaw = [...s.drawnPolicies];
+    if (!s.presidentSaw || s.presidentSaw.length === 0) {
+      s.presidentSaw = [...s.drawnPolicies];
+    }
     while (s.drawnPolicies.length > 2) {
       const idx = this.choosePolicyToDiscard(president, s.drawnPolicies, s.stateDirectives);
       s.discard.push(s.drawnPolicies.splice(idx, 1)[0]);

@@ -1,9 +1,24 @@
 import { useState, useEffect, RefObject } from 'react';
 
+interface ScalingOptions {
+  targetWidth?: number;
+  targetHeight?: number;
+  multiplier?: number;
+  minScale?: number;
+  maxScale?: number;
+  disableOnMobile?: boolean;
+}
+
 export function useScaling(
-  containerRef: RefObject<HTMLElement>,
-  targetWidth: number = 1280,
-  targetHeight: number = 720
+  containerRef: RefObject<HTMLElement | null>,
+  {
+    targetWidth = 1200,
+    targetHeight = 850,
+    multiplier = 1,
+    minScale = 0.4,
+    maxScale = 2,
+    disableOnMobile = true,
+  }: ScalingOptions = {}
 ) {
   const [scale, setScale] = useState(1);
 
@@ -11,23 +26,31 @@ export function useScaling(
     const updateScale = () => {
       if (!containerRef.current) return;
 
-      const containerWidth = containerRef.current.clientWidth;
-      const containerHeight = containerRef.current.clientHeight;
+      const w = containerRef.current.clientWidth;
+      const h = containerRef.current.clientHeight;
 
-      const scaleX = containerWidth / targetWidth;
-      const scaleY = containerHeight / targetHeight;
+      const scaleW = w / targetWidth;
+      const scaleH = h / targetHeight;
 
-      // We want to fit the content, so we take the minimum scale
-      // But we also don't want to scale UP too much if it's a huge screen
-      // and we don't want to scale DOWN so much that it's unreadable
-      const newScale = Math.min(scaleX, scaleY, 1.2);
-      setScale(Math.max(newScale, 0.5));
+      const isMobile = w < 640;
+      const autoScale = isMobile && disableOnMobile ? 1 : Math.min(scaleW, scaleH, 1);
+      const finalScale = autoScale * multiplier;
+
+      setScale(Math.max(minScale, Math.min(finalScale, maxScale)));
     };
+
+    const observer = new ResizeObserver(updateScale);
+    if (containerRef.current) observer.observe(containerRef.current);
 
     updateScale();
     window.addEventListener('resize', updateScale);
-    return () => window.removeEventListener('resize', updateScale);
-  }, [containerRef, targetWidth, targetHeight]);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateScale);
+    };
+  }, [containerRef, targetWidth, targetHeight, multiplier, minScale, maxScale, disableOnMobile]);
 
   return scale;
 }
+

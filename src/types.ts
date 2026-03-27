@@ -232,7 +232,10 @@ export interface SystemConfig {
 export type AIPersonality = 'Honest' | 'Deceptive' | 'Chaotic' | 'Strategic' | 'Aggressive';
 
 export interface Player {
+  /** Stable unique ID for this player session (persists across reconnects) */
   id: string;
+  /** Volatile socket ID (changes on every reconnect) */
+  socketId: string;
   name: string;
   userId?: string;
   avatarUrl?: string;

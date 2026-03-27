@@ -75,7 +75,7 @@ export function checkAchievements(ctx: AchievementContext): string[] {
   if (
     p.titleRole === 'Assassin' &&
     p.titleUsed &&
-    s.winReason === 'OVERSEER ASSASSINATED' &&
+    s.winReason?.startsWith('OVERSEER ASSASSINATED') &&
     won // Civil wins when Overseer is assassinated
   ) {
     grant('overseer_hunter');
