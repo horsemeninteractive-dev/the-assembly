@@ -6,7 +6,7 @@ import { FriendsList } from './FriendsList';
 import { Inventory } from './Inventory';
 import { cn, getProxiedUrl, apiUrl } from '../lib/utils';
 import { getPolicyStyles, getVoteStyles, getFrameStyles, getRarity } from '../lib/cosmetics';
-import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../constants';
+import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../sharedConstants';
 import { getLevelFromXp, getXpForNextLevel, getXpInCurrentLevel, getTotalXpForLevel } from '../lib/xp';
 import { getRankTier, getRankLabel } from '../lib/ranks';
 import { ACHIEVEMENT_DEFS, ACHIEVEMENT_MAP } from '../lib/achievements';

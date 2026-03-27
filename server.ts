@@ -11,7 +11,7 @@ import { randomUUID, randomBytes } from "crypto";
 import { User, GameState, Player } from "./src/types.ts";
 import { createDeck } from "./server/utils.ts";
 import { GameEngine } from "./server/gameEngine.ts";
-import { registerRoutes } from "./server/apiRoutes.ts";
+import { registerRoutes, validateToken } from "./server/apiRoutes.ts";
 import { getUserById, sendFriendRequest, acceptFriendRequest, getFriends, isFriend, getSystemConfig, updateSystemConfig, saveUser } from "./server/supabaseService.ts";
 import { pubClient, subClient, isRedisConfigured } from "./server/redis.ts";
 import { SystemConfig } from "./src/types.ts";
@@ -24,6 +24,7 @@ if (!process.env.STRIPE_SECRET_KEY) {
 }
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const MAX_ROOM_CAPACITY = 500;
 
 // Cloud Run URLs: https://<service>-<hash>-<region>.a.run.app
 const CLOUD_RUN_PATTERN = /^https:\/\/[a-z0-9-]+-[a-z0-9]+-[a-z]{2,4}\.a\.run\.app$/;
@@ -39,6 +40,9 @@ function isAllowedOrigin(origin: string | undefined): boolean {
   ].filter(Boolean);
   return explicit.includes(origin) || CLOUD_RUN_PATTERN.test(origin);
 }
+
+let httpServer: any;
+let io: Server;
 
 async function startServer() {
   logger.info('Starting with Stripe integration...');
@@ -99,8 +103,8 @@ async function startServer() {
 
   app.use(express.json());
 
-  const httpServer = createServer(app);
-  const io = new Server(httpServer, {
+  httpServer = createServer(app);
+  io = new Server(httpServer, {
     pingTimeout: 60000,
     pingInterval: 25000,
     cors: {
@@ -132,11 +136,15 @@ async function startServer() {
         await pubClient.ping();
         checks.redis = true;
       }
-    } catch (e) {}
+    } catch (e: any) {
+      logger.warn({ err: e.message }, 'Health check: Redis ping failed');
+    }
     try {
       await getSystemConfig();
       checks.supabase = true;
-    } catch (e) {}
+    } catch (e: any) {
+      logger.error({ err: e.message }, 'Health check: Supabase connection failed');
+    }
 
     const ok = checks.supabase; // Supabase is critical for auth/config
     res.status(ok ? 200 : 503).json({
@@ -190,7 +198,6 @@ async function startServer() {
       }
 
       // Exact hostname match — endsWith() is vulnerable to subdomain spoofing
-      // (e.g. "evildomain.googleapis.com" would pass an endsWith check).
       const allowedHostnames = new Set([
         'storage.googleapis.com',
         'gamesounds.xyz',
@@ -292,16 +299,16 @@ async function startServer() {
     const getRoom = (): string | undefined =>
       Array.from(socket.rooms).find(r => r !== socket.id);
 
-    const drainSpectatorQueue = (state: any, roomId: string) => {
+    const drainSpectatorQueue = (state: GameState, roomId: string) => {
       if (!state.spectatorQueue) state.spectatorQueue = [];
       const queue = state.spectatorQueue;
-      const drained: any[] = [];
+      const drained: typeof state.spectatorQueue = [];
       
       for (const queued of queue) {
         if (state.players.length >= state.maxPlayers) break;
         
         // Move from spectators list to players list
-        state.spectators = state.spectators.filter((s: any) => s.id !== queued.id);
+        state.spectators = state.spectators.filter(s => s.id !== queued.id);
         state.players.push({
           id: queued.id,
           name: queued.name,
@@ -327,14 +334,19 @@ async function startServer() {
         io.to(queued.id).emit("queueDrained");
       }
       
-      state.spectatorQueue = queue.filter((q: any) => !drained.find(d => d.id === q.id));
+      state.spectatorQueue = queue.filter(q => !drained.find(d => d.id === q.id));
       if (drained.length > 0) {
         engine.broadcastState(roomId);
       }
     };
 
-    socket.on("userConnected", async (userId) => {
-      const user = await getUserById(userId);
+    socket.on("userConnected", async ({ userId, token }: { userId: string, token: string }) => {
+      const user = await validateToken(token);
+      if (!user || user.id !== userId) {
+        socket.emit("error", "Unauthorized: User ID mismatch or invalid token.");
+        socket.disconnect();
+        return;
+      }
       if (user?.isBanned) {
         socket.emit("error", "Your account has been restricted.");
         socket.disconnect();
@@ -362,11 +374,17 @@ async function startServer() {
     });
 
     socket.on("joinRoom", async ({
-      roomId, name, userId, activeFrame, activePolicyStyle, activeVotingStyle,
+      roomId, name: rawName, userId, activeFrame, activePolicyStyle, activeVotingStyle,
       maxPlayers, actionTimer, mode, isSpectator, privacy, inviteCode, hostUserId,
     }) => {
       // Validation & Sanitisation
       if (typeof roomId !== 'string' || roomId.length < 1 || roomId.length > 40) return;
+      if (typeof rawName !== 'string') return;
+      if (userId && userId !== socket.data.userId) {
+        socket.emit("error", "Unauthorized: User ID mismatch.");
+        return;
+      }
+      const name = rawName.replace(/<[^>]*>/g, "").replace(/\0/g, "").substring(0, 32);
       if (!/^[a-zA-Z0-9 _\-'!?.]+$/.test(roomId)) {
         socket.emit('error', 'Room name contains invalid characters.');
         return;
@@ -382,6 +400,10 @@ async function startServer() {
       }
 
       let state = engine.rooms.get(roomId);
+      if (!state && engine.rooms.size >= MAX_ROOM_CAPACITY) {
+        socket.emit('error', 'Server at capacity. Too many active rooms.');
+        return;
+      }
 
       if (!state) {
         if (currentConfig.maintenanceMode && !user?.isAdmin) {
@@ -492,8 +514,6 @@ async function startServer() {
         }
 
         // Lobby-phase reconnect: player refreshed tab or briefly disconnected
-        // while in the waiting room. Update their socket ID so later events
-        // (toggleReady etc.) can find them by socket.id correctly.
         if (!isSpectator && state.phase === "Lobby" && userId) {
           const existingLobbyPlayer = state.players.find(p => p.userId === userId && !p.isAI);
           if (existingLobbyPlayer) {
@@ -537,7 +557,6 @@ async function startServer() {
       }
 
       if (state.phase !== "Lobby") {
-        // Non-disconnected player trying to join an in-progress game
         socket.emit("error", "Game already in progress.");
         return;
       }
@@ -560,9 +579,7 @@ async function startServer() {
         for (const friend of friends) {
           const friendSocketId = userSockets.get(friend.id);
           if (friendSocketId) {
-            // Tell friend this user is online and in this room
             io.to(friendSocketId).emit("userStatusChanged", { userId, isOnline: true, roomId });
-            // Tell this user which room the friend is in (if any)
             let friendRoomId: string | undefined;
             for (const [rId, state] of engine.rooms.entries()) {
               if (state.players.some(p => p.userId === friend.id && !p.isDisconnected)) {
@@ -703,9 +720,7 @@ async function startServer() {
       player.vote = vote;
 
       if (state.players.filter(p => p.isAlive && p.id !== state.detainedPlayerId && !p.vote).length === 0) {
-        const jaVotes = state.players.filter(p => p.vote === "Aye").length;
-        const neinVotes = state.players.filter(p => p.vote === "Nay").length;
-        engine.handleVoteResult(state, roomId, jaVotes, neinVotes);
+        engine.handleVoteResult(state, roomId);
       } else {
         engine.broadcastState(roomId);
         engine.processAITurns(roomId);
@@ -743,7 +758,6 @@ async function startServer() {
         );
         if (alreadyDeclared) return;
 
-        // Remove any existing declaration of the same title (President/Chancellor)
         state.declarations = state.declarations.filter(d => d.type !== data.type);
 
         state.declarations.push({
@@ -838,13 +852,7 @@ async function startServer() {
         return;
       }
 
-      // Strip HTML tags and null bytes before storing — defense in depth
-      // against stored XSS if rendering ever changes from JSX to innerHTML.
-      const sanitized = text
-        .replace(/<[^>]*>/g, "")   // strip any HTML tags
-        .replace(/\0/g, "")        // strip null bytes
-        .trim();
-
+      const sanitized = text.replace(/<[^>]*>/g, "").replace(/\0/g, "").trim();
       if (sanitized.length === 0 || sanitized.length > 300) return;
 
       state.messages.push({ sender: player.name, text: sanitized, timestamp: Date.now() });
@@ -928,25 +936,20 @@ async function startServer() {
         p.alliances = undefined;
       });
 
-      // Drain the spectator queue into the lobby as players (up to maxPlayers)
       drainSpectatorQueue(state, roomId);
-
       engine.broadcastState(roomId);
     });
 
-    // Spectator queue join
     socket.on("joinQueue", (data: { name: string; userId?: string; avatarUrl?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string }) => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state) return;
-      // Only spectators can queue
       if (!state.spectators.find(s => s.id === socket.id)) return;
-      // Don't double-add
       if (state.spectatorQueue.find(q => q.id === socket.id)) return;
       state.spectatorQueue.push({ 
         id: socket.id, 
-        name: data.name, 
+        name: (data.name || "").replace(/<[^>]*>/g, "").replace(/\0/g, "").substring(0, 32), 
         userId: data.userId, 
         avatarUrl: data.avatarUrl,
         activeFrame: data.activeFrame, 
@@ -954,15 +957,12 @@ async function startServer() {
         activeVotingStyle: data.activeVotingStyle 
       });
       
-      // If in lobby, try to drain immediately
       if (state.phase === "Lobby") {
         drainSpectatorQueue(state, roomId);
       }
-      
       engine.broadcastState(roomId);
     });
 
-    // Spectator queue leave
     socket.on("leaveQueue", () => {
       const roomId = getRoom();
       if (!roomId) return;
@@ -972,24 +972,18 @@ async function startServer() {
       engine.broadcastState(roomId);
     });
 
-    // ── Host Controls ─────────────────────────────────────────────────────
-
     socket.on("kickPlayer", (targetSocketId: string) => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state) return;
-      // Only host can kick
       const host = state.players.find(p => p.userId === state.hostUserId);
       if (!host || host.id !== socket.id) return;
-      // Can't kick yourself
       if (targetSocketId === socket.id) return;
       const target = state.players.find(p => p.id === targetSocketId);
       if (!target) return;
-      // Remove from room
       state.players = state.players.filter(p => p.id !== targetSocketId);
       state.log.push(`${target.name} was removed by the host.`);
-      if (state.log.length > 50) state.log.shift();
       io.to(targetSocketId).emit("kicked");
       engine.broadcastState(roomId);
     });
@@ -1003,7 +997,6 @@ async function startServer() {
       if (!host || host.id !== socket.id) return;
       state.isLocked = !state.isLocked;
       state.log.push(`Room ${state.isLocked ? "locked" : "unlocked"} by host.`);
-      if (state.log.length > 50) state.log.shift();
       engine.broadcastState(roomId);
     });
 
@@ -1024,7 +1017,6 @@ async function startServer() {
         return;
       }
       state.log.push("Host started the game.");
-      if (state.log.length > 50) state.log.shift();
       if (state.mode === 'Ranked') {
         engine.startGame(roomId);
       } else {
@@ -1054,58 +1046,32 @@ async function startServer() {
       });
     });
 
-    // ── Admin Tools ────────────────────────────────────────────────────────
-
     socket.on("adminDeleteRoom", async (roomId: string) => {
       if (!socket.data.userId) return;
       const user = await getUserById(socket.data.userId);
-      if (!user || !user.isAdmin) {
-        socket.emit("error", "Unauthorized: Admin privileges required.");
-        return;
-      }
+      if (!user || !user.isAdmin) return;
 
       const state = engine.rooms.get(roomId);
       if (state) {
         state.log.push("This room has been terminated by an administrator.");
-        if (state.log.length > 50) state.log.shift();
         engine.broadcastState(roomId);
-        
-        // Give players a moment to see the message before closing
         setTimeout(() => {
           io.to(roomId).emit("kicked");
           engine.deleteRoom(roomId);
           logger.info({ admin: user.username, roomId }, 'Admin deleted room');
-          io.emit("adminBroadcast", {
-            message: `Admin closed room: ${roomId}`,
-            sender: "System",
-            timestamp: Date.now()
-          });
+          io.emit("adminBroadcast", { message: `Admin closed room: ${roomId}`, sender: "System", timestamp: Date.now() });
         }, 2000);
       } else {
-        // Cleanup Redis even if not in memory
         engine.deleteRoom(roomId);
         logger.info({ admin: user.username, roomId }, 'Admin deleted room (cleanup)');
-        io.emit("adminBroadcast", {
-          message: `Admin closed room: ${roomId}`,
-          sender: "System",
-          timestamp: Date.now()
-        });
       }
     });
 
     socket.on("adminBroadcast", async (message: string) => {
       if (!socket.data.userId) return;
       const user = await getUserById(socket.data.userId);
-      if (!user || !user.isAdmin) {
-        socket.emit("error", "Unauthorized: Admin privileges required.");
-        return;
-      }
-
-      io.emit("adminBroadcast", { 
-        message, 
-        sender: user.username,
-        timestamp: Date.now()
-      });
+      if (!user || !user.isAdmin) return;
+      io.emit("adminBroadcast", { message, sender: user.username, timestamp: Date.now() });
       logger.info({ admin: user.username, message }, 'Admin broadcast');
     });
 
@@ -1117,67 +1083,31 @@ async function startServer() {
       const targetUser = await getUserById(data.userId);
       if (!targetUser) return;
 
-      // Apply updates
-      if (data.updates.stats) {
-        targetUser.stats = { ...targetUser.stats, ...data.updates.stats };
-      }
-      if (typeof data.updates.cabinetPoints === 'number') {
-        targetUser.cabinetPoints = data.updates.cabinetPoints;
-      }
-      if (typeof data.updates.isBanned === 'boolean') {
-        targetUser.isBanned = data.updates.isBanned;
-      }
+      if (data.updates.stats) targetUser.stats = { ...targetUser.stats, ...data.updates.stats };
+      if (typeof data.updates.cabinetPoints === 'number') targetUser.cabinetPoints = data.updates.cabinetPoints;
+      if (typeof data.updates.isBanned === 'boolean') targetUser.isBanned = data.updates.isBanned;
 
       await saveUser(targetUser);
-      
-      // Notify target if online
       const targetSocketId = userSockets.get(data.userId);
       if (targetSocketId) {
         io.to(targetSocketId).emit("userUpdate", targetUser);
-        if (targetUser.isBanned) {
-          io.to(targetSocketId).emit("kicked", "Your account has been restricted.");
-        }
+        if (targetUser.isBanned) io.to(targetSocketId).emit("kicked", "Your account has been restricted.");
       }
-      logger.info({ admin: admin.username, targetUser: targetUser.username, updates: data.updates }, 'Admin updated user');
     });
 
     socket.on("adminUpdateConfig", async (config: Partial<SystemConfig>) => {
       if (!socket.data.userId) return;
       const admin = await getUserById(socket.data.userId);
       if (!admin || !admin.isAdmin) return;
-
       currentConfig = await updateSystemConfig(config);
       io.emit("adminConfigUpdate", currentConfig);
-      logger.info({ admin: admin.username, config }, 'Admin updated system config');
-
-      if (config.maintenanceMode) {
-        io.emit("adminBroadcast", {
-          message: "The server is entering maintenance mode. New rooms cannot be created.",
-          sender: "System",
-          timestamp: Date.now()
-        });
-      }
     });
-
-    socket.on("adminGetChatLogs", async (roomId: string) => {
-      if (!socket.data.userId) return;
-      const admin = await getUserById(socket.data.userId);
-      if (!admin || !admin.isAdmin) return;
-
-      const state = engine.rooms.get(roomId);
-      if (state) {
-        socket.emit("adminChatLogs", { roomId, logs: state.messages });
-      }
-    });
-
 
     socket.on("adminClearRedis", async () => {
       if (!socket.data.userId) return;
       const admin = await getUserById(socket.data.userId);
       if (!admin || !admin.isAdmin) return;
-
       await engine.clearAllRedisRooms();
-      logger.info({ admin: admin.username }, 'Admin purged all Redis room data');
       socket.emit("adminClearRedisSuccess", "Successfully purged all Redis room state.");
     });
 
@@ -1189,9 +1119,7 @@ async function startServer() {
           const friends = await getFriends(userId);
           for (const friend of friends) {
             const friendSocketId = userSockets.get(friend.id);
-            if (friendSocketId) {
-              io.to(friendSocketId).emit("userStatusChanged", { userId, isOnline: false });
-            }
+            if (friendSocketId) io.to(friendSocketId).emit("userStatusChanged", { userId, isOnline: false });
           }
         }
       }
@@ -1202,39 +1130,47 @@ async function startServer() {
   });
 
   if (process.env.NODE_ENV !== "production") {
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
+    const vite = await createViteServer({ server: { middlewareMode: true }, appType: "spa" });
     app.use(vite.middlewares);
   } else {
-    // Serve static files from the dist directory
     app.use(express.static("dist", {
       setHeaders: (res, filePath) => {
-        // Set long-term cache for hashed assets in the assets/ directory
-        if (filePath.includes(path.join("dist", "assets"))) {
-          res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
-        } else if (filePath.endsWith("index.html") || filePath.endsWith("sw.js") || filePath.endsWith("manifest.json")) {
-          // Never cache the entry points or service worker to ensure immediate updates upon redeploy
-          res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
-        }
+        if (filePath.includes(path.join("dist", "assets"))) res.setHeader("Cache-Control", "public, max-age=31536000, immutable");
+        else if (filePath.endsWith("index.html") || filePath.endsWith("sw.js") || filePath.endsWith("manifest.json")) res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
       }
     }));
-
-    app.get('/version', (req, res) => {
-      res.json({ version: 'v0.9.9' });
-    });
-
     app.get("*", (_req, res) => {
-      // Set no-cache for index.html as well (fallback route)
       res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, proxy-revalidate");
       res.sendFile(path.resolve("dist", "index.html"));
     });
   }
 
   httpServer.listen(PORT, "0.0.0.0", () => {
-    logger.info({ port: PORT }, 'Server running');
+    logger.info({ port: PORT }, "Server running");
   });
+}
+
+process.on("SIGTERM", gracefulShutdown);
+process.on("SIGINT", gracefulShutdown);
+
+async function gracefulShutdown() {
+  logger.info("Termination signal received: starting graceful shutdown");
+  if (io) {
+    io.emit("serverRestarting", "Server is undergoing maintenance or starting a new version. Reconnecting in 5s!");
+    io.close();
+  }
+  if (httpServer) {
+    httpServer.close(() => {
+      logger.info("HTTP server closed");
+      process.exit(0);
+    });
+  } else {
+    process.exit(0);
+  }
+  setTimeout(() => {
+    logger.warn("Graceful shutdown timed out, forcing exit");
+    process.exit(1);
+  }, 10000);
 }
 
 startServer();

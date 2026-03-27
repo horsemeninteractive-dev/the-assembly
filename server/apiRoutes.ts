@@ -9,7 +9,7 @@ import { GameEngine } from "./gameEngine.ts";
 import rateLimit from "express-rate-limit";
 import { GameState, RoomInfo, UserInternal } from "../src/types.ts";
 import nodemailer from "nodemailer";
-import { DEFAULT_ITEMS } from "../src/constants.ts";
+import { DEFAULT_ITEMS } from "../src/sharedConstants.ts";
 import {
   getUser,
   getUserById,
@@ -97,7 +97,7 @@ function htmlEscape(str: string): string {
     .replace(/>/g, "&gt;");
 }
 
-async function validateToken(token: string): Promise<UserInternal | null> {
+export async function validateToken(token: string): Promise<UserInternal | null> {
   if (!token) return null;
   try {
     const decoded = jwt.verify(token, JWT_SECRET!) as { userId: string; tokenVersion?: number };
@@ -138,58 +138,79 @@ function getErrorMessage(err: unknown): string {
 
 function oauthSuccessPage(user: UserInternal, token: string, platform: string = 'web'): string {
   const targetOrigin = process.env.APP_URL || "https://theassembly.web.app";
-
-  // Never interpolate user data or tokens directly into a <script> block —
-  // a crafted username like </script><script>evil()// would break out of the
-  // script context. Instead, store everything in HTML-escaped data attributes
-  // and read them from JS via getAttribute(), which is injection-safe.
   const safeUser   = htmlEscape(JSON.stringify(user));
   const safeToken  = htmlEscape(token);
   const safeOrigin = htmlEscape(targetOrigin);
   const safePlatform = htmlEscape(platform);
 
   return `<!DOCTYPE html>
-<html><body>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Authentication Success</title>
+  <style>
+    body { background: #0a0a0a; margin: 0; padding: 0; }
+    .container { display: flex; flex-direction: column; align-items: center; margin-top: 20vh; font-family: sans-serif; color: white; }
+  </style>
+</head>
+<body>
 <div id="d"
   data-user="${safeUser}"
   data-token="${safeToken}"
   data-origin="${safeOrigin}"
   data-platform="${safePlatform}"
 ></div>
+
+<div class="container" id="container">
+  <p>Authentication successful. Redirecting...</p>
+</div>
+
 <script>
-  var el       = document.getElementById('d');
-  var user     = JSON.parse(el.getAttribute('data-user'));
-  var token    = el.getAttribute('data-token');
-  var origin   = el.getAttribute('data-origin');
+(function() {
+  var el = document.getElementById('d');
+  var userStr = el.getAttribute('data-user');
+  var user = JSON.parse(userStr);
+  var token = el.getAttribute('data-token');
+  var origin = el.getAttribute('data-origin');
   var platform = el.getAttribute('data-platform');
+  var container = document.getElementById('container');
+  
+  var redirectParams = '?token=' + encodeURIComponent(token) + '&user=' + encodeURIComponent(userStr);
   
   if (platform === 'android') {
-    // Attempt standard custom scheme and intent fallback for Android
-    var redirectParams = '?token=' + encodeURIComponent(token) + '&user=' + encodeURIComponent(JSON.stringify(user));
-    window.location.href = 'intent://auth' + redirectParams + '#Intent;scheme=theassembly;package=com.horsemeninteractive.theassembly;end';
-    // Fallback if intent isn't supported immediately (e.g. non-Chrome browsers)
+    var intentLink = 'intent://auth' + redirectParams + '#Intent;scheme=theassembly;package=com.horsemeninteractive.theassembly;end';
+    window.location.href = intentLink;
     setTimeout(function() {
       window.location.href = 'theassembly://auth' + redirectParams;
     }, 500);
+
+    var p = document.createElement('p');
+    p.style.marginTop = '40px';
+    p.style.color = '#888';
+    p.style.fontSize = '14px';
+    p.textContent = 'If you are not redirected automatically:';
+    container.appendChild(p);
+
+    var a = document.createElement('a');
+    a.href = intentLink;
+    a.style.marginTop = '15px';
+    a.style.padding = '12px 24px';
+    a.style.background = '#2563eb';
+    a.style.color = 'white';
+    a.style.textDecoration = 'none';
+    a.style.borderRadius = '6px';
+    a.style.fontWeight = 'bold';
+    a.textContent = 'Return to The Assembly';
+    container.appendChild(a);
   } else if (window.opener) {
     window.opener.postMessage({ type: 'OAUTH_AUTH_SUCCESS', user: user, token: token }, origin);
     window.close();
   } else {
-    window.location.href = '/?token=' + encodeURIComponent(token) + '&user=' + encodeURIComponent(JSON.stringify(user));
+    window.location.href = '/?token=' + encodeURIComponent(token) + '&user=' + encodeURIComponent(userStr);
   }
-<\/script>
-<div style="display:flex;flex-direction:column;align-items:center;margin-top:20vh;font-family:sans-serif;color:white;background:#0a0a0a;">
-  <p>Authentication successful. Redirecting...</p>
-  <script>
-    if (platform === 'android') {
-      var intentLink = 'intent://auth' + redirectParams + '#Intent;scheme=theassembly;package=com.horsemeninteractive.theassembly;end';
-      document.write('<p style="margin-top:40px;color:#888;font-size:14px;">If you are not redirected automatically:</p>');
-      document.write('<a href="' + intentLink + '" style="margin-top:15px;padding:12px 24px;background:#2563eb;color:white;text-decoration:none;border-radius:6px;font-weight:bold;">Return to The Assembly</a>');
-    }
-  </script>
-</div>
+})();
+</script>
 </body>
-<style>body { background: #0a0a0a; }</style>
 </html>`;
 }
 

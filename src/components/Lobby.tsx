@@ -8,7 +8,7 @@ import { getFrameStyles } from '../lib/cosmetics';
 import { LeaderboardModal } from './game/modals/LeaderboardModal';
 import { HowToPlayModal } from './HowToPlayModal';
 import { CreditsModal } from './game/modals/CreditsModal';
-import { CLIENT_VERSION } from '../constants';
+import { CLIENT_VERSION } from '../sharedConstants';
 
 
 interface LobbyProps {

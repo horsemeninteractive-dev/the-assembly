@@ -68,6 +68,17 @@ export const SOUND_PACKS: Record<string, Record<string, string>> = {
     // Team-specific win sounds
     'win_civil':       `${BASE}/Retro%20Sounds%201/pickup3.ogg`,
     'win_state':       `${BASE}/Retro%20Sounds%201/pickup2.ogg`,
+    'reveal_civil':    `${BASE}/Retro%20Sounds%201/laser6.ogg`,
+    'reveal_state':    `${BASE}/Retro%20Sounds%201/laser7.ogg`,
+    // Missing UI sounds fallback or thematic retro equivalents
+    'hover':           `${BASE}/Retro%20Sounds%201/laser2.ogg`,
+    'stamp_aye':       `${BASE}/Retro%20Sounds%201/pickup1.ogg`,
+    'stamp_nay':       `${BASE}/Retro%20Sounds%201/lose2.ogg`,
+    'paper_slide':     `${BASE}/Retro%20Sounds%201/laser3.ogg`,
+    'gavel':           `${BASE}/Retro%20Sounds%201/laser4.ogg`,
+    'modal_open':      `${BASE}/Retro%20Sounds%202/coin2.ogg`,
+    'modal_close':     `${BASE}/Retro%20Sounds%202/coin3.ogg`,
+    'searching':       `${BASE}/Retro%20Sounds%202/coin4.ogg`,
   },
 
   // ─── Industrial ───────────────────────────────────────────────────────────
@@ -88,6 +99,17 @@ export const SOUND_PACKS: Record<string, Record<string, string>> = {
     // Team-specific win sounds
     'win_civil':       `${BASE}/Interface%20Sounds/maximize_001.ogg`,
     'win_state':       `${BASE}/Interface%20Sounds/maximize_002.ogg`,
+    'reveal_civil':    `${BASE}/Interface%20Sounds/maximize_004.ogg`,
+    'reveal_state':    `${BASE}/Interface%20Sounds/maximize_005.ogg`,
+    // Missing UI sounds fallback or thematic industrial equivalents
+    'hover':           `${BASE}/Impact%20Sounds/impactGeneric_light_001.ogg`,
+    'stamp_aye':       `${BASE}/Impact%20Sounds/impactGeneric_heavy_000.ogg`,
+    'stamp_nay':       `${BASE}/Impact%20Sounds/impactGeneric_heavy_001.ogg`,
+    'paper_slide':     `${BASE}/Impact%20Sounds/impactGeneric_light_004.ogg`,
+    'gavel':           `${BASE}/Impact%20Sounds/impactMetal_heavy_000.ogg`,
+    'modal_open':      `${BASE}/Interface%20Sounds/maximize_003.ogg`,
+    'modal_close':     `${BASE}/Interface%20Sounds/minimize_003.ogg`,
+    'searching':       `${BASE}/Impact%20Sounds/impactGeneric_light_002.ogg`,
   },
 
 };

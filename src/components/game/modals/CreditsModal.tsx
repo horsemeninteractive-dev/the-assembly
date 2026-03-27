@@ -2,7 +2,7 @@ import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Shield, Globe, Award, Code, Palette, Heart, Lock } from 'lucide-react';
 import { getProxiedUrl } from '../../../lib/utils';
-import { CLIENT_VERSION } from '../../../constants';
+import { CLIENT_VERSION } from '../../../sharedConstants';
 
 interface CreditsModalProps {
   onClose: () => void;
@@ -64,10 +64,6 @@ export const CreditsModal: React.FC<CreditsModalProps> = ({ onClose, playSound }
               <div className="flex items-center justify-center gap-4 mt-4">
                 <a href="https://horsemen-interactive.web.app/" target="_blank" rel="noopener noreferrer" className="text-red-500 hover:text-red-400 text-xs font-mono uppercase tracking-widest flex items-center gap-1">
                   <Globe className="w-3.5 h-3.5" /> Website
-                </a>
-                <div className="w-1 h-1 bg-subtle rounded-full" />
-                <a href="#" className="text-red-500 hover:text-red-400 text-xs font-mono uppercase tracking-widest flex items-center gap-1">
-                  <Award className="w-3.5 h-3.5" /> Studios
                 </a>
               </div>
             </div>

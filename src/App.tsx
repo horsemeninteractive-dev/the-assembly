@@ -14,7 +14,8 @@ import { TutorialModal } from './components/TutorialModal';
 import { MUSIC_TRACKS, SOUND_PACKS } from './lib/audio';
 import { DiscordSDK } from "@discord/embedded-app-sdk";
 import { discordSdk, setupDiscordSdk } from './lib/discord';
-import { DISCORD_CLIENT_ID, CLIENT_VERSION } from './constants';
+import { DISCORD_CLIENT_ID } from './constants';
+import { CLIENT_VERSION } from './sharedConstants';
 import { cn, getProxiedUrl, apiUrl } from './lib/utils';
 import { PurchaseCPModal } from './components/PurchaseCPModal';
 import { App as CapApp } from '@capacitor/app';
@@ -84,8 +85,11 @@ export default function App() {
           setIsDiscord(true);
           console.log("Discord instance detected, attempting auto-login...");
           try {
+            const clientId = DISCORD_CLIENT_ID;
+            if (!clientId) throw new Error("Discord client ID not set");
+            
             const { code } = await discordSdk!.commands.authorize({
-              client_id: DISCORD_CLIENT_ID,
+              client_id: clientId,
               response_type: "code",
               state: "",
               prompt: "none",
@@ -137,7 +141,7 @@ export default function App() {
         if (currentUser && currentToken) {
           setUser(currentUser);
           setToken(currentToken);
-          socket.emit('userConnected', currentUser.id);
+          socket.emit('userConnected', { userId: currentUser.id, token: currentToken });
 
           // If in Discord, auto-join room and bypass "Enter" screen
           if (instanceId) {
@@ -399,7 +403,7 @@ export default function App() {
     setUser(userData);
     setToken(authToken);
     localStorage.setItem('token', authToken);
-    socket.emit('userConnected', userData.id);
+    socket.emit('userConnected', { userId: userData.id, token: authToken });
     try {
       if (document.documentElement.requestFullscreen) {
         document.documentElement.requestFullscreen()

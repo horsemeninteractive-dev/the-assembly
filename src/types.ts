@@ -389,7 +389,7 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
-  userConnected: (userId: string) => void;
+  userConnected: (data: { userId: string, token: string }) => void;
   joinRoom: (data: { roomId: string; name: string; userId?: string; activeFrame?: string; activePolicyStyle?: string; activeVotingStyle?: string; maxPlayers?: number; actionTimer?: number; mode?: GameMode; isSpectator?: boolean; privacy?: RoomPrivacy; inviteCode?: string }) => void;
   leaveRoom: () => void;
   playAgain: () => void;

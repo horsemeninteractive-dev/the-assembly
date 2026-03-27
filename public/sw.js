@@ -1,4 +1,4 @@
-const CACHE_NAME = 'assembly-v0.9.8-' + Date.now(); // Dynamic cache name to force update on redeploy
+const CACHE_NAME = 'assembly-v0.9.9'; // Bump manually on asset changes to invalidate cache
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

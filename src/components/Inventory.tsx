@@ -3,7 +3,7 @@ import { cn, getProxiedUrl } from '../lib/utils';
 import { CosmeticItem, User } from '../types';
 import { Play, Pause, User as UserIcon, Scroll } from 'lucide-react';
 import { getPolicyStyles, getVoteStyles, getFrameStyles, getRarity } from '../lib/cosmetics';
-import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../constants';
+import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../sharedConstants';
 import { getLevelFromXp } from '../lib/xp';
 
 interface InventoryProps {

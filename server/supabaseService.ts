@@ -1,5 +1,4 @@
 import { randomUUID } from "crypto";
-import { appendFileSync } from "fs";
 import { supabase, isSupabaseConfigured } from "../src/lib/supabase.ts";
 import { supabaseAdmin, isSupabaseAdminConfigured } from "./supabaseAdmin.ts";
 import { User, UserInternal, MatchSummary, SystemConfig } from "../src/types.ts";
@@ -122,19 +121,7 @@ export async function getGlobalStats(): Promise<{ civilWins: number; stateWins: 
 
 export async function incrementGlobalWin(faction: 'Civil' | 'State'): Promise<void> {
   if (isConfigured) {
-    const column = faction === 'Civil' ? 'civil_wins' : 'state_wins';
-    const { data, error } = await db
-      .from("global_stats")
-      .select(column)
-      .eq("id", 1)
-      .single();
-    
-    if (data) {
-        await db
-          .from("global_stats")
-          .update({ [column]: data[column] + 1 })
-          .eq("id", 1);
-    }
+    await db.rpc('increment_global_win', { faction });
   }
 }
 
@@ -379,8 +366,7 @@ export async function searchUsers(query: string, currentUserId: string, limit = 
       .neq("id", currentUserId)
       .limit(limit);
     
-    const logMsg = `[AdminSearch] Simple Query: username ILIKE %${query}%, Results: ${data?.length || 0}, Error: ${JSON.stringify(error)}\n`;
-    try { appendFileSync('./admin_debug.log', logMsg); } catch(e) {}
+
 
     if (error) return [];
     return (data || []).map(mapSupabaseToUser).filter((u: UserInternal | null): u is UserInternal => u !== null);

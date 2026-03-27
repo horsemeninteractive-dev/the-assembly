@@ -928,7 +928,7 @@ export class GameEngine {
   }
 
   /** Public alias used by server.ts vote handler */
-  handleVoteResult(s: GameState, roomId: string, aye: number, nay: number): void {
+  handleVoteResult(s: GameState, roomId: string): void {
     this.tallyVotes(s, roomId);
   }
 
@@ -1040,7 +1040,7 @@ export class GameEngine {
 
     setTimeout(async () => {
       const st = this.rooms.get(roomId);
-      if (!st || st.isPaused) return;
+      if (!st || st.isPaused || st.phase === 'GameOver') return;
 
       if (policy === "Civil") {
         st.civilDirectives++;
@@ -1642,6 +1642,8 @@ export class GameEngine {
       const vetoChancellor = s.players.find(p => p.isChancellor);
       if (vetoChancellor) vetoChancellor.hasActed = false;
       addLog(s, `${player.name} (President) denied the Veto. Chancellor must enact a directive.`);
+      this.startActionTimer(roomId);
+      this.scheduleAITurns(s, roomId);
       this.broadcastState(roomId);
     }
   }
