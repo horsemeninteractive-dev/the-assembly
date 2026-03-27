@@ -1417,12 +1417,20 @@ export class GameEngine {
       const speaker = p?.isAI ? p : c?.isAI ? c : null;
       if (speaker) {
         setTimeout(() => {
-          if (s.isPaused) return;
+          const st = this.rooms.get(roomId);
+          if (!st || st.isPaused) return;
+
           const type = speaker.isPresident ? 'President' : 'Chancellor';
-          const lines = type === 'Chancellor'
-            ? speaker.role === 'Civil' ? CHAT.chanCivilStateEnacted : CHAT.chanStateStateEnacted
-            : speaker.role === 'Civil' ? CHAT.presCivilStateEnacted : CHAT.presStateStateEnacted;
-          this.postAIChat(s, speaker, lines);
+          const lines =
+            type === 'Chancellor'
+              ? speaker.role === 'Civil'
+                ? CHAT.chanCivilStateEnacted
+                : CHAT.chanStateStateEnacted
+              : speaker.role === 'Civil'
+                ? CHAT.presCivilStateEnacted
+                : CHAT.presStateStateEnacted;
+
+          this.postAIChat(st, speaker, lines);
           this.broadcastState(roomId);
         }, 1200);
       }
@@ -1862,15 +1870,16 @@ export class GameEngine {
       }
       if (pres?.isAI && Math.random() > 0.3) {
         setTimeout(() => {
-          if (!s.isPaused) {
-            this.postAIChat(
-              s,
-              pres,
-              result === 'State' ? CHAT.investigateState : CHAT.investigateCivil,
-              target.name
-            );
-            this.broadcastState(roomId);
-          }
+          const st = this.rooms.get(roomId);
+          if (!st || st.isPaused) return;
+
+          this.postAIChat(
+            st,
+            pres,
+            result === 'State' ? CHAT.investigateState : CHAT.investigateCivil,
+            target.name
+          );
+          this.broadcastState(roomId);
         }, 1000);
       }
     }
@@ -1960,11 +1969,15 @@ export class GameEngine {
     addLog(s, `Game over: ${reason}`);
     this.clearActionTimer(roomId);
     await this.updateUserStats(s, winner);
-    await incrementGlobalWin(winner);
+    if (winner) await incrementGlobalWin(winner);
     this.broadcastState(roomId);
   }
 
-  async updateUserStats(s: GameState, winningSide: 'Civil' | 'State'): Promise<void> {
+  async updateUserStats(
+    s: GameState,
+    winningSide?: 'Civil' | 'State',
+    leaverId?: string
+  ): Promise<void> {
     const humanPlayers = s.players.filter((p) => !p.isAI && p.userId);
     if (humanPlayers.length === 0) return;
 
@@ -1977,7 +1990,6 @@ export class GameEngine {
     }
 
     const validUsers = Array.from(userMap.values());
-
     const now = new Date().toISOString();
 
     // Per-player results collected for socket emissions after saves
@@ -2013,121 +2025,118 @@ export class GameEngine {
       ? Math.round(stateElos.reduce((a, b) => a + b, 0) / stateElos.length)
       : 1000;
 
+    const isInconclusive = !winningSide;
+
     // ── Mutate all user records in memory ─────────────────────────────────
     for (const p of humanPlayers) {
       const user = userMap.get(p.userId!);
       if (!user) continue;
+
+      const isLeaver = isInconclusive && p.id === leaverId;
+      const won =
+        !isInconclusive &&
+        ((winningSide === 'Civil' && p.role === 'Civil') ||
+          (winningSide === 'State' && (p.role === 'State' || p.role === 'Overseer')));
+
       const oldXp = user.stats.xp;
       const oldIp = user.stats.points;
-
-      user.stats.gamesPlayed++;
-      if (p.role === 'Civil') user.stats.civilGames++;
-      else if (p.role === 'State') user.stats.stateGames++;
-      else if (p.role === 'Overseer') user.stats.overseerGames++;
-
-      const won =
-        (winningSide === 'Civil' && p.role === 'Civil') ||
-        (winningSide === 'State' && (p.role === 'State' || p.role === 'Overseer'));
-
-      if (won) {
-        if (p.role === 'Civil') user.stats.civilWins = (user.stats.civilWins ?? 0) + 1;
-        if (p.role === 'State') user.stats.stateWins = (user.stats.stateWins ?? 0) + 1;
-        if (p.role === 'Overseer') user.stats.overseerWins = (user.stats.overseerWins ?? 0) + 1;
-      }
-
-      const xpGain = calculateXpGain({
-        win: won,
-        kills: p.role === 'Overseer' ? p.stateEnactments || 0 : 0,
-      });
-      user.stats.xp += xpGain;
-
-      // Compute ELO delta here, before ELO is mutated, so eloBeforeCalc is accurate.
-      // opponentAvgElo is the average rating of the opposing team.
-      const opponentAvgElo = p.role === 'Civil' ? avgStateElo : avgCivilElo;
-      const eloChange =
-        s.mode === 'Ranked'
-          ? computeEloChange(user.stats.elo, opponentAvgElo, won, user.stats.gamesPlayed)
-          : 0;
-
-      if (won) {
-        user.stats.wins++;
-        user.stats.points += s.mode === 'Ranked' ? 100 : 40;
-      } else {
-        user.stats.losses++;
-        user.stats.points += s.mode === 'Ranked' ? 25 : 10;
-      }
-
-      // Per-mode counters for segmented leaderboards
-      if (s.mode === 'Ranked') {
-        user.stats.rankedGames = (user.stats.rankedGames ?? 0) + 1;
-        if (won) user.stats.rankedWins = (user.stats.rankedWins ?? 0) + 1;
-      } else if (s.mode === 'Classic') {
-        user.stats.classicGames = (user.stats.classicGames ?? 0) + 1;
-        if (won) user.stats.classicWins = (user.stats.classicWins ?? 0) + 1;
-      } else {
-        user.stats.casualGames = (user.stats.casualGames ?? 0) + 1;
-        if (won) user.stats.casualWins = (user.stats.casualWins ?? 0) + 1;
-      }
-
       const eloBeforeCalc = user.stats.elo;
-      if (s.mode === 'Ranked') {
-        user.stats.elo = Math.max(0, user.stats.elo + eloChange);
-      }
 
-      // Personal agenda
+      let eloChange = 0;
+      let xpEarned = 0;
+      let ipEarned = 0;
+      let cpEarned = 0;
       let agendaCompleted = false;
-      if (p.personalAgenda) {
-        const agendaDef = AGENDA_MAP.get(p.personalAgenda);
-        if (agendaDef) {
-          agendaCompleted = agendaDef.evaluate(s, p.id) === 'completed';
-          if (agendaCompleted) {
-            user.stats.xp += 100;
-            user.stats.points += s.mode === 'Ranked' ? 40 : 20;
-            user.stats.agendasCompleted++;
+      let newAchievementIds: string[] = [];
+      const opponentAvgElo = p.role === 'Civil' ? avgStateElo : avgCivilElo;
+
+      // --- Stat Mutation Logic ---
+      if (!isInconclusive) {
+        // Normal game end
+        user.stats.gamesPlayed++;
+        if (p.role === 'Civil') user.stats.civilGames++;
+        else if (p.role === 'State') user.stats.stateGames++;
+        else if (p.role === 'Overseer') user.stats.overseerGames++;
+
+        if (won) {
+          user.stats.wins++;
+          if (p.role === 'Civil') user.stats.civilWins = (user.stats.civilWins ?? 0) + 1;
+          if (p.role === 'State') user.stats.stateWins = (user.stats.stateWins ?? 0) + 1;
+          if (p.role === 'Overseer') user.stats.overseerWins = (user.stats.overseerWins ?? 0) + 1;
+        } else {
+          user.stats.losses++;
+        }
+
+        if (s.mode === 'Ranked') {
+          user.stats.rankedGames = (user.stats.rankedGames ?? 0) + 1;
+          if (won) user.stats.rankedWins = (user.stats.rankedWins ?? 0) + 1;
+          eloChange = computeEloChange(user.stats.elo, opponentAvgElo, won, user.stats.gamesPlayed);
+        } else if (s.mode === 'Classic') {
+          user.stats.classicGames = (user.stats.classicGames ?? 0) + 1;
+          if (won) user.stats.classicWins = (user.stats.classicWins ?? 0) + 1;
+        } else {
+          user.stats.casualGames = (user.stats.casualGames ?? 0) + 1;
+          if (won) user.stats.casualWins = (user.stats.casualWins ?? 0) + 1;
+        }
+
+        user.stats.elo = Math.max(0, user.stats.elo + eloChange);
+
+        const xpGain = calculateXpGain({
+          win: won,
+          kills: p.role === 'Overseer' ? p.stateEnactments || 0 : 0,
+        });
+
+        // Agenda
+        if (p.personalAgenda) {
+          const agendaDef = AGENDA_MAP.get(p.personalAgenda);
+          if (agendaDef) {
+            agendaCompleted = agendaDef.evaluate(s, p.id) === 'completed';
+            if (agendaCompleted) user.stats.agendasCompleted++;
           }
         }
-      }
 
-      // Achievements
-      const newAchievementIds = checkAchievements({ user, s, p, won, agendaCompleted });
-      let achievementXp = 0;
-      let achievementCp = 0;
-      if (newAchievementIds.length > 0) {
-        if (!user.earnedAchievements) user.earnedAchievements = [];
-        if (!user.pinnedAchievements) user.pinnedAchievements = [];
-        for (const id of newAchievementIds) {
-          user.earnedAchievements.push({ id, earnedAt: now });
-          const def = ACHIEVEMENT_MAP.get(id);
-          if (def) {
-            achievementXp += def.xpReward;
-            achievementCp += def.cpReward;
+        // Achievements
+        newAchievementIds = checkAchievements({ user, s, p, won, agendaCompleted });
+        let achievementXp = 0;
+        let achievementCp = 0;
+        if (newAchievementIds.length > 0) {
+          if (!user.earnedAchievements) user.earnedAchievements = [];
+          for (const id of newAchievementIds) {
+            user.earnedAchievements.push({ id, earnedAt: now });
+            const def = ACHIEVEMENT_MAP.get(id);
+            if (def) {
+              achievementXp += def.xpReward;
+              achievementCp += def.cpReward;
+            }
           }
+          user.cabinetPoints = (user.cabinetPoints ?? 0) + achievementCp;
         }
-        user.stats.xp += achievementXp;
-        user.cabinetPoints = (user.cabinetPoints ?? 0) + achievementCp;
+
+        const config = this.getConfig();
+        const xpMult = config.xpMultiplier || 1.0;
+        const ipMult = config.ipMultiplier || 1.0;
+
+        const baseIp = won ? (s.mode === 'Ranked' ? 100 : 40) : s.mode === 'Ranked' ? 25 : 10;
+        const agendaIp = agendaCompleted ? (s.mode === 'Ranked' ? 40 : 20) : 0;
+        const agendaXp = agendaCompleted ? 100 : 0;
+
+        xpEarned = Math.floor((xpGain + agendaXp + achievementXp) * xpMult);
+        ipEarned = Math.floor((baseIp + agendaIp) * ipMult);
+        cpEarned = achievementCp;
+
+        user.stats.xp = oldXp + xpEarned;
+        user.stats.points = oldIp + ipEarned;
+      } else if (isLeaver) {
+        // Leaver penalty
+        user.stats.gamesPlayed++;
+        user.stats.losses++;
+        if (s.mode === 'Ranked') {
+          user.stats.rankedGames = (user.stats.rankedGames ?? 0) + 1;
+          eloChange = computeEloChange(user.stats.elo, opponentAvgElo, false, user.stats.gamesPlayed);
+          user.stats.elo = Math.max(0, user.stats.elo + eloChange);
+        }
+        // No XP, Points, or IP for leaver
       }
-
-      const config = this.getConfig();
-      const xpMult = config.xpMultiplier || 1.0;
-      const ipMult = config.ipMultiplier || 1.0;
-
-      const baseIp = won ? (s.mode === 'Ranked' ? 100 : 40) : s.mode === 'Ranked' ? 25 : 10;
-      const agendaIp = agendaCompleted ? (s.mode === 'Ranked' ? 40 : 20) : 0;
-      const agendaXp = agendaCompleted ? 100 : 0;
-
-      const totalMatchXp = Math.floor((xpGain + agendaXp + achievementXp) * xpMult);
-      const totalMatchIp = Math.floor((baseIp + agendaIp) * ipMult);
-
-      // We already added raw xpGain/points/achievementXp to user stats above,
-      // but we need to adjust them for the multiplier.
-      // Re-calculating the final state values:
-      user.stats.xp = oldXp + totalMatchXp;
-      user.stats.points = oldIp + totalMatchIp;
-
-      const eloAfter = user.stats.elo;
-      const xpEarned = totalMatchXp;
-      const ipEarned = totalMatchIp;
-      const cpEarned = achievementCp;
 
       results.push({
         playerId: p.id,
@@ -2165,6 +2174,7 @@ export class GameEngine {
           cpEarned,
         },
       });
+
     }
 
     // ── Recently Played With — computed from in-memory records, no re-fetch ─
@@ -2342,7 +2352,7 @@ export class GameEngine {
     this.pauseTimers.set(roomId, iv);
   }
 
-  handleLeave(socket: Socket, roomId: string, isIntentional: boolean = false): void {
+  async handleLeave(socket: Socket, roomId: string, isIntentional: boolean = false): Promise<void> {
     const state = this.rooms.get(roomId);
     if (!state) return;
 
@@ -2373,6 +2383,7 @@ export class GameEngine {
               state.winner = undefined;
               state.isPaused = false;
               const msg = `${player.name} has left the game. Match ended as inconclusive.`;
+              state.winReason = msg;
               addLog(state, msg);
               state.messages.push({
                 sender: 'System',
@@ -2380,6 +2391,7 @@ export class GameEngine {
                 timestamp: Date.now(),
                 type: 'text',
               });
+              await this.updateUserStats(state, undefined, player.id);
             } else {
               // Casual: Replace with AI immediately
               const takenNames = new Set(state.players.map((p) => p.name.replace(' (AI)', '')));
@@ -2426,7 +2438,7 @@ export class GameEngine {
     }
   }
 
-  handlePauseTimeout(roomId: string): void {
+  async handlePauseTimeout(roomId: string): Promise<void> {
     const state = this.rooms.get(roomId);
     if (!state || !state.isPaused) return;
 
@@ -2441,8 +2453,10 @@ export class GameEngine {
       state.phase = 'GameOver';
       state.winner = undefined;
       const msg = `Game ended as inconclusive — ${player.name} failed to reconnect.`;
+      state.winReason = msg;
       addLog(state, msg);
       state.messages.push({ sender: 'System', text: msg, timestamp: Date.now(), type: 'text' });
+      await this.updateUserStats(state, undefined, player.id);
     } else {
       const takenNames = new Set(state.players.map((p) => p.name.replace(' (AI)', '')));
       const available = AI_BOTS.filter((b) => !takenNames.has(b.name));
