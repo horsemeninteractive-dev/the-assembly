@@ -2,6 +2,52 @@ import { CosmeticItem } from './types';
 
 export const CLIENT_VERSION = 'v0.9.9';
 
+export interface CPPackage {
+  id: string;
+  name: string;
+  cp: number;
+  price: number; // in cents for Stripe
+  displayPrice: string;
+  description: string;
+  popular?: boolean;
+}
+
+export const CP_PACKAGES: CPPackage[] = [
+  {
+    id: 'starter',
+    name: 'Starter Bundle',
+    cp: 500,
+    price: 499,
+    displayPrice: '$4.99',
+    description: 'Perfect for your first few cosmetic unlocks.',
+  },
+  {
+    id: 'pro',
+    name: 'Pro Pack',
+    cp: 1200,
+    price: 999,
+    displayPrice: '$9.99',
+    description: 'Most popular. Great value for serious players.',
+    popular: true,
+  },
+  {
+    id: 'elite',
+    name: 'Elite Vault',
+    cp: 3000,
+    price: 1999,
+    displayPrice: '$19.99',
+    description: 'Build your collection fast with this elite stash.',
+  },
+  {
+    id: 'master',
+    name: 'Assembly Master',
+    cp: 10000,
+    price: 4999,
+    displayPrice: '$49.99',
+    description: 'The ultimate reserve for true masters of the Assembly.',
+  },
+];
+
 export const DEFAULT_ITEMS: CosmeticItem[] = [
   // Defaults
   {

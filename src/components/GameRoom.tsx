@@ -445,14 +445,26 @@ export const GameRoom = ({
   // ── Voice chat ───────────────────────────────────────────────────────────
   const [isVoiceActive, setIsVoiceActive] = useState(false);
   const [isVideoActive, setIsVideoActive] = useState(false);
+  const lastSpokenMessageIndexRef = useRef(-1);
 
   useEffect(() => {
     aiSpeech.initVoices();
+    return () => {
+      // Stop speech when leaving room
+      aiSpeech.stop();
+    };
   }, []);
 
   useEffect(() => {
     if (!isAiVoiceEnabled) return;
-    const lastMessage = gameState.messages[gameState.messages.length - 1];
+    const msgCount = gameState.messages.length;
+    if (msgCount === 0) return;
+
+    // Only speak the message if it's new (not just a volume change)
+    if (msgCount - 1 <= lastSpokenMessageIndexRef.current) return;
+    lastSpokenMessageIndexRef.current = msgCount - 1;
+
+    const lastMessage = gameState.messages[msgCount - 1];
     if (!lastMessage) return;
 
     const sender = gameState.players.find((p) => p.name === lastMessage.sender);
@@ -463,13 +475,13 @@ export const GameRoom = ({
           lastMessage.text,
           sender.name,
           profile,
-          ttsVolume / 100, // Added ttsVolume
+          ttsVolume / 100,
           () => setSpeakingPlayers((prev4) => ({ ...prev4, [sender.id]: true })),
           () => setSpeakingPlayers((prev4) => ({ ...prev4, [sender.id]: false }))
         );
       }
     }
-  }, [gameState.messages.length, isAiVoiceEnabled, ttsEngine, soundVolume, ttsVolume]); // Added ttsVolume to dependency array
+  }, [gameState.messages.length, isAiVoiceEnabled, ttsEngine, soundVolume, ttsVolume]);
   const [localStream, setLocalStream] = useState<MediaStream | null>(null);
   const [remoteStreams, setRemoteStreams] = useState<Record<string, MediaStream>>({});
   const [speakingPlayers, setSpeakingPlayers] = useState<Record<string, boolean>>({});

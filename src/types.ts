@@ -392,6 +392,7 @@ export interface GameState {
     chanDeclaration?: { civ: number; sta: number };
     executiveAction?: string;
   }[];
+  averageElo?: number;
 }
 
 export interface ServerToClientEvents {
@@ -419,6 +420,7 @@ export interface ServerToClientEvents {
   adminConfigUpdate: (config: SystemConfig) => void;
   adminChatLogs: (data: { roomId: string; logs: any[] }) => void;
   adminClearRedisSuccess: (message: string) => void;
+  serverRestarting: (message: string) => void;
 }
 
 export interface ClientToServerEvents {

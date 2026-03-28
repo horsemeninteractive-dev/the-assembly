@@ -9,11 +9,13 @@ import { createAdapter } from '@socket.io/redis-adapter';
 import { createServer as createViteServer } from 'vite';
 import { randomUUID, randomBytes, createHash } from 'crypto';
 import fs from 'fs';
+import { z } from 'zod';
 
 import { User, GameState, Player } from './src/types.ts';
-import { createDeck } from './server/utils.ts';
+import { createDeck, isAllowedOrigin } from './server/utils.ts';
 import { GameEngine } from './server/gameEngine.ts';
 import { registerRoutes, validateToken } from './server/apiRoutes.ts';
+import { handleJoinRoom } from './server/handlers/joinRoomHandler.ts';
 import {
   getUserById,
   sendFriendRequest,
@@ -48,24 +50,15 @@ if (!process.env.EMAIL_USER) {
 if (!process.env.RESEND_API_KEY) {
   logger.info('[Config] RESEND_API_KEY not set — Resend integration is disabled.');
 }
-
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
 const MAX_ROOM_CAPACITY = 500;
 
-// Cloud Run URLs: https://<service>-<hash>-<region>.a.run.app
-const CLOUD_RUN_PATTERN = /^https:\/\/[a-z0-9-]+-[a-z0-9]+-[a-z]{2,4}\.a\.run\.app$/;
-
-function isAllowedOrigin(origin: string | undefined): boolean {
-  if (!origin) return false;
-  const explicit = [
-    process.env.APP_URL,
-    'https://theassembly.web.app',
-    'http://localhost:3000',
-    'http://localhost',
-    'capacitor://localhost',
-  ].filter(Boolean);
-  return explicit.includes(origin) || CLOUD_RUN_PATTERN.test(origin);
-}
+import {
+  statsSchema,
+  adminUpdateUserSchema,
+  joinRoomSchema,
+  joinQueueSchema,
+} from './server/schemas.ts';
 
 let httpServer: any;
 let io: Server;
@@ -104,18 +97,67 @@ async function startServer() {
     : ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://*.discord.com'];
 
   const app = express();
+  
+  // Generate a nonce for every request to allow specific inline styles/scripts without 'unsafe-inline'
+  app.use((_req, res, next) => {
+    res.locals.nonce = randomBytes(16).toString('base64');
+    next();
+  });
+
   app.use(
     helmet({
       contentSecurityPolicy: {
         directives: {
           defaultSrc: ["'self'", 'https://*.discord.com', 'https://*.discordapp.io'],
           scriptSrc,
-          styleSrc: ["'self'", "'unsafe-inline'", 'https://fonts.googleapis.com'],
+          styleSrc: [
+            "'self'",
+            'https://fonts.googleapis.com',
+            // In development, we keep unsafe-inline for Vite's HMR and Tailwind 4 JIT.
+            // In production, we use the nonce.
+            isProd ? (_req, res) => `'nonce-${(res as any).locals.nonce}'` : "'unsafe-inline'",
+          ],
           fontSrc: ["'self'", 'data:', 'https://fonts.gstatic.com'],
-          imgSrc: ["'self'", 'data:', 'blob:', '*'],
-          mediaSrc: ["'self'", 'blob:', 'data:', '*'],
-          connectSrc: ["'self'", '*'],
-          frameAncestors: ["'self'", 'https://discord.com', 'https://*.discord.com', 'https://*.discordapp.io'],
+          imgSrc: [
+            "'self'",
+            'data:',
+            'blob:',
+            'https://*.discord.com',
+            'https://*.discordapp.com',
+            'https://lh3.googleusercontent.com',
+            'https://api.dicebear.com',
+            'https://picsum.photos',
+            'https://i.pravatar.cc',
+            'https://images.unsplash.com',
+            'https://raw.githubusercontent.com',
+            'https://transparenttextures.com',
+            'https://www.transparenttextures.com',
+            'https://storage.googleapis.com',
+          ],
+          mediaSrc: [
+            "'self'",
+            'blob:',
+            'data:',
+            'https://gamesounds.xyz',
+            'https://cdn.discordapp.com',
+            'https://storage.googleapis.com',
+          ],
+          connectSrc: [
+            "'self'",
+            'https://*.supabase.co',
+            'https://theassembly.web.app',
+            'wss://theassembly.web.app',
+            'https://*.discord.com',
+            'wss://*.discord.com',
+            'https://*.stripe.com',
+            'https://*.googleapis.com',
+          ],
+          frameAncestors: [
+            "'self'",
+            'https://discord.com',
+            'https://*.discord.com',
+            'https://*.discordapp.io',
+          ],
         },
       },
       crossOriginEmbedderPolicy: { policy: 'credentialless' },
@@ -309,8 +351,17 @@ async function startServer() {
       res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
       res.setHeader('Access-Control-Allow-Origin', '*');
 
-      // Set cache headers for better performance
-      res.setHeader('Cache-Control', 'public, max-age=31536000');
+      // Set cache headers - static assets get 1 year, dynamic/avatars get 1 hour
+      const dynamicDomains = [
+        'api.dicebear.com',
+        'picsum.photos',
+        'i.pravatar.cc',
+        'cdn.discordapp.com',
+        'lh3.googleusercontent.com',
+        'discord.com',
+      ];
+      const isDynamic = dynamicDomains.some((d) => parsedUrl.hostname.includes(d));
+      res.setHeader('Cache-Control', isDynamic ? 'public, max-age=3600' : 'public, max-age=31536000');
 
       const arrayBuffer = await response.arrayBuffer();
       let body = Buffer.from(arrayBuffer);
@@ -444,238 +495,8 @@ async function startServer() {
       }
     });
 
-    socket.on(
-      'joinRoom',
-      async ({
-        roomId,
-        name: rawName,
-        userId,
-        activeFrame,
-        activePolicyStyle,
-        activeVotingStyle,
-        maxPlayers,
-        actionTimer,
-        mode,
-        isSpectator,
-        privacy,
-        inviteCode,
-      }) => {
-        // Validation & Sanitisation
-        if (typeof roomId !== 'string' || roomId.length < 1 || roomId.length > 40) return;
-        if (typeof rawName !== 'string') return;
-        if (userId && userId !== socket.data.userId) {
-          socket.emit('error', 'Unauthorized: User ID mismatch.');
-          return;
-        }
-        const name = rawName
-          .replace(/<[^>]*>/g, '')
-          .replace(/\0/g, '')
-          .substring(0, 32);
-        if (!/^[a-zA-Z0-9 _\-'!?.]+$/.test(roomId)) {
-          socket.emit('error', 'Room name contains invalid characters.');
-          return;
-        }
-
-        const safeMax = Math.max(5, Math.min(10, maxPlayers || 5));
-        const safeTimer =
-          actionTimer === 0 ? 0 : Math.max(30, Math.min(120, actionTimer || 60));
-        const user = userId ? await getUserById(userId) : null;
-        if (user?.isBanned) {
-          socket.emit('error', 'Your account has been restricted.');
-          socket.disconnect();
-          return;
-        }
-
-        let state = engine.rooms.get(roomId);
-        if (!state && engine.rooms.size >= MAX_ROOM_CAPACITY) {
-          socket.emit('error', 'Server at capacity. Too many active rooms.');
-          return;
-        }
-
-        if (!state) {
-          if (currentConfig.maintenanceMode && !user?.isAdmin) {
-            socket.emit(
-              'error',
-              'The server is currently undergoing maintenance. New rooms cannot be created at this time.'
-            );
-            return;
-          }
-          // Generating a 4-char invite code if private
-          const code =
-            privacy === 'private'
-              ? randomBytes(3).toString('hex').toUpperCase().slice(0, 6)
-              : undefined;
-          state = {
-            roomId,
-            players: [],
-            spectators: [],
-            spectatorQueue: [],
-            privacy: privacy || 'public',
-            inviteCode: code,
-            hostUserId: userId,
-            mode: mode || 'Ranked',
-            phase: 'Lobby',
-            civilDirectives: 0,
-            stateDirectives: 0,
-            electionTracker: 0,
-            deck: createDeck(),
-            discard: [],
-            drawnPolicies: [],
-            chancellorPolicies: [],
-            currentExecutiveAction: 'None',
-            log: [`Room ${roomId} created in ${mode || 'Ranked'} mode.`],
-            presidentIdx: 0,
-            lastPresidentIdx: -1,
-            maxPlayers: safeMax,
-            actionTimer: safeTimer,
-            messages: [],
-            round: 1,
-            vetoUnlocked: false,
-            vetoRequested: false,
-            declarations: [],
-          };
-          engine.rooms.set(roomId, state);
-        } else {
-          // Room exists — check reconnect FIRST before any privacy gate
-          // (disconnected player rejoining should never be blocked by privacy)
-          if (!isSpectator && state.phase !== 'Lobby') {
-            const existingPlayer = state.players.find((p) => p.userId === userId && !p.isAI);
-            if (existingPlayer) {
-              existingPlayer.socketId = socket.id;
-              existingPlayer.isDisconnected = false;
-
-              state.isPaused = false;
-              state.pauseReason = undefined;
-              state.pauseTimer = undefined;
-              state.log.push(`${existingPlayer.name} reconnected.`);
-              if (state.log.length > 50) state.log.shift();
-
-              // Join room BEFORE broadcast so the client receives the update
-              socket.join(roomId);
-              engine.broadcastState(roomId);
-              socket.to(roomId).emit('peerJoined', socket.id);
-              return;
-            }
-          }
-
-          // Lobby-phase reconnect: player refreshed tab or briefly disconnected
-          if (!isSpectator && state.phase === 'Lobby' && userId) {
-            const existingLobbyPlayer = state.players.find((p) => p.userId === userId && !p.isAI);
-            if (existingLobbyPlayer) {
-              existingLobbyPlayer.socketId = socket.id;
-              existingLobbyPlayer.name = name; // refresh display name too
-              socket.join(roomId);
-              state.log.push(`${name} rejoined the lobby.`);
-              engine.broadcastState(roomId);
-              socket.to(roomId).emit('peerJoined', socket.id);
-              return;
-            }
-          }
-
-          // Enforce privacy — applies to both players and spectators
-          if (state.privacy === 'private') {
-            if (state.inviteCode && inviteCode?.toUpperCase() !== state.inviteCode) {
-              socket.emit('error', 'Invalid invite code.');
-              return;
-            }
-          } else if (state.privacy === 'friends') {
-            if (state.hostUserId && userId && state.hostUserId !== userId) {
-              const areFriends = await isFriend(state.hostUserId, userId);
-              if (!areFriends) {
-                socket.emit(
-                  'error',
-                  isSpectator
-                    ? 'You must be friends with the host to spectate this room.'
-                    : 'This room is friends only.'
-                );
-                return;
-              }
-            }
-          }
-        }
-
-        if (isSpectator) {
-          let avatarUrl: string | undefined;
-          if (userId) {
-            const user = await getUserById(userId);
-            if (user) avatarUrl = user.avatarUrl;
-          }
-          state.spectators.push({ id: socket.id, name, avatarUrl });
-          socket.join(roomId);
-          engine.broadcastState(roomId);
-          return;
-        }
-
-        if (state.phase !== 'Lobby') {
-          socket.emit('error', 'Game already in progress.');
-          return;
-        }
-
-        if (state.isLocked && userId !== state.hostUserId) {
-          socket.emit('error', 'This room is locked.');
-          return;
-        }
-
-        if (state.players.length >= state.maxPlayers) {
-          socket.emit('error', 'Room full.');
-          return;
-        }
-
-        let avatarUrl: string | undefined;
-        if (userId) {
-          socket.data.userId = userId;
-          userSockets.set(userId, socket.id);
-          const friends = await getFriends(userId);
-          for (const friend of friends) {
-            const friendSocketId = userSockets.get(friend.id);
-            if (friendSocketId) {
-              io.to(friendSocketId).emit('userStatusChanged', { userId, isOnline: true, roomId });
-              let friendRoomId: string | undefined;
-              for (const [rId, state] of engine.rooms.entries()) {
-                if (state.players.some((p) => p.userId === friend.id && !p.isDisconnected)) {
-                  friendRoomId = rId;
-                  break;
-                }
-              }
-              socket.emit('userStatusChanged', {
-                userId: friend.id,
-                isOnline: true,
-                roomId: friendRoomId,
-              });
-            }
-          }
-          const user = await getUserById(userId);
-          if (user) avatarUrl = user.avatarUrl;
-        }
-
-        const player: Player = {
-          id: randomUUID(),
-          socketId: socket.id,
-          name,
-          userId,
-          avatarUrl,
-          activeFrame,
-          activePolicyStyle,
-          activeVotingStyle,
-          isAlive: true,
-          isPresidentialCandidate: false,
-          isChancellorCandidate: false,
-          isPresident: false,
-          isChancellor: false,
-          wasPresident: false,
-          wasChancellor: false,
-          isReady: false,
-          isAI: false,
-          stateEnactments: 0,
-          civilEnactments: 0,
-        };
-
-        state.players.push(player);
-        socket.join(roomId);
-        state.log.push(`${name} joined the lobby.`);
-        socket.to(roomId).emit('peerJoined', socket.id);
-        engine.broadcastState(roomId);
-      }
+    socket.on('joinRoom', async (payload) => 
+      await handleJoinRoom(socket, io, engine, userSockets, currentConfig, payload)
     );
 
     socket.on('toggleReady', () => {
@@ -937,43 +758,40 @@ async function startServer() {
       engine.broadcastState(roomId);
     });
 
-    socket.on('playAgain', () => {
+    socket.on('playAgain', async () => {
       const roomId = getRoom();
       if (!roomId) return;
-      engine.resetRoom(roomId);
+      await engine.resetRoom(roomId);
     });
 
-    socket.on(
-      'joinQueue',
-      (data: {
-        name: string;
-        userId?: string;
-        avatarUrl?: string;
-        activeFrame?: string;
-        activePolicyStyle?: string;
-        activeVotingStyle?: string;
-      }) => {
-        const roomId = getRoom();
-        if (!roomId) return;
-        const state = engine.rooms.get(roomId);
-        if (!state) return;
-        if (!state.spectators.find((s) => s.id === socket.id)) return;
-        if (state.spectatorQueue.find((q) => q.id === socket.id)) return;
-        state.spectatorQueue.push({
-          id: socket.id,
-          name: (data.name || '')
-            .replace(/<[^>]*>/g, '')
-            .replace(/\0/g, '')
-            .substring(0, 32),
-          userId: data.userId,
-          avatarUrl: data.avatarUrl,
-          activeFrame: data.activeFrame,
-          activePolicyStyle: data.activePolicyStyle,
-          activeVotingStyle: data.activeVotingStyle,
-        });
+    socket.on('joinQueue', async (payload: unknown) => {
+      const result = joinQueueSchema.safeParse(payload);
+      if (!result.success) {
+        logger.warn({ errors: result.error.flatten() }, 'Invalid joinQueue payload');
+        return socket.emit('error', 'Invalid queue join data.');
+      }
+      const data = result.data;
+      const roomId = getRoom();
+      if (!roomId) return;
+      const state = engine.rooms.get(roomId);
+      if (!state) return;
+      if (!state.spectators.find((s) => s.id === socket.id)) return;
+      if (state.spectatorQueue.find((q) => q.id === socket.id)) return;
+      state.spectatorQueue.push({
+        id: socket.id,
+        name: data.name
+          .replace(/<[^>]*>/g, '')
+          .replace(/\0/g, '')
+          .substring(0, 32),
+        userId: data.userId,
+        avatarUrl: data.avatarUrl,
+        activeFrame: data.activeFrame,
+        activePolicyStyle: data.activePolicyStyle,
+        activeVotingStyle: data.activeVotingStyle,
+      });
 
         if (state.phase === 'Lobby') {
-          engine.drainSpectatorQueue(roomId);
+          await engine.drainSpectatorQueue(roomId);
         }
         engine.broadcastState(roomId);
       }
@@ -1049,13 +867,13 @@ async function startServer() {
       engine.broadcastState(roomId);
     });
 
-    socket.on('leaveRoom', () => {
+    socket.on('leaveRoom', async () => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
-      engine.handleLeave(socket, roomId, true);
+      await engine.handleLeave(socket, roomId, true);
       if (state && (state.phase === 'Lobby' || state.phase === 'GameOver')) {
-        engine.drainSpectatorQueue(roomId);
+        await engine.drainSpectatorQueue(roomId);
       }
     });
 
@@ -1103,21 +921,30 @@ async function startServer() {
       logger.info({ admin: user.username, message }, 'Admin broadcast');
     });
 
-    socket.on('adminUpdateUser', async (data: { userId: string; updates: any }) => {
+    socket.on('adminUpdateUser', async (data: any) => {
+      const result = adminUpdateUserSchema.safeParse(data);
+      if (!result.success) {
+        logger.warn(
+          { errors: result.error.flatten(), adminId: socket.data.userId },
+          'Invalid adminUpdateUser payload'
+        );
+        return socket.emit('error', 'Invalid update data provided.');
+      }
+
+      const { userId, updates } = result.data;
       if (!socket.data.userId) return;
       const admin = await getUserById(socket.data.userId);
       if (!admin || !admin.isAdmin) return;
 
-      const targetUser = await getUserById(data.userId);
-      if (!targetUser) return;
+      const targetUser = await getUserById(userId);
+      if (!targetUser) return socket.emit('error', 'Target user not found.');
 
-      if (data.updates.stats) targetUser.stats = { ...targetUser.stats, ...data.updates.stats };
-      if (typeof data.updates.cabinetPoints === 'number')
-        targetUser.cabinetPoints = data.updates.cabinetPoints;
-      if (typeof data.updates.isBanned === 'boolean') targetUser.isBanned = data.updates.isBanned;
+      if (updates.stats) targetUser.stats = { ...targetUser.stats, ...updates.stats };
+      if (typeof updates.cabinetPoints === 'number') targetUser.cabinetPoints = updates.cabinetPoints;
+      if (typeof updates.isBanned === 'boolean') targetUser.isBanned = updates.isBanned;
 
       await saveUser(targetUser);
-      const targetSocketId = userSockets.get(data.userId);
+      const targetSocketId = userSockets.get(userId);
       if (targetSocketId) {
         io.to(targetSocketId).emit('userUpdate', targetUser);
         if (targetUser.isBanned)
@@ -1155,11 +982,9 @@ async function startServer() {
         }
       }
 
-      // Efficient leave: only check rooms the socket was actually in
-      // socket.rooms is still populated during 'disconnecting'
       for (const roomId of socket.rooms) {
         if (roomId !== socket.id) {
-          engine.handleLeave(socket, roomId);
+          await engine.handleLeave(socket, roomId);
         }
       }
     });

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Zap, Loader2, CreditCard, ChevronRight, ShoppingBag } from 'lucide-react';
 import { cn, apiUrl } from '../lib/utils';
+import { CP_PACKAGES } from '../sharedConstants';
 
 interface PurchaseCPModalProps {
   isOpen: boolean;
@@ -10,37 +11,7 @@ interface PurchaseCPModalProps {
   playSound: (soundKey: string) => void;
 }
 
-const CP_PACKAGES = [
-  {
-    id: 'starter',
-    name: 'Starter Bundle',
-    cp: 500,
-    price: '$4.99',
-    description: 'Perfect for your first few cosmetic unlocks.',
-  },
-  {
-    id: 'pro',
-    name: 'Pro Pack',
-    cp: 1200,
-    price: '$9.99',
-    description: 'Most popular. Great value for serious players.',
-    popular: true,
-  },
-  {
-    id: 'elite',
-    name: 'Elite Vault',
-    cp: 3000,
-    price: '$19.99',
-    description: 'Build your collection fast with this elite stash.',
-  },
-  {
-    id: 'master',
-    name: 'Assembly Master',
-    cp: 10000,
-    price: '$49.99',
-    description: 'The ultimate reserve for true masters of the Assembly.',
-  },
-];
+
 
 export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({
   isOpen,
@@ -101,6 +72,8 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
+            role="dialog"
+            aria-modal="true"
             className="relative w-full max-w-2xl bg-surface border border-subtle rounded-[2rem] overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
           >
             {/* Header */}
@@ -120,6 +93,7 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({
               </div>
               <button
                 onClick={onClose}
+                aria-label="Close"
                 className="p-2 text-ghost hover:text-white transition-colors"
               >
                 <X className="w-6 h-6" />
@@ -178,7 +152,7 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({
                     </p>
 
                     <div className="flex items-center justify-between">
-                      <span className="text-xl font-mono font-bold text-primary">{pkg.price}</span>
+                      <span className="text-xl font-mono font-bold text-primary">{pkg.displayPrice}</span>
                       <div
                         className={cn(
                           'w-10 h-10 rounded-xl flex items-center justify-center transition-all',

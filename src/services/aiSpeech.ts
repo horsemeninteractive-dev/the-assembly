@@ -211,3 +211,18 @@ export const speak = async (
 
   window.speechSynthesis.speak(utterance);
 };
+
+export const stop = async () => {
+  if (Capacitor.isNativePlatform()) {
+    try {
+      await TextToSpeech.stop();
+    } catch (err) {
+      console.error('Native speech stop error:', err);
+    }
+    return;
+  }
+
+  if (typeof window !== 'undefined' && window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+};

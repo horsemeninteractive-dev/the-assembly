@@ -115,6 +115,9 @@ export const PlayerCard = React.memo(
 
     return (
       <motion.div
+        role="button"
+        aria-label={`Player ${p.name.replace(' (AI)', '')}${isMe ? ' (You)' : ''}`}
+        tabIndex={0}
         animate={{ scale: speakingPlayers[p.id] ? 1.05 : 1 }}
         transition={{ duration: 0.2 }}
         onMouseEnter={() => playSound('hover')}
@@ -494,6 +497,7 @@ export const PlayerCard = React.memo(
                   playSound('click');
                   socket.emit('nominateChancellor', p.id);
                 }}
+                aria-label={`Nominate ${p.name.replace(' (AI)', '')} for Chancellor`}
                 className="absolute inset-0 bg-blue-900/80 rounded-xl flex items-center justify-center font-thematic tracking-wide text-white text-[12px] uppercase"
               >
                 Nominate
@@ -516,6 +520,7 @@ export const PlayerCard = React.memo(
                     playSound('click');
                     socket.emit('useTitleAbility', { use: true, role: 'Assassin', targetId: p.id });
                   }}
+                  aria-label={`Execute ${p.name.replace(' (AI)', '')}`}
                   className="absolute inset-0 z-30 bg-red-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
                 >
                   Execute
@@ -535,6 +540,7 @@ export const PlayerCard = React.memo(
                         targetId: p.id,
                       });
                     }}
+                    aria-label={`Detain ${p.name.replace(' (AI)', '')}`}
                     className="absolute inset-0 z-30 bg-purple-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
                   >
                     Detain
@@ -556,6 +562,7 @@ export const PlayerCard = React.memo(
                 playSound('click');
                 socket.emit('performExecutiveAction', p.id);
               }}
+              aria-label={`${gameState.currentExecutiveAction} ${p.name.replace(' (AI)', '')}`}
               className="absolute inset-0 bg-red-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
             >
               {gameState.currentExecutiveAction}
@@ -570,6 +577,7 @@ export const PlayerCard = React.memo(
               playSound('click');
               socket.emit('kickPlayer', p.id);
             }}
+            aria-label={`Kick ${p.name.replace(' (AI)', '')}`}
             className="absolute top-1 left-1 z-30 p-1 rounded-lg bg-red-900/80 border border-red-700/50 text-red-300 opacity-0 group-hover:opacity-100 transition-opacity hover:bg-red-900"
           >
             <ShieldOff className="w-[1.5vh] h-[1.5vh]" />

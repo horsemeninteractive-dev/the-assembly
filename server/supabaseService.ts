@@ -57,7 +57,7 @@ export const SupabaseUserSchema = z.object({
   password: z.string().nullable().optional(),
   avatar_url: z.string().nullable().optional(),
   created_at: z.string().nullable().optional(),
-  stats: UserStatsSchema.nullable().default({}),
+  stats: UserStatsSchema.nullable().default({} as any),
   owned_cosmetics: z.array(z.string()).nullable().default([]),
   active_frame: z.string().nullable().optional(),
   active_policy: z.string().nullable().optional(),
@@ -351,6 +351,8 @@ export async function createPasswordResetToken(
     const ttlSeconds = Math.ceil((expiresAt.getTime() - Date.now()) / 1000);
     if (ttlSeconds > 0) {
       await stateClient.setex(`resetToken:${token}`, ttlSeconds, userId);
+      await stateClient.sadd(`userResetTokens:${userId}`, token);
+      await stateClient.expire(`userResetTokens:${userId}`, ttlSeconds);
     }
   }
 
@@ -376,6 +378,7 @@ export async function verifyPasswordResetToken(token: string): Promise<string | 
     const userId = await stateClient.get(`resetToken:${token}`);
     if (userId) {
       await stateClient.del(`resetToken:${token}`);
+      await stateClient.srem(`userResetTokens:${userId}`, token);
       return userId;
     }
   }
@@ -407,9 +410,13 @@ export async function verifyPasswordResetToken(token: string): Promise<string | 
 }
 
 export async function deletePasswordResetTokens(userId: string): Promise<void> {
-  // In a real scenario, we'd need to find tokens by userId in Redis to delete them,
-  // which requires a reverse lookup. For simplicity, we rely on the single-use
-  // nature and TTL. Direct DB deletion still works.
+  if (isRedisConfigured && stateClient) {
+    const tokens = await stateClient.smembers(`userResetTokens:${userId}`);
+    if (tokens.length > 0) {
+      await stateClient.del(...tokens.map((t) => `resetToken:${t}`));
+    }
+    await stateClient.del(`userResetTokens:${userId}`);
+  }
 
   if (isConfigured) {
     await db.from('password_resets').delete().eq('user_id', userId);
@@ -485,7 +492,7 @@ export async function removeFriend(userId1: string, userId2: string): Promise<vo
       .from('friends')
       .delete()
       .or(
-        `and(user_id_1.eq.${userId1},user_id_2.eq.${userId2}),and(user_id_1.eq.${userId2},user_id_1.eq.${userId1})`
+        `and(user_id_1.eq.${userId1},user_id_2.eq.${userId2}),and(user_id_1.eq.${userId2},user_id_2.eq.${userId1})`
       );
   }
 }
@@ -527,7 +534,6 @@ export async function searchUsers(
     )
     .slice(0, limit);
 
-  console.log(`[AdminSearch-Fallback] Found ${results.length} results for "${query}"`);
   return results;
 }
 

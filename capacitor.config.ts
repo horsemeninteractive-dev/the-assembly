@@ -5,7 +5,7 @@ const config: CapacitorConfig = {
   appName: 'The Assembly',
   webDir: 'dist',
   server: {
-    cleartext: true,
+    cleartext: false,
   },
   plugins: {
     CapacitorHttp: {

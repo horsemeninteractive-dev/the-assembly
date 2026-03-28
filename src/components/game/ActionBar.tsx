@@ -184,6 +184,7 @@ export const ActionBar = ({
         <div className="flex gap-2">
           <Tooltip content={isVoiceActive ? 'Mute Mic' : 'Unmute Mic'}>
             <button
+              aria-label={isVoiceActive ? 'Mute Mic' : 'Unmute Mic'}
               onMouseEnter={() => playSound('hover')}
               onClick={() => {
                 playSound('click');
@@ -203,6 +204,7 @@ export const ActionBar = ({
           </Tooltip>
           <Tooltip content={isVideoActive ? 'Stop Video' : 'Start Video'}>
             <button
+              aria-label={isVideoActive ? 'Stop Video' : 'Start Video'}
               onMouseEnter={() => playSound('hover')}
               onClick={() => {
                 playSound('click');
@@ -488,6 +490,7 @@ export const ActionBar = ({
                       {/* Lock / Unlock */}
                       <Tooltip content={gameState.isLocked ? 'Unlock Room' : 'Lock Room'}>
                         <button
+                          aria-label={gameState.isLocked ? 'Unlock Room' : 'Lock Room'}
                           onClick={() => {
                             playSound('click');
                             socket.emit('toggleLock');
@@ -518,6 +521,7 @@ export const ActionBar = ({
                         }
                       >
                         <button
+                          aria-label="Force Start Game"
                           onClick={() => {
                             if (canForceStart) {
                               playSound('click');

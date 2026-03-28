@@ -1665,17 +1665,6 @@ export const Profile: React.FC<ProfileProps> = ({
                         className="w-full accent-red-900"
                       />
                     </div>
-                    <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
-                      <span className="text-sm font-mono text-primary">TTS Volume</span>
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={ttsVolume}
-                        onChange={(e) => setTtsVolume(parseInt(e.target.value))}
-                        className="w-full accent-red-900"
-                      />
-                    </div>
                   </>
                 )}
 
@@ -1713,6 +1702,24 @@ export const Profile: React.FC<ProfileProps> = ({
                           </option>
                         ))}
                       </select>
+                    </div>
+
+                    <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm font-mono text-primary">Narrator Volume</span>
+                        <span className="text-xs font-mono text-muted">{ttsVolume}%</span>
+                      </div>
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={ttsVolume}
+                        onChange={(e) => setTtsVolume(parseInt(e.target.value))}
+                        className="w-full accent-emerald-900"
+                      />
+                      <p className="text-[10px] font-mono text-ghost uppercase mt-1">
+                        Adjusts the loudness of the AI Narrator
+                      </p>
                     </div>
                   </>
                 )}

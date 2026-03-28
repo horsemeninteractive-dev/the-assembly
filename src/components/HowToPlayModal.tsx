@@ -357,6 +357,8 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ isOpen, onClose 
             initial={{ opacity: 0, scale: 0.95, y: 10 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
+            role="dialog"
+            aria-modal="true"
             className="w-full max-w-lg bg-elevated border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col"
             style={{ maxHeight: '88dvh' }}
           >
@@ -370,6 +372,7 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ isOpen, onClose 
               </div>
               <button
                 onClick={onClose}
+                aria-label="Close Rules Reference"
                 className="text-ghost hover:text-white transition-colors p-1"
               >
                 <X className="w-5 h-5" />

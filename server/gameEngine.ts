@@ -114,6 +114,8 @@ export class GameEngine {
   private pauseTimers: Map<string, ReturnType<typeof setInterval>> = new Map();
   /** Lobby countdown handles (kept for API compatibility). */
   private lobbyTimers: Map<string, ReturnType<typeof setInterval>> = new Map();
+  /** Pending delayed emissions for spectators (anti-cheat). */
+  private delayedSpectatorEmissions: Map<string, Set<ReturnType<typeof setTimeout>>> = new Map();
 
   constructor({ io, getConfig }: Deps) {
     this.io = io;
@@ -123,6 +125,31 @@ export class GameEngine {
   // ═══════════════════════════════════════════════════════════════════════════
   // Public surface — called from server.ts socket handlers
   // ═══════════════════════════════════════════════════════════════════════════
+
+  /**
+   * Recalculates and caches the average ELO of human players in a room.
+   * This value is stored on the GameState object to prevent sequential DB reads 
+   * during /api/rooms calls.
+   */
+  public async updateRoomAverageElo(state: GameState): Promise<void> {
+    const humanPlayers = state.players.filter((p) => !p.isAI && p.userId);
+    if (humanPlayers.length === 0) {
+      state.averageElo = undefined;
+      return;
+    }
+
+    try {
+      const elos = await Promise.all(
+        humanPlayers.map(async (p) => {
+          const user = await getUserById(p.userId!);
+          return user?.stats?.elo ?? 1000;
+        })
+      );
+      state.averageElo = Math.round(elos.reduce((a, b) => a + b, 0) / elos.length);
+    } catch (err) {
+      logger.error({ roomId: state.roomId, err }, 'Failed to update average ELO');
+    }
+  }
 
   broadcastState(roomId: string): void {
     const state = this.rooms.get(roomId);
@@ -215,29 +242,53 @@ export class GameEngine {
 
         // pendingChancellorClaim is intentionally omitted from every emit.
       };
-      socket.emit('gameStateUpdate', payload);
+      const isRanked = state.mode === 'Ranked';
+      const shouldDelay = isSpectator && isRanked && !isGameOver;
 
-      // Special handling for privateInfo (State/Overseer agents list, etc.)
-      // Reuses `player` already found above — no duplicate lookup needed.
-      if (player && !player.isAI && player.role && !isGameOver) {
-        const stateAgents = state.players
-          .filter((pl) => pl.role === 'State' || pl.role === 'Overseer')
-          .map((pl) => ({ id: pl.id, name: pl.name, role: pl.role! }));
+      const emitUpdate = () => {
+        const currentSocket = this.io.sockets.sockets.get(socketId);
+        if (currentSocket) {
+          currentSocket.emit('gameStateUpdate', payload);
 
-        if (player.role === 'State' || (player.role === 'Overseer' && state.players.length <= 6)) {
-          socket.emit('privateInfo', {
-            role: player.role,
-            stateAgents,
-            titleRole: player.titleRole,
-            personalAgenda: getPlayerAgenda(state, player.id),
-          });
-        } else {
-          socket.emit('privateInfo', {
-            role: player.role,
-            titleRole: player.titleRole,
-            personalAgenda: getPlayerAgenda(state, player.id),
-          });
+          // Special handling for privateInfo (State/Overseer agents list, etc.)
+          if (player && !player.isAI && player.role && !isGameOver) {
+            const stateAgents = state.players
+              .filter((pl) => pl.role === 'State' || pl.role === 'Overseer')
+              .map((pl) => ({ id: pl.id, name: pl.name, role: pl.role! }));
+
+            if (
+              player.role === 'State' ||
+              (player.role === 'Overseer' && state.players.length <= 6)
+            ) {
+              currentSocket.emit('privateInfo', {
+                role: player.role,
+                stateAgents,
+                titleRole: player.titleRole,
+                personalAgenda: getPlayerAgenda(state, player.id),
+              });
+            } else {
+              currentSocket.emit('privateInfo', {
+                role: player.role,
+                titleRole: player.titleRole,
+                personalAgenda: getPlayerAgenda(state, player.id),
+              });
+            }
+          }
         }
+      };
+
+      if (shouldDelay) {
+        if (!this.delayedSpectatorEmissions.has(roomId)) {
+          this.delayedSpectatorEmissions.set(roomId, new Set());
+        }
+        const timeouts = this.delayedSpectatorEmissions.get(roomId)!;
+        const handle = setTimeout(() => {
+          timeouts.delete(handle);
+          emitUpdate();
+        }, 10000);
+        timeouts.add(handle);
+      } else {
+        emitUpdate();
       }
     }
 
@@ -255,12 +306,21 @@ export class GameEngine {
   /** Remove a room from the in-memory map and Redis. */
   public deleteRoom(roomId: string): void {
     this.rooms.delete(roomId);
+    this.clearDelayedSpectatorEmissions(roomId);
     if (isRedisConfigured && stateClient) {
       stateClient
         .del(roomKey(roomId))
         .catch((err) =>
           logger.error({ roomId, err: err.message }, 'Failed to delete room from Redis')
         );
+    }
+  }
+
+  private clearDelayedSpectatorEmissions(roomId: string): void {
+    const timeouts = this.delayedSpectatorEmissions.get(roomId);
+    if (timeouts) {
+      for (const h of timeouts) clearTimeout(h);
+      this.delayedSpectatorEmissions.delete(roomId);
     }
   }
 
@@ -517,6 +577,12 @@ export class GameEngine {
   private enterPhase(s: GameState, roomId: string, phase: GamePhase): void {
     if (s.phase === 'GameOver') return;
     s.phase = phase;
+
+    // Game is over — any pending delayed spectator emissions are now obsolete
+    if (phase === 'GameOver') {
+      this.clearDelayedSpectatorEmissions(roomId);
+    }
+
     this.resetPlayerHasActed(s);
     this.startActionTimer(roomId);
     this.broadcastState(roomId);
@@ -2394,6 +2460,7 @@ export class GameEngine {
                 type: 'text',
               });
               await this.updateUserStats(state, undefined, player.id);
+              state.players = state.players.filter((p) => p.id !== player.id);
             } else {
               // Casual: Replace with AI immediately
               const takenNames = new Set(state.players.map((p) => p.name.replace(' (AI)', '')));
@@ -2427,7 +2494,7 @@ export class GameEngine {
     }
 
     socket.leave(roomId);
-
+    await this.updateRoomAverageElo(state);
     if (!this.checkRoomCleanup(roomId)) {
       this.broadcastState(roomId);
     }
@@ -2480,6 +2547,7 @@ export class GameEngine {
       addLog(state, msg);
       state.messages.push({ sender: 'System', text: msg, timestamp: Date.now(), type: 'text' });
       await this.updateUserStats(state, undefined, player.id);
+      state.players = state.players.filter((p) => p.id !== player.id);
     } else {
       const takenNames = new Set(state.players.map((p) => p.name.replace(' (AI)', '')));
       const available = AI_BOTS.filter((b) => !takenNames.has(b.name));
@@ -2513,7 +2581,7 @@ export class GameEngine {
     }
 
     state.pauseTimer = undefined;
-
+    await this.updateRoomAverageElo(state);
     if (!this.checkRoomCleanup(roomId)) {
       this.broadcastState(roomId);
     }
@@ -2888,7 +2956,7 @@ export class GameEngine {
     }
   }
 
-  resetRoom(roomId: string): void {
+  async resetRoom(roomId: string): Promise<void> {
     const state = this.rooms.get(roomId);
     if (!state || state.phase !== 'GameOver') return;
 
@@ -2962,11 +3030,12 @@ export class GameEngine {
       p.alliances = undefined;
     });
 
-    this.drainSpectatorQueue(roomId);
+    await this.drainSpectatorQueue(roomId);
+    await this.updateRoomAverageElo(state);
     this.broadcastState(roomId);
   }
 
-  drainSpectatorQueue(roomId: string): void {
+  async drainSpectatorQueue(roomId: string): Promise<void> {
     const state = this.rooms.get(roomId);
     if (!state) return;
 
@@ -3002,6 +3071,7 @@ export class GameEngine {
       state.spectatorQueue = state.spectatorQueue.filter((q) => q.id !== queued.id);
       this.io.to(queued.id).emit('queueDrained');
     }
+    await this.updateRoomAverageElo(state);
     this.broadcastState(roomId);
   }
 }

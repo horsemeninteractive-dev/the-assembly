@@ -425,6 +425,8 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete
             initial={{ opacity: 0, scale: 0.95, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
+            role="dialog"
+            aria-modal="true"
             className="w-full max-w-md bg-elevated border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col"
             style={{ maxHeight: '90dvh' }}
           >
@@ -448,6 +450,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete
               </div>
               <button
                 onClick={onSkip}
+                aria-label="Close Tutorial"
                 className="text-ghost hover:text-tertiary transition-colors p-1"
               >
                 <X className="w-4 h-4" />

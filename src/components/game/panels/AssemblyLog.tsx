@@ -62,12 +62,17 @@ export const AssemblyLog = ({ log, isOpen, onClose, showDebug }: AssemblyLogProp
             </div>
             <button
               onClick={onClose}
+              aria-label="Close Assembly Log"
               className="p-2 text-muted hover:text-white transition-colors bg-card rounded-xl"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar overscroll-contain bg-elevated">
+          <div 
+            aria-live="polite" 
+            aria-atomic="false"
+            className="flex-1 overflow-y-auto p-4 space-y-2 custom-scrollbar overscroll-contain bg-elevated"
+          >
             {log
               .filter((entry) => showDebug || !entry.includes('DEBUG:'))
               .map((entry, i) => {

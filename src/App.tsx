@@ -60,6 +60,7 @@ export default function App() {
   const [adminBroadcast, setAdminBroadcast] = useState<{ message: string; sender: string } | null>(
     null
   );
+  const [serverRestarting, setServerRestarting] = useState<string | null>(null);
 
   const handleDiscordAutoJoin = (roomId: string, currentUser: User) => {
     console.log('Auto-joining Discord instance room:', roomId);
@@ -450,6 +451,13 @@ export default function App() {
       playSound('notification');
       setTimeout(() => setAdminBroadcast(null), 10000); // Hide after 10s
     });
+    socket.on('serverRestarting', (message: string) => {
+      setServerRestarting(message);
+      // Give them a few seconds to read it, then refresh to get the new version
+      setTimeout(() => {
+        window.location.reload();
+      }, 5500);
+    });
     return () => {
       socket.off('gameStateUpdate');
       socket.off('privateInfo');
@@ -459,6 +467,7 @@ export default function App() {
       socket.off('friendRequestReceived');
       socket.off('queueDrained');
       socket.off('kicked');
+      socket.off('serverRestarting');
     };
   }, []);
 
@@ -567,6 +576,7 @@ export default function App() {
 
   const handleLeaveRoom = (onComplete?: () => void) => {
     socket.emit('leaveRoom');
+    aiSpeech.stop();
     setJoined(false);
     setGameState(null);
     setPrivateInfo(null);
@@ -901,6 +911,53 @@ export default function App() {
                   <div className="text-[9px] font-mono text-yellow-500/50 uppercase tracking-widest text-right">
                     — {adminBroadcast.sender}
                   </div>
+                </div>
+              </div>
+            </motion.div>
+          )}
+
+          {serverRestarting && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[20000] bg-backdrop-heavy backdrop-blur-2xl flex items-center justify-center p-6 text-center"
+            >
+              <div className="max-w-md">
+                <motion.div
+                  initial={{ scale: 0.8, rotate: -10 }}
+                  animate={{ scale: 1, rotate: 0 }}
+                  className="w-20 h-20 rounded-3xl bg-red-900/20 border border-red-500/30 flex items-center justify-center mx-auto mb-8 shadow-[0_0_30px_rgba(239,68,68,0.2)]"
+                >
+                  <Megaphone className="w-10 h-10 text-red-500" />
+                </motion.div>
+                <h2 className="text-3xl font-thematic text-primary tracking-tighter uppercase mb-4">
+                  Incoming Update
+                </h2>
+                <p className="text-lg text-ghost font-serif italic mb-8 leading-relaxed">
+                  "{serverRestarting}"
+                </p>
+                <div className="flex flex-col items-center gap-4">
+                  <div className="flex gap-1.5">
+                    {[0, 1, 2].map((i) => (
+                      <motion.div
+                        key={i}
+                        animate={{
+                          scale: [1, 1.5, 1],
+                          opacity: [0.3, 1, 0.3],
+                        }}
+                        transition={{
+                          duration: 1,
+                          repeat: Infinity,
+                          delay: i * 0.2,
+                        }}
+                        className="w-2 h-2 rounded-full bg-red-500"
+                      />
+                    ))}
+                  </div>
+                  <span className="text-[10px] font-mono text-muted uppercase tracking-[0.3em]">
+                    Synchronizing...
+                  </span>
                 </div>
               </div>
             </motion.div>

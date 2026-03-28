@@ -9,7 +9,17 @@ import { GameEngine } from './gameEngine.ts';
 import rateLimit from 'express-rate-limit';
 import { GameState, RoomInfo, UserInternal } from '../src/types.ts';
 import nodemailer from 'nodemailer';
-import { DEFAULT_ITEMS } from '../src/sharedConstants.ts';
+import { DEFAULT_ITEMS, CP_PACKAGES } from '../src/sharedConstants.ts';
+import { z } from 'zod';
+import { getAppUrl, isAllowedOrigin } from './utils.ts';
+import {
+  registerSchema,
+  loginSchema,
+  updateEmailSchema,
+  updateUsernameSchema,
+  forgotPasswordSchema,
+  resetPasswordSchema,
+} from './schemas.ts';
 
 declare global {
   namespace Express {
@@ -64,45 +74,14 @@ const transporter =
     : null;
 
 const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) throw new Error('JWT_SECRET env variable is not set');
+if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is not set.');
+if (JWT_SECRET.length < 32) {
+  throw new Error('JWT_SECRET must be at least 32 characters long for security compliance.');
+}
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
-
-function getAppUrl(req?: Request): string {
-  // Legitimate origins: explicit allowlist + Cloud Run deployment URLs.
-  // Cloud Run URLs follow the pattern:
-  //   https://<service>-<hash>-<region>.a.run.app
-  // We match that exactly rather than using endsWith('.run.app'), which would
-  // accept any attacker-controlled subdomain like "evil.run.app".
-  const CLOUD_RUN_PATTERN = /^https:\/\/[a-z0-9-]+-[a-z0-9]+-[a-z]{2,4}\.a\.run\.app$/;
-
-  const isAllowedOrigin = (o: string): boolean => {
-    const explicit = [
-      process.env.APP_URL,
-      'https://theassembly.web.app',
-      'http://localhost:3000',
-      'http://localhost',
-      'capacitor://localhost',
-    ].filter(Boolean);
-    return explicit.includes(o) || CLOUD_RUN_PATTERN.test(o);
-  };
-
-  const origin = (req?.query?.origin as string) || (req?.body?.origin as string);
-  if (origin && isAllowedOrigin(origin)) return origin;
-
-  if (req?.query?.state) {
-    try {
-      const stateData = JSON.parse(decodeURIComponent(req.query.state as string));
-      if (stateData.origin && isAllowedOrigin(stateData.origin)) {
-        return stateData.origin;
-      }
-    } catch (_) {}
-  }
-
-  return process.env.APP_URL || 'https://theassembly.web.app';
-}
 
 function htmlEscape(str: string): string {
   return str
@@ -165,19 +144,25 @@ function getErrorMessage(err: unknown): string {
   return String(err);
 }
 
-function oauthSuccessPage(user: UserInternal, token: string, platform: string = 'web'): string {
+function oauthSuccessPage(
+  user: UserInternal,
+  token: string,
+  platform: string = 'web',
+  nonce: string = ''
+): string {
   const targetOrigin = process.env.APP_URL || 'https://theassembly.web.app';
   const safeUser = htmlEscape(JSON.stringify(user));
   const safeToken = htmlEscape(token);
   const safeOrigin = htmlEscape(targetOrigin);
   const safePlatform = htmlEscape(platform);
+  const nonceAttr = nonce ? ` nonce="${nonce}"` : '';
 
   return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
   <title>Authentication Success</title>
-  <style>
+  <style${nonceAttr}>
     body { background: #0a0a0a; margin: 0; padding: 0; }
     .container { display: flex; flex-direction: column; align-items: center; margin-top: 20vh; font-family: sans-serif; color: white; }
   </style>
@@ -194,7 +179,7 @@ function oauthSuccessPage(user: UserInternal, token: string, platform: string = 
   <p>Authentication successful. Redirecting...</p>
 </div>
 
-<script>
+<script${nonceAttr}>
 (function() {
   var el = document.getElementById('d');
   var userStr = el.getAttribute('data-user');
@@ -275,7 +260,7 @@ export function registerRoutes(
     message: { error: 'Too many requests. Please slow down.' },
   });
 
-  // General: blanket cap on all other API routes.
+  // High-frequency: blanket cap on all other API routes.
   const generalLimiter = rateLimit({
     windowMs: 60 * 1000, // 1 minute
     max: 100,
@@ -284,9 +269,20 @@ export function registerRoutes(
     message: { error: 'Too many requests. Please slow down.' },
   });
 
+  // Dedicated: forgot-password (prevents email spam).
+  const forgotPasswordLimiter = rateLimit({
+    windowMs: 30 * 60 * 1000, // 30 minutes
+    max: 5,
+    standardHeaders: true,
+    legacyHeaders: false,
+    message: { error: 'Too many reset requests. Please wait 30 minutes.' },
+  });
+
   app.use('/api', generalLimiter);
   app.use('/api/register', authLimiter);
   app.use('/api/login', authLimiter);
+  app.use('/api/auth/forgot-password', forgotPasswordLimiter);
+  app.use('/api/auth/reset-password', authLimiter);
   app.use('/api/tts', costLimiter);
   app.use('/api/shop/buy', costLimiter);
 
@@ -296,22 +292,12 @@ export function registerRoutes(
     res.json({ version: process.env.APP_VERSION || 'dev' });
   });
 
-  // ── Auth ──────────────────────────────────────────────────────────────────
-
   app.post('/api/register', async (req: Request, res: Response) => {
-    const { username, password, email, avatarUrl } = req.body;
-
-    if (!username || typeof username !== 'string' || username.length < 3 || username.length > 20) {
-      return res.status(400).json({ error: 'Username must be between 3 and 20 characters' });
+    const result = registerSchema.safeParse(req.body);
+    if (!result.success) {
+      return res.status(400).json({ error: result.error.issues[0].message });
     }
-    if (!email || typeof email !== 'string' || !email.includes('@')) {
-      return res
-        .status(400)
-        .json({ error: 'A valid email address is required for account recovery' });
-    }
-    if (!password || typeof password !== 'string' || password.length < 8) {
-      return res.status(400).json({ error: 'Password must be at least 8 characters long' });
-    }
+    const { username, password, email, avatarUrl } = result.data;
 
     if (await getUser(username)) {
       return res.status(400).json({ error: 'Username already exists' });
@@ -338,8 +324,11 @@ export function registerRoutes(
   });
 
   app.post('/api/auth/forgot-password', async (req: Request, res: Response) => {
-    const { email } = req.body;
-    if (!email) return res.status(400).json({ error: 'Email is required' });
+    const result = forgotPasswordSchema.safeParse(req.body);
+    if (!result.success) {
+      return res.status(400).json({ error: 'Valid email is required' });
+    }
+    const { email } = result.data;
 
     try {
       const user = await getUserByEmail(email);
@@ -384,10 +373,11 @@ export function registerRoutes(
   });
 
   app.post('/api/auth/reset-password', async (req: Request, res: Response) => {
-    const { token, newPassword } = req.body;
-    if (!token || !newPassword || newPassword.length < 8) {
+    const result = resetPasswordSchema.safeParse(req.body);
+    if (!result.success) {
       return res.status(400).json({ error: 'Invalid request or password too short' });
     }
+    const { token, newPassword } = result.data;
 
     try {
       const userId = await verifyPasswordResetToken(token);
@@ -423,10 +413,11 @@ export function registerRoutes(
 
       if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
 
-      const { email } = req.body;
-      if (!email || !email.includes('@')) {
+      const result = updateEmailSchema.safeParse(req.body);
+      if (!result.success) {
         return res.status(400).json({ error: 'Invalid email address' });
       }
+      const { email } = result.data;
 
       // Check if email is already taken
       const existingUser = await getUserByEmail(email);
@@ -464,7 +455,7 @@ export function registerRoutes(
   app.post('/api/logout', async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'No token' });
-    const user = await validateToken(token);
+    const user = await validateToken(token as string);
     if (user) {
       user.tokenVersion = (user.tokenVersion || 0) + 1;
       await saveUser(user);
@@ -476,7 +467,7 @@ export function registerRoutes(
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'No token' });
     try {
-      const user = await validateToken(token);
+      const user = await validateToken(token as string);
       if (!user) return res.status(401).json({ error: 'Invalid token' });
       const userWithoutPassword = sanitizeUser(user);
       res.json({ user: userWithoutPassword });
@@ -487,27 +478,16 @@ export function registerRoutes(
 
   app.post('/api/user/update-username', async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(' ')[1];
-    const { newUsername } = req.body;
-
     if (!token) return res.status(401).json({ error: 'No token' });
-    if (
-      !newUsername ||
-      typeof newUsername !== 'string' ||
-      newUsername.length < 3 ||
-      newUsername.length > 20
-    ) {
-      return res.status(400).json({ error: 'Username must be between 3 and 20 characters' });
-    }
 
-    // Alphanumeric only
-    if (!/^[a-zA-Z0-9_]+$/.test(newUsername)) {
-      return res
-        .status(400)
-        .json({ error: 'Username can only contain letters, numbers, and underscores' });
+    const result = updateUsernameSchema.safeParse(req.body);
+    if (!result.success) {
+      return res.status(400).json({ error: 'Username must be 3-20 alphanumeric characters' });
     }
+    const { newUsername } = result.data;
 
     try {
-      const user = await validateToken(token);
+      const user = await validateToken(token as string);
       if (!user) return res.status(401).json({ error: 'Invalid or expired token' });
 
       if (user.username === newUsername) {
@@ -565,6 +545,11 @@ export function registerRoutes(
     try {
       const user = await validateToken(token);
       if (!user) return res.status(401).json({ error: 'Invalid token' });
+
+      // IDOR Mitigation: Only owner or admin can read this history
+      if (user.id !== req.params.userId && !user.isAdmin) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
 
       const limit = parseInt(req.query.limit as string) || 20;
       const offset = parseInt(req.query.offset as string) || 0;
@@ -673,6 +658,7 @@ export function registerRoutes(
 
   app.get(
     ['/auth/google/callback', '/auth/google/callback/'],
+    authLimiter,
     async (req: Request, res: Response) => {
       const { code } = req.query;
       if (!code) return res.status(400).send('No code provided');
@@ -716,7 +702,7 @@ export function registerRoutes(
         const token = jwt.sign({ userId: user.id, tokenVersion: user.tokenVersion }, JWT_SECRET!, {
           expiresIn: '30d',
         });
-        res.send(oauthSuccessPage(user, token, platform));
+        res.send(oauthSuccessPage(user, token, platform, (res as any).locals.nonce));
       } catch (err: unknown) {
         logger.error({ err: getErrorMessage(err) }, 'Google OAuth Error');
         res.status(500).send('Authentication failed');
@@ -783,7 +769,7 @@ export function registerRoutes(
     res.json({ url: `https://discord.com/api/oauth2/authorize?${params}` });
   });
 
-  app.post('/api/auth/discord/callback', async (req: Request, res: Response) => {
+  app.post('/api/auth/discord/callback', authLimiter, async (req: Request, res: Response) => {
     const { code } = req.body;
     if (!code) return res.status(400).json({ error: 'No code provided' });
     try {
@@ -799,6 +785,7 @@ export function registerRoutes(
 
   app.get(
     ['/auth/discord/callback', '/auth/discord/callback/'],
+    authLimiter,
     async (req: Request, res: Response) => {
       const { code } = req.query;
       if (!code) return res.status(400).send('No code provided');
@@ -811,7 +798,7 @@ export function registerRoutes(
           } catch (e) {}
         }
         const { user, token } = await handleDiscordAuth(code as string, origin);
-        res.send(oauthSuccessPage(user, token, platform));
+        res.send(oauthSuccessPage(user, token, platform, (res as any).locals.nonce));
       } catch (err: unknown) {
         logger.error({ err: getErrorMessage(err) }, 'Discord OAuth Error');
         res.status(500).send('Authentication failed');
@@ -823,19 +810,8 @@ export function registerRoutes(
 
   app.get('/api/rooms', async (_req: Request, res: Response) => {
     const roomList = await Promise.all(
-      Array.from(engine.rooms.entries()).map(async ([id, state]) => {
-        // Compute average ELO of human players in room
-        let averageElo: number | undefined;
-        const humanPlayers = state.players.filter((p) => !p.isAI && p.userId);
-        if (humanPlayers.length > 0) {
-          const elos = await Promise.all(
-            humanPlayers.map(async (p) => {
-              const u = await getUserById(p.userId!);
-              return u?.stats?.elo ?? 1000;
-            })
-          );
-          averageElo = Math.round(elos.reduce((a, b) => a + b, 0) / elos.length);
-        }
+      Array.from(engine.rooms.entries()).map(([id, state]) => {
+        const averageElo = state.averageElo;
         const host = state.players.find((p) => p.userId === state.hostUserId) || state.players[0];
         return {
           id,
@@ -948,13 +924,6 @@ export function registerRoutes(
   });
 
   // ── Stripe Payments ──────────────────────────────────────────────────────
-
-  const CP_PACKAGES = [
-    { id: 'starter', name: 'Starter Bundle', cp: 500, price: 499 }, // $4.99
-    { id: 'pro', name: 'Pro Pack', cp: 1200, price: 999 }, // $9.99
-    { id: 'elite', name: 'Elite Vault', cp: 3000, price: 1999 }, // $19.99
-    { id: 'master', name: 'Assembly Master', cp: 10000, price: 4999 }, // $49.99
-  ];
 
   app.post('/api/create-checkout-session', async (req: Request, res: Response) => {
     if (!process.env.STRIPE_SECRET_KEY)
@@ -1246,8 +1215,7 @@ export function registerRoutes(
       res.status(401).json({ error: 'Invalid token' });
     }
   });
-  // ── TTS proxy ─────────────────────────────────────────────────────────────
-
+  
   // ── TTS proxy ─────────────────────────────────────────────────────────────
   // Calls Gemini TTS server-side so the API key is never exposed in the
   // client bundle. Returns the base64-encoded WAV audio from Gemini directly.
