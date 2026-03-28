@@ -35,8 +35,8 @@ function createClient(): Redis | null {
 }
 
 export const pubClient = createClient();
-export const subClient = pubClient?.duplicate() ?? null;
-export const stateClient = pubClient?.duplicate() ?? null;
+export const subClient = createClient();
+export const stateClient = createClient();
 
 /** Redis key for a room's GameState */
 export const roomKey = (roomId: string): string => `room:${roomId}`;

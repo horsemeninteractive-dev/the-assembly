@@ -28,10 +28,25 @@ import { pubClient, subClient, isRedisConfigured } from './server/redis.ts';
 import { SystemConfig } from './src/types.ts';
 import Stripe from 'stripe';
 
+if (process.env.NODE_ENV === 'production' && !isRedisConfigured) {
+  logger.fatal('REDIS_URL is required in production for HA and persistence.');
+  process.exit(1);
+}
+
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
 
 if (!process.env.STRIPE_SECRET_KEY) {
-  logger.warn('[Stripe] STRIPE_SECRET_KEY not set — payment endpoints will return 503.');
+  logger.warn('[Config] STRIPE_SECRET_KEY not set — payment endpoints will return 503.');
+}
+if (!process.env.STRIPE_WEBHOOK_SECRET) {
+  logger.info('[Config] STRIPE_WEBHOOK_SECRET not set — webhook verification will fail.');
+}
+if (!process.env.EMAIL_USER) {
+  logger.info('[Config] EMAIL_USER not set — Nodemailer password recovery is disabled.');
+}
+if (!process.env.RESEND_API_KEY) {
+  logger.info('[Config] RESEND_API_KEY not set — Resend integration is disabled.');
 }
 
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
@@ -121,6 +136,9 @@ async function startServer() {
 
   // Stripe webhook must be placed BEFORE express.json() to get the raw body
   app.post('/api/webhook/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
+    if (!process.env.STRIPE_SECRET_KEY) {
+      return res.status(503).json({ error: 'Payment service not configured.' });
+    }
     const sig = req.headers['stripe-signature'];
     const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
@@ -387,48 +405,7 @@ async function startServer() {
 
     const getRoom = (): string | undefined => Array.from(socket.rooms).find((r) => r !== socket.id);
 
-    const drainSpectatorQueue = (state: GameState, roomId: string) => {
-      if (!state.spectatorQueue) state.spectatorQueue = [];
-      const queue = state.spectatorQueue;
-      const drained: typeof state.spectatorQueue = [];
 
-      for (const queued of queue) {
-        if (state.players.length >= state.maxPlayers) break;
-
-        // Move from spectators list to players list
-        state.spectators = state.spectators.filter((s) => s.id !== queued.id);
-        const player: Player = {
-          id: randomUUID(),
-          socketId: queued.id,
-          name: queued.name,
-          userId: queued.userId,
-          avatarUrl: queued.avatarUrl,
-          activeFrame: queued.activeFrame,
-          activePolicyStyle: queued.activePolicyStyle,
-          activeVotingStyle: queued.activeVotingStyle,
-          isAlive: true,
-          isPresidentialCandidate: false,
-          isChancellorCandidate: false,
-          isPresident: false,
-          isChancellor: false,
-          wasPresident: false,
-          wasChancellor: false,
-          isReady: false,
-          hasActed: false,
-          stateEnactments: 0,
-          civilEnactments: 0,
-        };
-        state.players.push(player);
-        drained.push(queued);
-        // Notify the queued player that they've joined
-        io.to(queued.id).emit('queueDrained');
-      }
-
-      state.spectatorQueue = queue.filter((q) => !drained.find((d) => d.id === q.id));
-      if (drained.length > 0) {
-        engine.broadcastState(roomId);
-      }
-    };
 
     socket.on('userConnected', async ({ userId, token }: { userId: string; token: string }) => {
       const user = await validateToken(token);
@@ -944,21 +921,18 @@ async function startServer() {
       const player = state.players.find((p) => p.socketId === socket.id);
       if (!player) return;
 
-      const now = Date.now();
-      const lastChat = (socket.data as any).lastChatTimestamp || 0;
-      if (now - lastChat < 1000) {
-        socket.emit('error', 'Please wait before sending another message.');
-        return;
-      }
-      (socket.data as any).lastChatTimestamp = now;
-
       const sanitized = text
         .replace(/<[^>]*>/g, '')
         .replace(/\0/g, '')
         .trim();
       if (sanitized.length === 0 || sanitized.length > 300) return;
 
-      state.messages.push({ sender: player.name, text: sanitized, timestamp: Date.now() });
+      state.messages.push({
+        sender: player.name,
+        text: sanitized,
+        timestamp: Date.now(),
+        type: 'text',
+      });
       if (state.messages.length > 50) state.messages.shift();
       engine.broadcastState(roomId);
     });
@@ -966,81 +940,7 @@ async function startServer() {
     socket.on('playAgain', () => {
       const roomId = getRoom();
       if (!roomId) return;
-      const state = engine.rooms.get(roomId);
-      if (!state || state.phase !== 'GameOver') return;
-
-      Object.assign(state, {
-        phase: 'Lobby',
-        civilDirectives: 0,
-        stateDirectives: 0,
-        electionTracker: 0,
-        deck: createDeck(),
-        discard: [],
-        drawnPolicies: [],
-        chancellorPolicies: [],
-        currentExecutiveAction: 'None',
-        log: [`Game reset in room ${roomId}.`],
-        presidentIdx: 0,
-        lastPresidentIdx: -1,
-        round: 1,
-        winner: undefined,
-        declarations: [],
-        lastEnactedPolicy: undefined,
-        isTimerActive: false,
-        lobbyTimer: 30,
-        roundHistory: [],
-        pendingChancellorClaim: undefined,
-        lastGovernmentVotes: undefined,
-        lastGovernmentPresidentId: undefined,
-        lastGovernmentChancellorId: undefined,
-        messages: [],
-        detainedPlayerId: undefined,
-        rejectedChancellorId: undefined,
-        presidentId: undefined,
-        chancellorId: undefined,
-        investigationResult: undefined,
-        presidentSaw: undefined,
-        chancellorSaw: undefined,
-        presidentTimedOut: false,
-        chancellorTimedOut: false,
-        isPaused: false,
-        pauseReason: undefined,
-        pauseTimer: undefined,
-        disconnectedPlayerId: undefined,
-        titlePrompt: undefined,
-        lastExecutiveActionStateCount: 0,
-        vetoUnlocked: false,
-        vetoRequested: false,
-        previousVotes: undefined,
-        handlerSwapPending: undefined,
-        handlerSwapPositions: undefined,
-        isStrategistAction: undefined,
-      });
-
-      state.players = state.players.filter((p) => !p.isAI && !p.isDisconnected);
-      state.players.forEach((p) => {
-        p.role = undefined;
-        p.titleRole = undefined;
-        p.titleUsed = false;
-        p.isAlive = true;
-        p.isPresident = false;
-        p.isChancellor = false;
-        p.isPresidentialCandidate = false;
-        p.isChancellorCandidate = false;
-        p.wasPresident = false;
-        p.wasChancellor = false;
-        p.vote = undefined;
-        p.isReady = false;
-        p.hasActed = false;
-        p.suspicion = undefined;
-        p.stateEnactments = 0;
-        p.civilEnactments = 0;
-        p.isProvenNotOverseer = false;
-        p.alliances = undefined;
-      });
-
-      drainSpectatorQueue(state, roomId);
-      engine.broadcastState(roomId);
+      engine.resetRoom(roomId);
     });
 
     socket.on(
@@ -1073,7 +973,7 @@ async function startServer() {
         });
 
         if (state.phase === 'Lobby') {
-          drainSpectatorQueue(state, roomId);
+          engine.drainSpectatorQueue(roomId);
         }
         engine.broadcastState(roomId);
       }
@@ -1088,19 +988,27 @@ async function startServer() {
       engine.broadcastState(roomId);
     });
 
-    socket.on('kickPlayer', (targetSocketId: string) => {
+    socket.on('kickPlayer', (targetPlayerId: string) => {
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state) return;
+
+      // Only host can kick. hostUserId is stable (Supabase UUID).
       const host = state.players.find((p) => p.userId === state.hostUserId);
       if (!host || host.socketId !== socket.id) return;
-      if (targetSocketId === socket.id) return;
-      const target = state.players.find((p) => p.id === targetSocketId);
-      if (!target) return;
-      state.players = state.players.filter((p) => p.id !== targetSocketId);
+
+      // targetPlayerId is the stable session UUID (p.id)
+      const target = state.players.find((p) => p.id === targetPlayerId);
+      if (!target || target.id === host.id) return;
+
+      state.players = state.players.filter((p) => p.id !== targetPlayerId);
       state.log.push(`${target.name} was removed by the host.`);
-      io.to(targetSocketId).emit('kicked');
+
+      // Emit to the volatile socket ID, not the stable session ID
+      if (target.socketId) {
+        io.to(target.socketId).emit('kicked');
+      }
       engine.broadcastState(roomId);
     });
 
@@ -1147,7 +1055,7 @@ async function startServer() {
       const state = engine.rooms.get(roomId);
       engine.handleLeave(socket, roomId, true);
       if (state && (state.phase === 'Lobby' || state.phase === 'GameOver')) {
-        drainSpectatorQueue(state, roomId);
+        engine.drainSpectatorQueue(roomId);
       }
     });
 
@@ -1233,7 +1141,7 @@ async function startServer() {
       socket.emit('adminClearRedisSuccess', 'Successfully purged all Redis room state.');
     });
 
-    socket.on('disconnect', async () => {
+    socket.on('disconnecting', async () => {
       if (socket.data.userId) {
         const userId = socket.data.userId;
         if (userSockets.get(userId) === socket.id) {
@@ -1246,9 +1154,14 @@ async function startServer() {
           }
         }
       }
-      engine.rooms.forEach((state, roomId) => {
-        engine.handleLeave(socket, roomId);
-      });
+
+      // Efficient leave: only check rooms the socket was actually in
+      // socket.rooms is still populated during 'disconnecting'
+      for (const roomId of socket.rooms) {
+        if (roomId !== socket.id) {
+          engine.handleLeave(socket, roomId);
+        }
+      }
     });
   });
 

@@ -196,11 +196,10 @@ export class GameEngine {
             )
           : undefined;
 
-      socket.emit('gameStateUpdate', {
+      const payload = {
         ...publicState,
         players: tailoredPlayers,
         spectatorRoles: tailoredSpectatorRoles,
-
         // Deck & discard: send as length-preserving masked arrays so the UI
         // can show "X cards remaining" without revealing order or composition.
         deck: seeAllCards ? deck : (new Array(deck.length).fill('Civil') as Policy[]),
@@ -215,7 +214,8 @@ export class GameEngine {
         chancellorSaw: seeAllCards || isChancellor ? chancellorSaw : undefined,
 
         // pendingChancellorClaim is intentionally omitted from every emit.
-      });
+      };
+      socket.emit('gameStateUpdate', payload);
 
       // Special handling for privateInfo (State/Overseer agents list, etc.)
       // Reuses `player` already found above — no duplicate lookup needed.
@@ -2215,7 +2215,7 @@ export class GameEngine {
     for (const r of results) {
       const { password: _, ...safe } = r.user;
       const player = s.players.find((p) => p.id === r.playerId);
-      if (player) {
+      if (player && player.socketId) {
         this.io.to(player.socketId).emit('userUpdate', safe);
         this.io.to(player.socketId).emit('postMatchResult', {
           won: r.won,
@@ -2226,17 +2226,17 @@ export class GameEngine {
           eloAfter: r.user.stats.elo,
           opponentAverageElo: r.opponentAverageElo,
           xpEarned: r.xpEarned,
-        ipEarned: r.ipEarned,
-        agendaName: r.agendaName,
-        agendaCompleted: r.agendaCompleted,
-        rounds: s.round,
-        civilDirectives: s.civilDirectives,
-        stateDirectives: s.stateDirectives,
-        newAchievements: r.newAchievementIds,
-      });
+          ipEarned: r.ipEarned,
+          agendaName: r.agendaName,
+          agendaCompleted: r.agendaCompleted,
+          rounds: s.round,
+          civilDirectives: s.civilDirectives,
+          stateDirectives: s.stateDirectives,
+          newAchievements: r.newAchievementIds,
+        });
+      }
     }
   }
-}
 
   // ═══════════════════════════════════════════════════════════════════════════
   // Round History
@@ -2335,7 +2335,9 @@ export class GameEngine {
           clearInterval(iv);
           s.players = s.players.filter((p) => p.id !== player.id);
           addLog(s, `${player.name} removed from lobby (timeout).`);
-          this.broadcastState(roomId);
+          if (!this.checkRoomCleanup(roomId)) {
+            this.broadcastState(roomId);
+          }
         }
       } else {
         if (s.pauseTimer === undefined) s.pauseTimer = 60;
@@ -2426,16 +2428,37 @@ export class GameEngine {
 
     socket.leave(roomId);
 
-    if (state.players.filter((p) => !p.isAI).length === 0 && state.spectators.length === 0) {
+    if (!this.checkRoomCleanup(roomId)) {
+      this.broadcastState(roomId);
+    }
+  }
+
+  /**
+   * Evaluates if a room should be deleted.
+   * A room is purged if it has NO human players and NO human spectators.
+   */
+  private checkRoomCleanup(roomId: string): boolean {
+    const state = this.rooms.get(roomId);
+    if (!state) return true;
+
+    const humanCount = state.players.filter((p) => !p.isAI).length;
+    const spectatorCount = state.spectators.length; 
+
+    if (humanCount === 0 && spectatorCount === 0) {
       this.deleteRoom(roomId);
       const lt = this.lobbyTimers.get(roomId);
       if (lt) {
         clearInterval(lt);
         this.lobbyTimers.delete(roomId);
       }
-    } else {
-      this.broadcastState(roomId);
+      const pt = this.pauseTimers.get(roomId);
+      if (pt) {
+        clearInterval(pt);
+        this.pauseTimers.delete(roomId);
+      }
+      return true;
     }
+    return false;
   }
 
   async handlePauseTimeout(roomId: string): Promise<void> {
@@ -2489,10 +2512,11 @@ export class GameEngine {
       this.scheduleAITurns(state, roomId);
     }
 
-    state.disconnectedPlayerId = undefined;
-    state.pauseReason = undefined;
     state.pauseTimer = undefined;
-    this.broadcastState(roomId);
+
+    if (!this.checkRoomCleanup(roomId)) {
+      this.broadcastState(roomId);
+    }
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -2862,5 +2886,122 @@ export class GameEngine {
         1000 + Math.random() * 2000
       );
     }
+  }
+
+  resetRoom(roomId: string): void {
+    const state = this.rooms.get(roomId);
+    if (!state || state.phase !== 'GameOver') return;
+
+    Object.assign(state, {
+      phase: 'Lobby',
+      civilDirectives: 0,
+      stateDirectives: 0,
+      electionTracker: 0,
+      deck: createDeck(),
+      discard: [],
+      drawnPolicies: [],
+      chancellorPolicies: [],
+      currentExecutiveAction: 'None',
+      log: [`Game reset in room ${roomId}.`],
+      presidentIdx: 0,
+      lastPresidentIdx: -1,
+      round: 1,
+      winner: undefined,
+      declarations: [],
+      lastEnactedPolicy: undefined,
+      isTimerActive: false,
+      lobbyTimer: 30,
+      roundHistory: [],
+      pendingChancellorClaim: undefined,
+      lastGovernmentVotes: undefined,
+      lastGovernmentPresidentId: undefined,
+      lastGovernmentChancellorId: undefined,
+      messages: [],
+      detainedPlayerId: undefined,
+      rejectedChancellorId: undefined,
+      presidentId: undefined,
+      chancellorId: undefined,
+      investigationResult: undefined,
+      presidentSaw: undefined,
+      chancellorSaw: undefined,
+      presidentTimedOut: false,
+      chancellorTimedOut: false,
+      isPaused: false,
+      pauseReason: undefined,
+      pauseTimer: undefined,
+      disconnectedPlayerId: undefined,
+      titlePrompt: undefined,
+      lastExecutiveActionStateCount: 0,
+      vetoUnlocked: false,
+      vetoRequested: false,
+      previousVotes: undefined,
+      handlerSwapPending: undefined,
+      handlerSwapPositions: undefined,
+      isStrategistAction: undefined,
+    });
+
+    state.players = state.players.filter((p) => !p.isAI && !p.isDisconnected);
+    state.players.forEach((p) => {
+      p.role = undefined;
+      p.titleRole = undefined;
+      p.titleUsed = false;
+      p.isAlive = true;
+      p.isPresident = false;
+      p.isChancellor = false;
+      p.isPresidentialCandidate = false;
+      p.isChancellorCandidate = false;
+      p.wasPresident = false;
+      p.wasChancellor = false;
+      p.vote = undefined;
+      p.isReady = false;
+      p.hasActed = false;
+      p.suspicion = undefined;
+      p.stateEnactments = 0;
+      p.civilEnactments = 0;
+      p.isProvenNotOverseer = false;
+      p.alliances = undefined;
+    });
+
+    this.drainSpectatorQueue(roomId);
+    this.broadcastState(roomId);
+  }
+
+  drainSpectatorQueue(roomId: string): void {
+    const state = this.rooms.get(roomId);
+    if (!state) return;
+
+    if (!state.spectatorQueue) state.spectatorQueue = [];
+    const queue = [...state.spectatorQueue];
+
+    for (const queued of queue) {
+      if (state.players.length >= (state.maxPlayers ?? 10)) break;
+
+      state.spectators = state.spectators.filter((s) => s.id !== queued.id);
+      const player: Player = {
+        id: randomUUID(),
+        socketId: queued.id,
+        name: queued.name,
+        userId: queued.userId,
+        avatarUrl: queued.avatarUrl,
+        activeFrame: queued.activeFrame,
+        activePolicyStyle: queued.activePolicyStyle,
+        activeVotingStyle: queued.activeVotingStyle,
+        isAlive: true,
+        isPresidentialCandidate: false,
+        isChancellorCandidate: false,
+        isPresident: false,
+        isChancellor: false,
+        wasPresident: false,
+        wasChancellor: false,
+        isReady: false,
+        hasActed: false,
+        stateEnactments: 0,
+        civilEnactments: 0,
+      };
+      state.players.push(player);
+      state.spectatorQueue = state.spectatorQueue.filter((q) => q.id !== queued.id);
+      this.io.to(queued.id).emit('queueDrained');
+    }
+    this.broadcastState(roomId);
   }
 }

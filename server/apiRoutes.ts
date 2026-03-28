@@ -11,6 +11,14 @@ import { GameState, RoomInfo, UserInternal } from '../src/types.ts';
 import nodemailer from 'nodemailer';
 import { DEFAULT_ITEMS } from '../src/sharedConstants.ts';
 
+declare global {
+  namespace Express {
+    interface Request {
+      user?: UserInternal;
+    }
+  }
+}
+
 export function sanitizeUser(user: UserInternal): Omit<UserInternal, 'password'> {
   const { password, ...safeUser } = user;
   return safeUser;
@@ -124,10 +132,24 @@ async function requireAdmin(req: Request, res: Response, next: NextFunction) {
   const token = req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'No token' });
   const user = await validateToken(token);
-  if (!user) return res.status(401).json({ error: 'Invalid token' });
+  if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
   if (!user.isAdmin) return res.status(403).json({ error: 'Forbidden' });
   (req as any).user = user;
   next();
+}
+
+/** Standard authentication middleware for general user routes. */
+export async function requireAuth(req: Request, res: Response, next: NextFunction) {
+  const token = req.headers.authorization?.split(' ')[1];
+  if (!token) return res.status(401).json({ error: 'No token' });
+  try {
+    const user = await validateToken(token);
+    if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
+    req.user = user;
+    next();
+  } catch (_) {
+    return res.status(401).json({ error: 'Invalid token' });
+  }
 }
 
 /** Safely extracts a message from unknown catch values, including axios errors. */
@@ -536,14 +558,18 @@ export function registerRoutes(
     }
   });
 
-  // Match history — returns last 20 games for a user
+  // Match history — returns last X games for a user
   app.get('/api/match-history/:userId', async (req: Request, res: Response) => {
     const token = req.headers.authorization?.split(' ')[1];
     if (!token) return res.status(401).json({ error: 'No token' });
     try {
       const user = await validateToken(token);
       if (!user) return res.status(401).json({ error: 'Invalid token' });
-      const history = await getMatchHistory(req.params.userId, 20);
+
+      const limit = parseInt(req.query.limit as string) || 20;
+      const offset = parseInt(req.query.offset as string) || 0;
+
+      const history = await getMatchHistory(req.params.userId, limit, offset);
       res.json({ history });
     } catch (_) {
       res.status(401).json({ error: 'Invalid token' });
@@ -831,8 +857,11 @@ export function registerRoutes(
     res.json(roomList);
   });
 
-  app.get('/api/leaderboard', async (_req: Request, res: Response) => {
-    const boards = await getAllLeaderboards();
+  app.get('/api/leaderboard', async (req: Request, res: Response) => {
+    const limit = parseInt(req.query.limit as string) || 50;
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    const boards = await getAllLeaderboards(limit, offset);
     const strip = (arr: any[]) => arr.map((u) => sanitizeUser(u as UserInternal));
     res.json({
       overall: strip(boards.overall),
@@ -929,7 +958,7 @@ export function registerRoutes(
 
   app.post('/api/create-checkout-session', async (req: Request, res: Response) => {
     if (!process.env.STRIPE_SECRET_KEY)
-      return res.status(503).json({ error: 'Payments not configured.' });
+      return res.status(503).json({ error: 'Payment service not configured.' });
 
     const token = req.headers.authorization?.split(' ')[1];
     const { packageId } = req.body;
@@ -1217,12 +1246,13 @@ export function registerRoutes(
       res.status(401).json({ error: 'Invalid token' });
     }
   });
+  // ── TTS proxy ─────────────────────────────────────────────────────────────
 
   // ── TTS proxy ─────────────────────────────────────────────────────────────
   // Calls Gemini TTS server-side so the API key is never exposed in the
   // client bundle. Returns the base64-encoded WAV audio from Gemini directly.
 
-  app.post('/api/tts', async (req: Request, res: Response) => {
+  app.post('/api/tts', requireAuth, async (req: Request, res: Response) => {
     const { text, voice } = req.body as { text?: string; voice?: string };
 
     if (!text || typeof text !== 'string' || text.trim().length === 0) {

@@ -151,22 +151,29 @@ function mapUserToSupabase(userData: UserInternal): Record<string, unknown> {
 
 type LeaderboardMode = 'Overall' | 'Ranked' | 'Casual' | 'Classic';
 
-export async function getLeaderboard(mode: LeaderboardMode = 'Overall'): Promise<any[]> {
-  const orderField =
-    mode === 'Ranked'
-      ? 'stats->elo'
-      : mode === 'Casual'
-        ? 'stats->casualWins'
-        : mode === 'Classic'
-          ? 'stats->classicWins'
-          : 'stats->elo';
+export async function getLeaderboard(
+  mode: LeaderboardMode = 'Overall',
+  limit = 50,
+  offset = 0
+): Promise<UserInternal[]> {
+  const safeLimit = Math.min(50, limit);
+  const safeOffset = Math.max(0, offset);
 
   if (isConfigured) {
+    const orderField =
+      mode === 'Ranked'
+        ? 'stats->elo'
+        : mode === 'Casual'
+          ? 'stats->casualWins'
+          : mode === 'Classic'
+            ? 'stats->classicWins'
+            : 'stats->elo';
+
     const { data, error } = await db
       .from('users')
       .select('*')
       .order(orderField as any, { ascending: false })
-      .limit(50);
+      .range(safeOffset, safeOffset + safeLimit - 1);
     if (error) return [];
     return data
       .map(mapSupabaseToUser)
@@ -174,29 +181,36 @@ export async function getLeaderboard(mode: LeaderboardMode = 'Overall'): Promise
   }
   const allUsers = Array.from(users.values());
   if (mode === 'Ranked')
-    return allUsers.sort((a, b) => (b.stats.elo ?? 0) - (a.stats.elo ?? 0)).slice(0, 50);
+    return allUsers
+      .sort((a, b) => (b.stats.elo ?? 0) - (a.stats.elo ?? 0))
+      .slice(safeOffset, safeOffset + safeLimit);
   if (mode === 'Casual')
     return allUsers
       .sort((a, b) => (b.stats.casualWins ?? 0) - (a.stats.casualWins ?? 0))
-      .slice(0, 50);
+      .slice(safeOffset, safeOffset + safeLimit);
   if (mode === 'Classic')
     return allUsers
       .sort((a, b) => (b.stats.classicWins ?? 0) - (a.stats.classicWins ?? 0))
-      .slice(0, 50);
-  return allUsers.sort((a, b) => b.stats.elo - a.stats.elo).slice(0, 50);
+      .slice(safeOffset, safeOffset + safeLimit);
+  return allUsers
+    .sort((a, b) => (b.stats.elo ?? 0) - (a.stats.elo ?? 0))
+    .slice(safeOffset, safeOffset + safeLimit);
 }
 
-export async function getAllLeaderboards(): Promise<{
+export async function getAllLeaderboards(
+  limit = 50,
+  offset = 0
+): Promise<{
   overall: any[];
   ranked: any[];
   casual: any[];
   classic: any[];
 }> {
   const [overall, ranked, casual, classic] = await Promise.all([
-    getLeaderboard('Overall'),
-    getLeaderboard('Ranked'),
-    getLeaderboard('Casual'),
-    getLeaderboard('Classic'),
+    getLeaderboard('Overall', limit, offset),
+    getLeaderboard('Ranked', limit, offset),
+    getLeaderboard('Casual', limit, offset),
+    getLeaderboard('Classic', limit, offset),
   ]);
   return { overall, ranked, casual, classic };
 }
@@ -590,14 +604,22 @@ export async function saveMatchResult(
   }
 }
 
-export async function getMatchHistory(userId: string, limit = 20): Promise<MatchSummary[]> {
+export async function getMatchHistory(
+  userId: string,
+  limit = 20,
+  offset = 0
+): Promise<MatchSummary[]> {
+  const safeLimit = Math.min(50, limit);
+  const safeOffset = Math.max(0, offset);
+
   if (isConfigured) {
     const { data, error } = await db
       .from('match_history')
       .select('*')
       .eq('user_id', userId)
       .order('played_at', { ascending: false })
-      .limit(limit);
+      .range(safeOffset, safeOffset + safeLimit - 1);
+
     if (error || !data) return [];
     return data.map((r: any) => ({
       id: r.id,
