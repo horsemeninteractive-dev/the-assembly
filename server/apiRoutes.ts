@@ -1,7 +1,7 @@
 import { logger } from './logger.ts';
 import { Express, Request, Response, NextFunction } from 'express';
 import { Server } from 'socket.io';
-import { randomUUID } from 'crypto';
+import { randomUUID, createHmac } from 'crypto';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import axios from 'axios';
@@ -33,6 +33,8 @@ export function sanitizeUser(user: UserInternal): Omit<UserInternal, 'password'>
   const { password, ...safeUser } = user;
   return safeUser;
 }
+
+import { getRedisStatus } from './redis.ts';
 
 import {
   getUser,
@@ -290,6 +292,22 @@ export function registerRoutes(
     res.json({ version: process.env.APP_VERSION || 'dev' });
   });
 
+  app.get('/api/health', (req: Request, res: Response) => {
+    const memory = process.memoryUsage();
+    res.json({
+      status: 'healthy',
+      rooms: engine.rooms.size,
+      redis: getRedisStatus(),
+      uptime: process.uptime(),
+      memory: {
+        rss: `${Math.round(memory.rss / 1024 / 1024)}MB`,
+        heapUsed: `${Math.round(memory.heapUsed / 1024 / 1024)}MB`,
+        heapTotal: `${Math.round(memory.heapTotal / 1024 / 1024)}MB`,
+        external: `${Math.round(memory.external / 1024 / 1024)}MB`,
+      },
+    });
+  });
+
   app.post('/api/register', async (req: Request, res: Response) => {
     const result = registerSchema.safeParse(req.body);
     if (!result.success) {
@@ -399,18 +417,9 @@ export function registerRoutes(
     }
   });
 
-  app.post('/api/user/update-email', async (req: Request, res: Response) => {
+  app.post('/api/user/update-email', requireAuth, async (req: Request, res: Response) => {
     try {
-      const authHeader = req.headers.authorization;
-      if (!authHeader || !authHeader.startsWith('Bearer ')) {
-        return res.status(401).json({ error: 'Unauthorized' });
-      }
-
-      const token = authHeader.split(' ')[1];
-      const user = await validateToken(token);
-
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
-
+      const user = req.user!;
       const result = updateEmailSchema.safeParse(req.body);
       if (!result.success) {
         return res.status(400).json({ error: 'Invalid email address' });
@@ -430,9 +439,6 @@ export function registerRoutes(
       res.json({ success: true, user: safe });
     } catch (err: any) {
       logger.error({ err }, 'Update email error');
-      if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
-        return res.status(401).json({ error: 'Session expired, please login again' });
-      }
       res.status(500).json({ error: 'Internal server error' });
     }
   });
@@ -450,34 +456,19 @@ export function registerRoutes(
     res.json({ user: userWithoutPassword, token });
   });
 
-  app.post('/api/logout', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
-    const user = await validateToken(token as string);
-    if (user) {
-      user.tokenVersion = (user.tokenVersion || 0) + 1;
-      await saveUser(user);
-    }
+  app.post('/api/logout', requireAuth, async (req: Request, res: Response) => {
+    const user = req.user!;
+    user.tokenVersion = (user.tokenVersion || 0) + 1;
+    await saveUser(user);
     res.json({ success: true, message: 'Logged out' });
   });
 
-  app.get('/api/me', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token as string);
-      if (!user) return res.status(401).json({ error: 'Invalid token' });
-      const userWithoutPassword = sanitizeUser(user);
-      res.json({ user: userWithoutPassword });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
-    }
+  app.get('/api/me', requireAuth, async (req: Request, res: Response) => {
+    const userWithoutPassword = sanitizeUser(req.user!);
+    res.json({ user: userWithoutPassword });
   });
 
-  app.post('/api/user/update-username', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
-
+  app.post('/api/user/update-username', requireAuth, async (req: Request, res: Response) => {
     const result = updateUsernameSchema.safeParse(req.body);
     if (!result.success) {
       return res.status(400).json({ error: 'Username must be 3-20 alphanumeric characters' });
@@ -485,8 +476,7 @@ export function registerRoutes(
     const { newUsername } = result.data;
 
     try {
-      const user = await validateToken(token as string);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired token' });
+      const user = req.user!;
 
       if (user.username === newUsername) {
         return res.status(400).json({ error: 'New username must be different' });
@@ -497,9 +487,6 @@ export function registerRoutes(
         return res.status(400).json({ error: 'Username already taken' });
       }
 
-      // If using in-memory store in dev, we need to handle the key change
-      // Since supabaseService just exposes saveUser, we trust it or handle it there.
-      // But we can update the cached user here.
       user.username = newUsername;
       await saveUser(user);
 
@@ -510,124 +497,85 @@ export function registerRoutes(
       const safe = sanitizeUser(user);
       res.json({ user: safe, token: newToken });
     } catch (err: any) {
-      if (err.name === 'JsonWebTokenError' || err.name === 'TokenExpiredError') {
-        return res.status(401).json({ error: 'Session expired, please login again' });
-      }
       logger.error({ err }, 'Username update failed');
       res.status(500).json({ error: err.message || 'Failed to update username' });
     }
   });
 
   // Mark tutorial as completed — adds 'tutorial-complete' to claimedRewards
-  app.post('/api/tutorial-complete', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
-      if (!user.claimedRewards.includes('tutorial-complete')) {
-        user.claimedRewards.push('tutorial-complete');
-        await saveUser(user);
-      }
-      const safe = sanitizeUser(user);
-      res.json({ user: safe });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
+  app.post('/api/tutorial-complete', requireAuth, async (req: Request, res: Response) => {
+    const user = req.user!;
+    if (!user.claimedRewards.includes('tutorial-complete')) {
+      user.claimedRewards.push('tutorial-complete');
+      await saveUser(user);
     }
+    const safe = sanitizeUser(user);
+    res.json({ user: safe });
   });
 
   // Match history — returns last X games for a user
-  app.get('/api/match-history/:userId', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid token' });
+  app.get('/api/match-history/:userId', requireAuth, async (req: Request, res: Response) => {
+    const user = req.user!;
 
-      // IDOR Mitigation: Only owner or admin can read this history
-      if (user.id !== req.params.userId && !user.isAdmin) {
-        return res.status(403).json({ error: 'Forbidden' });
-      }
-
-      const limit = parseInt(req.query.limit as string) || 20;
-      const offset = parseInt(req.query.offset as string) || 0;
-
-      const history = await getMatchHistory(req.params.userId, limit, offset);
-      res.json({ history });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
+    // IDOR Mitigation: Only owner or admin can read this history
+    if (user.id !== req.params.userId && !user.isAdmin) {
+      return res.status(403).json({ error: 'Forbidden' });
     }
+
+    const limit = parseInt(req.query.limit as string) || 20;
+    const offset = parseInt(req.query.offset as string) || 0;
+
+    const history = await getMatchHistory(req.params.userId, limit, offset);
+    res.json({ history });
   });
 
   // Claim a season pass reward
-  app.post('/api/pass/claim', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
+  app.post('/api/pass/claim', requireAuth, async (req: Request, res: Response) => {
     const { rewardId, itemId } = req.body;
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
-      if (user.claimedRewards.includes(rewardId)) {
-        return res.status(400).json({ error: 'Already claimed' });
-      }
-      // Grant the cosmetic item if one is attached
-      if (itemId && !user.ownedCosmetics.includes(itemId)) {
-        user.ownedCosmetics.push(itemId);
-      }
-      // Grant CP for the level-30 reward
-      if (rewardId === 'pass-0-lvl30') {
-        user.cabinetPoints = (user.cabinetPoints ?? 0) + 500;
-      }
-      user.claimedRewards.push(rewardId);
-      await saveUser(user);
-      const safe = sanitizeUser(user);
-      res.json({ user: safe });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
+    const user = req.user!;
+    if (user.claimedRewards.includes(rewardId)) {
+      return res.status(400).json({ error: 'Already claimed' });
     }
+    // Grant the cosmetic item if one is attached
+    if (itemId && !user.ownedCosmetics.includes(itemId)) {
+      user.ownedCosmetics.push(itemId);
+    }
+    // Grant CP for the level-30 reward
+    if (rewardId === 'pass-0-lvl30') {
+      user.cabinetPoints = (user.cabinetPoints ?? 0) + 500;
+    }
+    user.claimedRewards.push(rewardId);
+    await saveUser(user);
+    const safe = sanitizeUser(user);
+    res.json({ user: safe });
   });
 
   // Pin/unpin achievements — body: { pinnedAchievements: string[] } (max 3 IDs)
-  app.post('/api/achievements/pin', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
+  app.post('/api/achievements/pin', requireAuth, async (req: Request, res: Response) => {
+    const user = req.user!;
 
-      const { pinnedAchievements } = req.body;
-      if (!Array.isArray(pinnedAchievements) || pinnedAchievements.length > 3) {
-        return res
-          .status(400)
-          .json({ error: 'pinnedAchievements must be an array of up to 3 IDs' });
-      }
-
-      // Verify each ID is actually earned by this user
-      const earned = new Set(
-        (user.earnedAchievements ?? []).map((a: any) => (typeof a === 'string' ? a : a.id))
-      );
-      const valid = pinnedAchievements.filter((id: string) => earned.has(id)).slice(0, 3);
-
-      user.pinnedAchievements = valid;
-      await saveUser(user);
-      const safe = sanitizeUser(user);
-      res.json({ user: safe });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
+    const { pinnedAchievements } = req.body;
+    if (!Array.isArray(pinnedAchievements) || pinnedAchievements.length > 3) {
+      return res
+        .status(400)
+        .json({ error: 'pinnedAchievements must be an array of up to 3 IDs' });
     }
+
+    // Verify each ID is actually earned by this user
+    const earned = new Set(
+      (user.earnedAchievements ?? []).map((a: any) => (typeof a === 'string' ? a : a.id))
+    );
+    const valid = pinnedAchievements.filter((id: string) => earned.has(id)).slice(0, 3);
+
+    user.pinnedAchievements = valid;
+    await saveUser(user);
+    const safe = sanitizeUser(user);
+    res.json({ user: safe });
   });
 
   // Recently played with — returns the stored list from the user record
-  app.get('/api/recently-played', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
-      res.json({ recentlyPlayedWith: user.recentlyPlayedWith ?? [] });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
-    }
+  app.get('/api/recently-played', requireAuth, async (req: Request, res: Response) => {
+    res.json({ recentlyPlayedWith: req.user!.recentlyPlayedWith ?? [] });
   });
 
   // ── Google OAuth ──────────────────────────────────────────────────────────
@@ -895,47 +843,35 @@ export function registerRoutes(
 
   // ── Shop ──────────────────────────────────────────────────────────────────
 
-  app.post('/api/shop/buy', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
+  app.post('/api/shop/buy', requireAuth, async (req: Request, res: Response) => {
     const { itemId } = req.body;
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
+    const user = req.user!;
 
-      const item = DEFAULT_ITEMS.find((i) => i.id === itemId);
-      if (!item) return res.status(404).json({ error: 'Item not found' });
+    const item = DEFAULT_ITEMS.find((i) => i.id === itemId);
+    if (!item) return res.status(404).json({ error: 'Item not found' });
 
-      if (user.stats.points < item.price)
-        return res.status(400).json({ error: 'Not enough points' });
-      if (user.ownedCosmetics.includes(itemId))
-        return res.status(400).json({ error: 'Already owned' });
+    if (user.stats.points < item.price)
+      return res.status(400).json({ error: 'Not enough points' });
+    if (user.ownedCosmetics.includes(itemId))
+      return res.status(400).json({ error: 'Already owned' });
 
-      user.stats.points -= item.price;
-      user.ownedCosmetics.push(itemId);
-      await saveUser(user);
-      const userWithoutPassword = sanitizeUser(user);
-      res.json({ user: userWithoutPassword });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
-    }
+    user.stats.points -= item.price;
+    user.ownedCosmetics.push(itemId);
+    await saveUser(user);
+    const userWithoutPassword = sanitizeUser(user);
+    res.json({ user: userWithoutPassword });
   });
 
   // ── Stripe Payments ──────────────────────────────────────────────────────
 
-  app.post('/api/create-checkout-session', async (req: Request, res: Response) => {
+  app.post('/api/create-checkout-session', requireAuth, async (req: Request, res: Response) => {
     if (!process.env.STRIPE_SECRET_KEY)
       return res.status(503).json({ error: 'Payment service not configured.' });
 
-    const token = req.headers.authorization?.split(' ')[1];
     const { packageId } = req.body;
-
-    if (!token) return res.status(401).json({ error: 'No token' });
+    const user = req.user!;
 
     try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
-
       const pkg = CP_PACKAGES.find((p) => p.id === packageId);
       if (!pkg) return res.status(400).json({ error: 'Invalid package' });
 
@@ -974,12 +910,9 @@ export function registerRoutes(
 
   // ── Friends ───────────────────────────────────────────────────────────────
 
-  app.get('/api/friends/status', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
+  app.get('/api/friends/status', requireAuth, async (req: Request, res: Response) => {
+    const user = req.user!;
     try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
       const friends = await getFriends(user.id);
       const statuses: Record<string, { isOnline: boolean; roomId?: string }> = {};
       for (const friend of friends) {
@@ -999,33 +932,23 @@ export function registerRoutes(
       }
       res.json({ statuses });
     } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
+      res.status(500).json({ error: 'Failed to fetch friend statuses' });
     }
   });
 
   // Pending friend requests received by this user
-  app.get('/api/friends/pending', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
-      const pending = await getPendingFriendRequests(user.id);
-      res.json({ pending });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
-    }
+  app.get('/api/friends/pending', requireAuth, async (req: Request, res: Response) => {
+    const user = req.user!;
+    const pending = await getPendingFriendRequests(user.id);
+    res.json({ pending });
   });
 
   // Search users by username (for friend search)
-  app.get('/api/users/search', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
+  app.get('/api/users/search', requireAuth, async (req: Request, res: Response) => {
     const query = req.query.q as string;
-    if (!token) return res.status(401).json({ error: 'No token' });
+    const currentUser = req.user!;
     if (!query || query.length < 2) return res.json({ users: [] });
     try {
-      const currentUser = await validateToken(token);
-      if (!currentUser) return res.status(401).json({ error: 'Invalid or expired session' });
       const results = await searchUsers(query, currentUser.id);
       // Attach isFriend status to each result
       const withStatus = await Promise.all(
@@ -1037,181 +960,132 @@ export function registerRoutes(
       );
       res.json({ users: withStatus });
     } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
+      res.status(500).json({ error: 'Failed to search users' });
     }
   });
 
-  app.get('/api/friends', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
-      const friends = await getFriends(user.id);
-      res.json({ friends });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
-    }
+  app.get('/api/friends', requireAuth, async (req: Request, res: Response) => {
+    const user = req.user!;
+    const friends = await getFriends(user.id);
+    res.json({ friends });
   });
 
-  app.post('/api/friends/request', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
+  app.post('/api/friends/request', requireAuth, async (req: Request, res: Response) => {
     const { targetUserId } = req.body;
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
-      await sendFriendRequest(user.id, targetUserId);
-      res.json({ success: true });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
-    }
+    const user = req.user!;
+    await sendFriendRequest(user.id, targetUserId);
+    res.json({ success: true });
   });
 
-  app.post('/api/friends/accept', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
+  app.post('/api/friends/accept', requireAuth, async (req: Request, res: Response) => {
     const { targetUserId } = req.body;
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
-      await acceptFriendRequest(user.id, targetUserId);
-      res.json({ success: true });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
-    }
+    const user = req.user!;
+    await acceptFriendRequest(user.id, targetUserId);
+    res.json({ success: true });
   });
 
-  app.get('/api/user/:userId', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const currentUser = await validateToken(token);
-      if (!currentUser) return res.status(401).json({ error: 'Invalid or expired session' });
+  app.get('/api/user/:userId', requireAuth, async (req: Request, res: Response) => {
+    const currentUser = req.user!;
 
-      const user = await getUserById(req.params.userId);
-      if (!user) return res.status(404).json({ error: 'User not found' });
+    const user = await getUserById(req.params.userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
 
-      const isFriendStatus = await isFriend(currentUser.id, user.id);
+    const isFriendStatus = await isFriend(currentUser.id, user.id);
 
-      const userWithoutPassword = sanitizeUser(user);
-      res.json({ user: userWithoutPassword, isFriend: isFriendStatus });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
-    }
+    const userWithoutPassword = sanitizeUser(user);
+    res.json({ user: userWithoutPassword, isFriend: isFriendStatus });
   });
 
-  app.delete('/api/friends/:targetUserId', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
-      await removeFriend(user.id, req.params.targetUserId);
-      res.json({ success: true });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
-    }
+  app.delete('/api/friends/:targetUserId', requireAuth, async (req: Request, res: Response) => {
+    const user = req.user!;
+    await removeFriend(user.id, req.params.targetUserId);
+    res.json({ success: true });
   });
 
-  app.post('/api/friends/invite/:friendId', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
+  app.post('/api/friends/invite/:friendId', requireAuth, async (req: Request, res: Response) => {
     const { roomId } = req.body;
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
+    const user = req.user!;
 
-      const friendSocketId = userSockets.get(req.params.friendId);
-      if (friendSocketId) {
-        io.to(friendSocketId).emit('friendInvite', {
-          fromUserId: user.id,
-          fromUsername: user.username,
-          roomId,
-        });
-      }
-      res.json({ success: true });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
+    const friendSocketId = userSockets.get(req.params.friendId);
+    if (friendSocketId) {
+      io.to(friendSocketId).emit('friendInvite', {
+        fromUserId: user.id,
+        fromUsername: user.username,
+        roomId,
+      });
     }
+    res.json({ success: true });
   });
 
-  app.post('/api/profile/frame', async (req: Request, res: Response) => {
-    const token = req.headers.authorization?.split(' ')[1];
+  app.post('/api/profile/frame', requireAuth, async (req: Request, res: Response) => {
     const { frameId, policyStyle, votingStyle, music, soundPack, backgroundId } = req.body;
-    if (!token) return res.status(401).json({ error: 'No token' });
-    try {
-      const user = await validateToken(token);
-      if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
+    const user = req.user!;
 
-      const PASS_ITEM_LEVELS: { [key: string]: number } = {
-        'bg-pass-0': 10,
-        'vote-pass-0': 20,
-        'music-pass-0': 40,
-        'frame-pass-0': 50,
-      };
+    const PASS_ITEM_LEVELS: { [key: string]: number } = {
+      'bg-pass-0': 10,
+      'vote-pass-0': 20,
+      'music-pass-0': 40,
+      'frame-pass-0': 50,
+    };
 
-      const isItemUnlocked = (itemId: string) => {
-        if (user.ownedCosmetics.includes(itemId)) return true;
-        const requiredLevel = PASS_ITEM_LEVELS[itemId];
-        if (requiredLevel) {
-          const userLevel = Math.floor(user.stats.gamesPlayed / 5) + 1;
-          return userLevel >= requiredLevel;
-        }
-        return false;
-      };
+    const isItemUnlocked = (itemId: string) => {
+      if (user.ownedCosmetics.includes(itemId)) return true;
+      const requiredLevel = PASS_ITEM_LEVELS[itemId];
+      if (requiredLevel) {
+        const userLevel = Math.floor(user.stats.gamesPlayed / 5) + 1;
+        return userLevel >= requiredLevel;
+      }
+      return false;
+    };
 
-      if (frameId !== undefined) {
-        if (frameId && !isItemUnlocked(frameId))
-          return res.status(400).json({ error: 'Not owned' });
-        user.activeFrame = frameId;
-      }
-      if (policyStyle !== undefined) {
-        if (policyStyle && !isItemUnlocked(policyStyle))
-          return res.status(400).json({ error: 'Not owned' });
-        user.activePolicyStyle = policyStyle;
-      }
-      if (votingStyle !== undefined) {
-        if (votingStyle && !isItemUnlocked(votingStyle))
-          return res.status(400).json({ error: 'Not owned' });
-        user.activeVotingStyle = votingStyle;
-      }
-      if (music !== undefined) {
-        if (music && !isItemUnlocked(music)) return res.status(400).json({ error: 'Not owned' });
-        user.activeMusic = music;
-      }
-      if (soundPack !== undefined) {
-        if (soundPack && !isItemUnlocked(soundPack))
-          return res.status(400).json({ error: 'Not owned' });
-        user.activeSoundPack = soundPack;
-      }
-      if (backgroundId !== undefined) {
-        if (backgroundId && !isItemUnlocked(backgroundId))
-          return res.status(400).json({ error: 'Not owned' });
-        user.activeBackground = backgroundId;
-      }
-
-      await saveUser(user);
-
-      // Push cosmetic changes to all live rooms immediately
-      for (const room of rooms.values()) {
-        let changed = false;
-        for (const p of room.players) {
-          if (p.userId === user.id) {
-            if (frameId !== undefined) p.activeFrame = frameId;
-            if (policyStyle !== undefined) p.activePolicyStyle = policyStyle;
-            if (votingStyle !== undefined) p.activeVotingStyle = votingStyle;
-            changed = true;
-          }
-        }
-        if (changed) engine.broadcastState(room.roomId);
-      }
-
-      const userWithoutPassword = sanitizeUser(user);
-      res.json({ user: userWithoutPassword });
-    } catch (_) {
-      res.status(401).json({ error: 'Invalid token' });
+    if (frameId !== undefined) {
+      if (frameId && !isItemUnlocked(frameId))
+        return res.status(400).json({ error: 'Not owned' });
+      user.activeFrame = frameId;
     }
+    if (policyStyle !== undefined) {
+      if (policyStyle && !isItemUnlocked(policyStyle))
+        return res.status(400).json({ error: 'Not owned' });
+      user.activePolicyStyle = policyStyle;
+    }
+    if (votingStyle !== undefined) {
+      if (votingStyle && !isItemUnlocked(votingStyle))
+        return res.status(400).json({ error: 'Not owned' });
+      user.activeVotingStyle = votingStyle;
+    }
+    if (music !== undefined) {
+      if (music && !isItemUnlocked(music)) return res.status(400).json({ error: 'Not owned' });
+      user.activeMusic = music;
+    }
+    if (soundPack !== undefined) {
+      if (soundPack && !isItemUnlocked(soundPack))
+        return res.status(400).json({ error: 'Not owned' });
+      user.activeSoundPack = soundPack;
+    }
+    if (backgroundId !== undefined) {
+      if (backgroundId && !isItemUnlocked(backgroundId))
+        return res.status(400).json({ error: 'Not owned' });
+      user.activeBackground = backgroundId;
+    }
+
+    await saveUser(user);
+
+    // Push cosmetic changes to all live rooms immediately
+    for (const room of rooms.values()) {
+      let changed = false;
+      for (const p of room.players) {
+        if (p.userId === user.id) {
+          if (frameId !== undefined) p.activeFrame = frameId;
+          if (policyStyle !== undefined) p.activePolicyStyle = policyStyle;
+          if (votingStyle !== undefined) p.activeVotingStyle = votingStyle;
+          changed = true;
+        }
+      }
+      if (changed) engine.broadcastState(room.roomId);
+    }
+
+    const userWithoutPassword = sanitizeUser(user);
+    res.json({ user: userWithoutPassword });
   });
   
   // ── TTS proxy ─────────────────────────────────────────────────────────────
@@ -1272,5 +1146,42 @@ export function registerRoutes(
       logger.error({ msg }, 'TTS Request failed');
       res.status(500).json({ error: 'TTS request failed' });
     }
+  });
+
+  // ── WebRTC ICE Servers ────────────────────────────────────────────────────
+  // Provides STUN and time-limited TURN credentials to authenticated users.
+  app.get('/api/webrtc/ice-servers', requireAuth, (req: Request, res: Response) => {
+    const iceServers: any[] = [
+      { urls: 'stun:stun.l.google.com:19302' },
+      { urls: 'stun:stun1.l.google.com:19302' },
+    ];
+
+    const turnUrl = process.env.TURN_URL; // e.g., "turn:turn.theassembly.net:3478"
+    const turnSecret = process.env.TURN_SECRET; // Shared secret for coturn/Xirsys
+    const turnUsername = process.env.TURN_USERNAME; // Optional fixed prefix
+
+    if (turnUrl && turnSecret) {
+      // Time-limited credentials (standard for coturn/Xirsys/Cloudflare)
+      const unixTimestamp = Math.floor(Date.now() / 1000) + 3600; // 1h validity
+      const username = `${unixTimestamp}:${turnUsername || req.user!.id}`;
+      const hmac = createHmac('sha1', turnSecret);
+      hmac.update(username);
+      const password = hmac.digest('base64');
+
+      iceServers.push({
+        urls: turnUrl.split(','), // Support comma-separated URLs
+        username,
+        credential: password,
+      });
+    } else if (turnUrl && turnUsername && process.env.TURN_PASSWORD) {
+      // Fixed credentials (fallback)
+      iceServers.push({
+        urls: turnUrl.split(','),
+        username: turnUsername,
+        credential: process.env.TURN_PASSWORD,
+      });
+    }
+
+    res.json({ iceServers });
   });
 }

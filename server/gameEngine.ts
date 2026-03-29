@@ -27,7 +27,10 @@ import {
   SystemConfig,
 } from '../src/types.ts';
 import { shuffle, createDeck } from './utils.ts';
-import { AI_BOTS, CHAT } from './aiConstants.ts';
+import { AI_BOTS } from './aiPersonalities.ts';
+import { CHAT } from './aiChatPhrases.ts';
+import { AI_WEIGHTS } from './aiWeights.ts';
+
 import { getExecutiveAction, assignRoles } from './gameRules.ts';
 import {
   initializeSuspicion,
@@ -1404,9 +1407,12 @@ export class GameEngine {
       let lie = false;
       if (player.role !== 'Civil') {
         if (player.personality === 'Deceptive') lie = true;
-        else if (player.personality === 'Aggressive') lie = Math.random() > 0.15;
-        else if (player.personality === 'Strategic') lie = (s.stateDirectives ?? 0) >= 1;
-        else if (player.personality === 'Chaotic') lie = Math.random() > 0.3;
+        else if (player.personality === 'Aggressive')
+          lie = Math.random() < AI_WEIGHTS.lying.Aggressive;
+        else if (player.personality === 'Strategic')
+          lie = (s.stateDirectives ?? 0) >= AI_WEIGHTS.legislative.STRATEGIC_PASS_THRESHOLD;
+        else if (player.personality === 'Chaotic')
+          lie = Math.random() < AI_WEIGHTS.lying.Chaotic;
       }
       if (lie && civ > 0) {
         if (enacted === 'Civil' && civ === 1) {
@@ -2649,17 +2655,26 @@ export class GameEngine {
     president: Player,
     chancellor: Player | null
   ): 'Aye' | 'Nay' {
-    const diff = ai.difficulty === 'Elite' ? 1.5 : ai.difficulty === 'Casual' ? 0.5 : 1.0;
+    const diff =
+      ai.difficulty === 'Elite'
+        ? AI_WEIGHTS.difficulty.Elite
+        : ai.difficulty === 'Casual'
+          ? AI_WEIGHTS.difficulty.Casual
+          : AI_WEIGHTS.difficulty.Normal;
 
     if (ai.role === 'Civil' && ai.suspicion) {
       const ps = getSuspicion(ai, president.id);
       const cs = chancellor ? getSuspicion(ai, chancellor.id) : 0;
       const thr = Math.min(0.6, 0.45 + s.round * 0.015) * diff;
-      const risk = ai.personality === 'Strategic' ? 0.3 : ai.personality === 'Chaotic' ? 0.7 : 0.5;
+      const risk =
+        AI_WEIGHTS.riskThresholds[ai.personality!] ?? AI_WEIGHTS.riskThresholds.Default;
 
       // Agenda-based Noise: Certain agendas make Civils more "thorny" and prone to Naying
       const agendasWithNoise: string[] = ['chaos_agent', 'the_hawk', 'stonewalled'];
-      const noise = ai.personalAgenda && agendasWithNoise.includes(ai.personalAgenda) ? 0.25 : 0;
+      const noise =
+        ai.personalAgenda && agendasWithNoise.includes(ai.personalAgenda)
+          ? AI_WEIGHTS.noise.AGENDA_CONTRIBUTION
+          : 0;
 
       if ((ps * diff > thr || cs * diff > thr) && Math.random() > risk - noise) {
         return s.electionTracker >= 2 ? 'Aye' : 'Nay';
@@ -2668,7 +2683,8 @@ export class GameEngine {
       if (s.electionTracker >= 2) return 'Aye';
 
       // Base noise: 20% of the time, vote randomly, influenced by noise-heavy agendas
-      if (Math.random() < 0.2 + noise) return Math.random() > 0.5 ? 'Aye' : 'Nay';
+      if (Math.random() < AI_WEIGHTS.noise.BASE_VOTING + noise)
+        return Math.random() > 0.5 ? 'Aye' : 'Nay';
       return 'Aye';
     }
 
@@ -2680,8 +2696,8 @@ export class GameEngine {
 
     if (s.stateDirectives >= 3 && chancellor?.role === 'Overseer') return 'Aye';
     if (chancellor?.role !== 'Civil' || president.role !== 'Civil')
-      return Math.random() > 0.15 ? 'Aye' : 'Nay';
-    return Math.random() > 0.45 ? 'Aye' : 'Nay';
+      return Math.random() > AI_WEIGHTS.stateVoting.AYE_THRESHOLD_BASE ? 'Aye' : 'Nay';
+    return Math.random() > AI_WEIGHTS.stateVoting.NAY_THRESHOLD_BASE ? 'Aye' : 'Nay';
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -2720,10 +2736,12 @@ export class GameEngine {
       idx = hand.findIndex((p) => p === 'Civil');
     } else if (player.personality === 'Strategic' && player.role !== 'Civil') {
       idx =
-        stateDir < 1 ? hand.findIndex((p) => p === 'State') : hand.findIndex((p) => p === 'Civil');
+        stateDir < AI_WEIGHTS.legislative.STRATEGIC_PASS_THRESHOLD
+          ? hand.findIndex((p) => p === 'State')
+          : hand.findIndex((p) => p === 'Civil');
     } else if (player.personality === 'Honest' || player.role === 'Civil') {
       // Civil Noise: 5% chance to "accidentally" discard Civil or follow a weird agenda
-      if (Math.random() < 0.05) {
+      if (Math.random() < AI_WEIGHTS.legislative.CIVIL_MISTAKE_CHANCE) {
         idx = hand.findIndex((p) => p === 'Civil');
       } else {
         idx = hand.findIndex((p) => p === 'State');
@@ -2768,7 +2786,9 @@ export class GameEngine {
       idx = hand.findIndex((p) => p === 'Civil');
     } else if (player.personality === 'Strategic' && player.role !== 'Civil') {
       idx =
-        stateDir < 2 ? hand.findIndex((p) => p === 'Civil') : hand.findIndex((p) => p === 'State');
+        stateDir < AI_WEIGHTS.legislative.STRATEGIC_PLAY_THRESHOLD
+          ? hand.findIndex((p) => p === 'Civil')
+          : hand.findIndex((p) => p === 'State');
     } else if (player.personality === 'Honest' || player.role === 'Civil') {
       idx = hand.findIndex((p) => p === 'Civil');
     }

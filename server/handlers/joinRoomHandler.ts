@@ -8,6 +8,7 @@ import { Player, SystemConfig } from '../../src/types.ts';
 import { logger } from '../logger.ts';
 
 import { joinRoomSchema } from '../schemas.ts';
+import v8 from 'v8';
 
 const MAX_ROOM_CAPACITY = parseInt(process.env.MAX_ROOM_CAPACITY || '100');
 
@@ -67,9 +68,24 @@ export async function handleJoinRoom(
   }
 
   let state = engine.rooms.get(roomId);
+  
   if (!state && engine.rooms.size >= MAX_ROOM_CAPACITY) {
     socket.emit('error', 'Server at capacity. Too many active rooms.');
     return;
+  }
+
+  // Circuit Breaker: Prevent new room creation if memory pressure is high (>80% heapUsed)
+  if (!state) {
+    const mem = process.memoryUsage();
+    const heapLimit = v8.getHeapStatistics().heap_size_limit;
+    if (mem.heapUsed > heapLimit * 0.8) {
+      logger.error(
+        { heapUsed: mem.heapUsed, heapLimit, roomCount: engine.rooms.size },
+        'Circuit Breaker: Rejecting room creation due to high memory pressure'
+      );
+      socket.emit('error', 'The assembly is currently overcrowded. Please try again in a few minutes.');
+      return;
+    }
   }
 
   if (!state) {

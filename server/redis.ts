@@ -43,3 +43,9 @@ export const roomKey = (roomId: string): string => `room:${roomId}`;
 
 /** How long to keep an idle room in Redis before auto-expiry (24 hours) */
 export const ROOM_TTL_SECONDS = 60 * 60 * 24;
+
+/** Returns the current raw connection status of the Redis pubClient. */
+export function getRedisStatus(): string {
+  if (!REDIS_URL || !pubClient) return 'disabled';
+  return (pubClient as any).status || 'unknown';
+}

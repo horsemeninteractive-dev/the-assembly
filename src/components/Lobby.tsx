@@ -20,7 +20,7 @@ import {
 } from 'lucide-react';
 import { Tooltip } from './Tooltip';
 import { User, RoomInfo, RoomPrivacy } from '../types';
-import { cn, getProxiedUrl, apiUrl } from '../lib/utils';
+import { cn, getProxiedUrl, apiUrl, debugError } from '../lib/utils';
 import { getFrameStyles } from '../lib/cosmetics';
 import { LeaderboardModal } from './game/modals/LeaderboardModal';
 import { HowToPlayModal } from './HowToPlayModal';
@@ -143,7 +143,7 @@ export const Lobby: React.FC<LobbyProps> = ({
       const rejoinData = await rejoinResponse.json();
       setRejoinInfo(rejoinData);
     } catch (err) {
-      console.error('Failed to fetch rooms', err);
+      debugError('Failed to fetch rooms', err);
     } finally {
       setIsLoading(false);
     }
@@ -160,7 +160,7 @@ export const Lobby: React.FC<LobbyProps> = ({
     } catch (err) {
       // Only log once to avoid console spam
       if (globalStats.civilWins === 0 && globalStats.stateWins === 0) {
-        console.error('Failed to fetch global stats', err);
+        debugError('Failed to fetch global stats', err);
       }
     }
   };

@@ -2,15 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { socket } from '../socket';
 import { GameState, Role, Policy, User, PrivateInfo, PostMatchResult } from '../types';
 import { getBackgroundTexture } from '../lib/cosmetics';
-import { cn, getProxiedUrl } from '../lib/utils';
+import { cn, getProxiedUrl, debugLog, debugWarn, debugError, apiUrl } from '../lib/utils';
 import * as aiSpeech from '../services/aiSpeech';
 
-const debugLog = (...args: any[]) => {
-  if (import.meta.env.DEV) console.log(...args);
-};
-const debugError = (...args: any[]) => {
-  if (import.meta.env.DEV) console.error(...args);
-};
 
 import { GameHeader } from './game/GameHeader';
 import { PolicyTracks } from './game/PolicyTracks';
@@ -582,6 +576,30 @@ export const GameRoom = ({
   // Push a track into a peer connection.
   // Removes any existing sender for this kind first — including null-tracked senders
   // left by removeTrack — so we never accumulate stale transceivers.
+  // ── WebRTC ─────────────────────────────────────────────────────────────
+  const [iceServers, setIceServers] = useState<any[]>([
+    { urls: 'stun:stun.l.google.com:19302' },
+  ]);
+
+  useEffect(() => {
+    const fetchIce = async () => {
+      try {
+        const res = await fetch(apiUrl('/api/webrtc/ice-servers'), {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        if (res.ok) {
+          const { iceServers: fetched } = await res.json();
+          if (fetched && fetched.length > 0) {
+            setIceServers(fetched);
+          }
+        }
+      } catch (err) {
+        debugWarn('[WebRTC] Failed to fetch custom ICE servers, falling back to public STUN');
+      }
+    };
+    if (token) fetchIce();
+  }, [token]);
+
   const addTrackToPeer = (pc: RTCPeerConnection, track: MediaStreamTrack, stream: MediaStream) => {
     debugLog(
       `[WebRTC] addTrackToPeer kind=${track.kind} | senders=[${pc
@@ -608,7 +626,7 @@ export const GameRoom = ({
     const polite = socket.id! > peerId;
     peerMetaRef.current[peerId] = { makingOffer: false, polite };
 
-    const pc = new RTCPeerConnection({ iceServers: [{ urls: 'stun:stun.l.google.com:19302' }] });
+    const pc = new RTCPeerConnection({ iceServers });
     peersRef.current[peerId] = pc;
 
     // Seed an empty stream so the video tile renders immediately

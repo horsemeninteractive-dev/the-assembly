@@ -28,7 +28,7 @@ import {
 import { User, CosmeticItem, Policy, MatchSummary } from '../types';
 import { FriendsList } from './FriendsList';
 import { Inventory } from './Inventory';
-import { cn, getProxiedUrl, apiUrl } from '../lib/utils';
+import { cn, getProxiedUrl, apiUrl, debugLog, debugError } from '../lib/utils';
 import { getPolicyStyles, getVoteStyles, getFrameStyles, getRarity } from '../lib/cosmetics';
 import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../sharedConstants';
 import {
@@ -366,7 +366,7 @@ export const Profile: React.FC<ProfileProps> = ({
     type: 'frame' | 'badge' | 'policy' | 'vote' | 'music' | 'sound' | 'background',
     itemId: string | undefined
   ) => {
-    console.log('handleEquip called', type, itemId);
+    debugLog('handleEquip called', type, itemId);
     setIsLoading(true);
     setError('');
     try {

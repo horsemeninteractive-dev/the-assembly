@@ -13,7 +13,7 @@ import {
   Medal,
 } from 'lucide-react';
 import { User } from '../../../types';
-import { cn, getProxiedUrl, apiUrl } from '../../../lib/utils';
+import { cn, getProxiedUrl, apiUrl, debugError } from '../../../lib/utils';
 import { getFrameStyles } from '../../../lib/cosmetics';
 import { socket } from '../../../socket';
 import { getLevelFromXp } from '../../../lib/xp';
@@ -54,7 +54,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
           }
         }
       } catch (err) {
-        console.error('Failed to fetch user', err);
+        debugError('Failed to fetch user', err);
       } finally {
         setLoading(false);
       }
@@ -87,7 +87,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
         setIsPending(true);
       }
     } catch (err) {
-      console.error('Failed to toggle friend', err);
+      debugError('Failed to toggle friend', err);
     }
   };
 

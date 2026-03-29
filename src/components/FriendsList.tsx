@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { socket } from '../socket';
 import { User, RecentlyPlayedEntry } from '../types';
-import { cn, getProxiedUrl, apiUrl } from '../lib/utils';
+import { cn, getProxiedUrl, apiUrl, debugError } from '../lib/utils';
 import { getFrameStyles } from '../lib/cosmetics';
 import { getLevelFromXp } from '../lib/xp';
 import { getRankTier, getRankLabel } from '../lib/ranks';
@@ -152,7 +152,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
         }))
       );
     } catch (err) {
-      console.error('Failed to fetch friends', err);
+      debugError('Failed to fetch friends', err);
     } finally {
       setLoading(false);
     }

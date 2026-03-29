@@ -4,7 +4,7 @@ import { Lock, User as UserIcon, Loader2, Chrome, MessageSquare } from 'lucide-r
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
 import { User } from '../types';
-import { cn, getProxiedUrl, apiUrl } from '../lib/utils';
+import { cn, getProxiedUrl, apiUrl, debugLog, debugError } from '../lib/utils';
 import { discordSdk } from '../lib/discord';
 import { DISCORD_CLIENT_ID } from '../constants';
 
@@ -64,7 +64,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
     const instanceId = discordSdk?.instanceId;
     try {
       if (instanceId) {
-        console.log('Environment: Discord Activity. Attempting SDK authorization...');
+        debugLog('Environment: Discord Activity. Attempting SDK authorization...');
         // Use environment variable for security
         const clientId = DISCORD_CLIENT_ID;
 
@@ -81,7 +81,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
           // Removed prompt: "none" for manual clicks to allow first-time consent
           scope: ['identify', 'guilds'],
         });
-        console.log('SDK authorize success. Exchanging code with server...');
+        debugLog('SDK authorize success. Exchanging code with server...');
 
         const response = await fetch(apiUrl('/api/auth/discord/callback'), {
           method: 'POST',
@@ -91,17 +91,17 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
 
         if (!response.ok) {
           const data = await response.json().catch(() => ({}));
-          console.error('Server callback failed:', data);
+          debugError('Server callback failed:', data);
           throw new Error(
             data.error || 'The game server rejected the login attempt. Please try again.'
           );
         }
 
         const data = await response.json();
-        console.log('Server authentication success!');
+        debugLog('Server authentication success!');
         onAuthSuccess(data.user, data.token);
       } else {
-        console.log('Environment: Standard Web. Using OAuth flow.');
+        debugLog('Environment: Standard Web. Using OAuth flow.');
         const origin = window.location.origin;
         const isNative = Capacitor.isNativePlatform();
         const response = await fetch(
@@ -115,7 +115,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
         if (isNative) {
           await Browser.open({ url });
         } else if (discordSdk && window.self !== window.top) {
-          console.log('In iframe, using SDK openExternalLink:', url);
+          debugLog('In iframe, using SDK openExternalLink:', url);
           await discordSdk.commands.openExternalLink({ url });
         } else {
           const isIframe = window.self !== window.top;
@@ -127,7 +127,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
         }
       }
     } catch (err: any) {
-      console.error('Discord login process failed:', err);
+      debugError('Discord login process failed:', err);
       // Map common Discord SDK errors to user-friendly messages
       let msg = err.message || 'Unknown error';
       if (err.code === 4001) msg = 'Login cancelled. You must authorize the app to play.';
@@ -152,13 +152,13 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
         }
       }
     } catch (err) {
-      console.error(`${provider} login error:`, err);
+      debugError(`${provider} login error:`, err);
       setError(`Failed to initiate ${provider} login`);
     }
   };
 
   const handleSocialLogin = async (provider: 'google' | 'discord') => {
-    console.log(`handleSocialLogin clicked for: ${provider}`);
+    debugLog(`handleSocialLogin clicked for: ${provider}`);
     setError('');
 
     if (provider === 'discord') {
@@ -179,13 +179,13 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
           throw new Error(data.error || `Failed to reach auth server for ${provider}`);
         }
         const { url } = await response.json();
-        console.log(`In Discord, using commands.openExternalLink for ${provider}:`, url);
+        debugLog(`In Discord, using commands.openExternalLink for ${provider}:`, url);
         await discordSdk.commands.openExternalLink({ url });
       } else {
         await handleOAuthLogin(provider);
       }
     } catch (err: any) {
-      console.error(`${provider} login process failed:`, err);
+      debugError(`${provider} login process failed:`, err);
       setError(`${provider} Auth Error: ${err.message || 'Unknown error'}`);
     }
   };

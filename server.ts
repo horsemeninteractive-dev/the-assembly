@@ -135,6 +135,7 @@ async function startServer() {
             'https://*.discordapp.com',
             'https://lh3.googleusercontent.com',
             'https://api.dicebear.com',
+            'https://*.dicebear.com',
             'https://picsum.photos',
             'https://i.pravatar.cc',
             'https://images.unsplash.com',
@@ -142,6 +143,8 @@ async function startServer() {
             'https://transparenttextures.com',
             'https://www.transparenttextures.com',
             'https://storage.googleapis.com',
+            'https://*.googleapis.com',
+            'https://*.gstatic.com',
           ],
           mediaSrc: [
             "'self'",
@@ -169,7 +172,7 @@ async function startServer() {
           ],
         },
       },
-      crossOriginEmbedderPolicy: { policy: 'credentialless' },
+      crossOriginEmbedderPolicy: false,
       crossOriginOpenerPolicy: { policy: 'same-origin' },
       crossOriginResourcePolicy: { policy: 'cross-origin' },
     })

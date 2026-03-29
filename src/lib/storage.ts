@@ -1,9 +1,11 @@
+import { debugWarn } from './utils';
+
 export const storage = {
   getItem: (key: string): string | null => {
     try {
       return localStorage.getItem(key);
     } catch (e) {
-      console.warn('localStorage.getItem failed:', e);
+      debugWarn('localStorage.getItem failed:', e);
       return null;
     }
   },
@@ -11,14 +13,14 @@ export const storage = {
     try {
       localStorage.setItem(key, value);
     } catch (e) {
-      console.warn('localStorage.setItem failed:', e);
+      debugWarn('localStorage.setItem failed:', e);
     }
   },
   removeItem: (key: string): void => {
     try {
       localStorage.removeItem(key);
     } catch (e) {
-      console.warn('localStorage.removeItem failed:', e);
+      debugWarn('localStorage.removeItem failed:', e);
     }
   },
 };

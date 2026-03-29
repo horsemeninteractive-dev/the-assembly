@@ -19,7 +19,7 @@ import {
   X,
 } from 'lucide-react';
 import { socket } from '../socket';
-import { cn, apiUrl } from '../lib/utils';
+import { cn, apiUrl, debugLog, debugError } from '../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
 import { RoomInfo, User, SystemConfig } from '../types';
 
@@ -104,7 +104,7 @@ export const AdminTools: React.FC<AdminToolsProps> = ({ adminId, token }) => {
         setRooms(Array.isArray(data) ? data : []);
       }
     } catch (err) {
-      console.error('Failed to fetch rooms:', err);
+      debugError('Failed to fetch rooms:', err);
     } finally {
       setLoading(false);
     }
@@ -121,7 +121,7 @@ export const AdminTools: React.FC<AdminToolsProps> = ({ adminId, token }) => {
         setConfig(data);
       }
     } catch (err) {
-      console.error('Failed to fetch config:', err);
+      debugError('Failed to fetch config:', err);
     }
   };
 
@@ -170,7 +170,7 @@ export const AdminTools: React.FC<AdminToolsProps> = ({ adminId, token }) => {
     setLoading(true);
     setHasSearched(true);
     try {
-      console.log(`[AdminTools] Searching for: "${userSearchQuery}" with adminId: ${adminId}`);
+      debugLog(`[AdminTools] Searching for: "${userSearchQuery}" with adminId: ${adminId}`);
       const res = await fetch(
         apiUrl(`/api/admin/users/search?adminId=${adminId}&q=${userSearchQuery}`),
         {
@@ -179,15 +179,15 @@ export const AdminTools: React.FC<AdminToolsProps> = ({ adminId, token }) => {
       );
       if (res.ok) {
         const data = await res.json();
-        console.log(`[AdminTools] Search results:`, data);
+        debugLog(`[AdminTools] Search results:`, data);
         setUserSearchResults(data);
         if (data.length > 0) setSelectedUser(data[0]);
       } else {
         const errText = await res.text();
-        console.error(`[AdminTools] Search failed (${res.status}):`, errText);
+        debugError(`[AdminTools] Search failed (${res.status}):`, errText);
       }
     } catch (err) {
-      console.error('Failed to search users:', err);
+      debugError('Failed to search users:', err);
     } finally {
       setLoading(false);
     }

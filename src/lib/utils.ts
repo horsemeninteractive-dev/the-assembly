@@ -23,6 +23,7 @@ export function apiUrl(path: string): string {
   return path;
 }
 
+
 export function getProxiedUrl(url: string | undefined): string {
   if (!url) return '';
   if (url.startsWith('data:') || url.startsWith('blob:') || url.startsWith('/')) return url;
@@ -45,3 +46,15 @@ export function getProxiedUrl(url: string | undefined): string {
 
   return url;
 }
+
+export const debugLog = (...args: any[]) => {
+  if (import.meta.env.DEV) console.log(...args);
+};
+
+export const debugWarn = (...args: any[]) => {
+  if (import.meta.env.DEV) console.warn(...args);
+};
+
+export const debugError = (...args: any[]) => {
+  if (import.meta.env.DEV) console.error(...args);
+};

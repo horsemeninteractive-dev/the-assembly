@@ -1,3 +1,4 @@
+import { debugError } from '../lib/utils';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { Capacitor } from '@capacitor/core';
 
@@ -140,7 +141,7 @@ export const speakAiMessage = async (
         category: 'ambient',
       });
     } catch (err) {
-      console.error('Native speech error:', err);
+      debugError('Native speech error:', err);
     } finally {
       clearTimeout(safetyTimer);
       onEnd();
@@ -152,7 +153,7 @@ export const speakAiMessage = async (
 
   // Define SpeechSynthesisUtterance safely to avoid ReferenceError on some Android WebViews
   if (typeof SpeechSynthesisUtterance === 'undefined') {
-    console.error('SpeechSynthesisUtterance is not defined in this browser');
+    debugError('SpeechSynthesisUtterance is not defined in this browser');
     onEnd();
     return;
   }
@@ -166,7 +167,7 @@ export const speakAiMessage = async (
   utterance.onstart = onStart;
   utterance.onend = onEnd;
   utterance.onerror = (e) => {
-    console.error('Speech error:', e);
+    debugError('Speech error:', e);
     onEnd();
   };
 
@@ -190,7 +191,7 @@ export const speak = async (
         category: 'ambient',
       });
     } catch (err) {
-      console.error('Native speech error:', err);
+      debugError('Native speech error:', err);
     }
     return;
   }
@@ -217,7 +218,7 @@ export const stop = async () => {
     try {
       await TextToSpeech.stop();
     } catch (err) {
-      console.error('Native speech stop error:', err);
+      debugError('Native speech stop error:', err);
     }
     return;
   }

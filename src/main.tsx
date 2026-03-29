@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Capacitor } from '@capacitor/core';
 import App from './App.tsx';
 import './index.css';
+import { debugLog, debugError } from './lib/utils';
 
 // Global Fetch Interceptor for Native Capacitor
 if (Capacitor.isNativePlatform()) {
@@ -18,7 +19,7 @@ if (Capacitor.isNativePlatform()) {
 
 // Global error handler for debugging white screens
 window.onerror = (message, source, lineno, colno, error) => {
-  console.error('Global Error:', { message, source, lineno, colno, error });
+  debugError('Global Error:', { message, source, lineno, colno, error });
   const root = document.getElementById('root');
   if (root && root.innerHTML === '') {
     root.innerHTML = `
@@ -38,7 +39,7 @@ try {
       navigator.serviceWorker
         .register('/sw.js')
         .then((registration) => {
-          console.log('SW registered:', registration);
+          debugLog('SW registered:', registration);
 
           // Force an update check on every load
           registration.update();
@@ -48,7 +49,7 @@ try {
             if (newWorker) {
               newWorker.onstatechange = () => {
                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                  console.log('New SW version installed, reloading...');
+                  debugLog('New SW version installed, reloading...');
                   window.location.reload();
                 }
               };
@@ -56,7 +57,7 @@ try {
           };
         })
         .catch((error) => {
-          console.log('SW registration failed:', error);
+          debugLog('SW registration failed:', error);
         });
     });
 
@@ -65,13 +66,13 @@ try {
     navigator.serviceWorker.addEventListener('controllerchange', () => {
       if (!refreshing) {
         refreshing = true;
-        console.log('Controller changed, reloading...');
+        debugLog('Controller changed, reloading...');
         window.location.reload();
       }
     });
   }
 } catch (e) {
-  console.error('Service worker initialization error:', e);
+  debugError('Service worker initialization error:', e);
 }
 
 createRoot(document.getElementById('root')!).render(

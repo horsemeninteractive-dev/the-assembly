@@ -1,4 +1,6 @@
 import { GameState, Player, Policy } from '../src/types.ts';
+import { AI_WEIGHTS } from './aiWeights.ts';
+
 
 // =============================================================================
 // BAYESIAN SUSPICION MODEL
@@ -47,7 +49,11 @@ export function initializeSuspicion(state: GameState): void {
       } else {
         // State / Overseer know everyone's alignment
         const isStateTeam = target.role === 'State' || target.role === 'Overseer';
-        ai.suspicion[target.id] = logOdds(isStateTeam ? 0.97 : 0.03);
+        ai.suspicion[target.id] = logOdds(
+          isStateTeam
+            ? AI_WEIGHTS.suspicionModel.INITIAL_BELIEF.STATE_TEAM
+            : AI_WEIGHTS.suspicionModel.INITIAL_BELIEF.CIVIL_TEAM
+        );
       }
     }
   }
@@ -80,19 +86,19 @@ export function updateSuspicionFromPolicy(state: GameState, policy: Policy): voi
     for (const [pid, v] of Object.entries(votes)) {
       if (pid === ai.id) continue;
       if (policy === 'State') {
-        nudge(ai, pid, v === 'Aye' ? 1.78 : 0.56);
+        nudge(ai, pid, v === 'Aye' ? AI_WEIGHTS.suspicionModel.VOTING_LR.STATE_POLICY.AYE : AI_WEIGHTS.suspicionModel.VOTING_LR.STATE_POLICY.NAY);
       } else {
-        nudge(ai, pid, v === 'Aye' ? 0.71 : 1.4);
+        nudge(ai, pid, v === 'Aye' ? AI_WEIGHTS.suspicionModel.VOTING_LR.CIVIL_POLICY.AYE : AI_WEIGHTS.suspicionModel.VOTING_LR.CIVIL_POLICY.NAY);
       }
     }
 
     // Government members are stronger signals than plain votes
     // Chancellor blame model: Chancellor gets more blame/credit than President
     if (presId && presId !== ai.id) {
-      nudge(ai, presId, policy === 'State' ? 1.4 : 0.75);
+      nudge(ai, presId, policy === 'State' ? AI_WEIGHTS.suspicionModel.BLAME_LR.PRESIDENT.STATE : AI_WEIGHTS.suspicionModel.BLAME_LR.PRESIDENT.CIVIL);
     }
     if (chanId && chanId !== ai.id) {
-      nudge(ai, chanId, policy === 'State' ? 2.8 : 0.45);
+      nudge(ai, chanId, policy === 'State' ? AI_WEIGHTS.suspicionModel.BLAME_LR.CHANCELLOR.STATE : AI_WEIGHTS.suspicionModel.BLAME_LR.CHANCELLOR.CIVIL);
       const chan = state.players.find((p) => p.id === chanId);
       if (chan && policy === 'State') {
         chan.stateEnactments = (chan.stateEnactments ?? 0) + 1;
@@ -112,7 +118,8 @@ export function updateSuspicionFromPolicyExpectation(state: GameState, policy: P
   // If President drew 3 Civil, playing State is highly suspicious, but give benefit of doubt for noise
   if (presDecl.drewSta === 0 && policy === 'State') {
     for (const ai of state.players.filter((p) => p.isAI && p.role === 'Civil')) {
-      if (presDecl.playerId !== ai.id) nudge(ai, presDecl.playerId, 3.5);
+      if (presDecl.playerId !== ai.id)
+        nudge(ai, presDecl.playerId, AI_WEIGHTS.suspicionModel.DECLARATION_LR.POLICY_EXPECTATION);
     }
   }
 }
@@ -137,24 +144,29 @@ export function updateSuspicionFromDeclarations(state: GameState): void {
 
     if (inconsistent) {
       // Definite lie — raise both by LR ≈ 2.0
-      if (presDecl.playerId !== ai.id) nudge(ai, presDecl.playerId, 2.0);
-      if (chanDecl.playerId !== ai.id) nudge(ai, chanDecl.playerId, 2.0);
+      if (presDecl.playerId !== ai.id)
+        nudge(ai, presDecl.playerId, AI_WEIGHTS.suspicionModel.DECLARATION_LR.INCONSISTENT);
+      if (chanDecl.playerId !== ai.id)
+        nudge(ai, chanDecl.playerId, AI_WEIGHTS.suspicionModel.DECLARATION_LR.INCONSISTENT);
       state.log.push(
         `[Suspicion] Inconsistent declarations: ${presDecl.playerName} vs ${chanDecl.playerName}.`
       );
       if (state.log.length > 50) state.log.shift();
     } else {
       // Consistent — modest trust boost
-      if (presDecl.playerId !== ai.id) nudge(ai, presDecl.playerId, 0.88);
-      if (chanDecl.playerId !== ai.id) nudge(ai, chanDecl.playerId, 0.88);
+      if (presDecl.playerId !== ai.id)
+        nudge(ai, presDecl.playerId, AI_WEIGHTS.suspicionModel.DECLARATION_LR.CONSISTENT);
+      if (chanDecl.playerId !== ai.id)
+        nudge(ai, chanDecl.playerId, AI_WEIGHTS.suspicionModel.DECLARATION_LR.CONSISTENT);
     }
 
     // "All 3 were State" is a common State deflection
-    if (presDecl.sta === 3 && presDecl.playerId !== ai.id) nudge(ai, presDecl.playerId, 1.2);
+    if (presDecl.sta === 3 && presDecl.playerId !== ai.id)
+      nudge(ai, presDecl.playerId, AI_WEIGHTS.suspicionModel.DECLARATION_LR.TRIPLE_STATE_DEFLECTION);
 
     // Chancellor claiming 2-State hand is exculpatory for them but pins president
     if (chanDecl.sta === 2 && presDecl.sta >= 2 && presDecl.playerId !== ai.id) {
-      nudge(ai, presDecl.playerId, 1.3);
+      nudge(ai, presDecl.playerId, AI_WEIGHTS.suspicionModel.DECLARATION_LR.CHANCELLOR_EXCULPATORY);
     }
   }
 }
@@ -167,8 +179,22 @@ export function updateSuspicionFromInvestigation(
 ): void {
   for (const ai of state.players.filter((p) => p.isAI && p.role === 'Civil')) {
     if (!ai.suspicion) continue;
-    if (targetId !== ai.id) nudge(ai, targetId, result === 'State' ? 10.0 : 0.08);
-    if (investigatorId !== ai.id) nudge(ai, investigatorId, result === 'State' ? 0.85 : 0.88);
+    if (targetId !== ai.id)
+      nudge(
+        ai,
+        targetId,
+        result === 'State'
+          ? AI_WEIGHTS.suspicionModel.INVESTIGATION_LR.TARGET_STATE
+          : AI_WEIGHTS.suspicionModel.INVESTIGATION_LR.TARGET_CIVIL
+      );
+    if (investigatorId !== ai.id)
+      nudge(
+        ai,
+        investigatorId,
+        result === 'State'
+          ? AI_WEIGHTS.suspicionModel.INVESTIGATION_LR.INVESTIGATOR_STATE_CLAIM
+          : AI_WEIGHTS.suspicionModel.INVESTIGATION_LR.INVESTIGATOR_CIVIL_CLAIM
+      );
   }
 }
 
@@ -184,11 +210,17 @@ export function updateSuspicionFromNomination(
   for (const ai of state.players.filter((p) => p.isAI && p.role === 'Civil')) {
     if (!ai.suspicion) continue;
     const chanSusp = getSuspicion(ai, chancellorId);
-    if (chanSusp > 0.6 && presidentId !== ai.id) {
-      nudge(ai, presidentId, 1.0 + chanSusp);
+    if (chanSusp > AI_WEIGHTS.suspicionModel.NOMINATION.SUSPICION_THRESHOLD && presidentId !== ai.id) {
+      nudge(ai, presidentId, AI_WEIGHTS.suspicionModel.NOMINATION.SUSPICIOUS_NOMINATION_LR_BASE + chanSusp);
     }
     if (chancellorId !== ai.id) {
-      nudge(ai, chancellorId, chanSusp > 0.55 ? 1.2 : 0.95);
+      nudge(
+        ai,
+        chancellorId,
+        chanSusp > AI_WEIGHTS.suspicionModel.NOMINATION.SUSPICION_THRESHOLD - 0.05
+          ? AI_WEIGHTS.suspicionModel.NOMINATION.BASE_INCREASE
+          : AI_WEIGHTS.suspicionModel.NOMINATION.BASE_DECREASE
+      );
     }
   }
 }

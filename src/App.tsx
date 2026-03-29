@@ -16,7 +16,7 @@ import { DiscordSDK } from '@discord/embedded-app-sdk';
 import { discordSdk, setupDiscordSdk } from './lib/discord';
 import { DISCORD_CLIENT_ID } from './constants';
 import { CLIENT_VERSION } from './sharedConstants';
-import { cn, getProxiedUrl, apiUrl } from './lib/utils';
+import { cn, getProxiedUrl, apiUrl, debugLog, debugWarn, debugError } from './lib/utils';
 import { PurchaseCPModal } from './components/PurchaseCPModal';
 import { App as CapApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
@@ -24,6 +24,7 @@ import { StatusBar, Style } from '@capacitor/status-bar';
 import { Browser } from '@capacitor/browser';
 import * as aiSpeech from './services/aiSpeech';
 import { Megaphone, X } from 'lucide-react';
+import { ErrorBoundary } from './components/common/ErrorBoundary';
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null);
@@ -63,7 +64,7 @@ export default function App() {
   const [serverRestarting, setServerRestarting] = useState<string | null>(null);
 
   const handleDiscordAutoJoin = (roomId: string, currentUser: User) => {
-    console.log('Auto-joining Discord instance room:', roomId);
+    debugLog('Auto-joining Discord instance room:', roomId);
     socket.emit('joinRoom', {
       roomId,
       name: currentUser.username,
@@ -82,7 +83,7 @@ export default function App() {
     const init = async () => {
       try {
         setLoading(true);
-        console.log(
+        debugLog(
           `App initialization started [${CLIENT_VERSION}]. Initial detection - isDiscord:`,
           isDiscord,
           'isMobile:',
@@ -91,7 +92,7 @@ export default function App() {
 
         await setupDiscordSdk();
         const instanceId = discordSdk?.instanceId;
-        console.log('Discord SDK setup complete. instanceId:', instanceId);
+        debugLog('Discord SDK setup complete. instanceId:', instanceId);
 
         let currentUser: User | null = null;
         let currentToken: string | null = localStorage.getItem('token');
@@ -99,7 +100,7 @@ export default function App() {
         // 1. Try Discord Auto-Login first if we are in Discord
         if (instanceId) {
           setIsDiscord(true);
-          console.log('Discord instance detected, attempting auto-login...');
+          debugLog('Discord instance detected, attempting auto-login...');
           try {
             const clientId = DISCORD_CLIENT_ID;
             if (!clientId) throw new Error('Discord client ID not set');
@@ -111,7 +112,7 @@ export default function App() {
               prompt: 'none',
               scope: ['identify', 'guilds'],
             });
-            console.log('Discord authorize success, exchanging code...');
+            debugLog('Discord authorize success, exchanging code...');
             const response = await fetch(apiUrl('/api/auth/discord/callback'), {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -122,15 +123,15 @@ export default function App() {
               currentUser = data.user;
               currentToken = data.token;
               localStorage.setItem('token', data.token);
-              console.log('Discord auto-login success for user:', currentUser?.username);
+              debugLog('Discord auto-login success for user:', currentUser?.username);
             } else {
               const errData = await response
                 .json()
                 .catch(() => ({ error: 'Unknown server error' }));
-              console.error('Discord callback failed:', errData);
+              debugError('Discord callback failed:', errData);
             }
           } catch (err) {
-            console.error(
+            debugError(
               'Discord auto-login access_denied usually means user needs to authorize manually.'
             );
           }
@@ -138,7 +139,7 @@ export default function App() {
 
         // 2. Fallback: Restore session from token
         if (!currentUser && currentToken) {
-          console.log('Restoring session from local token...');
+          debugLog('Restoring session from local token...');
           try {
             const res = await fetch(apiUrl('/api/me'), {
               headers: { Authorization: `Bearer ${currentToken}` },
@@ -147,15 +148,15 @@ export default function App() {
               const data = await res.json();
               if (data.user) {
                 currentUser = data.user;
-                console.log('Session restored for user:', currentUser!.username);
+                debugLog('Session restored for user:', currentUser!.username);
               }
             } else {
-              console.warn('Session token invalid or expired, clearing.');
+              debugWarn('Session token invalid or expired, clearing.');
               currentToken = null;
               localStorage.removeItem('token');
             }
           } catch (err) {
-            console.error('Session restore API failed:', err);
+            debugError('Session restore API failed:', err);
           }
         }
 
@@ -167,7 +168,7 @@ export default function App() {
 
           // If in Discord, auto-join room and bypass "Enter" screen
           if (instanceId) {
-            console.log('Bypassing splash screen for Discord auto-join.');
+            debugLog('Bypassing splash screen for Discord auto-join.');
             setIsInteracted(true);
             handleDiscordAutoJoin(instanceId.slice(0, 8), currentUser);
 
@@ -181,14 +182,14 @@ export default function App() {
                 }
               });
             } catch (err) {
-              console.warn('Could not subscribe to ACTIVITY_LAYOUT_MODE_UPDATE', err);
+              debugWarn('Could not subscribe to ACTIVITY_LAYOUT_MODE_UPDATE', err);
             }
           }
         } else {
-          console.log('No user session found after initialization.');
+          debugLog('No user session found after initialization.');
         }
       } catch (err) {
-        console.error('Critical initialization failure:', err);
+        debugError('Critical initialization failure:', err);
       } finally {
         setLoading(false);
       }
@@ -364,7 +365,7 @@ export default function App() {
           window.history.replaceState({}, document.title, window.location.pathname);
         }
       } catch (e) {
-        console.error('Failed to parse user from URL', e);
+        debugError('Failed to parse user from URL', e);
       }
     }
   }, []);
@@ -385,7 +386,7 @@ export default function App() {
           handleAuthSuccess(userData, urlToken);
         }
       } catch (e) {
-        console.error('Capacitor appUrlOpen parse failed', e);
+        debugError('Capacitor appUrlOpen parse failed', e);
       }
     }).then((handle) => {
       listenerHandle = handle;
@@ -396,7 +397,7 @@ export default function App() {
       try {
         StatusBar.hide();
       } catch (e) {
-        console.warn('Status bar config failed', e);
+        debugWarn('Status bar config failed', e);
       }
     }
 
@@ -614,8 +615,8 @@ export default function App() {
       }}
     >
       <div className="absolute inset-0 pointer-events-none bg-vignette z-[5] flex items-center justify-center" />
-
-      <div className="relative z-10 flex flex-col h-full w-full">
+      <ErrorBoundary name="Root Application">
+        <div className="relative z-10 flex flex-col h-full w-full">
         <UpdateBanner visible={updateAvailable} />
 
         {error && (
@@ -698,7 +699,8 @@ export default function App() {
               transition={{ duration: 0.5 }}
               className="flex-1 flex flex-col min-h-0"
             >
-              <Lobby
+<ErrorBoundary name="Lobby">
+               <Lobby
                 user={user}
                 onJoinRoom={handleJoinRoom}
                 onLogout={handleLogout}
@@ -708,49 +710,52 @@ export default function App() {
                 uiScaleSetting={uiScaleSetting}
                 token={token}
               />
+              </ErrorBoundary>
               {isProfileOpen && (
-                <Profile
-                  user={user}
-                  token={token!}
-                  onClose={() => setIsProfileOpen(false)}
-                  onOpenPurchase={() => {
-                    setIsProfileOpen(false);
-                    setIsPurchaseModalOpen(true);
-                  }}
-                  onUpdateUser={setUser}
-                  playSound={playSound}
-                  playMusic={playMusic}
-                  stopMusic={stopMusic}
-                  settings={{
-                    isMusicOn,
-                    setIsMusicOn,
-                    isSoundOn,
-                    setIsSoundOn,
-                    musicVolume,
-                    setMusicVolume,
-                    soundVolume,
-                    setSoundVolume,
-                    ttsVolume,
-                    setTtsVolume,
-                    isFullscreen,
-                    setIsFullscreen,
-                    ttsVoice,
-                    setTtsVoice,
-                    ttsEngine,
-                    setTtsEngine,
-                    isAiVoiceEnabled,
-                    setIsAiVoiceEnabled,
-                    uiScaleSetting,
-                    setUiScaleSetting,
-                    isLightMode,
-                    setIsLightMode,
-                  }}
-                  onJoinRoom={(roomId) => {
-                    setIsProfileOpen(false);
-                    handleJoinRoom(roomId);
-                  }}
-                />
-              )}
+                <ErrorBoundary name="Profile">
+                 <Profile
+                   user={user}
+                   token={token!}
+                   onClose={() => setIsProfileOpen(false)}
+                   onOpenPurchase={() => {
+                     setIsProfileOpen(false);
+                     setIsPurchaseModalOpen(true);
+                   }}
+                   onUpdateUser={setUser}
+                   playSound={playSound}
+                   playMusic={playMusic}
+                   stopMusic={stopMusic}
+                   settings={{
+                     isMusicOn,
+                     setIsMusicOn,
+                     isSoundOn,
+                     setIsSoundOn,
+                     musicVolume,
+                     setMusicVolume,
+                     soundVolume,
+                     setSoundVolume,
+                     ttsVolume,
+                     setTtsVolume,
+                     isFullscreen,
+                     setIsFullscreen,
+                     ttsVoice,
+                     setTtsVoice,
+                     ttsEngine,
+                     setTtsEngine,
+                     isAiVoiceEnabled,
+                     setIsAiVoiceEnabled,
+                     uiScaleSetting,
+                     setUiScaleSetting,
+                     isLightMode,
+                     setIsLightMode,
+                   }}
+                   onJoinRoom={(roomId) => {
+                     setIsProfileOpen(false);
+                     handleJoinRoom(roomId);
+                   }}
+                 />
+                </ErrorBoundary>
+               )}
               {pendingInvite && (
                 <InviteModal
                   inviterName={pendingInvite.fromUsername}
@@ -772,6 +777,7 @@ export default function App() {
               transition={{ duration: 0.5 }}
               className="flex-1 flex flex-col"
             >
+<ErrorBoundary name="Game Room">
               <GameRoom
                 gameState={gameState}
                 privateInfo={privateInfo}
@@ -793,50 +799,53 @@ export default function App() {
                 isAiVoiceEnabled={isAiVoiceEnabled}
                 uiScaleSetting={uiScaleSetting}
               />
+              </ErrorBoundary>
               {isProfileOpen && (
-                <Profile
-                  user={user}
-                  token={token!}
-                  onClose={() => setIsProfileOpen(false)}
-                  onUpdateUser={setUser}
-                  playSound={playSound}
-                  playMusic={playMusic}
-                  stopMusic={stopMusic}
-                  settings={{
-                    isMusicOn,
-                    setIsMusicOn,
-                    isSoundOn,
-                    setIsSoundOn,
-                    musicVolume,
-                    setMusicVolume,
-                    soundVolume,
-                    setSoundVolume,
-                    ttsVolume,
-                    setTtsVolume,
-                    isFullscreen,
-                    setIsFullscreen,
-                    ttsVoice,
-                    setTtsVoice,
-                    ttsEngine,
-                    setTtsEngine,
-                    isAiVoiceEnabled,
-                    setIsAiVoiceEnabled,
-                    uiScaleSetting,
-                    setUiScaleSetting,
-                    isLightMode,
-                    setIsLightMode,
-                  }}
-                  roomId={gameState?.roomId}
-                  mode={gameState?.mode}
-                  onOpenPurchase={() => {
-                    setIsProfileOpen(false);
-                    setIsPurchaseModalOpen(true);
-                  }}
-                  onJoinRoom={(roomId) => {
-                    setIsProfileOpen(false);
-                    handleLeaveRoom(() => handleJoinRoom(roomId));
-                  }}
-                />
+                <ErrorBoundary name="Profile (Game Room)">
+                 <Profile
+                   user={user}
+                   token={token!}
+                   onClose={() => setIsProfileOpen(false)}
+                   onUpdateUser={setUser}
+                   playSound={playSound}
+                   playMusic={playMusic}
+                   stopMusic={stopMusic}
+                   settings={{
+                     isMusicOn,
+                     setIsMusicOn,
+                     isSoundOn,
+                     setIsSoundOn,
+                     musicVolume,
+                     setMusicVolume,
+                     soundVolume,
+                     setSoundVolume,
+                     ttsVolume,
+                     setTtsVolume,
+                     isFullscreen,
+                     setIsFullscreen,
+                     ttsVoice,
+                     setTtsVoice,
+                     ttsEngine,
+                     setTtsEngine,
+                     isAiVoiceEnabled,
+                     setIsAiVoiceEnabled,
+                     uiScaleSetting,
+                     setUiScaleSetting,
+                     isLightMode,
+                     setIsLightMode,
+                   }}
+                   roomId={gameState?.roomId}
+                   mode={gameState?.mode}
+                   onOpenPurchase={() => {
+                     setIsProfileOpen(false);
+                     setIsPurchaseModalOpen(true);
+                   }}
+                   onJoinRoom={(roomId) => {
+                     setIsProfileOpen(false);
+                     handleLeaveRoom(() => handleJoinRoom(roomId));
+                   }}
+                 />
+                </ErrorBoundary>
               )}
               {pendingInvite && (
                 <InviteModal
@@ -964,6 +973,7 @@ export default function App() {
           )}
         </AnimatePresence>
       </div>
+      </ErrorBoundary>
     </div>
   );
 }

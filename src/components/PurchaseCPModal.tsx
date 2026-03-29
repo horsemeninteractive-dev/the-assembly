@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Zap, Loader2, CreditCard, ChevronRight, ShoppingBag } from 'lucide-react';
-import { cn, apiUrl } from '../lib/utils';
+import { cn, apiUrl, debugError } from '../lib/utils';
 import { CP_PACKAGES } from '../sharedConstants';
 
 interface PurchaseCPModalProps {
@@ -50,7 +50,7 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({
         throw new Error('No checkout URL received');
       }
     } catch (err: any) {
-      console.error('[Purchase] Error:', err);
+      debugError('[Purchase] Error:', err);
       setError(err.message);
       setIsLoading(null);
     }
