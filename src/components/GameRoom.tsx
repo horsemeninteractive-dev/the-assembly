@@ -25,6 +25,10 @@ import { DeclarationModal } from './game/modals/DeclarationModal';
 import { PlayerProfileModal } from './game/modals/PlayerProfileModal';
 import { GameReferencePanel } from './game/GameReferencePanel';
 import { useScaling } from '../hooks/useScaling';
+import { useWebRTC } from '../hooks/useWebRTC';
+import { useGameSounds } from '../hooks/useGameSounds';
+import { usePostMatchHandler } from '../hooks/usePostMatchHandler';
+import { useLegislativeHandler } from '../hooks/useLegislativeHandler';
 
 interface GameRoomProps {
   gameState: GameState;
@@ -89,45 +93,10 @@ export const GameRoom = ({
   const [chatText, setChatText] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0);
+  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
   const chatInputRef = useRef<HTMLInputElement | null>(null);
   const chatGhostRef = useRef<HTMLDivElement | null>(null);
   const chatEndRef = useRef<HTMLDivElement | null>(null);
-
-  const hasNewMessages =
-    !isChatOpen &&
-    gameState.messages
-      .slice(lastSeenMessageCount)
-      .some(
-        (m) =>
-          m.type !== 'round_separator' && m.type !== 'declaration' && m.type !== 'failed_election'
-      );
-
-  useEffect(() => {
-    if (isChatOpen) setLastSeenMessageCount(gameState.messages.length);
-  }, [isChatOpen, gameState.messages.length]);
-
-  // Auto-open dossier at the start of the game (Round 1)
-  const hasAutoOpenedDossier = useRef(false);
-  useEffect(() => {
-    if (
-      !isSpectator &&
-      gameState.round === 1 &&
-      gameState.phase !== 'Lobby' &&
-      gameState.phase !== 'GameOver' &&
-      !hasAutoOpenedDossier.current
-    ) {
-      setIsDossierOpen(true);
-      hasAutoOpenedDossier.current = true;
-    }
-    // Reset if we go back to Lobby (e.g. Play Again)
-    if (gameState.phase === 'Lobby') {
-      hasAutoOpenedDossier.current = false;
-    }
-  }, [gameState.phase, gameState.round, isSpectator]);
-
-  useEffect(() => {
-    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [gameState.messages, isChatOpen]);
 
   const handleChatScroll = () => {
     if (chatInputRef.current && chatGhostRef.current) {
@@ -172,259 +141,73 @@ export const GameRoom = ({
     }
   };
 
-  // ── Modals ───────────────────────────────────────────────────────────────
+  const hasNewMessages =
+    !isChatOpen &&
+    gameState.messages
+      .slice(lastSeenMessageCount)
+      .some(
+        (m) =>
+          m.type !== 'round_separator' && m.type !== 'declaration' && m.type !== 'failed_election'
+      );
+
+  // ── Custom Hooks ──────────────────────────────────────────────────────────
+  const [isVoiceActive, setIsVoiceActive] = useState(false);
+  const [isVideoActive, setIsVideoActive] = useState(false);
+  const [speakingPlayers, setSpeakingPlayers] = useState<Record<string, boolean>>({});
+
+  const { localStream, remoteStreams } = useWebRTC({
+    gameState,
+    me,
+    token,
+    socket,
+    isVoiceActive,
+    setIsVoiceActive,
+    isVideoActive,
+    setIsVideoActive,
+    setSpeakingPlayers,
+  });
+
   const [peekedPolicies, setPeekedPolicies] = useState<Policy[] | null>(null);
   const [peekTitle, setPeekTitle] = useState<string | undefined>(undefined);
   const [investigationResult, setInvestigationResult] = useState<{
     targetName: string;
     role: Role;
   } | null>(null);
-  const [selectedPlayerId, setSelectedPlayerId] = useState<string | null>(null);
 
-  useEffect(() => {
-    const handlePeek = (policies: Policy[], title?: string) => {
-      setPeekedPolicies(policies);
-      setPeekTitle(title);
-    };
-    const handleInvestigation = (result: { targetName: string; role: Role }) => {
-      setInvestigationResult(result);
-    };
-    const handlePostMatch = (result: PostMatchResult) => {
-      setPostMatchResult(result);
-    };
-
-    socket.on('policyPeekResult', handlePeek);
-    socket.on('investigationResult', handleInvestigation);
-    socket.on('postMatchResult', handlePostMatch);
-
-    return () => {
-      socket.off('policyPeekResult', handlePeek);
-      socket.off('investigationResult', handleInvestigation);
-      socket.off('postMatchResult', handlePostMatch);
-    };
-  }, [token]);
-
-  // ── Declaration state & logic ────────────────────────────────────────────
-  const [showDeclarationUI, setShowDeclarationUI] = useState(false);
-  const [declarationType, setDeclarationType] = useState<'President' | 'Chancellor' | null>(null);
-  const [declCiv, setDeclCiv] = useState(0);
-  const [declSta, setDeclSta] = useState(0);
-  const [declDrawCiv, setDeclDrawCiv] = useState(0);
-  const [declDrawSta, setDeclDrawSta] = useState(3);
-  const [showPolicyAnim, setShowPolicyAnim] = useState(false);
-
-  const showPolicyAnimRef = useRef(false);
-  const pendingDeclarationRef = useRef<'President' | 'Chancellor' | null>(null);
-  const chancellorSinceRef = useRef<number>(0);
-  const wasChancellorRef = useRef(false);
-  // Separate refs for each role's declaration prompt — avoids key collision bugs
-  const presidentPromptedForRef = useRef<string>(''); // policyKey we already prompted president for
-  const chancellorPromptedForRef = useRef<string>(''); // policyKey we already prompted chancellor for
-
-  useEffect(() => {
-    showPolicyAnimRef.current = showPolicyAnim;
-  }, [showPolicyAnim]);
-
-  // Track the initial policy broadcast (trackerReady=false) separately for animation
-  const lastSeenPolicyIdRef = useRef<string>('');
-
-  useEffect(() => {
-    if (!gameState.lastEnactedPolicy) return;
-    // Use type+playerId+approximate-time as a unique key for this policy event
-    const key = `${gameState.lastEnactedPolicy.type}-${gameState.lastEnactedPolicy.playerId ?? ''}-${Math.floor(gameState.lastEnactedPolicy.timestamp / 10000)}`;
-    if (key !== lastSeenPolicyIdRef.current) {
-      lastSeenPolicyIdRef.current = key;
-      setShowPolicyAnim(true);
-    }
-  }, [gameState.lastEnactedPolicy]);
-
-  useEffect(() => {
-    if (showPolicyAnim) {
-      const timer = setTimeout(() => setShowPolicyAnim(false), 4000);
-      return () => clearTimeout(timer);
-    }
-  }, [showPolicyAnim]);
-
-  useEffect(() => {
-    if (!showPolicyAnim && pendingDeclarationRef.current) {
-      const type = pendingDeclarationRef.current;
-      pendingDeclarationRef.current = null;
-      setDeclarationType(type);
-      if (type === 'President') {
-        setDeclCiv(0);
-        setDeclSta(2);
-        setDeclDrawCiv(0);
-        setDeclDrawSta(3);
-      } else {
-        setDeclCiv(0);
-        setDeclSta(2);
-      }
-      setShowDeclarationUI(true);
-    }
-  }, [showPolicyAnim]);
-
-  useEffect(() => {
-    if (!me) return;
-    const alreadyDeclared = gameState.declarations.some((d) => d.playerId === socket.id);
-    if (alreadyDeclared || gameState.phase === 'GameOver') {
-      pendingDeclarationRef.current = null;
-      setShowDeclarationUI(false);
-      return;
-    }
-    if (me.isChancellor && !wasChancellorRef.current) chancellorSinceRef.current = Date.now();
-    wasChancellorRef.current = !!me.isChancellor;
-
-    const trackerReady = gameState.lastEnactedPolicy?.trackerReady === true;
-    if (!trackerReady || !gameState.lastEnactedPolicy) return;
-
-    // Stable policy key — use timestamp rounded to nearest second, not 10s bucket,
-    // to avoid bucket-boundary mismatches between trackerReady=false and true broadcasts.
-    const policyKey = `${gameState.lastEnactedPolicy.type}-${gameState.lastEnactedPolicy.playerId ?? ''}-${Math.floor(gameState.lastEnactedPolicy.timestamp / 1000)}`;
-
-    let needed: 'President' | 'Chancellor' | null = null;
-
-    // President: prompt once per policy
-    if (me.isPresident && presidentPromptedForRef.current !== policyKey) {
-      presidentPromptedForRef.current = policyKey;
-      needed = 'President';
-    }
-
-    // Chancellor: prompt once per policy, but only after president has declared
-    const presidentDeclared = gameState.declarations.some((d) => d.type === 'President');
-    if (me.isChancellor && presidentDeclared && chancellorPromptedForRef.current !== policyKey) {
-      const policyEnactedThisTerm =
-        (gameState.lastEnactedPolicy?.timestamp ?? 0) > chancellorSinceRef.current;
-      if (policyEnactedThisTerm) {
-        chancellorPromptedForRef.current = policyKey;
-        needed = 'Chancellor';
-      }
-    }
-
-    if (needed) {
-      if (!showPolicyAnimRef.current) {
-        pendingDeclarationRef.current = null;
-        setDeclarationType(needed);
-        if (needed === 'President') {
-          setDeclCiv(0);
-          setDeclSta(2);
-          setDeclDrawCiv(0);
-          setDeclDrawSta(3);
-        } else {
-          setDeclCiv(0);
-          setDeclSta(2);
-        }
-        setShowDeclarationUI(true);
-      } else {
-        pendingDeclarationRef.current = needed;
-      }
-    }
-  }, [me, gameState.declarations, gameState.lastEnactedPolicy, gameState.phase, showPolicyAnim]);
-
-  const handleSubmitDeclaration = () => {
-    if (!declarationType) return;
-    socket.emit('declarePolicies', {
-      civ: declCiv,
-      sta: declSta,
-      ...(declarationType === 'President' ? { drewCiv: declDrawCiv, drewSta: declDrawSta } : {}),
-      type: declarationType,
-    });
-    setShowDeclarationUI(false);
-  };
-
-  // ── Timer tick ───────────────────────────────────────────────────────────
-  const [, setTick] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => setTick((t) => t + 1), 1000);
-    return () => clearInterval(interval);
-  }, []);
-
-  // ── Game sound effects on state change ──────────────────────────────────
-  const prevPhase = useRef<string | undefined>(undefined);
-  const prevVotes = useRef(0);
-  const prevCivilDirectives = useRef(0);
-  const prevStateDirectives = useRef(0);
-  const prevAliveCount = useRef(0);
-
-  const speak = (text: string) => {
-    if (!isSoundOn) return;
-    aiSpeech.speak(text, {
-      voice: ttsVoice,
-      volume: ttsVolume / 100,
-      rate: 0.9,
-      pitch: 0.8,
-    });
-  };
-
-  useEffect(() => {
-    const currentVotes = gameState.players.filter((p) => p.vote).length;
-    if (currentVotes > prevVotes.current && me && !me.vote) playSound('click');
-    prevVotes.current = currentVotes;
-
-    const currentAliveCount = gameState.players.filter((p) => p.isAlive).length;
-    if (prevAliveCount.current > 0 && currentAliveCount < prevAliveCount.current)
-      playSound('death');
-    prevAliveCount.current = currentAliveCount;
-
-    if (
-      (prevPhase.current === 'Voting' || prevPhase.current === 'Voting_Reveal') &&
-      gameState.phase !== 'Voting' &&
-      gameState.phase !== 'Voting_Reveal'
-    ) {
-      if (gameState.phase === 'Legislative_President') playSound('election_passed');
-      else if (gameState.phase === 'Nominate_Chancellor') playSound('election_failed');
-    }
-
-    if (gameState.civilDirectives > prevCivilDirectives.current) speak('Charter secured.');
-    if (gameState.stateDirectives > prevStateDirectives.current) speak('The State advances.');
-    prevCivilDirectives.current = gameState.civilDirectives;
-    prevStateDirectives.current = gameState.stateDirectives;
-
-    if (prevPhase.current !== 'GameOver' && gameState.phase === 'GameOver') {
-      if (gameState.winner === 'Civil') playSound('win_civil');
-      else if (gameState.winner === 'State') playSound('win_state');
-    }
-
-    prevPhase.current = gameState.phase;
-  }, [gameState]);
-
-  // ── Panel sound effects ──────────────────────────────────────────────────
-  const prevPanelsState = useRef({
-    isLogOpen,
-    isChatOpen,
-    isHistoryOpen,
-    isDossierOpen,
-    isReferenceOpen,
-    isPeekOpen: !!peekedPolicies,
-    isInvestigationOpen: !!investigationResult,
-    isDeclarationOpen: showDeclarationUI,
-    isProfileOpen: !!selectedPlayerId,
+  usePostMatchHandler({
+    socket,
+    token,
+    setPeekedPolicies,
+    setPeekTitle,
+    setInvestigationResult,
+    setPostMatchResult,
   });
 
-  useEffect(() => {
-    const current = {
-      isLogOpen,
-      isChatOpen,
-      isHistoryOpen,
-      isDossierOpen,
-      isReferenceOpen,
-      isPeekOpen: !!peekedPolicies,
-      isInvestigationOpen: !!investigationResult,
-      isDeclarationOpen: showDeclarationUI,
-      isProfileOpen: !!selectedPlayerId,
-    };
+  const {
+    showDeclarationUI,
+    declarationType,
+    declCiv,
+    declSta,
+    declDrawCiv,
+    declDrawSta,
+    setDeclCiv,
+    setDeclSta,
+    setDeclDrawCiv,
+    setDeclDrawSta,
+    showPolicyAnim,
+    handleSubmitDeclaration,
+  } = useLegislativeHandler({ gameState, me, socket });
 
-    const opened = Object.keys(current).some(
-      (k) => (current as any)[k] && !(prevPanelsState.current as any)[k]
-    );
-    const closed = Object.keys(current).some(
-      (k) => !(current as any)[k] && (prevPanelsState.current as any)[k]
-    );
-
-    if (opened) playSound('modal_open');
-    else if (closed) playSound('modal_close');
-
-    prevPanelsState.current = current;
-  }, [
+  useGameSounds({
+    gameState,
+    me,
+    playSound,
+    isSoundOn,
+    ttsVoice,
+    ttsVolume,
+    isAiVoiceEnabled,
+    ttsEngine,
+    soundVolume,
     isLogOpen,
     isChatOpen,
     isHistoryOpen,
@@ -434,475 +217,36 @@ export const GameRoom = ({
     investigationResult,
     showDeclarationUI,
     selectedPlayerId,
-  ]);
+    setSpeakingPlayers,
+  });
 
-  // ── Voice chat ───────────────────────────────────────────────────────────
-  const [isVoiceActive, setIsVoiceActive] = useState(false);
-  const [isVideoActive, setIsVideoActive] = useState(false);
-  const lastSpokenMessageIndexRef = useRef(-1);
-
+  // ── UI Effects ───────────────────────────────────────────────────────────
   useEffect(() => {
-    aiSpeech.initVoices();
-    return () => {
-      // Stop speech when leaving room
-      aiSpeech.stop();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!isAiVoiceEnabled) return;
-    const msgCount = gameState.messages.length;
-    if (msgCount === 0) return;
-
-    // Only speak the message if it's new (not just a volume change)
-    if (msgCount - 1 <= lastSpokenMessageIndexRef.current) return;
-    lastSpokenMessageIndexRef.current = msgCount - 1;
-
-    const lastMessage = gameState.messages[msgCount - 1];
-    if (!lastMessage) return;
-
-    const sender = gameState.players.find((p) => p.name === lastMessage.sender);
-    if (sender && sender.isAI) {
-      const profile = aiSpeech.getVoiceProfileForAi(sender.name);
-      if (profile) {
-        aiSpeech.speakAiMessage(
-          lastMessage.text,
-          sender.name,
-          profile,
-          ttsVolume / 100,
-          () => setSpeakingPlayers((prev4) => ({ ...prev4, [sender.id]: true })),
-          () => setSpeakingPlayers((prev4) => ({ ...prev4, [sender.id]: false }))
-        );
-      }
+    if (isChatOpen) {
+      setLastSeenMessageCount(gameState.messages.length);
     }
-  }, [gameState.messages.length, isAiVoiceEnabled, ttsEngine, soundVolume, ttsVolume]);
-  const [localStream, setLocalStream] = useState<MediaStream | null>(null);
-  const [remoteStreams, setRemoteStreams] = useState<Record<string, MediaStream>>({});
-  const [speakingPlayers, setSpeakingPlayers] = useState<Record<string, boolean>>({});
-  const peersRef = useRef<Record<string, RTCPeerConnection>>({});
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const speakingTimers = useRef<Record<string, NodeJS.Timeout>>({});
+    chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [isChatOpen, gameState.messages.length]);
 
-  const setupSpeakingDetection = async (stream: MediaStream, playerId: string) => {
-    if (!playerId) return;
-    try {
-      if (!audioContextRef.current) {
-        audioContextRef.current = new (window.AudioContext || (window as any).webkitAudioContext)();
-      }
-      const context = audioContextRef.current;
-      if (context.state === 'suspended') await context.resume();
-
-      const audioTrack = stream.getAudioTracks()[0];
-      if (!audioTrack) return;
-
-      const source = context.createMediaStreamSource(new MediaStream([audioTrack]));
-      const analyser = context.createAnalyser();
-      analyser.fftSize = 512;
-      analyser.smoothingTimeConstant = 0.8;
-      source.connect(analyser);
-      const bufferLength = analyser.frequencyBinCount;
-      const dataArray = new Uint8Array(bufferLength);
-      let isRunning = true;
-      const check = () => {
-        if (!isRunning) return;
-        const isLocal = me && playerId === me.id;
-        const peerExists = !!peersRef.current[playerId];
-        if (!isLocal && !peerExists) {
-          isRunning = false;
-          source.disconnect();
-          analyser.disconnect();
-          return;
-        }
-        analyser.getByteFrequencyData(dataArray);
-        let sum = 0;
-        for (let i = 0; i < bufferLength; i++) sum += dataArray[i];
-        if (sum / bufferLength > 10) {
-          setSpeakingPlayers((prev) => ({ ...prev, [playerId]: true }));
-          if (speakingTimers.current[playerId]) clearTimeout(speakingTimers.current[playerId]);
-          speakingTimers.current[playerId] = setTimeout(() => {
-            setSpeakingPlayers((prev) => ({ ...prev, [playerId]: false }));
-          }, 400);
-        }
-        requestAnimationFrame(check);
-      };
-      check();
-    } catch (err) {
-      debugError('Voice detection error:', err);
+  const hasAutoOpenedDossier = useRef(false);
+  useEffect(() => {
+    if (
+      !isSpectator &&
+      gameState.round === 1 &&
+      gameState.phase !== 'Lobby' &&
+      gameState.phase !== 'GameOver' &&
+      !hasAutoOpenedDossier.current
+    ) {
+      setIsDossierOpen(true);
+      hasAutoOpenedDossier.current = true;
     }
-  };
+    if (gameState.phase === 'Lobby') hasAutoOpenedDossier.current = false;
+  }, [gameState.phase, gameState.round, isSpectator]);
 
-  // ── WebRTC — Perfect Negotiation Pattern ────────────────────────────────
-  //
-  // Key principle: ONLY onnegotiationneeded sends offers. Nothing else ever
-  // calls createOffer directly. This eliminates all glare and race conditions.
-  //
-  // Each peer connection has a per-peer `makingOffer` flag and a `polite` flag.
-  // The polite peer (lex-larger socket ID) backs off if both sides offer at once.
-  // The impolite peer (lex-smaller socket ID) ignores incoming offers while making one.
-  //
-  // To trigger renegotiation from any side at any time, just call
-  // addTrack on the pc — onnegotiationneeded does the rest.
-  // We NEVER use replaceTrack(null) to "remove" a track — instead we just
-  // stop the track and let the remote side see it end. On re-enable we
-  // removeTrack the old sender and addTrack the new one so onnegotiationneeded fires.
-
-  // Must be declared before createPeer, which closes over it.
-  // Kept in sync synchronously (not via useEffect) to avoid one-render lag.
-  const localStreamRef = useRef<MediaStream | null>(null);
-
-  // Per-peer signaling metadata needed for perfect negotiation
-  const peerMetaRef = useRef<Record<string, { makingOffer: boolean; polite: boolean }>>({});
-
-  const destroyPeer = (peerId: string) => {
-    const pc = peersRef.current[peerId];
-    if (pc) {
-      try {
-        pc.close();
-      } catch (e) {}
-      delete peersRef.current[peerId];
-    }
-    delete peerMetaRef.current[peerId];
-    setRemoteStreams((prev) => {
-      const next = { ...prev };
-      delete next[peerId];
-      return next;
-    });
-  };
-
-  // Tracks the kind ('audio'|'video') for each RTCRtpSender we create,
-  // so we can identify null-tracked senders after removeTrack.
-  const senderKindMap = useRef(new WeakMap<RTCRtpSender, string>());
-
-  // Push a track into a peer connection.
-  // Removes any existing sender for this kind first — including null-tracked senders
-  // left by removeTrack — so we never accumulate stale transceivers.
-  // ── WebRTC ─────────────────────────────────────────────────────────────
-  const [iceServers, setIceServers] = useState<any[]>([
-    { urls: 'stun:stun.l.google.com:19302' },
-  ]);
-
+  const [, setTick] = useState(0);
   useEffect(() => {
-    const fetchIce = async () => {
-      try {
-        const res = await fetch(apiUrl('/api/webrtc/ice-servers'), {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        if (res.ok) {
-          const { iceServers: fetched } = await res.json();
-          if (fetched && fetched.length > 0) {
-            setIceServers(fetched);
-          }
-        }
-      } catch (err) {
-        debugWarn('[WebRTC] Failed to fetch custom ICE servers, falling back to public STUN');
-      }
-    };
-    if (token) fetchIce();
-  }, [token]);
-
-  const addTrackToPeer = (pc: RTCPeerConnection, track: MediaStreamTrack, stream: MediaStream) => {
-    debugLog(
-      `[WebRTC] addTrackToPeer kind=${track.kind} | senders=[${pc
-        .getSenders()
-        .map((s) => s.track?.kind ?? `null(was ${senderKindMap.current.get(s) ?? '?'})`)
-        .join(', ')}] | sigState=${pc.signalingState}`
-    );
-    pc.getSenders().forEach((s) => {
-      const kind = s.track?.kind ?? senderKindMap.current.get(s);
-      if (kind === track.kind) {
-        try {
-          pc.removeTrack(s);
-        } catch (e) {}
-      }
-    });
-    const sender = pc.addTrack(track, stream); // fires onnegotiationneeded
-    senderKindMap.current.set(sender, track.kind);
-  };
-
-  const createPeer = (peerId: string) => {
-    if (peersRef.current[peerId]) return peersRef.current[peerId];
-
-    // Polite = lex-larger ID. The polite peer rolls back when there's a glare.
-    const polite = socket.id! > peerId;
-    peerMetaRef.current[peerId] = { makingOffer: false, polite };
-
-    const pc = new RTCPeerConnection({ iceServers });
-    peersRef.current[peerId] = pc;
-
-    // Seed an empty stream so the video tile renders immediately
-    setRemoteStreams((prev) => ({ ...prev, [peerId]: new MediaStream() }));
-
-    // Add whatever local tracks we already have. If we have none yet (camera
-    // not on), this is a no-op and onnegotiationneeded won't fire — that's
-    // fine; the remote side will offer when they add their tracks, and we'll
-    // answer. When we turn our camera on later, addTrack fires onnegotiationneeded.
-    if (localStreamRef.current) {
-      localStreamRef.current
-        .getTracks()
-        .forEach((track) => addTrackToPeer(pc, track, localStreamRef.current!));
-    }
-    pc.onicecandidate = ({ candidate }) => {
-      const target = gameState.players.find((p) => p.id === peerId);
-      if (candidate && target?.socketId) {
-        socket.emit('signal', { to: target.socketId, from: socket.id!, signal: { candidate } });
-      }
-    };
-
-    pc.ontrack = ({ track }) => {
-      debugLog(
-        `[WebRTC] ontrack peer=${peerId.slice(0, 6)} kind=${track.kind} readyState=${track.readyState} muted=${track.muted}`
-      );
-      setRemoteStreams((prev) => {
-        const existing = prev[peerId] || new MediaStream();
-        // Replace any existing track of the same kind rather than accumulating.
-        // Accumulated stale tracks cause hasVideo to return true for ended tracks,
-        // and the video element gets confused about which track to render.
-        const otherTracks = existing.getTracks().filter((t) => t.kind !== track.kind);
-        const next = new MediaStream([...otherTracks, track]);
-        return { ...prev, [peerId]: next };
-      });
-
-      track.onended = () => {
-        debugLog(`[WebRTC] track ended peer=${peerId.slice(0, 6)} kind=${track.kind}`);
-        setRemoteStreams((prev) => {
-          const st = prev[peerId];
-          if (!st) return prev;
-          const active = st.getTracks().filter((t) => t !== track);
-          if (active.length === 0) {
-            const n = { ...prev };
-            delete n[peerId];
-            return n;
-          }
-          return { ...prev, [peerId]: new MediaStream(active) };
-        });
-      };
-
-      if (track.kind === 'audio') {
-        const audioStream = new MediaStream([track]);
-        const init = () => setupSpeakingDetection(audioStream, peerId);
-        track.onunmute = init;
-        if (!track.muted) init();
-      }
-    };
-
-    pc.onnegotiationneeded = async () => {
-      const meta = peerMetaRef.current[peerId];
-      if (!meta) return;
-      debugLog(
-        `[WebRTC] onnegotiationneeded peer=${peerId.slice(0, 6)} sigState=${pc.signalingState} makingOffer=${meta.makingOffer}`
-      );
-      try {
-        meta.makingOffer = true;
-        await pc.setLocalDescription(); // browser auto-creates offer
-        const target = gameState.players.find((p) => p.id === peerId);
-      if (target?.socketId) {
-        debugLog(`[WebRTC] offer/renegotiate for target=${target.socketId.slice(0, 6)}`);
-        socket.emit('signal', {
-          to: target.socketId,
-          from: socket.id!,
-          signal: { sdp: pc.localDescription },
-        });
-      }
-      } catch (err) {
-        debugError('onnegotiationneeded error', err);
-      } finally {
-        meta.makingOffer = false;
-      }
-    };
-
-    pc.oniceconnectionstatechange = () => {
-      debugLog(`[WebRTC] ICE state peer=${peerId.slice(0, 6)} => ${pc.iceConnectionState}`);
-      if (pc.iceConnectionState === 'failed' || pc.iceConnectionState === 'closed') {
-        debugLog(
-          `[WebRTC] ICE ${pc.iceConnectionState} — destroying and recreating peer=${peerId.slice(0, 6)}`
-        );
-        destroyPeer(peerId);
-        createPeerRef.current(peerId);
-      }
-    };
-
-    return pc;
-  };
-
-  // Stable ref so the signal handler never captures a stale createPeer closure
-  const createPeerRef = useRef(createPeer);
-  createPeerRef.current = createPeer;
-
-  // ── Cleanup: destroy peers for players who left / disconnected / rejoined ──
-  useEffect(() => {
-    if (!socket.id) return;
-    const activeIds = new Set(
-      gameState.players
-        .filter((p) => p.socketId !== socket.id && !p.isDisconnected && !p.isAI)
-        .map((p) => p.id)
-    );
-    Object.keys(peersRef.current).forEach((peerId) => {
-      if (!activeIds.has(peerId)) destroyPeer(peerId);
-    });
-  }, [gameState.players, socket.id]);
-
-  // ── Mesh: ensure a peer connection exists for every active player ──────────
-  useEffect(() => {
-    if (!socket.id) return;
-    gameState.players.forEach((p) => {
-      if (p.socketId === socket.id || p.isDisconnected || p.isAI) return;
-      createPeerRef.current(p.id);
-    });
-  }, [gameState.players, socket.id]);
-
-  // ── Signal handler (perfect negotiation) ──────────────────────────────────
-  useEffect(() => {
-    const handleSignal = async ({ from, signal }: { from: string; signal: any }) => {
-      const p = gameState.players.find((pl) => pl.socketId === from);
-      if (!p) return;
-      const peerId = p.id;
-
-      const pc = peersRef.current[peerId] ?? createPeerRef.current(peerId);
-      const meta = peerMetaRef.current[peerId];
-      if (!meta) return;
-
-      try {
-        if (signal.sdp) {
-          debugLog(
-            `[WebRTC] signal sdp type=${signal.sdp.type} from=${from.slice(0, 6)} | sigState=${pc.signalingState} makingOffer=${meta.makingOffer} polite=${meta.polite}`
-          );
-          const offerCollision =
-            signal.sdp.type === 'offer' && (meta.makingOffer || pc.signalingState !== 'stable');
-
-          const ignoreOffer = !meta.polite && offerCollision;
-          if (ignoreOffer) {
-            debugLog(`[WebRTC] ignoring offer (impolite collision)`);
-            return;
-          }
-
-          if (offerCollision) {
-            debugLog(`[WebRTC] rollback (polite collision)`);
-            await pc.setLocalDescription({ type: 'rollback' });
-          }
-
-          await pc.setRemoteDescription(new RTCSessionDescription(signal.sdp));
-
-          if (signal.sdp.type === 'offer') {
-            await pc.setLocalDescription(); // auto-creates answer
-            debugLog(`[WebRTC] answer sent to from=${from.slice(0, 6)}`);
-            socket.emit('signal', {
-              to: from,
-              from: socket.id!,
-              signal: { sdp: pc.localDescription },
-            });
-          }
-        } else if (signal.candidate) {
-          try {
-            await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
-          } catch (e) {
-            if (!meta.makingOffer) debugError('ICE error', e);
-          }
-        }
-      } catch (e) {
-        debugError('Signal error:', e);
-      }
-    };
-
-    socket.on('signal', handleSignal);
-    return () => {
-      socket.off('signal', handleSignal);
-    };
-  }, []);
-
-  // ── Media toggle ───────────────────────────────────────────────────────────
-  useEffect(() => {
-    if (me && !me.isAlive) {
-      setIsVoiceActive(false);
-      setIsVideoActive(false);
-    }
-  }, [me?.isAlive]);
-
-  useEffect(() => {
-    if ((isVoiceActive || isVideoActive) && me?.id && localStream) {
-      setupSpeakingDetection(localStream, me.id);
-    }
-  }, [isVoiceActive, isVideoActive, localStream, me?.id]);
-
-  useEffect(() => {
-    localStreamRef.current = localStream;
-  }, [localStream]);
-
-  useEffect(() => {
-    socket.emit('updateMediaState', { isMicOn: isVoiceActive, isCamOn: isVideoActive });
-
-    if (isVoiceActive || isVideoActive) {
-      debugLog(`[WebRTC] getUserMedia audio=${isVoiceActive} video=${isVideoActive}`);
-      navigator.mediaDevices
-        .getUserMedia({ audio: isVoiceActive, video: isVideoActive })
-        .then((stream) => {
-          const oldStream = localStreamRef.current;
-          debugLog(
-            `[WebRTC] got stream tracks=${stream
-              .getTracks()
-              .map((t) => t.kind)
-              .join(
-                ','
-              )} | hadStream=${!!oldStream} | peers=${Object.keys(peersRef.current).length}`
-          );
-
-          // Sync ref immediately before peer operations
-          localStreamRef.current = stream;
-          setLocalStream(stream);
-
-          (Object.entries(peersRef.current) as [string, RTCPeerConnection][]).forEach(
-            ([peerId, pc]) => {
-              stream.getTracks().forEach((track) => {
-                const existingSender = pc.getSenders().find((s) => s.track?.kind === track.kind);
-                if (existingSender) {
-                  // Sender already exists with a live track — just swap to the new track.
-                  debugLog(`[WebRTC] replaceTrack kind=${track.kind} peer=${peerId.slice(0, 6)}`);
-                  existingSender.replaceTrack(track);
-                  senderKindMap.current.set(existingSender, track.kind);
-                } else {
-                  // No sender for this kind — fresh addTrack fires onnegotiationneeded.
-                  debugLog(`[WebRTC] addTrack kind=${track.kind} peer=${peerId.slice(0, 6)}`);
-                  addTrackToPeer(pc, track, stream);
-                }
-              });
-            }
-          );
-
-          // Stop old tracks AFTER new ones are in place
-          if (oldStream) oldStream.getTracks().forEach((t) => t.stop());
-        })
-        .catch((err) => {
-          debugError('Media error:', err);
-          setIsVoiceActive(false);
-          setIsVideoActive(false);
-        });
-    } else if (localStream) {
-      debugLog(
-        `[WebRTC] turning off media — removing our senders, keeping peer connections alive | peers=${Object.keys(peersRef.current).length}`
-      );
-      localStream.getTracks().forEach((t) => t.stop());
-      localStreamRef.current = null;
-      setLocalStream(null);
-      // Only remove OUR senders from each PC — do NOT destroy the peer connection.
-      // Destroying the PC would wipe remoteStreams and we'd lose the other player's
-      // video feed. By just removing our senders, the inbound tracks (their video)
-      // stay intact. On re-enable, addTrackToPeer removes any stale null senders
-      // before calling addTrack, so the PC stays clean.
-      (Object.values(peersRef.current) as RTCPeerConnection[]).forEach((pc) => {
-        pc.getSenders().forEach((s) => {
-          try {
-            pc.removeTrack(s);
-          } catch (e) {}
-        });
-      });
-    }
-  }, [isVoiceActive, isVideoActive]);
-
-  useEffect(() => {
-    return () => {
-      if (localStreamRef.current) {
-        localStreamRef.current.getTracks().forEach((t) => t.stop());
-      }
-    };
+    const interval = setInterval(() => setTick((t) => t + 1), 1000);
+    return () => clearInterval(interval);
   }, []);
 
   // ── Render ───────────────────────────────────────────────────────────────
