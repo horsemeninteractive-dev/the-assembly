@@ -18,9 +18,49 @@ if (!isConfigured) {
 const users: Map<string, UserInternal> = new Map();
 const memoryResetTokens: Map<string, { userId: string; expiresAt: Date }> = new Map();
 
+import { z } from 'zod';
 import { stateClient, isRedisConfigured } from './redis.ts';
 
-import { z } from 'zod';
+// ---------------------------------------------------------------------------
+// Retry Utility
+// ---------------------------------------------------------------------------
+
+async function withRetry<T>(fn: () => Promise<T>, name: string): Promise<T> {
+  const delays = [500, 1000, 2000];
+  let lastError: any;
+
+  for (let attempt = 1; attempt <= delays.length + 1; attempt++) {
+    try {
+      return await fn();
+    } catch (err: any) {
+      lastError = err;
+      // Do not retry on "Not Found" errors from Supabase (PostgREST code PGRST116)
+      if (err && (err.code === 'PGRST116' || err.status === 404)) {
+        throw err;
+      }
+
+      if (attempt <= delays.length) {
+        const delay = delays[attempt - 1];
+        logger.warn(
+          { 
+            attempt, 
+            nextDelay: delay, 
+            function: name, 
+            err: err instanceof Error ? err.message : String(err) 
+          },
+          `Supabase operation '${name}' failed. Retrying in ${delay}ms...`
+        );
+        await new Promise((res) => setTimeout(res, delay));
+      }
+    }
+  }
+  
+  logger.error(
+    { function: name, err: lastError instanceof Error ? lastError.message : String(lastError) },
+    `Supabase operation '${name}' failed after ${delays.length + 1} attempts.`
+  );
+  throw lastError;
+}
 
 // ---------------------------------------------------------------------------
 // Runtime Schema Validation (Zod)
@@ -169,15 +209,17 @@ export async function getLeaderboard(
             ? 'stats->classicWins'
             : 'stats->elo';
 
-    const { data, error } = await db
-      .from('users')
-      .select('*')
-      .order(orderField as any, { ascending: false })
-      .range(safeOffset, safeOffset + safeLimit - 1);
-    if (error) return [];
-    return data
-      .map(mapSupabaseToUser)
-      .filter((u: UserInternal | null): u is UserInternal => u !== null);
+    return await withRetry(async () => {
+      const { data, error } = await db
+        .from('users')
+        .select('*')
+        .order(orderField as any, { ascending: false })
+        .range(safeOffset, safeOffset + safeLimit - 1);
+      if (error) throw error;
+      return (data as any[])
+        .map(mapSupabaseToUser)
+        .filter((u: UserInternal | null): u is UserInternal => u !== null);
+    }, 'getLeaderboard').catch(() => []);
   }
   const allUsers = Array.from(users.values());
   if (mode === 'Ranked')
@@ -217,13 +259,19 @@ export async function getAllLeaderboards(
 
 export async function getGlobalStats(): Promise<{ civilWins: number; stateWins: number }> {
   if (isConfigured) {
-    const { data, error } = await db
-      .from('global_stats')
-      .select('civil_wins, state_wins')
-      .eq('id', 1)
-      .single();
-    if (error || !data) return { civilWins: 0, stateWins: 0 };
-    return { civilWins: data.civil_wins, stateWins: data.state_wins };
+    try {
+      return await withRetry(async () => {
+        const { data, error } = await db
+          .from('global_stats')
+          .select('civil_wins, state_wins')
+          .eq('id', 1)
+          .single();
+        if (error || !data) throw error || new Error('Global stats not found');
+        return { civilWins: data.civil_wins, stateWins: data.state_wins };
+      }, 'getGlobalStats');
+    } catch (_) {
+      return { civilWins: 0, stateWins: 0 };
+    }
   }
   return { civilWins: 0, stateWins: 0 };
 }
@@ -283,18 +331,36 @@ export async function updateSystemConfig(config: Partial<SystemConfig>): Promise
 
 export async function getUser(username: string): Promise<UserInternal | null> {
   if (isConfigured) {
-    const { data, error } = await db.from('users').select('*').eq('username', username).single();
-    if (error) return null;
-    return mapSupabaseToUser(data);
+    try {
+      return await withRetry(async () => {
+        const { data, error } = await db.from('users').select('*').eq('username', username).single();
+        if (error) {
+          if (error.code === 'PGRST116') return null;
+          throw error;
+        }
+        return mapSupabaseToUser(data);
+      }, 'getUser');
+    } catch (_) {
+      return null;
+    }
   }
   return users.get(username) ?? null;
 }
 
 export async function getUserById(id: string): Promise<UserInternal | null> {
   if (isConfigured) {
-    const { data, error } = await db.from('users').select('*').eq('id', id).single();
-    if (error) return null;
-    return mapSupabaseToUser(data);
+    try {
+      return await withRetry(async () => {
+        const { data, error } = await db.from('users').select('*').eq('id', id).single();
+        if (error) {
+          if (error.code === 'PGRST116') return null;
+          throw error;
+        }
+        return mapSupabaseToUser(data);
+      }, 'getUserById');
+    } catch (_) {
+      return null;
+    }
   }
   for (const u of users.values()) {
     if (u.id === id) return u;
@@ -434,22 +500,30 @@ export async function deletePasswordResetTokens(userId: string): Promise<void> {
 
 export async function getFriends(userId: string): Promise<UserInternal[]> {
   if (isConfigured) {
-    const { data, error } = await db
-      .from('friends')
-      .select('*, user_id_1, user_id_2')
-      .or(`user_id_1.eq.${userId},user_id_2.eq.${userId}`)
-      .eq('status', 'accepted');
-    if (error) return [];
+    try {
+      return await withRetry(async () => {
+        const { data, error } = await db
+          .from('friends')
+          .select('*, user_id_1, user_id_2')
+          .or(`user_id_1.eq.${userId},user_id_2.eq.${userId}`)
+          .eq('status', 'accepted');
+        if (error) throw error;
 
-    const friendIds = data.map((f: any) => (f.user_id_1 === userId ? f.user_id_2 : f.user_id_1));
-    const { data: friendsData, error: friendsError } = await db
-      .from('users')
-      .select('*')
-      .in('id', friendIds);
-    if (friendsError) return [];
-    return friendsData
-      .map(mapSupabaseToUser)
-      .filter((u: UserInternal | null): u is UserInternal => u !== null);
+        const friendIds = (data as any[]).map((f: any) =>
+          f.user_id_1 === userId ? f.user_id_2 : f.user_id_1
+        );
+        const { data: friendsData, error: friendsError } = await db
+          .from('users')
+          .select('*')
+          .in('id', friendIds);
+        if (friendsError) throw friendsError;
+        return (friendsData as any[])
+          .map(mapSupabaseToUser)
+          .filter((u: UserInternal | null): u is UserInternal => u !== null);
+      }, 'getFriends');
+    } catch (_) {
+      return [];
+    }
   }
   return [];
 }
@@ -563,10 +637,10 @@ export async function getPendingFriendRequests(userId: string): Promise<UserInte
 
 export async function saveUser(userData: UserInternal): Promise<void> {
   if (isConfigured) {
-    const { error } = await db.from('users').upsert(mapUserToSupabase(userData));
-    if (error) {
-      console.error('Supabase Save Error:', JSON.stringify(error, null, 2));
-    }
+    await withRetry(async () => {
+      const { error } = await db.from('users').upsert(mapUserToSupabase(userData));
+      if (error) throw error;
+    }, 'saveUser');
   } else {
     users.set(userData.username, userData);
   }
@@ -582,27 +656,29 @@ export async function saveMatchResult(
   match: Omit<MatchSummary, 'id'> & { id: string }
 ): Promise<void> {
   if (isConfigured) {
-    const { error } = await db.from('match_history').insert({
-      id: match.id,
-      user_id: match.userId,
-      played_at: match.playedAt,
-      room_name: match.roomName,
-      mode: match.mode,
-      player_count: match.playerCount,
-      role: match.role,
-      won: match.won,
-      win_reason: match.winReason,
-      rounds: match.rounds,
-      civil_directives: match.civilDirectives,
-      state_directives: match.stateDirectives,
-      agenda_id: match.agendaId ?? null,
-      agenda_name: match.agendaName ?? null,
-      agenda_completed: match.agendaCompleted,
-      xp_earned: match.xpEarned,
-      ip_earned: match.ipEarned,
-      cp_earned: match.cpEarned,
-    });
-    if (error) console.error('Match history save error:', error.message);
+    await withRetry(async () => {
+      const { error } = await db.from('match_history').insert({
+        id: match.id,
+        user_id: match.userId,
+        played_at: match.playedAt,
+        room_name: match.roomName,
+        mode: match.mode,
+        player_count: match.playerCount,
+        role: match.role,
+        won: match.won,
+        win_reason: match.winReason,
+        rounds: match.rounds,
+        civil_directives: match.civilDirectives,
+        state_directives: match.stateDirectives,
+        agenda_id: match.agendaId ?? null,
+        agenda_name: match.agendaName ?? null,
+        agenda_completed: match.agendaCompleted,
+        xp_earned: match.xpEarned,
+        ip_earned: match.ipEarned,
+        cp_earned: match.cpEarned,
+      });
+      if (error) throw error;
+    }, 'saveMatchResult');
   } else {
     const existing = matchHistoryStore.get(match.userId) ?? [];
     existing.unshift(match as any);
