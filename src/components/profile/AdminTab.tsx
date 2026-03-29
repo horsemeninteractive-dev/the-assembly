@@ -18,10 +18,10 @@ import {
   ChevronRight,
   X,
 } from 'lucide-react';
-import { socket } from '../socket';
-import { cn, apiUrl, debugLog, debugError } from '../lib/utils';
+import { socket } from '../../socket';
+import { cn, apiUrl, debugLog, debugError } from '../../lib/utils';
 import { motion, AnimatePresence } from 'motion/react';
-import { RoomInfo, User, SystemConfig } from '../types';
+import { RoomInfo, User, SystemConfig } from '../../types';
 
 type AdminTab = 'rooms' | 'users' | 'system' | 'logs';
 

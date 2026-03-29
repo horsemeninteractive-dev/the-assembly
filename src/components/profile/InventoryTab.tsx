@@ -1,36 +1,59 @@
 import React, { useState } from 'react';
-import { cn, getProxiedUrl } from '../lib/utils';
-import { CosmeticItem, User } from '../types';
+import { cn, getProxiedUrl, apiUrl } from '../../lib/utils';
+import { CosmeticItem, User } from '../../types';
 import { Play, Pause, User as UserIcon, Scroll } from 'lucide-react';
-import { getPolicyStyles, getVoteStyles, getFrameStyles, getRarity } from '../lib/cosmetics';
-import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../sharedConstants';
-import { getLevelFromXp } from '../lib/xp';
+import { getPolicyStyles, getVoteStyles, getFrameStyles, getRarity } from '../../lib/cosmetics';
+import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../../sharedConstants';
+import { getLevelFromXp } from '../../lib/xp';
 
 interface InventoryProps {
   user: User;
   onUpdateUser: (user: User) => void;
   token: string;
   playSound: (soundKey: string) => void;
-  handleEquip: (
-    type: 'frame' | 'badge' | 'policy' | 'vote' | 'music' | 'sound' | 'background',
-    itemId: string | undefined
-  ) => void;
-  items: CosmeticItem[];
   playPreview: (item: CosmeticItem) => void;
   playingItemId: string | null;
 }
 
-export const Inventory: React.FC<InventoryProps> = ({
+export const InventoryTab: React.FC<InventoryProps> = ({
   user,
-  handleEquip,
+  onUpdateUser,
+  token,
   playSound,
-  items,
   playPreview,
   playingItemId,
 }) => {
   const [category, setCategory] = useState<
     'frame' | 'badge' | 'policy' | 'vote' | 'music' | 'sound' | 'background'
   >('frame');
+
+  const handleEquip = async (
+    type: 'frame' | 'badge' | 'policy' | 'vote' | 'music' | 'sound' | 'background',
+    itemId: string | undefined
+  ) => {
+    try {
+      const body: Record<string, string> = {};
+      if (type === 'frame') body.frameId = itemId ?? '';
+      else if (type === 'policy') body.policyStyle = itemId ?? '';
+      else if (type === 'vote') body.votingStyle = itemId ?? '';
+      else if (type === 'music') body.music = itemId ?? '';
+      else if (type === 'sound') body.soundPack = itemId ?? '';
+      else if (type === 'background') body.backgroundId = itemId ?? '';
+
+      const res = await fetch(apiUrl('/api/profile/frame'), {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify(body),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        onUpdateUser(data.user);
+      }
+    } catch {
+      // Ignored for UI
+    }
+  };
+
   const typeItems = DEFAULT_ITEMS.filter((item) => {
     if (item.type !== category) return false;
 
@@ -200,7 +223,7 @@ export const Inventory: React.FC<InventoryProps> = ({
               <button
                 onClick={() => {
                   playSound('click');
-                  handleEquip(item.type, item.id.endsWith('-default') ? undefined : item.id);
+                  handleEquip(item.type as any, item.id.endsWith('-default') ? undefined : item.id);
                 }}
                 disabled={isEquipped}
                 className={cn(
