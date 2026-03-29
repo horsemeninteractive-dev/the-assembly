@@ -75,8 +75,12 @@ try {
   debugError('Service worker initialization error:', e);
 }
 
+import { SettingsProvider } from './contexts/SettingsContext.tsx';
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <App />
+    <SettingsProvider>
+      <App />
+    </SettingsProvider>
   </StrictMode>
 );
