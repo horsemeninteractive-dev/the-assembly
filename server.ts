@@ -58,6 +58,15 @@ import {
   adminUpdateUserSchema,
   joinRoomSchema,
   joinQueueSchema,
+  declarePoliciesSchema,
+  nominateChancellorSchema,
+  presidentDiscardSchema,
+  chancellorPlaySchema,
+  performExecutiveActionSchema,
+  voteSchema,
+  kickPlayerSchema,
+  vetoResponseSchema,
+  titleAbilityDataSchema,
 } from './server/schemas.ts';
 
 let httpServer: any;
@@ -571,7 +580,11 @@ async function startServer() {
       }
     });
 
-    socket.on('nominateChancellor', (chancellorId) => {
+    socket.on('nominateChancellor', (payload) => {
+      const result = nominateChancellorSchema.safeParse(payload);
+      if (!result.success) return socket.emit('error', 'Invalid nomination data.');
+      const chancellorId = result.data;
+
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -583,8 +596,10 @@ async function startServer() {
       engine.nominateChancellor(state, roomId, chancellorId, me.id);
     });
 
-    socket.on('vote', (vote) => {
-      if (vote !== 'Aye' && vote !== 'Nay') return;
+    socket.on('vote', (payload) => {
+      const result = voteSchema.safeParse(payload);
+      if (!result.success) return socket.emit('error', 'Invalid vote data.');
+      const vote = result.data;
 
       const roomId = getRoom();
       if (!roomId) return;
@@ -613,7 +628,11 @@ async function startServer() {
       }
     });
 
-    socket.on('presidentDiscard', (idx) => {
+    socket.on('presidentDiscard', (payload) => {
+      const result = presidentDiscardSchema.safeParse(payload);
+      if (!result.success) return socket.emit('error', 'Invalid discard data.');
+      const idx = result.data;
+
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -625,7 +644,11 @@ async function startServer() {
       engine.handlePresidentDiscard(state, roomId, me.id, idx);
     });
 
-    socket.on('chancellorPlay', (idx) => {
+    socket.on('chancellorPlay', (payload) => {
+      const result = chancellorPlaySchema.safeParse(payload);
+      if (!result.success) return socket.emit('error', 'Invalid play data.');
+      const idx = result.data;
+
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -637,7 +660,14 @@ async function startServer() {
       engine.handleChancellorPlay(state, roomId, me.id, idx);
     });
 
-    socket.on('declarePolicies', (data) => {
+    socket.on('declarePolicies', (payload) => {
+      const result = declarePoliciesSchema.safeParse(payload);
+      if (!result.success) {
+        logger.warn({ errors: result.error.flatten() }, 'Invalid declarePolicies payload');
+        return socket.emit('error', 'Invalid policy declaration data.');
+      }
+      const data = result.data;
+
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -646,38 +676,48 @@ async function startServer() {
       const player = state.players.find((p) => p.socketId === socket.id);
       if (!player) return;
 
-      if (data) {
-        const alreadyDeclared = state.declarations.some(
-          (d) => d.playerId === player.id && d.type === data.type
-        );
-        if (alreadyDeclared) return;
-
-        state.declarations = state.declarations.filter((d) => d.type !== data.type);
-
-        state.declarations.push({
-          playerId: player.id,
-          playerName: player.name,
-          civ: data.civ,
-          sta: data.sta,
-          ...(data.type === 'President' ? { drewCiv: data.drewCiv, drewSta: data.drewSta } : {}),
-          type: data.type,
-          timestamp: Date.now(),
-        });
-        const passedOrReceived = data.type === 'President' ? 'passed' : 'received';
-        const drewStr =
-          data.type === 'President' && data.drewCiv !== undefined
-            ? ` (drew ${data.drewCiv}C/${data.drewSta}S)`
-            : '';
-        state.log.push(
-          `${player.name} (${data.type}) declared ${passedOrReceived} ${data.civ} Civil and ${data.sta} State directives.${drewStr}`
-        );
+      // Verify player is the active president/chancellor for the type they are declaring
+      if (data.type === 'President' && state.presidentId !== player.id) {
+        return socket.emit('error', 'Only the active President can declare as President.');
       }
+      if (data.type === 'Chancellor' && state.chancellorId !== player.id) {
+        return socket.emit('error', 'Only the active Chancellor can declare as Chancellor.');
+      }
+
+      const alreadyDeclared = state.declarations.some(
+        (d) => d.playerId === player.id && d.type === data.type
+      );
+      if (alreadyDeclared) return;
+
+      state.declarations = state.declarations.filter((d) => d.type !== data.type);
+
+      state.declarations.push({
+        playerId: player.id,
+        playerName: player.name,
+        civ: data.civ,
+        sta: data.sta,
+        ...(data.type === 'President' ? { drewCiv: data.drewCiv, drewSta: data.drewSta } : {}),
+        type: data.type,
+        timestamp: Date.now(),
+      });
+      const passedOrReceived = data.type === 'President' ? 'passed' : 'received';
+      const drewStr =
+        data.type === 'President' && data.drewCiv !== undefined
+          ? ` (drew ${data.drewCiv}C/${data.drewSta}S)`
+          : '';
+      state.log.push(
+        `${player.name} (${data.type}) declared ${passedOrReceived} ${data.civ} Civil and ${data.sta} State directives.${drewStr}`
+      );
 
       engine.broadcastState(roomId);
       engine.checkRoundEnd(state, roomId);
     });
 
-    socket.on('performExecutiveAction', async (targetId) => {
+    socket.on('performExecutiveAction', async (payload) => {
+      const result = performExecutiveActionSchema.safeParse(payload);
+      if (!result.success) return socket.emit('error', 'Invalid executive action data.');
+      const targetId = result.data;
+
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -689,14 +729,18 @@ async function startServer() {
       await engine.handleExecutiveAction(state, roomId, targetId, me.id);
     });
 
-    socket.on('useTitleAbility', async (abilityData) => {
+    socket.on('useTitleAbility', async (payload) => {
+      const result = titleAbilityDataSchema.safeParse(payload);
+      if (!result.success) return socket.emit('error', 'Invalid title ability data.');
+      const abilityData = result.data;
+
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
       if (!state) return;
       const player = state.players.find((p) => p.socketId === socket.id);
       if (!state.titlePrompt || !player || state.titlePrompt.playerId !== player.id) return;
-      await engine.handleTitleAbility(state, roomId, abilityData);
+      await engine.handleTitleAbility(state, roomId, abilityData as any);
     });
 
     socket.on('vetoRequest', () => {
@@ -718,7 +762,11 @@ async function startServer() {
       }
     });
 
-    socket.on('vetoResponse', (agree) => {
+    socket.on('vetoResponse', (payload) => {
+      const result = vetoResponseSchema.safeParse(payload);
+      if (!result.success) return socket.emit('error', 'Invalid veto response data.');
+      const agree = result.data;
+
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -806,7 +854,11 @@ async function startServer() {
       engine.broadcastState(roomId);
     });
 
-    socket.on('kickPlayer', (targetPlayerId: string) => {
+    socket.on('kickPlayer', (payload) => {
+      const result = kickPlayerSchema.safeParse(payload);
+      if (!result.success) return socket.emit('error', 'Invalid kick data.');
+      const targetPlayerId = result.data;
+
       const roomId = getRoom();
       if (!roomId) return;
       const state = engine.rooms.get(roomId);
@@ -942,6 +994,8 @@ async function startServer() {
       if (updates.stats) targetUser.stats = { ...targetUser.stats, ...updates.stats };
       if (typeof updates.cabinetPoints === 'number') targetUser.cabinetPoints = updates.cabinetPoints;
       if (typeof updates.isBanned === 'boolean') targetUser.isBanned = updates.isBanned;
+      if (typeof updates.isAdmin === 'boolean') targetUser.isAdmin = updates.isAdmin;
+      if (updates.username) targetUser.username = updates.username;
 
       await saveUser(targetUser);
       const targetSocketId = userSockets.get(userId);

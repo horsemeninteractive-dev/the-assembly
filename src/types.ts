@@ -451,15 +451,13 @@ export interface ClientToServerEvents {
   performExecutiveAction: (targetId: string) => void;
   useTitleAbility: (abilityData: TitleAbilityData) => void;
   sendMessage: (message: string) => void;
-  declarePolicies: (
-    data: {
-      civ: number;
-      sta: number;
-      drewCiv?: number;
-      drewSta?: number;
-      type: 'President' | 'Chancellor';
-    } | null
-  ) => void;
+  declarePolicies: (data: {
+    civ: number;
+    sta: number;
+    drewCiv?: number;
+    drewSta?: number;
+    type: 'President' | 'Chancellor';
+  }) => void;
   vetoRequest: () => void;
   vetoResponse: (agree: boolean) => void;
   voiceData: (data: ArrayBuffer) => void;

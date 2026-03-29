@@ -151,11 +151,16 @@ function oauthSuccessPage(
   nonce: string = ''
 ): string {
   const targetOrigin = process.env.APP_URL || 'https://theassembly.web.app';
-  const safeUser = htmlEscape(JSON.stringify(user));
-  const safeToken = htmlEscape(token);
-  const safeOrigin = htmlEscape(targetOrigin);
-  const safePlatform = htmlEscape(platform);
+  const saneUser = sanitizeUser(user);
   const nonceAttr = nonce ? ` nonce="${nonce}"` : '';
+
+  // JSON.stringify is safe but we escape < to prevent </script> injection
+  const authDataJson = JSON.stringify({
+    user: saneUser,
+    token: token,
+    platform: platform,
+    origin: targetOrigin,
+  }).replace(/</g, '\\u003c');
 
   return `<!DOCTYPE html>
 <html>
@@ -168,25 +173,18 @@ function oauthSuccessPage(
   </style>
 </head>
 <body>
-<div id="d"
-  data-user="${safeUser}"
-  data-token="${safeToken}"
-  data-origin="${safeOrigin}"
-  data-platform="${safePlatform}"
-></div>
-
 <div class="container" id="container">
   <p>Authentication successful. Redirecting...</p>
 </div>
 
 <script${nonceAttr}>
 (function() {
-  var el = document.getElementById('d');
-  var userStr = el.getAttribute('data-user');
-  var user = JSON.parse(userStr);
-  var token = el.getAttribute('data-token');
-  var origin = el.getAttribute('data-origin');
-  var platform = el.getAttribute('data-platform');
+  var authData = ${authDataJson};
+  var user = authData.user;
+  var userStr = JSON.stringify(user);
+  var token = authData.token;
+  var origin = authData.origin;
+  var platform = authData.platform;
   var container = document.getElementById('container');
   
   var redirectParams = '?token=' + encodeURIComponent(token) + '&user=' + encodeURIComponent(userStr);

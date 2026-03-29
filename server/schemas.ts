@@ -25,13 +25,15 @@ export const statsSchema = z.object({
 });
 
 export const adminUpdateUserSchema = z.object({
-  userId: z.string(),
+  userId: z.string().uuid(),
   updates: z.object({
-    stats: statsSchema.partial().optional(),
-    cabinetPoints: z.number().int().min(0).optional(),
+    username: z.string().min(3).max(20).regex(/^[a-zA-Z0-9_]+$/).optional(),
+    isAdmin: z.boolean().optional(),
     isBanned: z.boolean().optional(),
-  }),
-});
+    cabinetPoints: z.number().int().min(0).optional(),
+    stats: statsSchema.partial().optional(),
+  }).strict(),
+}).strict();
 
 export const joinRoomSchema = z.object({
   roomId: z.string().min(1).max(40),
@@ -94,3 +96,40 @@ export const resetPasswordSchema = z.object({
   token: z.string().uuid(),
   newPassword: z.string().min(8),
 });
+
+export const declarePoliciesSchema = z.object({
+  type: z.enum(['President', 'Chancellor']),
+  civ: z.number().int().min(0).max(3),
+  sta: z.number().int().min(0).max(3),
+  drewCiv: z.number().int().min(0).max(3).optional(),
+  drewSta: z.number().int().min(0).max(3).optional(),
+}).refine(data => data.civ + data.sta <= 3, {
+  message: "Declared policies cannot exceed 3",
+  path: ["civ", "sta"]
+}).refine(data => {
+  if (data.type === 'President' && (data.drewCiv !== undefined || data.drewSta !== undefined)) {
+    const dc = data.drewCiv ?? 0;
+    const ds = data.drewSta ?? 0;
+    return dc + ds === 3;
+  }
+  return true;
+}, {
+  message: "President must declare exactly 3 drawn policies",
+  path: ["drewCiv", "drewSta"]
+});
+
+export const nominateChancellorSchema = z.string().min(1).max(64);
+export const presidentDiscardSchema = z.number().int().min(0).max(3); // handles Strategist 4-card draw (discard from hand)
+export const chancellorPlaySchema = z.number().int().min(0).max(2);
+export const performExecutiveActionSchema = z.string().min(1).max(64);
+export const voteSchema = z.enum(['Aye', 'Nay']);
+export const kickPlayerSchema = z.string().min(1).max(64);
+export const vetoResponseSchema = z.boolean();
+export const titleAbilityDataSchema = z.discriminatedUnion('use', [
+  z.object({ use: z.literal(false) }),
+  z.object({
+    use: z.literal(true),
+    role: z.enum(['Assassin', 'Strategist', 'Broker', 'Handler', 'Auditor', 'Interdictor']),
+    targetId: z.string().min(1).max(64).optional(),
+  }),
+]);
