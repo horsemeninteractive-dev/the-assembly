@@ -35,7 +35,10 @@ export function useWebRTC({
   const localStreamRef = useRef<MediaStream | null>(null);
   const peerMetaRef = useRef<Record<string, { makingOffer: boolean; polite: boolean; iceQueue: any[] }>>({});
   const senderKindMap = useRef(new WeakMap<RTCRtpSender, string>());
-  const createPeerRef = useRef<((peerId: string) => RTCPeerConnection) | null>(null);
+  const createPeerRef = useRef<((peerId: string, knownSocketId?: string) => RTCPeerConnection) | null>(null);
+  
+  const playersRef = useRef(gameState.players);
+  playersRef.current = gameState.players;
 
   const [iceServers, setIceServers] = useState<any[]>([
     { urls: 'stun:stun.l.google.com:19302' },
@@ -114,7 +117,7 @@ export function useWebRTC({
     if (pc) {
       try {
         pc.close();
-      } catch (e) {}
+      } catch (e) { /* ignore */ }
       delete peersRef.current[peerId];
     }
     delete peerMetaRef.current[peerId];
@@ -131,14 +134,14 @@ export function useWebRTC({
       if (kind === track.kind) {
         try {
           pc.removeTrack(s);
-        } catch (e) {}
+        } catch (e) { /* ignore */ }
       }
     });
     const sender = pc.addTrack(track, stream);
     senderKindMap.current.set(sender, track.kind);
   };
 
-  const createPeer = (peerId: string) => {
+  const createPeer = (peerId: string, knownSocketId?: string) => {
     if (peersRef.current[peerId]) return peersRef.current[peerId];
 
     const myId = me?.id || socket.id!;
@@ -150,16 +153,15 @@ export function useWebRTC({
 
     setRemoteStreams((prev) => ({ ...prev, [peerId]: new MediaStream() }));
 
-    if (localStreamRef.current) {
-      localStreamRef.current
-        .getTracks()
-        .forEach((track) => addTrackToPeer(pc, track, localStreamRef.current!));
-    }
-    
+    const getTargetSocketId = () => {
+      const target = playersRef.current.find((p) => p.id === peerId);
+      return target?.socketId || knownSocketId;
+    };
+
     pc.onicecandidate = ({ candidate }) => {
-      const target = gameState.players.find((p) => p.id === peerId);
-      if (candidate && target?.socketId) {
-        socket.emit('signal', { to: target.socketId, from: socket.id!, signal: { candidate } });
+      const targetSocketId = getTargetSocketId();
+      if (candidate && targetSocketId) {
+        socket.emit('signal', { to: targetSocketId, fromId: myId, signal: { candidate } });
       }
     };
 
@@ -199,11 +201,11 @@ export function useWebRTC({
       try {
         meta.makingOffer = true;
         await pc.setLocalDescription();
-        const target = gameState.players.find((p) => p.id === peerId);
-        if (target?.socketId) {
+        const targetSocketId = getTargetSocketId();
+        if (targetSocketId) {
           socket.emit('signal', {
-            to: target.socketId,
-            from: socket.id!,
+            to: targetSocketId,
+            fromId: myId,
             signal: { sdp: pc.localDescription },
           });
         }
@@ -217,9 +219,15 @@ export function useWebRTC({
     pc.oniceconnectionstatechange = () => {
       if (pc.iceConnectionState === 'failed' || pc.iceConnectionState === 'closed') {
         destroyPeer(peerId);
-        if (createPeerRef.current) createPeerRef.current(peerId);
+        if (createPeerRef.current) createPeerRef.current(peerId, knownSocketId);
       }
     };
+
+    if (localStreamRef.current) {
+      localStreamRef.current
+        .getTracks()
+        .forEach((track) => addTrackToPeer(pc, track, localStreamRef.current!));
+    }
 
     return pc;
   };
@@ -247,12 +255,15 @@ export function useWebRTC({
   }, [gameState.players, socket.id]);
 
   useEffect(() => {
-    const handleSignal = async ({ from, signal }: { from: string; signal: any }) => {
-      const p = gameState.players.find((pl) => pl.socketId === from);
-      if (!p) return;
-      const peerId = p.id;
+    const handleSignal = async ({ from, fromId, signal }: { from: string; fromId?: string; signal: any }) => {
+      let peerId = fromId;
+      if (!peerId) {
+        const p = playersRef.current.find((pl) => pl.socketId === from);
+        if (!p) return;
+        peerId = p.id;
+      }
 
-      const pc = peersRef.current[peerId] ?? (createPeerRef.current ? createPeerRef.current(peerId) : null);
+      const pc = peersRef.current[peerId] ?? (createPeerRef.current ? createPeerRef.current(peerId, from) : null);
       if (!pc) return;
       const meta = peerMetaRef.current[peerId];
       if (!meta) return;
@@ -275,7 +286,7 @@ export function useWebRTC({
             await pc.setLocalDescription();
             socket.emit('signal', {
               to: from,
-              from: socket.id!,
+              fromId: me?.id || socket.id!, // The ID of the person answering (ourselves)
               signal: { sdp: pc.localDescription },
             });
           }
@@ -306,7 +317,7 @@ export function useWebRTC({
     return () => {
       socket.off('signal', handleSignal);
     };
-  }, [gameState.players]);
+  }, [socket, me?.id]); // Run only when socket or our ID changes to avoid race conditions
 
   useEffect(() => {
     if (me && !me.isAlive) {
@@ -364,11 +375,11 @@ export function useWebRTC({
         pc.getSenders().forEach((s) => {
           try {
             pc.removeTrack(s);
-          } catch (e) {}
+          } catch (e) { /* ignore */ }
         });
       });
     }
-  }, [isVoiceActive, isVideoActive, me?.id]);
+  }, [isVoiceActive, isVideoActive, me?.id, localStream, socket, setIsVoiceActive, setIsVideoActive]);
 
   useEffect(() => {
     return () => {

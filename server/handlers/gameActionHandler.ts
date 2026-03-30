@@ -404,8 +404,8 @@ export function registerGameActionHandlers(
     }
   });
 
-  socket.on('signal', ({ to, signal }) => {
-    io.to(to).emit('signal', { from: socket.id, signal });
+  socket.on('signal', ({ to, fromId, signal }) => {
+    io.to(to).emit('signal', { from: socket.id, fromId, signal });
   });
 
   socket.on('sendFriendRequest', async (targetUserId) => {
