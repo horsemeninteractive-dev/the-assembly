@@ -33,7 +33,7 @@ export function useWebRTC({
   const audioContextRef = useRef<AudioContext | null>(null);
   const speakingTimers = useRef<Record<string, NodeJS.Timeout>>({});
   const localStreamRef = useRef<MediaStream | null>(null);
-  const peerMetaRef = useRef<Record<string, { makingOffer: boolean; polite: boolean }>>({});
+  const peerMetaRef = useRef<Record<string, { makingOffer: boolean; polite: boolean; iceQueue: any[] }>>({});
   const senderKindMap = useRef(new WeakMap<RTCRtpSender, string>());
   const createPeerRef = useRef<((peerId: string) => RTCPeerConnection) | null>(null);
 
@@ -143,7 +143,7 @@ export function useWebRTC({
 
     const myId = me?.id || socket.id!;
     const polite = myId > peerId;
-    peerMetaRef.current[peerId] = { makingOffer: false, polite };
+    peerMetaRef.current[peerId] = { makingOffer: false, polite, iceQueue: [] };
 
     const pc = new RTCPeerConnection({ iceServers });
     peersRef.current[peerId] = pc;
@@ -279,9 +279,20 @@ export function useWebRTC({
               signal: { sdp: pc.localDescription },
             });
           }
+
+          if (meta.iceQueue && meta.iceQueue.length > 0) {
+            for (const c of meta.iceQueue) {
+              pc.addIceCandidate(new RTCIceCandidate(c)).catch((e) => debugError('Queued ICE error', e));
+            }
+            meta.iceQueue = [];
+          }
         } else if (signal.candidate) {
           try {
-            await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
+            if (pc.remoteDescription && pc.remoteDescription.type) {
+              await pc.addIceCandidate(new RTCIceCandidate(signal.candidate));
+            } else {
+              meta.iceQueue.push(signal.candidate);
+            }
           } catch (e) {
             if (!meta.makingOffer) debugError('ICE error', e);
           }
