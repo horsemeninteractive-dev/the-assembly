@@ -122,6 +122,9 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
         window.location.reload();
       }, 5500);
     });
+    socket.on('hostChanged', ({ newHostUserId }: { newHostUserId: string }) => {
+      setGameState((prev) => (prev ? { ...prev, hostUserId: newHostUserId } : prev));
+    });
 
     return () => {
       socket.off('gameStateUpdate');
@@ -134,6 +137,7 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
       socket.off('kicked');
       socket.off('serverRestarting');
       socket.off('adminBroadcast');
+      socket.off('hostChanged');
     };
   }, [handleLeaveRoom, playSound, setUser]);
 

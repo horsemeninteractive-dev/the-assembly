@@ -421,6 +421,7 @@ export interface ServerToClientEvents {
   adminChatLogs: (data: { roomId: string; logs: any[] }) => void;
   adminClearRedisSuccess: (message: string) => void;
   serverRestarting: (message: string) => void;
+  hostChanged: (data: { newHostUserId: string }) => void;
 }
 
 export interface ClientToServerEvents {

@@ -26,6 +26,23 @@ export class PauseManager {
   constructor(private readonly engine: IPauseContext) {}
 
   // ---------------------------------------------------------------------------
+  // Host migration — called immediately when the host leaves or disconnects
+  // in the Lobby phase. Only relevant in Lobby; mid-game the host role is unused.
+  // ---------------------------------------------------------------------------
+
+  private migrateHost(state: GameState, leavingUserId: string | undefined): void {
+    if (state.phase !== 'Lobby') return;
+    if (!leavingUserId || state.hostUserId !== leavingUserId) return;
+
+    const nextHost = state.players.find((p) => !p.isAI && p.userId !== leavingUserId);
+    if (!nextHost) return; // room is about to be empty — cleanup will handle it
+
+    state.hostUserId = nextHost.userId;
+    addLog(state, `${nextHost.name} is now the host.`);
+    this.engine.io.to(state.roomId).emit('hostChanged', { newHostUserId: nextHost.userId });
+  }
+
+  // ---------------------------------------------------------------------------
   // Pause interval — one per room
   // ---------------------------------------------------------------------------
 
@@ -40,8 +57,10 @@ export class PauseManager {
     if (state.phase === 'Lobby') {
       addLog(
         state,
-        `${player.name} disconnected from lobby. They will be removed in 60s if they don't return.`
+        `${player.name} disconnected from lobby. They will be removed in 10s if they don't return.`
       );
+      // Migrate the host crown immediately so the lobby isn't frozen.
+      this.migrateHost(state, player.userId);
     } else if (state.phase !== 'GameOver') {
       state.isPaused = true;
       state.pauseReason = `${player.name} disconnected. Waiting 60 s for reconnection…`;
@@ -114,6 +133,8 @@ export class PauseManager {
           if (state.phase === 'Lobby' || state.phase === 'GameOver') {
             state.players = state.players.filter((p) => p.id !== player.id);
             addLog(state, `${player.name} left the room.`);
+            // Migrate the host crown immediately if the host just left the lobby.
+            this.migrateHost(state, player.userId);
           } else {
             if (state.mode === 'Ranked') {
               state.phase = 'GameOver';
