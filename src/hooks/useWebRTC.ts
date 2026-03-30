@@ -141,7 +141,8 @@ export function useWebRTC({
   const createPeer = (peerId: string) => {
     if (peersRef.current[peerId]) return peersRef.current[peerId];
 
-    const polite = socket.id! > peerId;
+    const myId = me?.id || socket.id!;
+    const polite = myId > peerId;
     peerMetaRef.current[peerId] = { makingOffer: false, polite };
 
     const pc = new RTCPeerConnection({ iceServers });
