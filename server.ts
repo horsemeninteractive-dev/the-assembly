@@ -88,8 +88,19 @@ async function startServer() {
 
   const isProd = process.env.NODE_ENV === 'production';
   const scriptSrc = isProd
-    ? ["'self'", ...prodScriptHashes.trim().split(' ').filter(Boolean), 'https://*.discord.com']
-    : ["'self'", "'unsafe-inline'", "'unsafe-eval'", 'https://*.discord.com'];
+    ? [
+        "'self'",
+        ...prodScriptHashes.trim().split(' ').filter(Boolean),
+        'https://*.discord.com',
+        (_req: any, res: any) => `'nonce-${res.locals.nonce}'`,
+      ]
+    : [
+        "'self'",
+        "'unsafe-inline'",
+        "'unsafe-eval'",
+        'https://*.discord.com',
+        (_req: any, res: any) => `'nonce-${res.locals.nonce}'`,
+      ];
 
   const app = express();
   
@@ -163,7 +174,7 @@ async function startServer() {
         },
       },
       crossOriginEmbedderPolicy: false,
-      crossOriginOpenerPolicy: { policy: 'same-origin' },
+      crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
       crossOriginResourcePolicy: { policy: 'cross-origin' },
     })
   );

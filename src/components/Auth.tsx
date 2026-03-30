@@ -49,7 +49,14 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
     const handleMessage = (event: MessageEvent) => {
       const origin = event.origin;
       const CLOUD_RUN_PATTERN = /^https:\/\/[a-z0-9-]+-[a-z0-9]+-[a-z]{2,4}\.a\.run\.app$/;
-      if (!CLOUD_RUN_PATTERN.test(origin) && !origin.includes('localhost')) return;
+      if (
+        !CLOUD_RUN_PATTERN.test(origin) &&
+        !origin.includes('localhost') &&
+        origin !== window.location.origin &&
+        origin !== 'https://theassembly.web.app'
+      ) {
+        return;
+      }
       if (event.data?.type === 'OAUTH_AUTH_SUCCESS' && event.data.user && event.data.token) {
         onAuthSuccess(event.data.user as User, event.data.token as string);
       }
