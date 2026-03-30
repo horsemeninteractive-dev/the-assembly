@@ -9,7 +9,7 @@ deploy.ps1
 *.mjs
 !package.json
 !firebase.json
-!lock.json
+!package-lock.json
 !tsconfig.json
 !metadata.json
 the-assembly.code-workspace
@@ -21,3 +21,5 @@ dist/
 android/.gradle/
 android/app/build/
 android/.idea/workspace.xml
+android/
+*.txt

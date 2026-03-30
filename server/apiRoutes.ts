@@ -14,7 +14,6 @@ import { z } from 'zod';
 import { getAppUrl, isAllowedOrigin } from './utils.ts';
 import {
   registerSchema,
-  loginSchema,
   updateEmailSchema,
   updateUsernameSchema,
   forgotPasswordSchema,
@@ -449,6 +448,9 @@ export function registerRoutes(
     if (!user || !user.password || !(await bcrypt.compare(password, user.password))) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
+    if (user.isBanned) {
+  return res.status(403).json({ error: 'Account restricted.' });
+}
     const token = jwt.sign({ userId: user.id, tokenVersion: user.tokenVersion }, JWT_SECRET!, {
       expiresIn: '30d',
     });
@@ -824,8 +826,8 @@ export function registerRoutes(
     }
   });
 
-  app.get('/api/rejoin-info', (req: Request, res: Response) => {
-    const userId = req.query.userId as string;
+  app.get('/api/rejoin-info', requireAuth, (req: Request, res: Response) => {
+  const userId = req.user!.id;
     if (!userId) return res.json({ canRejoin: false });
     for (const state of engine.rooms.values()) {
       const player = state.players.find((p) => p.userId === userId && p.isDisconnected);

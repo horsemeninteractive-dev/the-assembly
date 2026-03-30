@@ -3,6 +3,7 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import path from 'path';
+import { statsSchema } from './server/schemas.ts';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';
@@ -10,7 +11,6 @@ import { createServer as createViteServer } from 'vite';
 import { randomUUID, randomBytes, createHash } from 'crypto';
 import fs from 'fs';
 import { z } from 'zod';
-
 import { User, GameState, Player } from './src/types.ts';
 import { createDeck, isAllowedOrigin } from './server/utils.ts';
 import { GameEngine } from './server/gameEngine.ts';
@@ -54,11 +54,6 @@ if (!process.env.RESEND_API_KEY) {
   logger.info('[Config] RESEND_API_KEY not set — Resend integration is disabled.');
 }
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
-const MAX_ROOM_CAPACITY = 500;
-
-import {
-  statsSchema,
-} from './server/schemas.ts';
 
 let httpServer: any;
 let io: Server;
@@ -150,6 +145,10 @@ async function startServer() {
             'https://*.supabase.co',
             'https://theassembly.web.app',
             'wss://theassembly.web.app',
+            'https://the-assembly-874660478794.us-west1.run.app',
+            'wss://the-assembly-874660478794.us-west1.run.app',
+            'https://*.a.run.app',
+            'wss://*.a.run.app',
             'https://*.discord.com',
             'wss://*.discord.com',
             'https://*.stripe.com',
