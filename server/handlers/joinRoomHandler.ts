@@ -160,6 +160,9 @@ export async function handleJoinRoom(
       if (existingLobbyPlayer) {
         existingLobbyPlayer.socketId = socket.id;
         existingLobbyPlayer.name = name; // refresh display name too
+        // Critical: clear disconnect state so the eviction timer stops running
+        existingLobbyPlayer.isDisconnected = false;
+        (state as any).lobbyPauseTimer = undefined;
         socket.join(roomId);
         state.log.push(`${name} rejoined the lobby.`);
         engine.broadcastState(roomId);

@@ -95,11 +95,12 @@ async function startServer() {
         (_req: any, res: any) => `'nonce-${res.locals.nonce}'`,
       ]
     : [
+        // Dev: no nonce — presence of nonce causes browsers to ignore 'unsafe-inline'
+        // per CSP spec, which breaks Vite's injected HMR scripts.
         "'self'",
         "'unsafe-inline'",
         "'unsafe-eval'",
         'https://*.discord.com',
-        (_req: any, res: any) => `'nonce-${res.locals.nonce}'`,
       ];
 
   const app = express();
@@ -164,6 +165,8 @@ async function startServer() {
             'wss://*.discord.com',
             'https://*.stripe.com',
             'https://*.googleapis.com',
+            // Allow Vite HMR websocket in development
+            ...(!isProd ? ['ws://localhost:*', 'wss://localhost:*'] : []),
           ],
           frameAncestors: [
             "'self'",
@@ -296,7 +299,7 @@ async function startServer() {
     // Explicitly allow microphone, camera, and display-capture for Discord Activity
     res.setHeader(
       'Permissions-Policy',
-      'microphone=*, camera=*, display-capture=*, speaker-selection=*, autoplay=*, text-to-speech=*, screen-wake-lock=*'
+      'microphone=*, camera=*, display-capture=*, autoplay=*, screen-wake-lock=*'
     );
 
     next();

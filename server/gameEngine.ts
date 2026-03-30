@@ -2401,7 +2401,8 @@ export class GameEngine {
       }
 
       if (s.phase === 'Lobby') {
-        if (s.lobbyPauseTimer === undefined) s.lobbyPauseTimer = 60;
+        // Short grace period in lobby — 10 s is enough to handle a page refresh
+        if (s.lobbyPauseTimer === undefined) s.lobbyPauseTimer = 10;
         s.lobbyPauseTimer--;
         if (s.lobbyPauseTimer <= 0) {
           clearInterval(iv);

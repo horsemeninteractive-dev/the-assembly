@@ -86,5 +86,25 @@ export function useAudioEngine({
     };
   }, [isSoundOn, ttsVoice, ttsVolume]);
 
+  // Pause audio and cancel TTS when the app is backgrounded / tab hidden (especially on mobile)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Stop music immediately
+        musicAudioRef.current?.pause();
+        // Cancel any ongoing TTS speech
+        aiSpeech.stop();
+      } else {
+        // Resume music only if it should be playing
+        if (isMusicOn && isInteracted && musicAudioRef.current) {
+          musicAudioRef.current.play().catch(() => {});
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [isMusicOn, isInteracted]);
+
   return { playSound, playMusic, stopMusic };
 }
