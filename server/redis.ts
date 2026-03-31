@@ -49,3 +49,33 @@ export function getRedisStatus(): string {
   if (!REDIS_URL || !pubClient) return 'disabled';
   return (pubClient as any).status || 'unknown';
 }
+
+/** Redis key for a user's current socket ID and online status */
+export const userStatusKey = (userId: string): string => `user:online:${userId}`;
+
+/** How long to keep a user's online status in Redis (3 minutes default heartbeat) */
+export const USER_STATUS_TTL_SECONDS = 180;
+
+/** Sets a user's socket ID in Redis with an expiry. */
+export async function setUserSocketId(userId: string, socketId: string): Promise<void> {
+  if (!stateClient) return;
+  await stateClient.set(userStatusKey(userId), socketId, 'EX', USER_STATUS_TTL_SECONDS);
+}
+
+/** Retrieves a user's socket ID from Redis. */
+export async function getUserSocketId(userId: string): Promise<string | null> {
+  if (!stateClient) return null;
+  return await stateClient.get(userStatusKey(userId));
+}
+
+/** Refreshes the TTL of a user's online status. */
+export async function refreshUserStatus(userId: string): Promise<void> {
+  if (!stateClient) return;
+  await stateClient.expire(userStatusKey(userId), USER_STATUS_TTL_SECONDS);
+}
+
+/** Removes a user's online status from Redis. */
+export async function removeUserSocketId(userId: string): Promise<void> {
+  if (!stateClient) return;
+  await stateClient.del(userStatusKey(userId));
+}

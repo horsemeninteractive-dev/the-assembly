@@ -2,39 +2,49 @@ import React from 'react';
 import { Lobby } from '../Lobby';
 import { Profile } from '../Profile';
 import { ErrorBoundary } from '../common/ErrorBoundary';
-import { User, RoomPrivacy } from '../../types';
+import { useAuthContext } from '../../contexts/AuthContext';
+import { useAudioContext } from '../../contexts/AudioContext';
+import { useGameContext } from '../../contexts/GameContext';
+import { useSettings } from '../../contexts/SettingsContext';
 
-export function LobbyView({ user, onJoinRoom, onLogout, setIsProfileOpen, setIsPurchaseModalOpen, playSound, token, uiScale }: { 
-  user: User, 
-  onJoinRoom: (id: string, max?: number, timer?: number, mode?: any, spec?: boolean, priv?: RoomPrivacy) => void,
-  onLogout: () => void,
+export function LobbyView({ setIsProfileOpen, setIsPurchaseModalOpen }: { 
   setIsProfileOpen: (v: boolean) => void,
-  setIsPurchaseModalOpen: (v: boolean) => void,
-  playSound: any,
-  token: string | null,
-  uiScale: number
+  setIsPurchaseModalOpen: (v: boolean) => void
 }) {
+  const { user, token, handleLogout } = useAuthContext();
+  const { playSound } = useAudioContext();
+  const { handleJoinRoom } = useGameContext();
+  const { uiScaleSetting } = useSettings();
+
+  if (!user) return null;
+
   return (
     <ErrorBoundary name="Lobby">
       <Lobby 
-        user={user} onJoinRoom={onJoinRoom} onLogout={onLogout} 
+        user={user} onJoinRoom={handleJoinRoom} onLogout={handleLogout} 
         onOpenProfile={() => setIsProfileOpen(true)} 
         onOpenPurchase={() => setIsPurchaseModalOpen(true)} 
-        playSound={playSound} token={token || undefined} uiScaleSetting={uiScale} 
+        playSound={playSound} token={token || undefined} uiScaleSetting={uiScaleSetting} 
       />
     </ErrorBoundary>
   );
 }
 
-export function ProfileModal({ isOpen, onClose, user, token, setUser, playSound, playMusic, stopMusic, settings, handleJoinRoom, setIsProfileOpen, setIsPurchaseModalOpen, roomId, mode }: any) {
-  if (!isOpen) return null;
+export function ProfileModal({ isOpen, onClose, setIsProfileOpen, setIsPurchaseModalOpen, roomId, mode }: any) {
+  const { user, token, setUser } = useAuthContext();
+  const { playSound, playMusic, stopMusic } = useAudioContext();
+  const { handleJoinRoom, handleLeaveRoom } = useGameContext();
+  const settings = useSettings();
+
+  if (!isOpen || !user) return null;
+
   return (
     <ErrorBoundary name="Profile">
       <Profile 
         user={user} token={token!} onClose={onClose} onUpdateUser={setUser}
         playSound={playSound} playMusic={playMusic} stopMusic={stopMusic}
         settings={settings} onOpenPurchase={() => { setIsProfileOpen(false); setIsPurchaseModalOpen(true); }}
-        onJoinRoom={(id: string) => { setIsProfileOpen(false); handleJoinRoom(id); }}
+        onJoinRoom={(id: string) => { setIsProfileOpen(false); handleLeaveRoom(() => handleJoinRoom(id)); }}
         roomId={roomId} mode={mode}
       />
     </ErrorBoundary>

@@ -11,8 +11,10 @@ import {
   vetoResponseSchema,
   nominateChancellorSchema,
   joinQueueSchema,
+  signalSchema,
 } from '../schemas.ts';
 import { sendFriendRequest, acceptFriendRequest } from '../supabaseService.ts';
+import { getUserSocketId } from '../redis.ts';
 
 /**
  * Handlers for standard in-game actions like voting, policy declaration, 
@@ -302,18 +304,42 @@ export function registerGameActionHandlers(
   socket.on('startGame', () => {
     const roomId = getRoom();
     if (!roomId) return;
-    engine.startGame(roomId);
+    const state = engine.rooms.get(roomId);
+    if (!state || state.phase !== 'Lobby') return;
+    const host = state.players.find((p) => p.userId === state.hostUserId);
+    if (!host || host.socketId !== socket.id) return;
+
+    const humanPlayers = state.players.filter((p) => !p.isAI);
+    if (state.mode === 'Ranked' && humanPlayers.length < 5) {
+      socket.emit('error', 'Need at least 5 players to start a ranked game.');
+      return;
+    }
+    if (humanPlayers.length < 1) {
+      socket.emit('error', 'Need at least 1 player to start.');
+      return;
+    }
+
+    state.log.push('Host started the game.');
+    if (state.mode === 'Ranked') {
+      engine.startGame(roomId);
+    } else {
+      engine.fillWithAI(roomId);
+    }
+    engine.broadcastState(roomId);
   });
 
   socket.on('updateMediaState', ({ isMicOn, isCamOn }) => {
-    engine.rooms.forEach((state, roomId) => {
-      const player = state.players.find((p) => p.socketId === socket.id);
-      if (player) {
-        player.isMicOn = isMicOn;
-        player.isCamOn = isCamOn;
-        engine.broadcastState(roomId);
-      }
-    });
+    const roomId = socket.data.roomId;
+    if (!roomId) return;
+    const state = engine.rooms.get(roomId);
+    if (!state) return;
+
+    const player = state.players.find((p) => p.socketId === socket.id);
+    if (player) {
+      player.isMicOn = isMicOn;
+      player.isCamOn = isCamOn;
+      engine.broadcastState(roomId);
+    }
   });
 
   socket.on('joinQueue', async (payload: unknown) => {
@@ -404,7 +430,21 @@ export function registerGameActionHandlers(
     }
   });
 
-  socket.on('signal', ({ to, fromId, signal }) => {
+  socket.on('signal', (payload) => {
+    const result = signalSchema.safeParse(payload);
+    if (!result.success) return;
+    const { to, fromId, signal } = result.data;
+
+    const roomId = getRoom();
+    if (!roomId) return;
+    const state = engine.rooms.get(roomId);
+    if (!state) return;
+
+    const isConnected = state.players.some((p) => p.socketId === to) || 
+                        state.spectators.some((s) => s.id === to) ||
+                        state.spectatorQueue.some((q) => q.id === to);
+    if (!isConnected) return;
+
     io.to(to).emit('signal', { from: socket.id, fromId, signal });
   });
 
@@ -412,7 +452,7 @@ export function registerGameActionHandlers(
     const userId = socket.data.userId;
     if (!userId) return;
     await sendFriendRequest(userId, targetUserId);
-    const targetSocketId = userSockets.get(targetUserId);
+    const targetSocketId = await getUserSocketId(targetUserId);
     if (targetSocketId) {
       io.to(targetSocketId).emit('friendRequestReceived', { fromUserId: userId });
     }
@@ -422,7 +462,7 @@ export function registerGameActionHandlers(
     const userId = socket.data.userId;
     if (!userId) return;
     await acceptFriendRequest(userId, targetUserId);
-    const targetSocketId = userSockets.get(targetUserId);
+    const targetSocketId = await getUserSocketId(targetUserId);
     if (targetSocketId) {
       io.to(targetSocketId).emit('friendRequestAccepted', { fromUserId: userId });
     }

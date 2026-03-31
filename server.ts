@@ -1,3 +1,4 @@
+import { env } from './server/env.ts';
 import { logger } from './server/logger.ts';
 import express from 'express';
 import helmet from 'helmet';
@@ -26,34 +27,16 @@ import {
   updateSystemConfig,
   saveUser,
 } from './server/supabaseService.ts';
-import { pubClient, subClient, isRedisConfigured } from './server/redis.ts';
+import { pubClient, subClient, isRedisConfigured, setUserSocketId, getUserSocketId, removeUserSocketId, refreshUserStatus } from './server/redis.ts';
 import { SystemConfig } from './src/types.ts';
 import Stripe from 'stripe';
 
 import { registerGameActionHandlers } from './server/handlers/gameActionHandler.ts';
 import { registerAdminHandlers } from './server/handlers/adminHandler.ts';
 
-if (process.env.NODE_ENV === 'production' && !isRedisConfigured) {
-  logger.fatal('REDIS_URL is required in production for HA and persistence.');
-  process.exit(1);
-}
+const stripe = new Stripe(env.STRIPE_SECRET_KEY || '');
 
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || '');
-
-if (!process.env.STRIPE_SECRET_KEY) {
-  logger.warn('[Config] STRIPE_SECRET_KEY not set — payment endpoints will return 503.');
-}
-if (!process.env.STRIPE_WEBHOOK_SECRET) {
-  logger.info('[Config] STRIPE_WEBHOOK_SECRET not set — webhook verification will fail.');
-}
-if (!process.env.EMAIL_USER) {
-  logger.info('[Config] EMAIL_USER not set — Nodemailer password recovery is disabled.');
-}
-if (!process.env.RESEND_API_KEY) {
-  logger.info('[Config] RESEND_API_KEY not set — Resend integration is disabled.');
-}
-const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
+const PORT = env.PORT;
 
 let httpServer: any;
 let io: Server;
@@ -63,7 +46,7 @@ async function startServer() {
 
   // Generate CSP hashes from index.html for production
   let prodScriptHashes = '';
-  if (process.env.NODE_ENV === 'production') {
+  if (env.NODE_ENV === 'production') {
     try {
       const htmlPath = path.resolve('dist', 'index.html');
       if (fs.existsSync(htmlPath)) {
@@ -86,7 +69,7 @@ async function startServer() {
     }
   }
 
-  const isProd = process.env.NODE_ENV === 'production';
+  const isProd = env.NODE_ENV === 'production';
   const scriptSrc = isProd
     ? [
         "'self'",
@@ -229,7 +212,7 @@ async function startServer() {
           await saveUser(user);
 
           // Notify the user via socket if they are online
-          const socketId = userSockets.get(userId);
+          const socketId = await getUserSocketId(userId);
           if (socketId) {
             io.to(socketId).emit('userUpdate', user);
           }
@@ -473,6 +456,12 @@ async function startServer() {
     const getRoom = (): string | undefined => Array.from(socket.rooms).find((r) => r !== socket.id);
 
     // Call modular handlers to register event listeners
+    // Periodically refresh presence in Redis
+    const staleInterval = setInterval(async () => {
+      if (socket.data.userId) await refreshUserStatus(socket.data.userId);
+    }, 60000);
+    (socket as any)._presenceInterval = staleInterval;
+
     registerGameActionHandlers(socket, io, engine, userSockets);
     registerAdminHandlers(socket, io, engine, userSockets, configRef);
 
@@ -493,9 +482,11 @@ async function startServer() {
       socket.data.userId = userId;
       socket.data.isAdmin = user?.isAdmin || false;
       userSockets.set(userId, socket.id);
+      await setUserSocketId(userId, socket.id);
+
       const friends = await getFriends(userId);
       for (const friend of friends) {
-        const friendSocketId = userSockets.get(friend.id);
+        const friendSocketId = await getUserSocketId(friend.id);
         if (friendSocketId) {
           // Find which room the friend is in (if any)
           let friendRoomId: string | undefined;
@@ -520,18 +511,20 @@ async function startServer() {
     );
 
     socket.on('disconnecting', async () => {
-      if (socket.data.userId) {
-        const userId = socket.data.userId;
-        if (userSockets.get(userId) === socket.id) {
-          userSockets.delete(userId);
-          const friends = await getFriends(userId);
-          for (const friend of friends) {
-            const friendSocketId = userSockets.get(friend.id);
-            if (friendSocketId)
-              io.to(friendSocketId).emit('userStatusChanged', { userId, isOnline: false });
-          }
+    if (socket.data.userId) {
+      const userId = socket.data.userId;
+      if (userSockets.get(userId) === socket.id) {
+        userSockets.delete(userId);
+        await removeUserSocketId(userId);
+        const friends = await getFriends(userId);
+        for (const friend of friends) {
+          const friendSocketId = await getUserSocketId(friend.id);
+          if (friendSocketId)
+            io.to(friendSocketId).emit('userStatusChanged', { userId, isOnline: false });
         }
       }
+    }
+    clearInterval((socket as any)._presenceInterval);
 
       for (const roomId of socket.rooms) {
         if (roomId !== socket.id) {

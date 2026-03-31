@@ -40,7 +40,7 @@ export function useWebRTC({
   const playersRef = useRef(gameState.players);
   playersRef.current = gameState.players;
 
-  const [iceServers, setIceServers] = useState<any[]>([
+  const [iceServers, setIceServers] = useState<RTCIceServer[]>([
     { urls: 'stun:stun.l.google.com:19302' },
   ]);
 

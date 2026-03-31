@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { UserInternal } from '../../src/types.ts';
 import { getUserById } from '../supabaseService.ts';
+import { env } from '../env.ts';
 
 declare global {
   namespace Express {
@@ -11,11 +12,7 @@ declare global {
   }
 }
 
-export const JWT_SECRET = process.env.JWT_SECRET;
-if (!JWT_SECRET) throw new Error('JWT_SECRET environment variable is not set.');
-if (JWT_SECRET.length < 32) {
-  throw new Error('JWT_SECRET must be at least 32 characters long for security compliance.');
-}
+export const JWT_SECRET = env.JWT_SECRET;
 
 export function htmlEscape(str: string): string {
   return str

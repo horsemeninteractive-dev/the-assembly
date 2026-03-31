@@ -23,22 +23,10 @@ export function registerSystemRoutes({ app, engine }: RouteContext): void {
   });
 
   app.get('/api/health', (req: Request, res: Response) => {
-    const memory = process.memoryUsage();
-    res.json({
-      status: 'healthy',
-      rooms: engine.rooms.size,
-      redis: getRedisStatus(),
-      uptime: process.uptime(),
-      memory: {
-        rss: `${Math.round(memory.rss / 1024 / 1024)}MB`,
-        heapUsed: `${Math.round(memory.heapUsed / 1024 / 1024)}MB`,
-        heapTotal: `${Math.round(memory.heapTotal / 1024 / 1024)}MB`,
-        external: `${Math.round(memory.external / 1024 / 1024)}MB`,
-      },
-    });
+    res.json({ status: 'ok' });
   });
 
-  app.get('/api/leaderboard', async (req: Request, res: Response) => {
+  app.get('/api/leaderboard', costLimiter, async (req: Request, res: Response) => {
     const limit = parseInt(req.query.limit as string) || 50;
     const offset = parseInt(req.query.offset as string) || 0;
 

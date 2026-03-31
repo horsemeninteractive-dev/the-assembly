@@ -9,6 +9,7 @@ import { logger } from '../logger.ts';
 
 import { joinRoomSchema } from '../schemas.ts';
 import v8 from 'v8';
+import { getUserSocketId, setUserSocketId } from '../redis.ts';
 
 const MAX_ROOM_CAPACITY = parseInt(process.env.MAX_ROOM_CAPACITY || '100');
 
@@ -147,6 +148,7 @@ export async function handleJoinRoom(
         if (state.log.length > 50) state.log.shift();
 
         // Join room BEFORE broadcast so the client receives the update
+        socket.data.roomId = roomId;
         socket.join(roomId);
         engine.broadcastState(roomId);
         socket.to(roomId).emit('peerJoined', socket.id);
@@ -163,6 +165,7 @@ export async function handleJoinRoom(
         // Critical: clear disconnect state so the eviction timer stops running
         existingLobbyPlayer.isDisconnected = false;
         (state as any).lobbyPauseTimer = undefined;
+        socket.data.roomId = roomId;
         socket.join(roomId);
         state.log.push(`${name} rejoined the lobby.`);
         engine.broadcastState(roomId);
@@ -199,6 +202,7 @@ export async function handleJoinRoom(
       const user = await getUserById(userId);
       if (user) avatarUrl = user.avatarUrl;
     }
+    socket.data.roomId = roomId;
     state.spectators.push({ id: socket.id, name, avatarUrl });
     socket.join(roomId);
     engine.broadcastState(roomId);
@@ -224,9 +228,10 @@ export async function handleJoinRoom(
   if (userId) {
     socket.data.userId = userId;
     userSockets.set(userId, socket.id);
+    await setUserSocketId(userId, socket.id);
     const friends = await getFriends(userId);
     for (const friend of friends) {
-      const friendSocketId = userSockets.get(friend.id);
+      const friendSocketId = await getUserSocketId(friend.id);
       if (friendSocketId) {
         io.to(friendSocketId).emit('userStatusChanged', { userId, isOnline: true, roomId });
         let friendRoomId: string | undefined;
@@ -270,6 +275,7 @@ export async function handleJoinRoom(
   };
 
   state.players.push(player);
+  socket.data.roomId = roomId;
   socket.join(roomId);
   state.log.push(`${name} joined the lobby.`);
   socket.to(roomId).emit('peerJoined', socket.id);

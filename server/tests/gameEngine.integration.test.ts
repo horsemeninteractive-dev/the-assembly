@@ -429,7 +429,7 @@ describe('Title Role Abilities', () => {
     state.phase = 'Assassin_Action';
     state.presidentIdx = 0;
 
-    await engine.resolveTitleAbility(state, state.roomId, {
+    await engine.handleTitleAbility(state, state.roomId, {
       use: true,
       role: 'Assassin',
       targetId: target.id,
@@ -456,7 +456,7 @@ describe('Title Role Abilities', () => {
     state.phase = 'Assassin_Action';
     state.presidentIdx = 0;
 
-    await engine.resolveTitleAbility(state, state.roomId, {
+    await engine.handleTitleAbility(state, state.roomId, {
       use: true,
       role: 'Assassin',
       targetId: overseer.id,
@@ -486,7 +486,7 @@ describe('Title Role Abilities', () => {
     };
     state.phase = 'Legislative_President';
 
-    await engine.resolveTitleAbility(state, state.roomId, {
+    await engine.handleTitleAbility(state, state.roomId, {
       use: true,
       role: 'Strategist',
     });
@@ -510,7 +510,7 @@ describe('Title Role Abilities', () => {
     state.phase = 'Legislative_President';
     state.deck = createDeck();
 
-    await engine.resolveTitleAbility(state, state.roomId, { use: false });
+    await engine.handleTitleAbility(state, state.roomId, { use: false });
 
     expect(state.drawnPolicies).toHaveLength(3);
     expect(strategist.titleUsed).toBe(false); // not consumed on decline
@@ -531,7 +531,7 @@ describe('Title Role Abilities', () => {
     };
     state.phase = 'Nomination_Review';
 
-    await engine.resolveTitleAbility(state, state.roomId, { use: true, role: 'Broker' });
+    await engine.handleTitleAbility(state, state.roomId, { use: true, role: 'Broker' });
 
     expect(players[1].isChancellorCandidate).toBe(false);
     expect(state.rejectedChancellorId).toBe(players[1].id);
@@ -554,7 +554,7 @@ describe('Title Role Abilities', () => {
     };
     state.phase = 'Nomination_Review';
 
-    await engine.resolveTitleAbility(state, state.roomId, {
+    await engine.handleTitleAbility(state, state.roomId, {
       use: true,
       role: 'Interdictor',
       targetId: target.id,
@@ -592,7 +592,7 @@ describe('Title Role Abilities', () => {
       { playerId: players[1].id, playerName: players[1].name, civ: 2, sta: 0, type: 'Chancellor', timestamp: Date.now() },
     ];
 
-    await engine.resolveTitleAbility(state, state.roomId, { use: true, role: 'Handler' });
+    await engine.handleTitleAbility(state, state.roomId, { use: true, role: 'Handler' });
 
     // i1 and i2 positions in presidentialOrder should be swapped
     expect(state.presidentialOrder![1]).toBe(originalFollowing);
@@ -628,7 +628,7 @@ describe('Title Role Abilities', () => {
 
     const spy = vi.spyOn(engine['io'], 'to').mockReturnValue({ emit: vi.fn() } as any);
 
-    await engine.resolveTitleAbility(state, state.roomId, { use: true, role: 'Auditor' });
+    await engine.handleTitleAbility(state, state.roomId, { use: true, role: 'Auditor' });
 
     expect(spy).toHaveBeenCalledWith(auditor.id);
     expect(auditor.titleUsed).toBe(true);

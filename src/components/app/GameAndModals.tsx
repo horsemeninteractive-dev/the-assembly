@@ -7,8 +7,19 @@ import { TutorialModal } from '../TutorialModal';
 import { FriendRequestModal } from '../game/modals/FriendRequestModal';
 import { AnimatePresence, motion } from 'motion/react';
 import { Megaphone, X } from 'lucide-react';
+import { useAuthContext } from '../../contexts/AuthContext';
+import { useAudioContext } from '../../contexts/AudioContext';
+import { useGameContext } from '../../contexts/GameContext';
+import { useSettings } from '../../contexts/SettingsContext';
 
-export function GameRoomView({ gameState, privateInfo, user, token, handleLeaveRoom, handleJoinRoom, setUser, setGameState, setPrivateInfo, playSound, settings, updateAvailable, setIsProfileOpen }: any) {
+export function GameRoomView({ updateAvailable, setIsProfileOpen }: { updateAvailable: boolean, setIsProfileOpen: (v: boolean) => void }) {
+  const { user, token, setUser } = useAuthContext();
+  const { playSound } = useAudioContext();
+  const { gameState, setGameState, privateInfo, setPrivateInfo, handleLeaveRoom, handleJoinRoom } = useGameContext();
+  const settings = useSettings();
+
+  if (!gameState || !user) return null;
+
   return (
     <ErrorBoundary name="Game Room">
       <GameRoom 
@@ -24,7 +35,15 @@ export function GameRoomView({ gameState, privateInfo, user, token, handleLeaveR
   );
 }
 
-export function ModalSection({ isPurchaseModalOpen, setIsPurchaseModalOpen, token, playSound, showTutorial, handleTutorialComplete, pendingFriendRequest, setPendingFriendRequest, adminBroadcast, setAdminBroadcast, serverRestarting }: any) {
+export function ModalSection({ isPurchaseModalOpen, setIsPurchaseModalOpen }: { isPurchaseModalOpen: boolean, setIsPurchaseModalOpen: (v: boolean) => void }) {
+  const { token, showTutorial, handleTutorialComplete } = useAuthContext();
+  const { playSound } = useAudioContext();
+  const { 
+    pendingFriendRequest, setPendingFriendRequest, 
+    adminBroadcast, setAdminBroadcast, 
+    serverRestarting 
+  } = useGameContext();
+
   return (
     <>
       <PurchaseCPModal isOpen={isPurchaseModalOpen} onClose={() => { playSound('modal_close'); setIsPurchaseModalOpen(false); }} token={token || ''} playSound={playSound} />

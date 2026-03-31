@@ -76,11 +76,20 @@ try {
 }
 
 import { SettingsProvider } from './contexts/SettingsContext.tsx';
+import { AuthProvider } from './contexts/AuthContext.tsx';
+import { AudioProvider } from './contexts/AudioContext.tsx';
+import { GameProvider } from './contexts/GameContext.tsx';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <SettingsProvider>
-      <App />
+      <AuthProvider>
+        <AudioProvider>
+          <GameProvider>
+            <App />
+          </GameProvider>
+        </AudioProvider>
+      </AuthProvider>
     </SettingsProvider>
   </StrictMode>
 );

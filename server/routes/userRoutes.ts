@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
+import rateLimit from 'express-rate-limit';
 import { RouteContext } from './types.ts';
 import { requireAuth, sanitizeUser, JWT_SECRET } from './shared.ts';
 import { logger } from '../logger.ts';
@@ -7,6 +8,15 @@ import { updateEmailSchema, updateUsernameSchema } from '../schemas.ts';
 import { getUser, getUserByEmail, saveUser, getMatchHistory } from '../supabaseService.ts';
 
 export function registerUserRoutes({ app, engine }: RouteContext): void {
+  const profileLimiter = rateLimit({
+    windowMs: 60 * 1000,
+    max: 10,
+    keyGenerator: (req) => (req as any).user?.id || req.ip,
+    message: { error: 'Too many profile updates. Please slow down.' },
+    standardHeaders: true,
+    legacyHeaders: false,
+  });
+
   app.post('/api/logout', requireAuth, async (req: Request, res: Response) => {
     const user = req.user!;
     user.tokenVersion = (user.tokenVersion || 0) + 1;
@@ -19,7 +29,7 @@ export function registerUserRoutes({ app, engine }: RouteContext): void {
     res.json({ user: userWithoutPassword });
   });
 
-  app.post('/api/user/update-email', requireAuth, async (req: Request, res: Response) => {
+  app.post('/api/user/update-email', requireAuth, profileLimiter, async (req: Request, res: Response) => {
     try {
       const user = req.user!;
       const result = updateEmailSchema.safeParse(req.body);
@@ -44,7 +54,7 @@ export function registerUserRoutes({ app, engine }: RouteContext): void {
     }
   });
 
-  app.post('/api/user/update-username', requireAuth, async (req: Request, res: Response) => {
+  app.post('/api/user/update-username', requireAuth, profileLimiter, async (req: Request, res: Response) => {
     const result = updateUsernameSchema.safeParse(req.body);
     if (!result.success) {
       return res.status(400).json({ error: 'Username must be 3-20 alphanumeric characters' });

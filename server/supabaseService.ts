@@ -12,6 +12,9 @@ if (!isConfigured) {
   logger.fatal(
     'CRITICAL: SUPABASE_URL is not configured! A temporary in-memory Map is being used as a fallback for the database. ALL user accounts, progression, cosmetics, and match history WILL BE SILENTLY DISCARDED upon server restart or crash. Configure Supabase variables immediately in production.'
   );
+  if (process.env.NODE_ENV === 'production') {
+    process.exit(1);
+  }
 }
 
 // In-memory fallback store (used when Supabase is not configured)

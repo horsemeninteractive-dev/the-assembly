@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { useSettings } from './contexts/SettingsContext';
-import { useAuth } from './hooks/useAuth';
-import { useAudioEngine } from './hooks/useAudioEngine';
-import { useSocketManager } from './hooks/useSocketManager';
+import { useAuthContext } from './contexts/AuthContext';
+import { useAudioContext } from './contexts/AudioContext';
+import { useGameContext } from './contexts/GameContext';
 
 import { Auth } from './components/Auth';
 import { UpdateBanner } from './components/UpdateBanner';
@@ -20,15 +20,16 @@ import { CLIENT_VERSION } from './sharedConstants';
 export default function App() {
   const settings = useSettings();
   const {
-    user, setUser, token, loading, isInteracted, isDiscord, isMobile,
-    showTutorial, handleAuthSuccess, handleLogout, handleEnterAssembly, handleTutorialComplete
-  } = useAuth();
-  const { playSound, playMusic, stopMusic } = useAudioEngine({ user, isInteracted, ...settings });
+    user, token, loading, isInteracted, isDiscord, isMobile,
+    handleAuthSuccess, handleEnterAssembly
+  } = useAuthContext();
+  
+  const { playSound, playMusic, stopMusic } = useAudioContext();
+  
   const {
-    joined, gameState, setGameState, privateInfo, setPrivateInfo, error,
-    pendingInvite, setPendingInvite, pendingFriendRequest, setPendingFriendRequest,
-    adminBroadcast, setAdminBroadcast, serverRestarting, handleJoinRoom, handleLeaveRoom
-  } = useSocketManager({ user, token, setUser, playSound });
+    joined, gameState, error, pendingInvite, setPendingInvite,
+    handleJoinRoom, handleLeaveRoom
+  } = useGameContext();
 
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
@@ -69,19 +70,19 @@ export default function App() {
               <motion.div key="splash" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 w-full bg-texture flex items-center justify-center p-4"><EnterSplash user={user} onEnter={handleEnterAssembly} /></motion.div>
             ) : !joined || !gameState ? (
               <motion.div key="lobby" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col min-h-0">
-                <LobbyView user={user} onJoinRoom={handleJoinRoom} onLogout={handleLogout} setIsProfileOpen={setIsProfileOpen} setIsPurchaseModalOpen={setIsPurchaseModalOpen} playSound={playSound} token={token} uiScale={settings.uiScaleSetting} />
-                <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={user} token={token} setUser={setUser} playSound={playSound} playMusic={playMusic} stopMusic={stopMusic} settings={settings} handleJoinRoom={handleJoinRoom} setIsProfileOpen={setIsProfileOpen} setIsPurchaseModalOpen={setIsPurchaseModalOpen} />
+                <LobbyView setIsProfileOpen={setIsProfileOpen} setIsPurchaseModalOpen={setIsPurchaseModalOpen} />
+                <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} setIsProfileOpen={setIsProfileOpen} setIsPurchaseModalOpen={setIsPurchaseModalOpen} />
                 {pendingInvite && <InviteModal inviterName={pendingInvite.fromUsername} roomId={pendingInvite.roomId} onAccept={() => { handleJoinRoom(pendingInvite.roomId); setPendingInvite(null); }} onReject={() => setPendingInvite(null)} />}
               </motion.div>
             ) : (
               <motion.div key="gameroom" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col">
-                <GameRoomView gameState={gameState} privateInfo={privateInfo} user={user} token={token} handleLeaveRoom={handleLeaveRoom} handleJoinRoom={handleJoinRoom} setUser={setUser} setGameState={setGameState} setPrivateInfo={setPrivateInfo} playSound={playSound} settings={settings} updateAvailable={updateAvailable} setIsProfileOpen={setIsProfileOpen} />
-                <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} user={user} token={token} setUser={setUser} playSound={playSound} playMusic={playMusic} stopMusic={stopMusic} settings={settings} handleJoinRoom={(id: string) => handleLeaveRoom(() => handleJoinRoom(id))} setIsProfileOpen={setIsProfileOpen} setIsPurchaseModalOpen={setIsPurchaseModalOpen} roomId={gameState.roomId} mode={gameState.mode} />
+                <GameRoomView updateAvailable={updateAvailable} setIsProfileOpen={setIsProfileOpen} />
+                <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} setIsProfileOpen={setIsProfileOpen} setIsPurchaseModalOpen={setIsPurchaseModalOpen} roomId={gameState.roomId} mode={gameState.mode} />
                 {pendingInvite && <InviteModal inviterName={pendingInvite.fromUsername} roomId={pendingInvite.roomId} onAccept={() => { handleLeaveRoom(() => handleJoinRoom(pendingInvite.roomId)); setPendingInvite(null); }} onReject={() => setPendingInvite(null)} />}
               </motion.div>
             )}
           </AnimatePresence>
-          <ModalSection isPurchaseModalOpen={isPurchaseModalOpen} setIsPurchaseModalOpen={setIsPurchaseModalOpen} token={token} playSound={playSound} showTutorial={showTutorial} handleTutorialComplete={handleTutorialComplete} pendingFriendRequest={pendingFriendRequest} setPendingFriendRequest={setPendingFriendRequest} adminBroadcast={adminBroadcast} setAdminBroadcast={setAdminBroadcast} serverRestarting={serverRestarting} />
+          <ModalSection isPurchaseModalOpen={isPurchaseModalOpen} setIsPurchaseModalOpen={setIsPurchaseModalOpen} />
         </div>
       </ErrorBoundary>
     </div>

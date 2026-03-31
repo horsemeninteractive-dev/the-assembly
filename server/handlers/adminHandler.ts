@@ -7,6 +7,7 @@ import {
 } from '../schemas.ts';
 import { getUserById, updateSystemConfig, saveUser } from '../supabaseService.ts';
 import { SystemConfig } from '../../src/types.ts';
+import { getUserSocketId } from '../redis.ts';
 
 /**
  * Handlers for administrative and host management actions like kicking players,
@@ -107,7 +108,7 @@ export function registerAdminHandlers(
     if (updates.username) targetUser.username = updates.username;
 
     await saveUser(targetUser);
-    const targetSocketId = userSockets.get(userId);
+    const targetSocketId = await getUserSocketId(userId);
     if (targetSocketId) {
       io.to(targetSocketId).emit('userUpdate', targetUser);
       if (targetUser.isBanned)

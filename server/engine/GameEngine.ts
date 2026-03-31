@@ -94,6 +94,10 @@ export class GameEngine implements IEngineCore {
     this.roundManager.clearActionTimer(roomId);
   }
 
+  startActionTimer(roomId: string): void {
+    this.roundManager.startActionTimer(roomId);
+  }
+
   // ═══════════════════════════════════════════════════════════════════════════
   // Phase management — delegates to RoundManager
   // ═══════════════════════════════════════════════════════════════════════════
@@ -225,14 +229,6 @@ export class GameEngine implements IEngineCore {
     await this.titleRoleResolver.handleTitleAbility(s, roomId, abilityData);
   }
 
-  /** Alias used by old server.ts path */
-  async resolveTitleAbility(
-    s: GameState,
-    roomId: string,
-    abilityData: TitleAbilityData
-  ): Promise<void> {
-    await this.titleRoleResolver.handleTitleAbility(s, roomId, abilityData);
-  }
 
   runPostRoundTitleAbilities(s: GameState, roomId: string): void {
     this.titleRoleResolver.runPostRoundTitleAbilities(s, roomId);
@@ -242,8 +238,6 @@ export class GameEngine implements IEngineCore {
     this.titleRoleResolver.continuePostRoundAfter(s, roomId, after);
   }
 
-  // No-op stub kept for server.ts call-site compatibility
-  checkAuditorTrigger(_state: GameState): void {}
 
   // ═══════════════════════════════════════════════════════════════════════════
   // Victory & Stats — delegates to MatchCloser
