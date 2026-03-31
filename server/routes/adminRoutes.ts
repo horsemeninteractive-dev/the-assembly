@@ -13,12 +13,11 @@ export function registerAdminRoutes({ app, engine }: RouteContext): void {
   });
 
   app.get('/api/admin/users/search', requireAdmin, async (req: Request, res: Response) => {
-    const admin = (req as any).user;
-    const query = req.query.q as string;
-    logger.info({ adminId: admin.id, query }, 'Admin User Search Request');
-
-    const users = await searchUsers(query, admin.id, 20);
-    res.json(users.map((u) => sanitizeUser(u as UserInternal)));
+    const admin = req.user;
+    if (!admin) return res.status(401).json({ error: 'Auth missing' });
+    const query = (req.query.q as string) || '';
+    const users: UserInternal[] = await searchUsers(query, admin.id, 20);
+    res.json(users.map(sanitizeUser));
   });
 
   app.get('/api/admin/config', requireAdmin, async (req: Request, res: Response) => {

@@ -15,6 +15,21 @@ interface UseWebRTCProps {
   setSpeakingPlayers: React.Dispatch<React.SetStateAction<Record<string, boolean>>>;
 }
 
+interface PeerMeta {
+  makingOffer: boolean;
+  polite: boolean;
+  iceQueue: RTCIceCandidateInit[];
+}
+
+interface SignalingPayload {
+  from: string;
+  fromId?: string;
+  signal: {
+    sdp?: RTCSessionDescriptionInit;
+    candidate?: RTCIceCandidateInit;
+  };
+}
+
 export function useWebRTC({
   gameState,
   me,
@@ -33,7 +48,7 @@ export function useWebRTC({
   const audioContextRef = useRef<AudioContext | null>(null);
   const speakingTimers = useRef<Record<string, NodeJS.Timeout>>({});
   const localStreamRef = useRef<MediaStream | null>(null);
-  const peerMetaRef = useRef<Record<string, { makingOffer: boolean; polite: boolean; iceQueue: any[] }>>({});
+  const peerMetaRef = useRef<Record<string, PeerMeta>>({});
   const senderKindMap = useRef(new WeakMap<RTCRtpSender, string>());
   const createPeerRef = useRef<((peerId: string, knownSocketId?: string) => RTCPeerConnection) | null>(null);
   
@@ -255,7 +270,7 @@ export function useWebRTC({
   }, [gameState.players, socket.id]);
 
   useEffect(() => {
-    const handleSignal = async ({ from, fromId, signal }: { from: string; fromId?: string; signal: any }) => {
+    const handleSignal = async ({ from, fromId, signal }: SignalingPayload) => {
       let peerId = fromId;
       if (!peerId) {
         const p = playersRef.current.find((pl) => pl.socketId === from);

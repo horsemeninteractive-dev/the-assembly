@@ -12,6 +12,16 @@ import { createServer as createViteServer } from 'vite';
 import { randomUUID, randomBytes, createHash } from 'crypto';
 import fs from 'fs';
 import { z } from 'zod';
+
+interface SocketData {
+  userId?: string;
+  isAdmin?: boolean;
+  chatTokens?: number;
+  gameTokens?: number;
+  lastChatLimitCheck?: number;
+  lastGameLimitCheck?: number;
+  _presenceInterval?: NodeJS.Timeout;
+}
 import { User, GameState, Player } from './src/types.ts';
 import { createDeck, isAllowedOrigin } from './server/utils.ts';
 import { GameEngine } from './server/gameEngine.ts';
@@ -39,7 +49,7 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY || '');
 const PORT = env.PORT;
 
 let httpServer: any;
-let io: Server;
+let io: Server<any, any, any, SocketData>;
 
 async function startServer() {
   logger.info('Starting with Stripe integration...');
@@ -433,8 +443,8 @@ async function startServer() {
       const lastKey = isChat ? 'lastChatLimitCheck' : 'lastGameLimitCheck';
       const tokenKey = isChat ? 'chatTokens' : 'gameTokens';
 
-      const last = (socket.data as any)[lastKey] || now;
-      const tokens = (socket.data as any)[tokenKey] ?? CAPACITY;
+      const last = socket.data[lastKey] || now;
+      const tokens = socket.data[tokenKey] ?? CAPACITY;
 
       const elapsed = now - last;
       const regained = (elapsed / 1000) * REFILL_RATE;
@@ -442,14 +452,14 @@ async function startServer() {
 
       if (currentTokens < 1) {
         logger.warn(
-          { event, userId: (socket.data as any).userId || 'unauth', socketId: socket.id },
+          { event, userId: socket.data.userId || 'unauth', socketId: socket.id },
           `Throttling ${isChat ? 'chat' : 'game action'} event due to rate limit`
         );
         return next(new Error('Rate limit exceeded. Please slow down.'));
       }
 
-      (socket.data as any)[tokenKey] = currentTokens - 1;
-      (socket.data as any)[lastKey] = now;
+      socket.data[tokenKey] = currentTokens - 1;
+      socket.data[lastKey] = now;
       next();
     });
 
@@ -460,7 +470,7 @@ async function startServer() {
     const staleInterval = setInterval(async () => {
       if (socket.data.userId) await refreshUserStatus(socket.data.userId);
     }, 60000);
-    (socket as any)._presenceInterval = staleInterval;
+    socket.data._presenceInterval = staleInterval;
 
     registerGameActionHandlers(socket, io, engine, userSockets);
     registerAdminHandlers(socket, io, engine, userSockets, configRef);
@@ -506,7 +516,7 @@ async function startServer() {
       }
     });
 
-    socket.on('joinRoom', async (payload) => 
+    socket.on('joinRoom', async (payload: any) => 
       await handleJoinRoom(socket, io, engine, userSockets, configRef.current, payload)
     );
 
@@ -524,7 +534,7 @@ async function startServer() {
         }
       }
     }
-    clearInterval((socket as any)._presenceInterval);
+    if (socket.data._presenceInterval) clearInterval(socket.data._presenceInterval);
 
       for (const roomId of socket.rooms) {
         if (roomId !== socket.id) {

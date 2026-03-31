@@ -9,6 +9,11 @@ declare global {
     interface Request {
       user?: UserInternal;
     }
+    interface Response {
+      locals: {
+        nonce?: string;
+      };
+    }
   }
 }
 
