@@ -129,25 +129,10 @@ export const vetoResponseSchema = z.boolean();
 export const signalSchema = z.object({
   to: z.string().min(1).max(64),
   fromId: z.string().min(1).max(64),
-  signal: z.discriminatedUnion('type', [
-    z.object({
-      type: z.literal('offer'),
-      sdp: z.string().max(16384),
-    }),
-    z.object({
-      type: z.literal('answer'),
-      sdp: z.string().max(16384),
-    }),
-    z.object({
-      type: z.literal('candidate'),
-      candidate: z.object({
-        candidate: z.string().max(2048).optional(),
-        sdpMid: z.string().max(256).nullable().optional(),
-        sdpMLineIndex: z.number().int().min(0).max(65535).nullable().optional(),
-        usernameFragment: z.string().max(256).nullable().optional(),
-      }).passthrough(),
-    }),
-  ]),
+  signal: z.object({
+    sdp: z.any().optional(),
+    candidate: z.any().optional(),
+  }).passthrough(),
 });
 
 export const titleAbilityDataSchema = z.discriminatedUnion('use', [

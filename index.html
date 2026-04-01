@@ -13,39 +13,62 @@
     <link rel="icon" type="image/png" href="/pwa-192x192.png" />
     <link rel="shortcut icon" href="/pwa-192x192.png" />
 
-    <!-- Self-healing script to fix White Screen errors -->
+    <!-- Hardened Self-healing script to fix White Screen / Asset mismatch errors -->
     <script>
-      window.addEventListener(
-        'error',
-        function (e) {
-          // Detect script errors or failed asset loads
-          if (
-            e.target.tagName === 'SCRIPT' ||
-            (e.message && e.message.toLowerCase().includes('script error'))
-          ) {
-            console.error('Asset load error detected. Clearing cache and reloading...');
-            try {
-              if ('serviceWorker' in navigator) {
-                navigator.serviceWorker.getRegistrations().then(function (regs) {
-                  for (var i = 0; i < regs.length; i++) regs[i].unregister();
-                });
-              }
-              if (window.caches) {
-                caches.keys().then(function (names) {
-                  for (var i = 0; i < names.length; i++) caches.delete(names[i]);
-                });
-              }
-              // Force reload from server, skipping cache
-              setTimeout(function () {
-                window.location.reload(true);
-              }, 500);
-            } catch (err) {
-              window.location.reload(true);
+      (function() {
+        var RELOAD_KEY = 'assembly_auto_reload_attempt';
+        
+        function clearAndReload() {
+          console.warn('Assembly: Critical load failure detected. Performing deep cache purge...');
+          try {
+            // 1. Unregister all service workers
+            if ('serviceWorker' in navigator) {
+              navigator.serviceWorker.getRegistrations().then(function(registrations) {
+                for (var i = 0; i < registrations.length; i++) registrations[i].unregister();
+              });
             }
+            // 2. Clear all named caches
+            if ('caches' in window) {
+              caches.keys().then(function(names) {
+                for (var i = 0; i < names.length; i++) caches.delete(names[i]);
+              });
+            }
+            // 3. Clear session storage but keep critical flags if needed
+            sessionStorage.removeItem(RELOAD_KEY);
+          } catch (e) {}
+
+          // Prevent infinite reload loops
+          var lastAttempt = parseInt(localStorage.getItem(RELOAD_KEY) || '0');
+          var now = Date.now();
+          if (now - lastAttempt < 10000) {
+            console.error('Assembly: Rapid reload detected. Stopping to prevent loop.');
+            return;
           }
-        },
-        true
-      );
+          localStorage.setItem(RELOAD_KEY, now.toString());
+          
+          // Force reload from network skipping HTTP cache
+          setTimeout(function() {
+            window.location.reload(true);
+          }, 200);
+        }
+
+        // Catch asset load errors (404s on hashed assets)
+        window.addEventListener('error', function(e) {
+          if (e.target.tagName === 'SCRIPT' || e.target.tagName === 'LINK') {
+            clearAndReload();
+          }
+        }, true);
+
+        // WATCHDOG: If the root is still empty after 5 seconds, the app failed to mount
+        // (usually due to a silent JS error in a chunk).
+        setTimeout(function() {
+          var root = document.getElementById('root');
+          if (root && root.innerHTML === '') {
+            console.warn('Assembly: Watchdog detected empty root after 5s. Recovering...');
+            clearAndReload();
+          }
+        }, 5000);
+      })();
     </script>
   </head>
   <body>

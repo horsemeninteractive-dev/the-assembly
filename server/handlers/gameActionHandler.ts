@@ -445,8 +445,8 @@ export function registerGameActionHandlers(
                         state.spectatorQueue.some((q) => q.id === to);
     if (!isConnected) return;
 
-    if (!socket.data.userId) return;
-    io.to(to).emit('signal', { from: socket.id, fromId: socket.data.userId, signal });
+    // Removed `if (!socket.data.userId) return;` because guests may not have a userId and breaking the fromId mapping breaks the client's WebRTC streams logic.
+    io.to(to).emit('signal', { from: socket.id, fromId, signal });
   });
 
   socket.on('sendFriendRequest', async (targetUserId) => {

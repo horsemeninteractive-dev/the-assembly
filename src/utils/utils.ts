@@ -48,15 +48,23 @@ export function getProxiedUrl(url: string | undefined): string {
 }
 
 export const debugLog = (...args: any[]) => {
-  if (import.meta.env.DEV) console.log(...args);
+  if (import.meta.env.DEV) {
+    console.log('[Dev]', ...args);
+  } else {
+    // In production, only log critical initialization/error info
+    const firstArg = typeof args[0] === 'string' ? args[0] : '';
+    if (firstArg.includes('SW') || firstArg.includes('Controller')) {
+       console.log('Assembly:', ...args);
+    }
+  }
 };
 
 export const debugWarn = (...args: any[]) => {
-  if (import.meta.env.DEV) console.warn(...args);
+  console.warn('Assembly:', ...args);
 };
 
 export const debugError = (...args: any[]) => {
-  if (import.meta.env.DEV) console.error(...args);
+  console.error('Assembly Error:', ...args);
 };
 
 
