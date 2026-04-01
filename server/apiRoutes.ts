@@ -44,6 +44,7 @@ export function registerRoutes(
 
   // Register domain-specific route controllers
   registerAuthRoutes(context);
+  registerOAuthRoutes(context);
   registerUserRoutes(context);
   registerFriendRoutes(context);
   registerRoomRoutes(context);
