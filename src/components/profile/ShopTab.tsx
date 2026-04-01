@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import { User, CosmeticItem } from '../../types';
+import { User, CosmeticItem } from '../../../shared/types';
 import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../../sharedConstants';
 import { Coins, User as UserIcon, Scroll, Pause, Play } from 'lucide-react';
-import { cn, getProxiedUrl, apiUrl } from '../../lib/utils';
-import { getPolicyStyles, getVoteStyles, getFrameStyles, getRarity } from '../../lib/cosmetics';
+import { cn, getProxiedUrl, apiUrl } from '../../utils/utils';
+import { getPolicyStyles, getVoteStyles, getFrameStyles, getRarity } from '../../utils/cosmetics';
 
 interface ShopTabProps {
   user: User;
@@ -246,3 +246,5 @@ export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, pla
     </div>
   );
 }
+
+

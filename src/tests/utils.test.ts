@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { cn, apiUrl, getProxiedUrl } from '../lib/utils';
+import { cn, apiUrl, getProxiedUrl } from '../utils/utils';
 import { Capacitor } from '@capacitor/core';
 
 // Mock Capacitor behavior
@@ -71,3 +71,5 @@ describe('Frontend Helpers (utils.ts)', () => {
     });
   });
 });
+
+

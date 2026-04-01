@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Scale, Eye, Crown, Vote, Zap, Target, FileText } from 'lucide-react';
 import { OverseerIcon } from './icons';
-import { cn } from '../lib/utils';
+import { cn } from '../utils/utils';
 
 interface HowToPlayModalProps {
   isOpen: boolean;
@@ -428,3 +428,5 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ isOpen, onClose 
     </AnimatePresence>
   );
 };
+
+

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { computeEloChange } from '../gameEngine';
 import { createDeck } from '../utils';
-import { assignRoles, getExecutiveAction } from '../gameRules';
-import { GameState } from '../../src/types';
+import { assignRoles, getExecutiveAction } from '../game/gameRules';
+import { GameState } from '../../shared/types';
 
 describe('Game Logic Pure Functions', () => {
   describe('computeEloChange', () => {
@@ -102,3 +102,4 @@ describe('Game Logic Pure Functions', () => {
     });
   });
 });
+

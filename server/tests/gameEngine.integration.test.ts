@@ -35,7 +35,7 @@
 
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { GameEngine } from '../gameEngine';
-import { GameState, Player, Policy } from '../../src/types';
+import { GameState, Player, Policy } from '../../shared/types';
 import { createDeck } from '../utils';
 
 // ---------------------------------------------------------------------------
@@ -892,3 +892,4 @@ describe('Eligibility Guards', () => {
     expect(eligible.find((p) => p.id === players[1].id)).toBeUndefined();
   });
 });
+

@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Server, Activity, Clock } from 'lucide-react';
-import { SystemConfig } from '../../../types';
-import { cn } from '../../../lib/utils';
+import { SystemConfig } from '../../../../shared/types';
+import { cn } from '../../../utils/utils';
 import { socket } from '../../../socket';
 
 interface AdminConfigPanelProps {
@@ -143,3 +143,5 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
     </motion.div>
   );
 };
+
+

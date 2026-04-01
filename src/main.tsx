@@ -3,7 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { Capacitor } from '@capacitor/core';
 import App from './App.tsx';
 import './index.css';
-import { debugLog, debugError } from './lib/utils';
+import { debugLog, debugError } from './utils/utils';
 
 // Global Fetch Interceptor for Native Capacitor
 if (Capacitor.isNativePlatform()) {
@@ -93,3 +93,5 @@ createRoot(document.getElementById('root')!).render(
     </SettingsProvider>
   </StrictMode>
 );
+
+

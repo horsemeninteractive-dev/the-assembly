@@ -2,8 +2,8 @@
  * engine/utils.ts — Pure, stateless helpers shared across all engine modules.
  */
 
-import { GameState, Policy } from '../../src/types.ts';
-import { shuffle } from '../utils.ts';
+import { GameState, Policy } from '../../shared/types';
+import { shuffle } from '../utils';
 
 // ---------------------------------------------------------------------------
 // Generic helpers
@@ -46,3 +46,4 @@ export function computeEloChange(
   const expected = 1 / (1 + Math.pow(10, (opponentAvgElo - playerElo) / 400));
   return Math.round(K * ((won ? 1 : 0) - expected));
 }
+

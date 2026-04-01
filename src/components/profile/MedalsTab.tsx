@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Check, Medal } from 'lucide-react';
-import { User } from '../../types';
-import { ACHIEVEMENT_DEFS } from '../../lib/achievements';
-import { cn, apiUrl } from '../../lib/utils';
+import { User } from '../../../shared/types';
+import { ACHIEVEMENT_DEFS } from '../../utils/achievements';
+import { cn, apiUrl } from '../../utils/utils';
 
 interface MedalsTabProps {
   user: User;
@@ -189,3 +189,5 @@ export function MedalsTab({ user, token, onUpdateUser, playSound }: MedalsTabPro
     </div>
   );
 }
+
+

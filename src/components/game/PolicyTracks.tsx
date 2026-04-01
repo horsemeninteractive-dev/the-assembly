@@ -1,10 +1,10 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Scale, Eye, Search, Zap, Target, Trophy, Layers, Trash2 } from 'lucide-react';
-import { GameState } from '../../types';
-import { cn } from '../../lib/utils';
+import { GameState } from '../../../shared/types';
+import { cn } from '../../utils/utils';
 import { User as UserIcon } from 'lucide-react';
-import { getProxiedUrl } from '../../lib/utils';
+import { getProxiedUrl } from '../../utils/utils';
 
 interface PolicyTracksProps {
   gameState: GameState;
@@ -236,3 +236,5 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
     </motion.div>
   );
 };
+
+

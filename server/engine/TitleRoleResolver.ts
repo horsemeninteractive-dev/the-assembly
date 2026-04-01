@@ -9,11 +9,11 @@
  *   - Title assignment on game start
  */
 
-import { GameState, Player, TitleRole, TitleAbilityData } from '../../src/types.ts';
-import { shuffle } from '../utils.ts';
-import { CHAT } from '../aiChatPhrases.ts';
-import { addLog, ensureDeckHas } from './utils.ts';
-import type { IEngineCore } from './IEngineCore.ts';
+import { GameState, Player, TitleRole, TitleAbilityData } from '../../shared/types';
+import { shuffle } from '../utils';
+import { CHAT } from './ai/aiChatPhrases';
+import { addLog, ensureDeckHas } from './utils';
+import type { IEngineCore } from './IEngineCore';
 
 export type PostRoundContinuation = 'Auditor' | 'Assassin' | 'Handler';
 
@@ -328,3 +328,4 @@ export class TitleRoleResolver {
     }
   }
 }
+

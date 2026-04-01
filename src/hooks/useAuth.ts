@@ -1,9 +1,9 @@
 import { useState, useEffect, useCallback } from 'react';
-import { User } from '../types';
+import { User } from '../../shared/types';
 import { socket } from '../socket';
-import { discordSdk, setupDiscordSdk } from '../lib/discord';
+import { discordSdk, setupDiscordSdk } from '../services/discord';
 import { DISCORD_CLIENT_ID } from '../constants';
-import { apiUrl, debugLog, debugWarn, debugError } from '../lib/utils';
+import { apiUrl, debugLog, debugWarn, debugError } from '../utils/utils';
 import { App as CapApp } from '@capacitor/app';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
@@ -277,3 +277,5 @@ export function useAuth() {
     handleTutorialComplete,
   };
 }
+
+

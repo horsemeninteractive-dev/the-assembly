@@ -2,7 +2,7 @@ import React, { createContext, useContext } from 'react';
 import { useSocketManager } from '../hooks/useSocketManager';
 import { useAuthContext } from './AuthContext';
 import { useAudioContext } from './AudioContext';
-import { GameState, PrivateInfo, RoomPrivacy } from '../types';
+import { GameState, PrivateInfo, RoomPrivacy } from '../../shared/types';
 
 interface GameContextType {
   joined: boolean;
@@ -52,3 +52,5 @@ export const useGameContext = () => {
   }
   return context;
 };
+
+

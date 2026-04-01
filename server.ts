@@ -23,7 +23,7 @@ interface SocketData {
   lastGameLimitCheck?: number;
   _presenceInterval?: NodeJS.Timeout;
 }
-import { User, GameState, Player } from './src/types.ts';
+import { User, GameState, Player } from './shared/types.ts';
 import { createDeck, isAllowedOrigin } from './server/utils.ts';
 import { GameEngine } from './server/gameEngine.ts';
 import { registerRoutes, validateToken } from './server/apiRoutes.ts';
@@ -41,7 +41,7 @@ import {
   recordStripeEvent,
 } from './server/supabaseService.ts';
 import { pubClient, subClient, isRedisConfigured, setUserSocketId, getSocketId, getUserSocketId, removeUserSocketId, refreshUserStatus } from './server/redis.ts';
-import { SystemConfig } from './src/types.ts';
+import { SystemConfig } from './shared/types.ts';
 import { registerStripeWebhook, stripe } from './server/handlers/stripeHandler.ts';
 import { registerSocketAuthMiddleware } from './server/handlers/socketAuthHandler.ts';
 import { registerPresenceHandlers } from './server/handlers/presenceHandler.ts';
@@ -433,3 +433,4 @@ async function gracefulShutdown() {
 }
 
 startServer();
+

@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Shield, Globe, Award, Code, Palette, Heart, Lock } from 'lucide-react';
-import { getProxiedUrl } from '../../../lib/utils';
+import { getProxiedUrl } from '../../../utils/utils';
 import { CLIENT_VERSION } from '../../../sharedConstants';
 
 interface CreditsModalProps {
@@ -156,3 +156,5 @@ export const CreditsModal: React.FC<CreditsModalProps> = ({ onClose, playSound }
     </div>
   );
 };
+
+

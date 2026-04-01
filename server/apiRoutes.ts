@@ -1,20 +1,20 @@
 import { Express } from 'express';
 import { Server } from 'socket.io';
 import rateLimit from 'express-rate-limit';
-import { GameEngine } from './gameEngine.ts';
+import { GameEngine } from './gameEngine';
 
-import { RouteContext } from './routes/types.ts';
-import { registerAuthRoutes } from './routes/authRoutes.ts';
-import { registerOAuthRoutes } from './routes/oauthRoutes.ts';
-import { registerUserRoutes } from './routes/userRoutes.ts';
-import { registerFriendRoutes } from './routes/friendRoutes.ts';
-import { registerRoomRoutes } from './routes/roomRoutes.ts';
-import { registerShopRoutes } from './routes/shopRoutes.ts';
-import { registerAdminRoutes } from './routes/adminRoutes.ts';
-import { registerSystemRoutes } from './routes/systemRoutes.ts';
+import { RouteContext } from './routes/types';
+import { registerAuthRoutes } from './routes/authRoutes';
+import { registerOAuthRoutes } from './routes/oauthRoutes';
+import { registerUserRoutes } from './routes/userRoutes';
+import { registerFriendRoutes } from './routes/friendRoutes';
+import { registerRoomRoutes } from './routes/roomRoutes';
+import { registerShopRoutes } from './routes/shopRoutes';
+import { registerAdminRoutes } from './routes/adminRoutes';
+import { registerSystemRoutes } from './routes/systemRoutes';
 
 // Re-export common utilities so other files do not break.
-export { sanitizeUser, validateToken, requireAuth } from './routes/shared.ts';
+export { sanitizeUser, validateToken, requireAuth } from './routes/shared';
 
 export function registerRoutes(
   app: Express,
@@ -51,3 +51,4 @@ export function registerRoutes(
   registerAdminRoutes(context);
   registerSystemRoutes(context);
 }
+

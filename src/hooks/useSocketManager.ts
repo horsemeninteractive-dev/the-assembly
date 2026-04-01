@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { User, GameState, PrivateInfo, RoomPrivacy, StructuredError } from '../types';
+import { User, GameState, PrivateInfo, RoomPrivacy, StructuredError } from '../../shared/types';
 import { socket } from '../socket';
-import { apiUrl, debugLog, debugWarn, debugError } from '../lib/utils';
+import { apiUrl, debugLog, debugWarn, debugError } from '../utils/utils';
 import * as aiSpeech from '../services/aiSpeech';
 
 interface UseSocketManagerProps {
@@ -161,3 +161,5 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
     handleLeaveRoom,
   };
 }
+
+

@@ -14,7 +14,7 @@
  */
 
 import Redis from 'ioredis';
-import { logger } from './logger.ts';
+import { logger } from './logger';
 
 const REDIS_URL = process.env.REDIS_URL;
 
@@ -178,3 +178,4 @@ export async function verifyOAuthNonce(nonce: string): Promise<boolean> {
   }
   return false;
 }
+

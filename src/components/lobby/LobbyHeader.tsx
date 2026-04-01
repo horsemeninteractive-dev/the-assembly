@@ -10,10 +10,10 @@ import {
   LogOut,
 } from 'lucide-react';
 import { Tooltip } from '../Tooltip';
-import { User } from '../../types';
-import { cn, getProxiedUrl } from '../../lib/utils';
-import { getFrameStyles, getBackgroundTexture } from '../../lib/cosmetics';
-import { getRankTier, getRankLabel } from '../../lib/ranks';
+import { User } from '../../../shared/types';
+import { cn, getProxiedUrl } from '../../utils/utils';
+import { getFrameStyles, getBackgroundTexture } from '../../utils/cosmetics';
+import { getRankTier, getRankLabel } from '../../utils/ranks';
 import { CLIENT_VERSION } from '../../sharedConstants';
 
 interface LobbyHeaderProps {
@@ -267,3 +267,5 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
     </motion.header>
   );
 };
+
+

@@ -1,5 +1,5 @@
-import { adminDb, db, isConfigured } from './core.ts';
-import { SystemConfig } from '../../src/types.ts';
+import { adminDb, db, isConfigured } from './core';
+import { SystemConfig } from '../../shared/types';
 
 export async function getSystemConfig(): Promise<SystemConfig> {
   const defaultConfig: SystemConfig = {
@@ -39,3 +39,4 @@ export async function updateSystemConfig(config: Partial<SystemConfig>): Promise
   }
   return updated;
 }
+

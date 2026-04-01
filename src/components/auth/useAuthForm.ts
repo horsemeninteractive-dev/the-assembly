@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
-import { User } from '../../types';
-import { apiUrl, debugLog, debugError } from '../../lib/utils';
-import { discordSdk } from '../../lib/discord';
+import { User } from '../../../shared/types';
+import { apiUrl, debugLog, debugError } from '../../utils/utils';
+import { discordSdk } from '../../services/discord';
 import { DISCORD_CLIENT_ID } from '../../constants';
 import { Capacitor } from '@capacitor/core';
 import { Browser } from '@capacitor/browser';
@@ -168,3 +168,5 @@ export function useAuthForm({ onAuthSuccess }: AuthFlowProps) {
     handleSocialLogin,
   };
 }
+
+

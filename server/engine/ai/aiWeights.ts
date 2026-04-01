@@ -4,7 +4,7 @@
  * for the various AI personality profiles.
  */
 
-import { AIPersonality } from '../src/types.ts';
+import { AIPersonality } from '../../../shared/types';
 
 export const AI_WEIGHTS = {
   // Difficulty-based scaling applied to suspicion thresholds
@@ -95,3 +95,4 @@ export const AI_WEIGHTS = {
     NOMINATION_RANDOM_TEAMMATE_CHANCE: 0.7, // Math.random() > 0.3
   },
 } as const;
+

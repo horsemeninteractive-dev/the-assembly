@@ -1,4 +1,4 @@
-import { adminDb, isConfigured, withRetry } from './core.ts';
+import { adminDb, isConfigured, withRetry } from './core';
 
 export async function isStripeEventProcessed(eventId: string): Promise<boolean> {
   if (!isConfigured) return false;
@@ -20,3 +20,4 @@ export async function recordStripeEvent(eventId: string, userId?: string): Promi
     if (error) throw error;
   }, 'recordStripeEvent');
 }
+

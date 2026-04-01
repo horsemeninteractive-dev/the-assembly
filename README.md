@@ -24,8 +24,16 @@ graph TD
     subgraph Backend [Node.js / Express Server]
         API[Auth/REST API]
         GE[Game Engine]
-        AI[AI Agent System]
         Redis[(Redis Pub/Sub)]
+        
+        subgraph EngineManagers [Engine Delegation]
+            GB[Game Broadcaster]
+            AI[AI Engine]
+            RM[Round Manager]
+            TRR[Title Role Resolver]
+            MC[Match Closer]
+            PM[Pause Manager]
+        end
     end
 
     subgraph DB [Persistence Layer]
@@ -38,16 +46,25 @@ graph TD
     SocketClient <-->|Socket.io| GE
     UI <--> RTCContext
     RTCContext <--> WebRTC
-    GE <--> AI
+    
+    GE --> GB
+    GE --> AI
+    GE --> RM
+    GE --> TRR
+    GE --> MC
+    GE --> PM
+    
     GE <--> Redis
     API <--> Supabase
-    GE <--> Supabase
+    MC <--> Supabase
+    AI <--> Supabase
     API <--> Stripe
 ```
 
 ### Core Architecture Components
-- **Game Engine**: Centralized authority for game state transitions, policy shuffling, and role assignments.
-- **AI System**: Bayesian-based agents capable of complex suspicion modelling, legislative strategy, and natural chat banter.
+- **Game Engine**: A thin orchestration layer that delegates core logic to specialized managers (RoundManager, AIEngine, MatchCloser, etc.).
+- **Round Manager**: Governs the state machine of a single game round, from nomination to enactment.
+- **AI Engine**: A complex Bayesian-based agent system capable of suspicion modelling, legislative strategy, and natural chat banter.
 - **Redis Integration**: Used for cross-process synchronization and reliable room state management.
 - **Supabase**: Handles multi-factor authentication, user profiles, friends lists, and match history.
 

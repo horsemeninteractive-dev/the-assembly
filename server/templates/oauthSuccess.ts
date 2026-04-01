@@ -1,5 +1,5 @@
-import { UserInternal } from '../../src/types.ts';
-import { sanitizeUser } from '../routes/shared.ts';
+import { UserInternal } from '../../shared/types';
+import { sanitizeUser } from '../routes/shared';
 
 export function oauthSuccessPage(
   user: UserInternal,
@@ -87,3 +87,4 @@ export function oauthSuccessPage(
 </body>
 </html>`;
 }
+

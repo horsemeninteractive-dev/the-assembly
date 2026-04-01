@@ -1,12 +1,12 @@
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
-import { RouteContext } from './types.ts';
-import { requireAuth, sanitizeUser, JWT_SECRET } from './shared.ts';
-import { logger } from '../logger.ts';
-import { updateEmailSchema, updateUsernameSchema } from '../schemas.ts';
-import { getUser, getUserByEmail, saveUser, getMatchHistory } from '../supabaseService.ts';
-import { ACHIEVEMENT_MAP } from '../../src/lib/achievements.ts';
+import { RouteContext } from './types';
+import { requireAuth, sanitizeUser, JWT_SECRET } from './shared';
+import { logger } from '../logger';
+import { updateEmailSchema, updateUsernameSchema } from '../game/schemas';
+import { getUser, getUserByEmail, saveUser, getMatchHistory } from '../supabaseService';
+import { ACHIEVEMENT_MAP } from '../../src/utils/achievements';
 
 export function registerUserRoutes({ app, engine }: RouteContext): void {
   const profileLimiter = rateLimit({
@@ -224,3 +224,4 @@ export function registerUserRoutes({ app, engine }: RouteContext): void {
     res.json({ user: userWithoutPassword });
   });
 }
+

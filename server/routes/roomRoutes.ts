@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { RouteContext } from './types.ts';
-import { RoomInfo } from '../../src/types.ts';
-import { requireAuth } from './shared.ts';
+import { RouteContext } from './types';
+import { RoomInfo } from '../../shared/types';
+import { requireAuth } from './shared';
 
 export function registerRoomRoutes({ app, engine }: RouteContext): void {
   app.get('/api/rooms', async (_req: Request, res: Response) => {
@@ -46,3 +46,4 @@ export function registerRoomRoutes({ app, engine }: RouteContext): void {
     res.json({ canRejoin: false });
   });
 }
+

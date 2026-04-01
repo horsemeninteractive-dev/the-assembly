@@ -1,15 +1,15 @@
 import { Server, Socket } from 'socket.io';
 import { randomBytes, randomUUID } from 'crypto';
 import { z } from 'zod';
-import { GameEngine } from '../gameEngine.ts';
-import { getUserById, getFriends, isFriend } from '../supabaseService.ts';
-import { createDeck } from '../utils.ts';
-import { Player, SystemConfig } from '../../src/types.ts';
-import { logger } from '../logger.ts';
+import { GameEngine } from '../gameEngine';
+import { getUserById, getFriends, isFriend } from '../supabaseService';
+import { createDeck } from '../utils';
+import { Player, SystemConfig } from '../../shared/types';
+import { logger } from '../logger';
 
-import { joinRoomSchema } from '../schemas.ts';
+import { joinRoomSchema } from '../game/schemas';
 import v8 from 'v8';
-import { getUserSocketId, getSocketId, setUserSocketId, checkRoomCreationLimit, recordRoomCreation } from '../redis.ts';
+import { getUserSocketId, getSocketId, setUserSocketId, checkRoomCreationLimit, recordRoomCreation } from '../redis';
 
 const MAX_ROOM_CAPACITY = parseInt(process.env.MAX_ROOM_CAPACITY || '100');
 
@@ -298,3 +298,4 @@ export async function handleJoinRoom(
   await engine.updateRoomAverageElo(state);
   engine.broadcastState(roomId);
 }
+

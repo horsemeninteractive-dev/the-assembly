@@ -1,9 +1,9 @@
 import { Request, Response } from 'express';
-import { RouteContext } from './types.ts';
-import { DEFAULT_ITEMS, CP_PACKAGES } from '../../src/sharedConstants.ts';
-import { saveUser } from '../supabaseService.ts';
-import { requireAuth, sanitizeUser } from './shared.ts';
-import { logger } from '../logger.ts';
+import { RouteContext } from './types';
+import { DEFAULT_ITEMS, CP_PACKAGES } from '../../src/sharedConstants';
+import { saveUser } from '../supabaseService';
+import { requireAuth, sanitizeUser } from './shared';
+import { logger } from '../logger';
 import rateLimit from 'express-rate-limit';
 
 export function registerShopRoutes({ app, stripe }: RouteContext): void {
@@ -76,3 +76,4 @@ export function registerShopRoutes({ app, stripe }: RouteContext): void {
     }
   });
 }
+

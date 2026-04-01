@@ -15,7 +15,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { OverseerIcon } from './icons';
-import { cn } from '../lib/utils';
+import { cn } from '../utils/utils';
 
 interface TutorialModalProps {
   isOpen: boolean;
@@ -537,3 +537,5 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete
     </AnimatePresence>
   );
 };
+
+

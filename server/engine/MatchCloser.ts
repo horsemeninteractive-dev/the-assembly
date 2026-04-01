@@ -8,16 +8,16 @@
  */
 
 import { randomUUID } from 'crypto';
-import { GameState, UserInternal, RecentlyPlayedEntry } from '../../src/types.ts';
-import { logger } from '../logger.ts';
-import { getUserById, saveUser, saveMatchResult, incrementGlobalWin, saveMatchAndUserAtomic } from '../supabaseService.ts';
-import { calculateXpGain } from '../../src/lib/xp.ts';
-import { inFlightWrites } from '../../server.ts';
-import { checkAchievements } from '../achievements.ts';
-import { ACHIEVEMENT_MAP } from '../../src/lib/achievements.ts';
-import { AGENDA_MAP } from '../personalAgendas.ts';
-import { computeEloChange } from './utils.ts';
-import type { IEngineCore } from './IEngineCore.ts';
+import { GameState, UserInternal, RecentlyPlayedEntry } from '../../shared/types';
+import { logger } from '../logger';
+import { getUserById, saveUser, saveMatchResult, incrementGlobalWin, saveMatchAndUserAtomic } from '../supabaseService';
+import { calculateXpGain } from '../../src/utils/xp';
+import { inFlightWrites } from '../../server';
+import { checkAchievements } from '../achievements';
+import { ACHIEVEMENT_MAP } from '../../src/utils/achievements';
+import { AGENDA_MAP } from '../game/personalAgendas';
+import { computeEloChange } from './utils';
+import type { IEngineCore } from './IEngineCore';
 
 export class MatchCloser {
   constructor(private readonly engine: IEngineCore) {}
@@ -308,3 +308,4 @@ export class MatchCloser {
     }
   }
 }
+

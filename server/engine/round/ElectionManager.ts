@@ -1,7 +1,7 @@
-import { GameState, Player } from '../../../src/types.ts';
-import { addLog, pick } from '../utils.ts';
-import { updateSuspicionFromNomination } from '../../suspicion.ts';
-import type { IRoundManagerContext } from '../RoundManager.ts';
+import { GameState, Player } from '../../../shared/types';
+import { addLog, pick } from '../utils';
+import { updateSuspicionFromNomination } from '../../game/suspicion';
+import type { IRoundManagerContext } from '../RoundManager';
 
 export class ElectionManager {
   constructor(private readonly round: any) {} // RoundManager reference
@@ -227,3 +227,4 @@ export class ElectionManager {
     }
   }
 }
+

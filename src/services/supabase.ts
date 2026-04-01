@@ -22,3 +22,5 @@ export const isSupabaseConfigured = !!(supabaseUrl && supabaseAnonKey);
 export const supabase = (
   isSupabaseConfigured ? createClient(supabaseUrl, supabaseAnonKey) : null
 ) as any; // Using any to avoid null-checks everywhere where isSupabaseConfigured is used as a guard
+
+

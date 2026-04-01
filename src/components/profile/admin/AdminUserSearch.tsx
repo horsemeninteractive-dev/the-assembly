@@ -1,7 +1,7 @@
 import React from 'react';
 import { Search, Users, Shield, Ban, ChevronRight } from 'lucide-react';
-import { User } from '../../../types';
-import { cn, apiUrl, debugLog, debugError } from '../../../lib/utils';
+import { User } from '../../../../shared/types';
+import { cn, apiUrl, debugLog, debugError } from '../../../utils/utils';
 
 interface AdminUserSearchProps {
   adminId: string;
@@ -120,3 +120,5 @@ export const AdminUserSearch: React.FC<AdminUserSearchProps> = ({
     </div>
   );
 };
+
+

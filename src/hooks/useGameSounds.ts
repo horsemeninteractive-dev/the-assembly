@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { GameState, Player } from '../types';
+import { GameState, Player } from '../../shared/types';
 import * as aiSpeech from '../services/aiSpeech';
 
 interface UseGameSoundsProps {
@@ -177,3 +177,5 @@ export function useGameSounds({
     }
   }, [gameState.messages.length, isAiVoiceEnabled, ttsEngine, soundVolume, ttsVolume]);
 }
+
+

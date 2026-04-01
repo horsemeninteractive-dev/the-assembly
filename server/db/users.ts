@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
-import { adminDb, isConfigured, withRetry } from './core.ts';
-import { UserInternal } from '../../src/types.ts';
-import { logger } from '../logger.ts';
-import { stateClient, isRedisConfigured } from '../redis.ts';
+import { adminDb, isConfigured, withRetry } from './core';
+import { UserInternal } from '../../shared/types';
+import { logger } from '../logger';
+import { stateClient, isRedisConfigured } from '../redis';
 
 export const users: Map<string, UserInternal> = new Map();
 export const memoryResetTokens: Map<string, { userId: string; expiresAt: Date }> = new Map();
@@ -459,3 +459,4 @@ export async function searchUsers(
 
   return results;
 }
+

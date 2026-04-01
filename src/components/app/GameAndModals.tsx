@@ -27,9 +27,7 @@ export function GameRoomView({ updateAvailable, setIsProfileOpen }: { updateAvai
         onLeaveRoom={handleLeaveRoom} onPlayAgain={() => socket.emit('playAgain')}
         onOpenProfile={() => setIsProfileOpen(true)} onJoinRoom={handleJoinRoom}
         setUser={setUser} setGameState={setGameState} setPrivateInfo={setPrivateInfo}
-        updateAvailable={updateAvailable} playSound={playSound} soundVolume={settings.soundVolume}
-        ttsVolume={settings.ttsVolume} ttsVoice={settings.ttsVoice} ttsEngine={settings.ttsEngine}
-        isAiVoiceEnabled={settings.isAiVoiceEnabled} uiScaleSetting={settings.uiScaleSetting}
+        updateAvailable={updateAvailable} playSound={playSound}
       />
     </ErrorBoundary>
   );
@@ -90,3 +88,5 @@ export function ModalSection({ isPurchaseModalOpen, setIsPurchaseModalOpen }: { 
     </>
   );
 }
+
+

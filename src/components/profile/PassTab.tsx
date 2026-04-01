@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { User, CosmeticItem } from '../../types';
+import { User, CosmeticItem } from '../../../shared/types';
 import { DEFAULT_ITEMS } from '../../sharedConstants';
-import { getLevelFromXp, getXpInCurrentLevel, getXpForNextLevel, getTotalXpForLevel } from '../../lib/xp';
+import { getLevelFromXp, getXpInCurrentLevel, getXpForNextLevel, getTotalXpForLevel } from '../../utils/xp';
 import { Check, Zap, Play, Pause, User as UserIcon } from 'lucide-react';
-import { cn, getProxiedUrl, apiUrl } from '../../lib/utils';
-import { getVoteStyles, getFrameStyles } from '../../lib/cosmetics';
+import { cn, getProxiedUrl, apiUrl } from '../../utils/utils';
+import { getVoteStyles, getFrameStyles } from '../../utils/cosmetics';
 
 interface PassTabProps {
   user: User;
@@ -350,3 +350,5 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
     </div>
   );
 }
+
+

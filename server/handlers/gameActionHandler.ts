@@ -1,6 +1,6 @@
 import { Server, Socket } from 'socket.io';
-import { GameEngine } from '../gameEngine.ts';
-import { logger } from '../logger.ts';
+import { GameEngine } from '../gameEngine';
+import { logger } from '../logger';
 import {
   voteSchema,
   presidentDiscardSchema,
@@ -12,9 +12,9 @@ import {
   nominateChancellorSchema,
   joinQueueSchema,
   signalSchema,
-} from '../schemas.ts';
-import { sendFriendRequest, acceptFriendRequest } from '../supabaseService.ts';
-import { getUserSocketId, getSocketId } from '../redis.ts';
+} from '../game/schemas';
+import { sendFriendRequest, acceptFriendRequest } from '../supabaseService';
+import { getUserSocketId, getSocketId } from '../redis';
 
 /**
  * Handlers for standard in-game actions like voting, policy declaration, 
@@ -469,3 +469,4 @@ export function registerGameActionHandlers(
     }
   });
 }
+

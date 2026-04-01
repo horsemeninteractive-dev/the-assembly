@@ -35,3 +35,5 @@ export const EmojiRenderer = ({ text }: { text: string }) => {
     return <>{text}</>;
   }
 };
+
+

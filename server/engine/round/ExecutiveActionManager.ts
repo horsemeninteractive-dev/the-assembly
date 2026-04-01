@@ -1,7 +1,7 @@
-import { GameState, Player } from '../../../src/types.ts';
-import { addLog } from '../utils.ts';
-import { getExecutiveAction } from '../../gameRules.ts';
-import { updateSuspicionFromInvestigation } from '../../suspicion.ts';
+import { GameState, Player } from '../../../shared/types';
+import { addLog } from '../utils';
+import { getExecutiveAction } from '../../game/gameRules';
+import { updateSuspicionFromInvestigation } from '../../game/suspicion';
 
 export class ExecutiveActionManager {
   constructor(private readonly round: any) {}
@@ -58,3 +58,4 @@ export class ExecutiveActionManager {
     this.round.nextRound(s, roomId, true, action === 'SpecialElection');
   }
 }
+

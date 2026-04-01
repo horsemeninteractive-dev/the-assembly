@@ -1,8 +1,8 @@
 // ---------------------------------------------------------------------------
 // Server-side achievement evaluator
 // ---------------------------------------------------------------------------
-import { ACHIEVEMENT_DEFS } from '../src/lib/achievements.ts';
-import type { GameState, Player, UserInternal } from '../src/types';
+import { ACHIEVEMENT_DEFS } from '../src/utils/achievements';
+import type { GameState, Player, UserInternal } from '../shared/types';
 
 export interface AchievementContext {
   /** User record AFTER stats have been incremented for this game */
@@ -106,3 +106,4 @@ export function checkAchievements(ctx: AchievementContext): string[] {
 
   return newlyEarned;
 }
+

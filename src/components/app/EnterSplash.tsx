@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { getProxiedUrl } from '../../lib/utils';
+import { getProxiedUrl } from '../../utils/utils';
 
 export function EnterSplash({ user, onEnter }: { user: any, onEnter: any }) {
   return (
@@ -14,3 +14,5 @@ export function EnterSplash({ user, onEnter }: { user: any, onEnter: any }) {
     </motion.div>
   );
 }
+
+

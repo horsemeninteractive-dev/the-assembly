@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { Socket } from 'socket.io-client';
-import { Policy, Role, PostMatchResult } from '../types';
+import { Policy, Role, PostMatchResult } from '../../shared/types';
 
 interface UsePostMatchHandlerProps {
   socket: Socket;
@@ -42,3 +42,5 @@ export function usePostMatchHandler({
     };
   }, [token, socket]);
 }
+
+

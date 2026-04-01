@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { socket } from '../../socket';
-import { GameState, Player } from '../../types';
-import { cn } from '../../lib/utils';
+import { GameState, Player } from '../../../shared/types';
+import { cn } from '../../utils/utils';
 import { PlayerCard } from './PlayerCard';
 
 // ── Grid container ────────────────────────────────────────────────────────────
@@ -87,3 +87,5 @@ export const PlayerGrid = ({
     </motion.div>
   );
 };
+
+

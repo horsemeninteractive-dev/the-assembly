@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Eye, Scale } from 'lucide-react';
-import { Policy } from '../../../types';
-import { cn } from '../../../lib/utils';
+import { Policy } from '../../../../shared/types';
+import { cn } from '../../../utils/utils';
 
 interface PolicyPeekModalProps {
   policies: Policy[] | null;
@@ -77,3 +77,5 @@ export const PolicyPeekModal = ({ policies, title, onClose, playSound }: PolicyP
     )}
   </AnimatePresence>
 );
+
+

@@ -22,3 +22,5 @@ export const UpdateBanner = ({ visible }: UpdateBannerProps) => {
     </div>
   );
 };
+
+

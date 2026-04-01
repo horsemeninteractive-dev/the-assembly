@@ -1,6 +1,27 @@
-import { CosmeticItem } from './types';
+import { CosmeticItem } from '../shared/types';
 
-export const CLIENT_VERSION = 'v0.9.9';
+// Safely resolve version across both Vite (client) and Node.js (server) environments
+const getAppVersion = (): string => {
+  try {
+    // Vite-specific environment variable injected at build time
+    if (typeof import.meta !== 'undefined' && (import.meta as any).env?.VITE_APP_VERSION) {
+      return `v${(import.meta as any).env.VITE_APP_VERSION}`;
+    }
+  } catch {}
+
+  try {
+    // Node.js environment variable
+    if (typeof process !== 'undefined' && process.env?.APP_VERSION) {
+      return process.env.APP_VERSION.startsWith('v') 
+        ? process.env.APP_VERSION 
+        : `v${process.env.APP_VERSION}`;
+    }
+  } catch {}
+
+  return 'v0.9.10'; // Fallback
+};
+
+export const CLIENT_VERSION = getAppVersion();
 
 export interface CPPackage {
   id: string;
@@ -447,3 +468,5 @@ export const PASS_ITEM_LEVELS: { [key: string]: number } = {
   'music-pass-0': 40,
   'frame-pass-0': 50,
 };
+
+

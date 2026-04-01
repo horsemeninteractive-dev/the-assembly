@@ -10,10 +10,10 @@
 
 import { randomUUID } from 'crypto';
 import { Socket } from 'socket.io';
-import { GameState, Player } from '../../src/types.ts';
-import { AI_BOTS } from '../aiPersonalities.ts';
-import { addLog, pick } from './utils.ts';
-import type { IEngineCore } from './IEngineCore.ts';
+import { GameState, Player } from '../../shared/types';
+import { AI_BOTS } from './ai/aiPersonalities';
+import { addLog, pick } from './utils';
+import type { IEngineCore } from './IEngineCore';
 
 /** Extra surface that PauseManager needs beyond the base orchestrator interface. */
 export interface IPauseContext extends IEngineCore {
@@ -280,3 +280,4 @@ export class PauseManager {
     return false;
   }
 }
+

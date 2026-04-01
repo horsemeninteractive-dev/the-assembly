@@ -1,15 +1,15 @@
 import express, { Request, Response } from 'express';
 import Stripe from 'stripe';
-import { env } from '../env.ts';
-import { logger } from '../logger.ts';
+import { env } from '../env';
+import { logger } from '../logger';
 import { Server } from 'socket.io';
 import {
   isStripeEventProcessed,
   recordStripeEvent,
   getUserById,
   saveUser,
-} from '../supabaseService.ts';
-import { getSocketId } from '../redis.ts';
+} from '../supabaseService';
+import { getSocketId } from '../redis';
 
 export const stripe = new Stripe(env.STRIPE_SECRET_KEY || '');
 
@@ -72,3 +72,4 @@ export function registerStripeWebhook(app: express.Application, getIo: () => Ser
     res.json({ received: true });
   });
 }
+

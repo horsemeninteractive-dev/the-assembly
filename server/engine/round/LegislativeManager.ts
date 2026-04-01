@@ -1,9 +1,9 @@
-import { GameState, Player, Policy } from '../../../src/types.ts';
-import { addLog, ensureDeckHas } from '../utils.ts';
-import { updateSuspicionFromPolicy, updateSuspicionFromPolicyExpectation, updateSuspicionFromDeclarations } from '../../suspicion.ts';
-import { AI_WEIGHTS } from '../../aiWeights.ts';
-import { CHAT } from '../../aiChatPhrases.ts';
-import { getExecutiveAction } from '../../gameRules.ts';
+import { GameState, Player, Policy } from '../../../shared/types';
+import { addLog, ensureDeckHas } from '../utils';
+import { updateSuspicionFromPolicy, updateSuspicionFromPolicyExpectation, updateSuspicionFromDeclarations } from '../../game/suspicion';
+import { AI_WEIGHTS } from '../ai/aiWeights';
+import { CHAT } from '../ai/aiChatPhrases';
+import { getExecutiveAction } from '../../game/gameRules';
 
 export class LegislativeManager {
   constructor(private readonly round: any) {}
@@ -444,3 +444,4 @@ export class LegislativeManager {
     });
   }
 }
+

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Zap, Loader2, CreditCard, ChevronRight, ShoppingBag } from 'lucide-react';
-import { cn, apiUrl, debugError } from '../lib/utils';
+import { cn, apiUrl, debugError } from '../utils/utils';
 import { CP_PACKAGES } from '../sharedConstants';
 
 interface PurchaseCPModalProps {
@@ -212,3 +212,5 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({
     </AnimatePresence>
   );
 };
+
+

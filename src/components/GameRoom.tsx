@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { socket } from '../socket';
-import { GameState, Role, Policy, User, PrivateInfo, PostMatchResult } from '../types';
-import { getBackgroundTexture } from '../lib/cosmetics';
-import { cn, getProxiedUrl, debugLog, debugWarn, debugError, apiUrl } from '../lib/utils';
+import { GameState, Role, Policy, User, PrivateInfo, PostMatchResult } from '../../shared/types';
+import { getBackgroundTexture } from '../utils/cosmetics';
+import { cn, getProxiedUrl, debugLog, debugWarn, debugError, apiUrl } from '../utils/utils';
 import * as aiSpeech from '../services/aiSpeech';
 
 
@@ -29,6 +29,7 @@ import { useWebRTC } from '../hooks/useWebRTC';
 import { useGameSounds } from '../hooks/useGameSounds';
 import { usePostMatchHandler } from '../hooks/usePostMatchHandler';
 import { useLegislativeHandler } from '../hooks/useLegislativeHandler';
+import { useSettings } from '../contexts/SettingsContext';
 
 interface GameRoomProps {
   gameState: GameState;
@@ -44,12 +45,6 @@ interface GameRoomProps {
   setPrivateInfo: (info: PrivateInfo | null) => void;
   updateAvailable: boolean;
   playSound: (soundKey: string) => void;
-  soundVolume: number;
-  ttsVolume: number;
-  ttsVoice: string;
-  ttsEngine: string;
-  isAiVoiceEnabled: boolean;
-  uiScaleSetting: number;
 }
 
 export const GameRoom = ({
@@ -66,21 +61,23 @@ export const GameRoom = ({
   setPrivateInfo,
   updateAvailable,
   playSound,
-  soundVolume,
-  ttsVolume,
-  ttsVoice,
-  ttsEngine,
-  isAiVoiceEnabled,
-  uiScaleSetting,
 }: GameRoomProps) => {
+  const { 
+    isSoundOn, 
+    soundVolume, 
+    ttsVolume, 
+    ttsVoice, 
+    ttsEngine, 
+    isAiVoiceEnabled, 
+    uiScaleSetting 
+  } = useSettings();
+
   const me = gameState.players.find((p) => p.socketId === socket.id);
   const isSpectator = !me && gameState.spectators.some((s) => s.id === socket.id);
   const [inQueue, setInQueue] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const uiScale = useScaling(containerRef, { multiplier: uiScaleSetting });
 
-  // Add this inside the component to check against sound settings
-  const isSoundOn = localStorage.getItem('isSoundOn') !== 'false';
 
   // ── UI panels ────────────────────────────────────────────────────────────
   const [isLogOpen, setIsLogOpen] = useState(false);
@@ -503,3 +500,5 @@ export const GameRoom = ({
     </div>
   );
 };
+
+

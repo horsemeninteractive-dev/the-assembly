@@ -2,9 +2,9 @@ import React, { RefObject } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { MessageSquare, X, Smile, Send, User as UserIcon } from 'lucide-react';
 import EmojiPicker, { Theme, EmojiStyle } from 'emoji-picker-react';
-import { GameState, Player } from '../../../types';
+import { GameState, Player } from '../../../../shared/types';
 import { EmojiRenderer } from '../../EmojiRenderer';
-import { cn, getProxiedUrl } from '../../../lib/utils';
+import { cn, getProxiedUrl } from '../../../utils/utils';
 
 interface ChatPanelProps {
   gameState: GameState;
@@ -220,3 +220,5 @@ export const ChatPanel = ({
     )}
   </AnimatePresence>
 );
+
+

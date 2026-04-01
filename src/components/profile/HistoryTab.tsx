@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Clock, ChevronDown, ChevronUp, Target } from 'lucide-react';
-import { cn, apiUrl } from '../../lib/utils';
-import { User, MatchSummary } from '../../types';
+import { cn, apiUrl } from '../../utils/utils';
+import { User, MatchSummary } from '../../../shared/types';
 
 interface HistoryTabProps {
   user: User;
@@ -270,3 +270,5 @@ export function HistoryTab({ user, token }: HistoryTabProps) {
     </div>
   );
 }
+
+

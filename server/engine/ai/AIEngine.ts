@@ -8,13 +8,13 @@
  *   - AI chat: postAIChat (used by other modules too) and triggerAIReactions
  */
 
-import { GameState, Player, TitleAbilityData } from '../../src/types.ts';
-import { CHAT } from '../aiChatPhrases.ts';
-import { AI_WEIGHTS } from '../aiWeights.ts';
-import { getSuspicion, leastSuspicious, mostSuspicious, updateSuspicionFromNomination } from '../suspicion.ts';
-import { shuffle } from '../utils.ts';
-import { addLog, pick } from './utils.ts';
-import type { IEngineCore } from './IEngineCore.ts';
+import { GameState, Player, TitleAbilityData } from '../../../shared/types';
+import { CHAT } from './aiChatPhrases';
+import { AI_WEIGHTS } from './aiWeights';
+import { getSuspicion, leastSuspicious, mostSuspicious, updateSuspicionFromNomination } from '../../game/suspicion';
+import { shuffle } from '../../utils';
+import { addLog, pick } from '../utils';
+import type { IEngineCore } from '../IEngineCore';
 
 type Policy = 'Civil' | 'State';
 
@@ -479,3 +479,4 @@ export class AIEngine {
     }
   }
 }
+

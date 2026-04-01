@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { GameEngine } from '../gameEngine';
-import { GameState, Player, UserInternal } from '../../src/types';
+import { GameState, Player, UserInternal } from '../../shared/types';
 
 // ---------------------------------------------------------------------------
 // Mocks
@@ -180,3 +180,4 @@ describe('GameEngine - updateUserStats', () => {
     expect(saveUser).toHaveBeenCalledTimes(3);
   });
 });
+

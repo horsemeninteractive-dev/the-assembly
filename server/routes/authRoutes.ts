@@ -5,11 +5,11 @@ import { randomUUID } from 'crypto';
 import rateLimit from 'express-rate-limit';
 import nodemailer from 'nodemailer';
 
-import { RouteContext } from './types.ts';
-import { JWT_SECRET, sanitizeUser } from './shared.ts';
-import { getAppUrl } from '../utils.ts';
-import { logger } from '../logger.ts';
-import { registerSchema, forgotPasswordSchema, resetPasswordSchema } from '../schemas.ts';
+import { RouteContext } from './types';
+import { JWT_SECRET, sanitizeUser } from './shared';
+import { getAppUrl } from '../utils';
+import { logger } from '../logger';
+import { registerSchema, forgotPasswordSchema, resetPasswordSchema } from '../game/schemas';
 import {
   getUser,
   getUserById,
@@ -19,7 +19,7 @@ import {
   createPasswordResetToken,
   verifyPasswordResetToken,
   deletePasswordResetTokens,
-} from '../db/index.ts';
+} from '../db/index';
 
 const transporter =
   process.env.EMAIL_USER && process.env.EMAIL_PASS
@@ -190,3 +190,4 @@ export function registerAuthRoutes({ app }: RouteContext): void {
     }
   });
 }
+

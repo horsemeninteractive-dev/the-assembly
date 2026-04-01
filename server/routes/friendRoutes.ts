@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
-import { RouteContext } from './types.ts';
-import { requireAuth, sanitizeUser } from './shared.ts';
-import { UserInternal } from '../../src/types.ts';
+import { RouteContext } from './types';
+import { requireAuth, sanitizeUser } from './shared';
+import { UserInternal } from '../../shared/types';
 import {
   getFriends,
   getPendingFriendRequests,
@@ -11,8 +11,8 @@ import {
   acceptFriendRequest,
   getUserById,
   removeFriend,
-} from '../supabaseService.ts';
-import { getUserSocketId, getSocketId } from '../redis.ts';
+} from '../supabaseService';
+import { getUserSocketId, getSocketId } from '../redis';
 
 export function registerFriendRoutes({ app, io, engine, userSockets }: RouteContext): void {
   app.get('/api/friends/status', requireAuth, async (req: Request, res: Response) => {
@@ -119,3 +119,4 @@ export function registerFriendRoutes({ app, io, engine, userSockets }: RouteCont
     res.json({ success: true });
   });
 }
+

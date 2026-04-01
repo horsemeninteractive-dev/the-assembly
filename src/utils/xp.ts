@@ -46,3 +46,5 @@ export const calculateXpGain = (stats: { win: boolean; kills: number }): number 
   xp += stats.kills * 50;
   return xp;
 };
+
+

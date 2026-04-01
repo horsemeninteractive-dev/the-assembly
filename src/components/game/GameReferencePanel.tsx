@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, HelpCircle } from 'lucide-react';
-import { GameState, GamePhase, Player } from '../../types';
-import { cn } from '../../lib/utils';
+import { GameState, GamePhase, Player } from '../../../shared/types';
+import { cn } from '../../utils/utils';
 
 interface GameReferenceProps {
   isOpen: boolean;
@@ -263,3 +263,5 @@ export const GameReferencePanel: React.FC<GameReferenceProps> = ({
     </AnimatePresence>
   );
 };
+
+

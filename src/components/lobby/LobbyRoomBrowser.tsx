@@ -8,8 +8,8 @@ import {
   Lock,
   Users2,
 } from 'lucide-react';
-import { cn, getProxiedUrl } from '../../lib/utils';
-import { RoomInfo, RoomPrivacy } from '../../types';
+import { cn, getProxiedUrl } from '../../utils/utils';
+import { RoomInfo, RoomPrivacy } from '../../../shared/types';
 
 interface LobbyRoomBrowserProps {
   rooms: RoomInfo[];
@@ -505,3 +505,5 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
     </div>
   );
 };
+
+

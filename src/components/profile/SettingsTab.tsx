@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Pencil, Check, X, Clock } from 'lucide-react';
-import { cn, apiUrl } from '../../lib/utils';
-import { User } from '../../types';
+import { cn, apiUrl } from '../../utils/utils';
+import { User } from '../../../shared/types';
 
 interface SettingsTabProps {
   user: User;
@@ -388,3 +388,5 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
     </div>
   );
 }
+
+

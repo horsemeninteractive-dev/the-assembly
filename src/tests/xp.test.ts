@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getLevelFromXp, getXpForNextLevel, calculateXpGain } from '../lib/xp';
+import { getLevelFromXp, getXpForNextLevel, calculateXpGain } from '../utils/xp';
 
 describe('XP Logic', () => {
   describe('calculateXpGain', () => {
@@ -36,3 +36,5 @@ describe('XP Logic', () => {
     });
   });
 });
+
+

@@ -13,10 +13,10 @@ import {
   Lock,
 } from 'lucide-react';
 import { Tooltip } from '../Tooltip';
-import { GameState, Player, Role, PrivateInfo } from '../../types';
+import { GameState, Player, Role, PrivateInfo } from '../../../shared/types';
 import { OverseerIcon } from '../icons';
-import { getFrameStyles } from '../../lib/cosmetics';
-import { cn, getProxiedUrl } from '../../lib/utils';
+import { getFrameStyles } from '../../utils/cosmetics';
+import { cn, getProxiedUrl } from '../../utils/utils';
 
 interface GameHeaderProps {
   gameState: GameState;
@@ -229,3 +229,5 @@ export const GameHeader = ({
     </motion.header>
   );
 };
+
+

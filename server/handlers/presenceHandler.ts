@@ -1,15 +1,15 @@
 import { Socket, Server } from 'socket.io';
-import { logger } from '../logger.ts';
-import { getFriends } from '../supabaseService.ts';
-import { validateToken } from '../apiRoutes.ts';
+import { logger } from '../logger';
+import { getFriends } from '../supabaseService';
+import { validateToken } from '../apiRoutes';
 import { 
   getUserSocketId, 
   setUserSocketId, 
   removeUserSocketId, 
   getSocketId, 
   refreshUserStatus 
-} from '../redis.ts';
-import { GameEngine } from '../gameEngine.ts';
+} from '../redis';
+import { GameEngine } from '../gameEngine';
 
 export function registerPresenceHandlers(
   socket: Socket, 
@@ -93,3 +93,4 @@ export function registerPresenceHandlers(
     }
   });
 }
+

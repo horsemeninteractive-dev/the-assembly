@@ -1,7 +1,7 @@
-import { adminDb, isConfigured, withRetry } from './core.ts';
-import { UserInternal, MatchSummary } from '../../src/types.ts';
-import { mapUserToSupabase, saveUser } from './users.ts';
-import { logger } from '../logger.ts';
+import { adminDb, isConfigured, withRetry } from './core';
+import { UserInternal, MatchSummary } from '../../shared/types';
+import { mapUserToSupabase, saveUser } from './users';
+import { logger } from '../logger';
 
 const matchHistoryStore: Map<string, MatchSummary[]> = new Map();
 
@@ -150,3 +150,4 @@ export async function incrementGlobalWin(faction: 'Civil' | 'State'): Promise<vo
     await adminDb.rpc('increment_global_win', { faction });
   }
 }
+

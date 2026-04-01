@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { User, RoomInfo, RoomPrivacy } from '../types';
-import { apiUrl, debugError } from '../lib/utils';
+import { User, RoomInfo, RoomPrivacy } from '../../shared/types';
+import { apiUrl, debugError } from '../utils/utils';
 import { LeaderboardModal } from './game/modals/LeaderboardModal';
 import { HowToPlayModal } from './HowToPlayModal';
 import { CreditsModal } from './game/modals/CreditsModal';
@@ -221,3 +221,5 @@ export const Lobby: React.FC<LobbyProps> = ({
     </div>
   );
 };
+
+

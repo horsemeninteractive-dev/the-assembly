@@ -1,5 +1,5 @@
 import { Socket } from 'socket.io';
-import { logger } from '../logger.ts';
+import { logger } from '../logger';
 
 const GAME_ACTIONS = [
   'userConnected',
@@ -72,3 +72,4 @@ export function registerSocketAuthMiddleware(socket: Socket) {
     next();
   });
 }
+

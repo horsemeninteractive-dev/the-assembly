@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { cn, getProxiedUrl, apiUrl } from '../../lib/utils';
-import { CosmeticItem, User } from '../../types';
+import { cn, getProxiedUrl, apiUrl } from '../../utils/utils';
+import { CosmeticItem, User } from '../../../shared/types';
 import { Play, Pause, User as UserIcon, Scroll } from 'lucide-react';
-import { getPolicyStyles, getVoteStyles, getFrameStyles, getRarity } from '../../lib/cosmetics';
+import { getPolicyStyles, getVoteStyles, getFrameStyles, getRarity } from '../../utils/cosmetics';
 import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../../sharedConstants';
-import { getLevelFromXp } from '../../lib/xp';
+import { getLevelFromXp } from '../../utils/xp';
 
 interface InventoryProps {
   user: User;
@@ -242,3 +242,5 @@ export const InventoryTab: React.FC<InventoryProps> = ({
     </div>
   );
 };
+
+

@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, type Mock } from 'vitest';
 import { GameEngine } from '../gameEngine';
-import { GameState, Player, UserInternal } from '../../src/types';
+import { GameState, Player, UserInternal } from '../../shared/types';
 import { createDeck } from '../utils';
 
 // ---------------------------------------------------------------------------
@@ -255,3 +255,4 @@ describe('Unhappy Path Integration Tests', () => {
     expect(mockSocket.emit).toHaveBeenCalledWith('error', 'Your account has been restricted.');
   });
 });
+

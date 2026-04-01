@@ -1,10 +1,10 @@
 import { Request, Response } from 'express';
-import { RouteContext } from './types.ts';
-import { requireAdmin, sanitizeUser } from './shared.ts';
-import { UserInternal } from '../../src/types.ts';
-import { getRedisStatus } from '../redis.ts';
-import { db, isConfigured, searchUsers, getSystemConfig } from '../supabaseService.ts';
-import { logger } from '../logger.ts';
+import { RouteContext } from './types';
+import { requireAdmin, sanitizeUser } from './shared';
+import { UserInternal } from '../../shared/types';
+import { getRedisStatus } from '../redis';
+import { db, isConfigured, searchUsers, getSystemConfig } from '../supabaseService';
+import { logger } from '../logger';
 
 export function registerAdminRoutes({ app, engine }: RouteContext): void {
   app.get('/api/admin/test', requireAdmin, async (req: Request, res: Response) => {
@@ -41,3 +41,4 @@ export function registerAdminRoutes({ app, engine }: RouteContext): void {
     });
   });
 }
+

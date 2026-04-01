@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
-import { UserInternal } from '../../src/types.ts';
-import { getUserById } from '../supabaseService.ts';
-import { env } from '../env.ts';
+import { UserInternal } from '../../shared/types';
+import { getUserById } from '../supabaseService';
+import { env } from '../env';
 
 declare global {
   namespace Express {
@@ -81,3 +81,4 @@ export function getErrorMessage(err: unknown): string {
   }
   return String(err);
 }
+

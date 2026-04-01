@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Eye, Scale, Target, CheckCircle, XCircle, Clock } from 'lucide-react';
-import { Role, PrivateInfo, TitleRole, AgendaStatus } from '../../../types';
+import { Role, PrivateInfo, TitleRole, AgendaStatus } from '../../../../shared/types';
 import { OverseerIcon } from '../../icons';
-import { cn } from '../../../lib/utils';
+import { cn } from '../../../utils/utils';
 
 interface DossierModalProps {
   isOpen: boolean;
@@ -249,3 +249,5 @@ export const DossierModal = ({ isOpen, onClose, privateInfo, playSound }: Dossie
     )}
   </AnimatePresence>
 );
+
+

@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { X, Trophy, Shield, Zap, Star } from 'lucide-react';
-import { cn } from '../../../lib/utils';
-import { User } from '../../../types';
-import { getRankTier, getRankLabel } from '../../../lib/ranks';
-import { getProxiedUrl, apiUrl } from '../../../lib/utils';
+import { cn } from '../../../utils/utils';
+import { User } from '../../../../shared/types';
+import { getRankTier, getRankLabel } from '../../../utils/ranks';
+import { getProxiedUrl, apiUrl } from '../../../utils/utils';
 
 interface LeaderboardModalProps {
   user: User;
@@ -302,3 +302,5 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
     </div>
   );
 };
+
+

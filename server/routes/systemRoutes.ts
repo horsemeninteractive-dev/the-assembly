@@ -1,12 +1,14 @@
 import { Request, Response } from 'express';
-import { RouteContext } from './types.ts';
-import { getRedisStatus } from '../redis.ts';
-import { getGlobalStats, getAllLeaderboards } from '../supabaseService.ts';
-import { logger } from '../logger.ts';
+import { RouteContext } from './types';
+import { getRedisStatus } from '../redis';
+import { getGlobalStats, getAllLeaderboards } from '../supabaseService';
+import { logger } from '../logger';
 import rateLimit from 'express-rate-limit';
-import { requireAuth, sanitizeUser } from './shared.ts';
+import { requireAuth, sanitizeUser } from './shared';
 import { createHmac } from 'crypto';
-import { UserInternal } from '../../src/types.ts';
+import { UserInternal } from '../../shared/types';
+
+import pkg from '../../package.json';
 
 export function registerSystemRoutes({ app, engine }: RouteContext): void {
   const costLimiter = rateLimit({
@@ -16,10 +18,10 @@ export function registerSystemRoutes({ app, engine }: RouteContext): void {
     legacyHeaders: false,
     message: { error: 'Too many requests. Please slow down.' },
   });
-
+  
   app.get('/version', (_req: Request, res: Response) => {
     res.setHeader('Cache-Control', 'no-store');
-    res.json({ version: process.env.APP_VERSION || 'dev' });
+    res.json({ version: process.env.APP_VERSION || pkg.version || 'dev' });
   });
 
   app.get('/api/health', (req: Request, res: Response) => {
@@ -139,3 +141,4 @@ export function registerSystemRoutes({ app, engine }: RouteContext): void {
     res.json({ iceServers });
   });
 }
+

@@ -1,8 +1,11 @@
 {
   "name": "the-assembly",
   "private": true,
-  "version": "0.9.9",
+  "version": "0.9.10",
   "type": "module",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "dev": "tsx watch server.ts",
     "preview": "vite preview",

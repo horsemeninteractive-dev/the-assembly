@@ -11,8 +11,8 @@
  */
 
 import { Server } from 'socket.io';
-import { GameState, Player, Policy, GamePhase, TitleAbilityData, SystemConfig } from '../../src/types.ts';
-import type { PostRoundContinuation } from './TitleRoleResolver.ts';
+import { GameState, Player, Policy, GamePhase, TitleAbilityData, SystemConfig } from '../../shared/types';
+import type { PostRoundContinuation } from './TitleRoleResolver';
 
 // ── Forward declarations for sub-engine shapes ───────────────────────────────
 
@@ -105,3 +105,4 @@ export interface IEngineCore {
   updateUserStats(s: GameState, winningSide?: 'Civil' | 'State', leaverId?: string): Promise<void>;
   runExecutiveAction(s: GameState, roomId: string): void;
 }
+

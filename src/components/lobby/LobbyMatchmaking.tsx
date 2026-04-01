@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Shuffle, Plus } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { User, RoomInfo } from '../../types';
+import { cn } from '../../utils/utils';
+import { User, RoomInfo } from '../../../shared/types';
 
 interface LobbyMatchmakingProps {
   user: User;
@@ -150,3 +150,5 @@ export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
     </div>
   );
 };
+
+

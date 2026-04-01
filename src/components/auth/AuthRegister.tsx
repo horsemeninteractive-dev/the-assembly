@@ -1,6 +1,6 @@
 import React from 'react';
 import { Loader2 } from 'lucide-react';
-import { apiUrl, getProxiedUrl, cn } from '../../lib/utils';
+import { apiUrl, getProxiedUrl, cn } from '../../utils/utils';
 import { useAuthContext } from '../../contexts/AuthContext';
 
 export const AuthRegister: React.FC<any> = ({ form }) => {
@@ -120,3 +120,5 @@ export const AuthRegister: React.FC<any> = ({ form }) => {
     </div>
   );
 };
+
+

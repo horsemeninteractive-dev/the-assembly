@@ -1,4 +1,4 @@
-const CACHE_NAME = 'assembly-v0.9.9'; // Bump manually on asset changes to invalidate cache
+const CACHE_NAME = 'assembly-v0.9.10'; // Bump manually on asset changes to invalidate cache
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

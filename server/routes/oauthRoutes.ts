@@ -4,10 +4,10 @@ import jwt from 'jsonwebtoken';
 import { randomUUID } from 'crypto';
 import rateLimit from 'express-rate-limit';
 
-import { RouteContext } from './types.ts';
-import { JWT_SECRET, sanitizeUser, getErrorMessage } from './shared.ts';
-import { getAppUrl } from '../utils.ts';
-import { logger } from '../logger.ts';
+import { RouteContext } from './types';
+import { JWT_SECRET, sanitizeUser, getErrorMessage } from './shared';
+import { getAppUrl } from '../utils';
+import { logger } from '../logger';
 import {
   getUser,
   getUserById,
@@ -15,14 +15,14 @@ import {
   getUserByDiscordId,
   saveUser,
   makeNewUser,
-} from '../db/index.ts';
+} from '../db/index';
 import {
   setOAuthExchangeCode,
   consumeOAuthExchangeCode,
   setOAuthNonce,
   verifyOAuthNonce,
-} from '../redis.ts';
-import { oauthSuccessPage } from '../templates/oauthSuccess.ts';
+} from '../redis';
+import { oauthSuccessPage } from '../templates/oauthSuccess';
 
 async function handleDiscordAuth(code: string, origin: string) {
   const redirectUri = `${origin}/auth/discord/callback`;
@@ -260,3 +260,4 @@ export function registerOAuthRoutes({ app }: RouteContext): void {
     }
   );
 }
+

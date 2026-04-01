@@ -15,12 +15,12 @@ import {
   Medal,
   Flame,
 } from 'lucide-react';
-import { GameState, PrivateInfo, PostMatchResult } from '../../../types';
-import { cn, getProxiedUrl } from '../../../lib/utils';
+import { GameState, PrivateInfo, PostMatchResult } from '../../../../shared/types';
+import { cn, getProxiedUrl } from '../../../utils/utils';
 import { OverseerIcon } from '../../icons';
-import { getLevelFromXp, getXpForNextLevel, getXpInCurrentLevel } from '../../../lib/xp';
-import { getRankTier, getRankLabel } from '../../../lib/ranks';
-import { ACHIEVEMENT_MAP, AchievementDef } from '../../../lib/achievements';
+import { getLevelFromXp, getXpForNextLevel, getXpInCurrentLevel } from '../../../utils/xp';
+import { getRankTier, getRankLabel } from '../../../utils/ranks';
+import { ACHIEVEMENT_MAP, AchievementDef } from '../../../utils/achievements';
 
 interface GameOverModalProps {
   gameState: GameState;
@@ -417,3 +417,5 @@ export const GameOverModal = ({
     </AnimatePresence>
   );
 };
+
+

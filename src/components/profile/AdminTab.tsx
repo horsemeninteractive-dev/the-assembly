@@ -10,9 +10,9 @@ import {
   ChevronRight,
 } from 'lucide-react';
 import { socket } from '../../socket';
-import { cn, apiUrl, debugError } from '../../lib/utils';
+import { cn, apiUrl, debugError } from '../../utils/utils';
 import { motion, AnimatePresence } from 'motion/react';
-import { RoomInfo, User, SystemConfig } from '../../types';
+import { RoomInfo, User, SystemConfig } from '../../../shared/types';
 import { AdminBroadcast } from './admin/AdminBroadcast';
 import { AdminConfigPanel } from './admin/AdminConfigPanel';
 import { AdminUserSearch } from './admin/AdminUserSearch';
@@ -218,3 +218,5 @@ export const AdminTools: React.FC<{ adminId: string; token: string }> = ({ admin
     </div>
   );
 };
+
+

@@ -1,7 +1,7 @@
 import React, { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Scroll, X } from 'lucide-react';
-import { cn } from '../../../lib/utils';
+import { cn } from '../../../utils/utils';
 
 interface AssemblyLogProps {
   log: string[];
@@ -119,3 +119,5 @@ export const AssemblyLog = ({ log, isOpen, onClose, showDebug }: AssemblyLogProp
     </AnimatePresence>
   );
 };
+
+

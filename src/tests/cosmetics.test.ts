@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getFrameStyles, getPolicyStyles, getVoteStyles, getRarity } from '../lib/cosmetics';
+import { getFrameStyles, getPolicyStyles, getVoteStyles, getRarity } from '../utils/cosmetics';
 
 describe('Cosmetics System Logic', () => {
   describe('getFrameStyles', () => {
@@ -70,3 +70,5 @@ describe('Cosmetics System Logic', () => {
     });
   });
 });
+
+

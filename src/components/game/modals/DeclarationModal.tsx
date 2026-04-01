@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { cn } from '../../../lib/utils';
+import { cn } from '../../../utils/utils';
 
 interface DeclarationModalProps {
   show: boolean;
@@ -145,3 +145,5 @@ export const DeclarationModal = ({
     )}
   </AnimatePresence>
 );
+
+

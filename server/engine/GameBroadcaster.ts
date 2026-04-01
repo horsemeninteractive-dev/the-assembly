@@ -9,11 +9,11 @@
  */
 
 import { Server } from 'socket.io';
-import { GameState, Policy, SystemConfig } from '../../src/types.ts';
-import { logger } from '../logger.ts';
-import { stateClient, roomKey, ROOM_TTL_SECONDS, isRedisConfigured, recordRoomDeletion } from '../redis.ts';
-import { getPlayerAgenda, AGENDA_MAP } from '../personalAgendas.ts';
-import { getUsersByIds } from '../supabaseService.ts';
+import { GameState, Policy, SystemConfig } from '../../shared/types';
+import { logger } from '../logger';
+import { stateClient, roomKey, ROOM_TTL_SECONDS, isRedisConfigured, recordRoomDeletion } from '../redis';
+import { getPlayerAgenda, AGENDA_MAP } from '../game/personalAgendas';
+import { getUsersByIds } from '../supabaseService';
 
 export class GameBroadcaster {
   /** Pending delayed emissions for spectators (anti-cheat). */
@@ -244,3 +244,4 @@ export class GameBroadcaster {
     }
   }
 }
+

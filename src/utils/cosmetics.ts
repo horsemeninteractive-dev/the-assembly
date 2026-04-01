@@ -1,4 +1,4 @@
-import { Policy } from '../types';
+import { Policy } from '../../shared/types';
 
 export const getFrameStyles = (id: string) => {
   switch (id) {
@@ -153,3 +153,5 @@ export const getRarity = (price: number) => {
   if (price < 3500) return { name: 'Epic', color: 'text-purple-500' };
   return { name: 'Legendary', color: 'text-yellow-500' };
 };
+
+

@@ -15,9 +15,9 @@ import {
 import { motion, AnimatePresence } from 'motion/react';
 import { Tooltip } from '../Tooltip';
 import { socket } from '../../socket';
-import { GameState, Player, User } from '../../types';
-import { getPolicyStyles, getVoteStyles } from '../../lib/cosmetics';
-import { cn } from '../../lib/utils';
+import { GameState, Player, User } from '../../../shared/types';
+import { getPolicyStyles, getVoteStyles } from '../../utils/cosmetics';
+import { cn } from '../../utils/utils';
 
 interface ActionBarProps {
   gameState: GameState;
@@ -568,3 +568,5 @@ export const ActionBar = ({
     </motion.div>
   );
 };
+
+

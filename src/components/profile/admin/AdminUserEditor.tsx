@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Ban, UserCheck } from 'lucide-react';
-import { User } from '../../../types';
-import { cn } from '../../../lib/utils';
+import { User } from '../../../../shared/types';
+import { cn } from '../../../utils/utils';
 import { socket } from '../../../socket';
 
 interface AdminUserEditorProps {
@@ -111,3 +111,5 @@ export const AdminUserEditor: React.FC<AdminUserEditorProps> = ({ user, onClose,
     </motion.div>
   );
 };
+
+

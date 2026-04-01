@@ -11,6 +11,7 @@
  *   computeEloChange← server/engine/utils.ts
  */
 
-export { GameEngine } from './engine/GameEngine.ts';
-export type { Deps } from './engine/GameEngine.ts';
-export { computeEloChange } from './engine/utils.ts';
+export { GameEngine } from './engine/GameEngine';
+export type { Deps } from './engine/GameEngine';
+export { computeEloChange } from './engine/utils';
+

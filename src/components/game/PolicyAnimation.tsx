@@ -1,9 +1,9 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Shield, Scale, Eye } from 'lucide-react';
-import { GameState } from '../../types';
-import { getPolicyStyles } from '../../lib/cosmetics';
-import { cn } from '../../lib/utils';
+import { GameState } from '../../../shared/types';
+import { getPolicyStyles } from '../../utils/cosmetics';
+import { cn } from '../../utils/utils';
 
 interface PolicyAnimationProps {
   gameState: GameState;
@@ -117,3 +117,5 @@ export const PolicyAnimation = ({ gameState, show, playSound }: PolicyAnimationP
     </AnimatePresence>
   );
 };
+
+

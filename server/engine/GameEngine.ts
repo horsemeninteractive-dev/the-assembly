@@ -20,11 +20,11 @@
  */
 
 import { Server, Socket } from 'socket.io';
-import { GameState, Player, Policy, GamePhase, TitleAbilityData, SystemConfig } from '../../src/types.ts';
+import { GameState, Player, Policy, GamePhase, TitleAbilityData, SystemConfig } from '../../shared/types.ts';
 import { logger } from '../logger.ts';
 import { stateClient, roomKey, ROOM_TTL_SECONDS, isRedisConfigured } from '../redis.ts';
 import { GameBroadcaster } from './GameBroadcaster.ts';
-import { AIEngine } from './AIEngine.ts';
+import { AIEngine } from './ai/AIEngine.ts';
 import { RoundManager } from './RoundManager.ts';
 import { TitleRoleResolver, PostRoundContinuation } from './TitleRoleResolver.ts';
 import { MatchCloser } from './MatchCloser.ts';
@@ -379,3 +379,4 @@ export class GameEngine implements IEngineCore {
     this.roundManager.nextRound(state, roomId, successfulGovernment);
   }
 }
+

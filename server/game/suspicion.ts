@@ -1,5 +1,5 @@
-import { GameState, Player, Policy } from '../src/types.ts';
-import { AI_WEIGHTS } from './aiWeights.ts';
+import { GameState, Player, Policy } from '../../shared/types';
+import { AI_WEIGHTS } from '../engine/ai/aiWeights';
 
 
 // =============================================================================
@@ -236,3 +236,4 @@ export function mostSuspicious(ai: Player, candidates: Player[]): Player {
     getSuspicion(ai, p.id) > getSuspicion(ai, most.id) ? p : most
   );
 }
+

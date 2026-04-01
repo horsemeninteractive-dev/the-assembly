@@ -1,6 +1,6 @@
-import { supabase, isSupabaseConfigured } from '../../src/lib/supabase.ts';
-import { supabaseAdmin, isSupabaseAdminConfigured } from '../supabaseAdmin.ts';
-import { logger } from '../logger.ts';
+import { supabase, isSupabaseConfigured } from '../../src/services/supabase';
+import { supabaseAdmin, isSupabaseAdminConfigured } from '../supabaseAdmin';
+import { logger } from '../logger';
 
 // Use regular client for most operations to respect RLS
 export const db = supabase;
@@ -34,13 +34,8 @@ export async function withRetry<T>(fn: () => Promise<T>, name: string): Promise<
       if (attempt <= delays.length) {
         const delay = delays[attempt - 1];
         logger.warn(
-          { 
-            attempt, 
-            nextDelay: delay, 
-            function: name, 
-            err: err instanceof Error ? err.message : String(err) 
-          },
-          `Supabase operation '${name}' failed. Retrying in ${delay}ms...`
+          { attempt, name, err: err instanceof Error ? err.message : String(err) },
+          'Retrying database operation'
         );
         await new Promise((res) => setTimeout(res, delay));
       }
@@ -53,3 +48,4 @@ export async function withRetry<T>(fn: () => Promise<T>, name: string): Promise<
   );
   throw lastError;
 }
+

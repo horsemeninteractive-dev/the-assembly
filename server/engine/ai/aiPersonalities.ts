@@ -1,4 +1,4 @@
-import { AIPersonality } from '../src/types.ts';
+import { AIPersonality } from '../../../shared/types';
 
 export const AI_BOTS: { name: string; avatarUrl: string; personality: AIPersonality }[] = [
   {
@@ -252,3 +252,4 @@ export const AI_BOTS: { name: string; avatarUrl: string; personality: AIPersonal
     personality: 'Deceptive',
   },
 ];
+

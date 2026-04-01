@@ -2,9 +2,9 @@ import React, { useRef } from 'react';
 import { motion } from 'motion/react';
 import { Users, Eye, Check, ShieldOff } from 'lucide-react';
 import { socket } from '../../socket';
-import { GameState, Player } from '../../types';
-import { getFrameStyles, getVoteStyles } from '../../lib/cosmetics';
-import { cn, getProxiedUrl } from '../../lib/utils';
+import { GameState, Player } from '../../../shared/types';
+import { getFrameStyles, getVoteStyles } from '../../utils/cosmetics';
+import { cn, getProxiedUrl } from '../../utils/utils';
 
 const VideoPlayer = React.memo(
   ({
@@ -594,3 +594,5 @@ export const PlayerCard = React.memo(
     );
   }
 );
+
+

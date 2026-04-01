@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Scale, Eye } from 'lucide-react';
-import { Role } from '../../../types';
-import { cn } from '../../../lib/utils';
+import { Role } from '../../../../shared/types';
+import { cn } from '../../../utils/utils';
 
 interface InvestigationModalProps {
   result: { targetName: string; role: Role } | null;
@@ -63,3 +63,5 @@ export const InvestigationModal = ({ result, onClose, playSound }: Investigation
     )}
   </AnimatePresence>
 );
+
+

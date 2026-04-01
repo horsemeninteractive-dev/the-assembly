@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Socket } from 'socket.io-client';
-import { GameState, Player } from '../types';
+import { GameState, Player } from '../../shared/types';
 
 interface UseLegislativeHandlerProps {
   gameState: GameState;
@@ -143,3 +143,5 @@ export function useLegislativeHandler({
     handleSubmitDeclaration,
   };
 }
+
+

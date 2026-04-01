@@ -1,6 +1,6 @@
 import React, { createContext, useContext } from 'react';
 import { useAuth } from '../hooks/useAuth';
-import { User } from '../types';
+import { User } from '../../shared/types';
 
 interface AuthContextType {
   user: User | null;
@@ -38,3 +38,5 @@ export const useAuthContext = () => {
   }
   return context;
 };
+
+

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Globe, Users2, Lock } from 'lucide-react';
-import { cn } from '../../lib/utils';
-import { RoomPrivacy, User } from '../../types';
+import { cn } from '../../utils/utils';
+import { RoomPrivacy, User } from '../../../shared/types';
 
 interface LobbyRoomCreatorProps {
   user: User;
@@ -270,3 +270,5 @@ export const LobbyRoomCreator: React.FC<LobbyRoomCreatorProps> = ({
     </AnimatePresence>
   );
 };
+
+

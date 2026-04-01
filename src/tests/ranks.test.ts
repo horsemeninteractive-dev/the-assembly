@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getRankTier, getRankLabel } from '../lib/ranks';
+import { getRankTier, getRankLabel } from '../utils/ranks';
 
 describe('Rank System Logic', () => {
   describe('getRankTier', () => {
@@ -50,3 +50,5 @@ describe('Rank System Logic', () => {
     });
   });
 });
+
+

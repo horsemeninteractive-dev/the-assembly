@@ -6,8 +6,8 @@
  * Status is evaluated at game end from GameState alone.
  */
 
-import { GameState, Player, PersonalAgendaId, AgendaStatus, PersonalAgenda } from '../src/types.ts';
-import { shuffle } from './utils.ts';
+import { GameState, Player, PersonalAgendaId, AgendaStatus, PersonalAgenda } from '../shared/types';
+import { shuffle } from '../utils';
 
 // ---------------------------------------------------------------------------
 // Agenda catalogue
@@ -350,3 +350,4 @@ export function getPlayerAgenda(state: GameState, playerId: string): PersonalAge
 
   return { id: def.id, name: def.name, description: def.description, status };
 }
+

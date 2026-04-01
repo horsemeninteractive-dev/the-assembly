@@ -1,8 +1,8 @@
 import React from 'react';
 import { Shield, Trophy, Check, Star, Flame, Zap, Heart, Scroll, Calendar } from 'lucide-react';
-import { User } from '../../types';
-import { getRankTier, getRankLabel } from '../../lib/ranks';
-import { cn } from '../../lib/utils';
+import { User } from '../../../shared/types';
+import { getRankTier, getRankLabel } from '../../utils/ranks';
+import { cn } from '../../utils/utils';
 
 export const StatCard = ({
   label,
@@ -154,3 +154,5 @@ export function StatsTab({ user }: StatsTabProps) {
     </div>
   );
 }
+
+

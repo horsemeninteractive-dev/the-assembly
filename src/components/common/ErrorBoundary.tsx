@@ -1,5 +1,5 @@
 import React, { Component, ErrorInfo, ReactNode } from 'react';
-import { debugError } from '../../lib/utils';
+import { debugError } from '../../utils/utils';
 
 interface Props {
   children: ReactNode;
@@ -60,3 +60,5 @@ export class ErrorBoundary extends Component<Props, State> {
     return this.props.children;
   }
 }
+
+

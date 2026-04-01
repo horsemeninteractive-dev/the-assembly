@@ -1,8 +1,8 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, X, Scale, Eye } from 'lucide-react';
-import { GameState } from '../../../types';
-import { cn } from '../../../lib/utils';
+import { GameState } from '../../../../shared/types';
+import { cn } from '../../../utils/utils';
 
 interface RoundHistoryProps {
   gameState: GameState;
@@ -215,3 +215,5 @@ export const RoundHistory = ({ gameState, isOpen, onClose }: RoundHistoryProps) 
     )}
   </AnimatePresence>
 );
+
+

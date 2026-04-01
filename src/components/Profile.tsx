@@ -17,11 +17,11 @@ import {
   Coins,
   Zap
 } from 'lucide-react';
-import { User, CosmeticItem } from '../types';
-import { cn, getProxiedUrl, apiUrl } from '../lib/utils';
-import { getFrameStyles } from '../lib/cosmetics';
-import { getLevelFromXp, getXpInCurrentLevel, getXpForNextLevel } from '../lib/xp';
-import { getRankTier, getRankLabel } from '../lib/ranks';
+import { User, CosmeticItem } from '../../shared/types';
+import { cn, getProxiedUrl, apiUrl } from '../utils/utils';
+import { getFrameStyles } from '../utils/cosmetics';
+import { getLevelFromXp, getXpInCurrentLevel, getXpForNextLevel } from '../utils/xp';
+import { getRankTier, getRankLabel } from '../utils/ranks';
 
 import { StatsTab } from './profile/StatsTab';
 import { ShopTab } from './profile/ShopTab';
@@ -364,3 +364,5 @@ export const Profile: React.FC<ProfileProps> = ({
     </div>
   );
 };
+
+

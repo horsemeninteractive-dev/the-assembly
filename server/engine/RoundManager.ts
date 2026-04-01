@@ -8,18 +8,18 @@
  */
 
 import { randomUUID } from 'crypto';
-import { GameState, Player, Policy, GamePhase } from '../../src/types.ts';
-import { createDeck } from '../utils.ts';
-import { AI_BOTS } from '../aiPersonalities.ts';
-import { assignRoles } from '../gameRules.ts';
-import { initializeSuspicion } from '../suspicion.ts';
-import { assignPersonalAgendas } from '../personalAgendas.ts';
-import { addLog, ensureDeckHas, pick } from './utils.ts';
-import type { IEngineCore } from './IEngineCore.ts';
+import { GameState, Player, Policy, GamePhase } from '../../shared/types';
+import { createDeck } from '../utils';
+import { AI_BOTS } from './ai/aiPersonalities';
+import { assignRoles } from '../game/gameRules';
+import { initializeSuspicion } from '../game/suspicion';
+import { assignPersonalAgendas } from '../game/personalAgendas';
+import { addLog, ensureDeckHas, pick } from './utils';
+import type { IEngineCore } from './IEngineCore';
 
-import { ElectionManager } from './round/ElectionManager.ts';
-import { LegislativeManager } from './round/LegislativeManager.ts';
-import { ExecutiveActionManager } from './round/ExecutiveActionManager.ts';
+import { ElectionManager } from './round/ElectionManager';
+import { LegislativeManager } from './round/LegislativeManager';
+import { ExecutiveActionManager } from './round/ExecutiveActionManager';
 
 export interface IRoundManagerContext extends IEngineCore {
   readonly actionTimers: Map<string, ReturnType<typeof setTimeout>>;
@@ -488,3 +488,4 @@ export class RoundManager {
     this.engine.broadcastState(roomId);
   }
 }
+

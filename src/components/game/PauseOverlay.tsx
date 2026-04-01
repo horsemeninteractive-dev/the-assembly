@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { AlertTriangle } from 'lucide-react';
-import { GameState } from '../../types';
+import { GameState } from '../../../shared/types';
 
 interface PauseOverlayProps {
   gameState: GameState;
@@ -47,3 +47,5 @@ export const PauseOverlay = ({ gameState }: PauseOverlayProps) => (
     )}
   </AnimatePresence>
 );
+
+

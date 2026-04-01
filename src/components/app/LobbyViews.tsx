@@ -50,3 +50,5 @@ export function ProfileModal({ isOpen, onClose, setIsProfileOpen, setIsPurchaseM
     </ErrorBoundary>
   );
 }
+
+

@@ -1,6 +1,6 @@
 import { z } from 'zod';
 import dotenv from 'dotenv';
-import { logger } from './logger.ts';
+import { logger } from './logger';
 
 /**
  * server/env.ts
@@ -96,3 +96,4 @@ if (!env.EMAIL_USER) {
 if (!env.RESEND_API_KEY) {
   logger.info('[Config] RESEND_API_KEY not set — backup email functionality via Resend is disabled.');
 }
+

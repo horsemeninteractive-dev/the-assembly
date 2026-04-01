@@ -1,5 +1,5 @@
-import { GameState, Player, Policy, ExecutiveAction, Role } from '../src/types.ts';
-import { shuffle } from './utils.ts';
+import { GameState, Player, Policy, ExecutiveAction, Role } from '../shared/types';
+import { shuffle } from '../utils';
 
 /**
  * Returns the executive action triggered after the nth State directive is enacted,
@@ -53,3 +53,4 @@ export function assignRoles(numPlayers: number): Role[] {
   };
   return shuffle(roleMap[numPlayers] ?? []);
 }
+

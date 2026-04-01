@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { motion } from 'motion/react';
-import { User } from '../types';
-import { getProxiedUrl } from '../lib/utils';
+import { User } from '../../shared/types';
+import { getProxiedUrl } from '../utils/utils';
 import { useAuthForm } from './auth/useAuthForm';
 import { AuthLogin } from './auth/AuthLogin';
 import { AuthRegister } from './auth/AuthRegister';
@@ -86,3 +86,5 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
     </div>
   );
 };
+
+

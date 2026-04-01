@@ -1,4 +1,4 @@
-import { debugError } from '../lib/utils';
+import { debugError } from '../utils/utils';
 import { TextToSpeech } from '@capacitor-community/text-to-speech';
 import { Capacitor } from '@capacitor/core';
 
@@ -227,3 +227,5 @@ export const stop = async () => {
     window.speechSynthesis.cancel();
   }
 };
+
+

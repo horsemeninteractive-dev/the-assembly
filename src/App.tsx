@@ -13,8 +13,8 @@ import { EnterSplash } from './components/app/EnterSplash';
 import { LobbyView, ProfileModal } from './components/app/LobbyViews';
 import { GameRoomView, ModalSection } from './components/app/GameAndModals';
 
-import { getBackgroundTexture } from './lib/cosmetics';
-import { cn, getProxiedUrl, apiUrl } from './lib/utils';
+import { getBackgroundTexture } from './utils/cosmetics';
+import { cn, getProxiedUrl, apiUrl } from './utils/utils';
 import { CLIENT_VERSION } from './sharedConstants';
 
 export default function App() {
@@ -88,3 +88,5 @@ export default function App() {
     </div>
   );
 }
+
+

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { AGENDA_MAP } from '../personalAgendas';
-import { GameState } from '../../src/types';
+import { AGENDA_MAP } from '../game/personalAgendas';
+import { GameState } from '../../shared/types';
 
 describe('Personal Agendas Evaluation', () => {
   const pid = 'p1';
@@ -141,3 +141,4 @@ describe('Personal Agendas Evaluation', () => {
     });
   });
 });
+

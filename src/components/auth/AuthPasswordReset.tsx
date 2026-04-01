@@ -1,7 +1,7 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Lock, Loader2 } from 'lucide-react';
-import { apiUrl } from '../../lib/utils';
+import { apiUrl } from '../../utils/utils';
 
 export const AuthPasswordReset: React.FC<any> = ({ form }) => {
   const {
@@ -146,3 +146,5 @@ export const AuthPasswordReset: React.FC<any> = ({ form }) => {
     </motion.div>
   );
 };
+
+

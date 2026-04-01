@@ -12,13 +12,13 @@ import {
   Zap,
   Medal,
 } from 'lucide-react';
-import { User } from '../../../types';
-import { cn, getProxiedUrl, apiUrl, debugError } from '../../../lib/utils';
-import { getFrameStyles } from '../../../lib/cosmetics';
+import { User } from '../../../../shared/types';
+import { cn, getProxiedUrl, apiUrl, debugError } from '../../../utils/utils';
+import { getFrameStyles } from '../../../utils/cosmetics';
 import { socket } from '../../../socket';
-import { getLevelFromXp } from '../../../lib/xp';
-import { getRankTier, getRankLabel } from '../../../lib/ranks';
-import { ACHIEVEMENT_MAP } from '../../../lib/achievements';
+import { getLevelFromXp } from '../../../utils/xp';
+import { getRankTier, getRankLabel } from '../../../utils/ranks';
+import { ACHIEVEMENT_MAP } from '../../../utils/achievements';
 
 interface PlayerProfileModalProps {
   userId: string;
@@ -311,3 +311,5 @@ const StatCard = ({
     <div className="text-lg font-serif italic text-primary leading-none">{value}</div>
   </div>
 );
+
+

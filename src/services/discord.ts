@@ -1,6 +1,6 @@
 import { DiscordSDK } from '@discord/embedded-app-sdk';
 import { DISCORD_CLIENT_ID } from '../constants';
-import { debugLog, debugWarn, debugError } from './utils';
+import { debugLog, debugWarn, debugError } from '../utils/utils';
 
 export let discordSdk: DiscordSDK | null = null;
 
@@ -35,3 +35,5 @@ export const setupDiscordSdk = async () => {
     debugError('Failed to initialize Discord SDK:', err);
   }
 };
+
+

@@ -33,12 +33,12 @@ const { viMockSupabase, viMockSupabaseAdmin } = vi.hoisted(() => {
 });
 
 // Mock dependencies
-vi.mock('../../src/lib/supabase.ts', () => ({
+vi.mock('../../src/services/supabase', () => ({
   supabase: viMockSupabase as any,
   isSupabaseConfigured: true,
 }));
 
-vi.mock('../supabaseAdmin.ts', () => ({
+vi.mock('../supabaseAdmin', () => ({
   supabaseAdmin: viMockSupabaseAdmin as any,
   isSupabaseAdminConfigured: true,
 }));
@@ -224,3 +224,4 @@ describe('supabaseService', () => {
     });
   });
 });
+

@@ -1,4 +1,4 @@
-import { debugWarn } from './utils';
+import { debugWarn } from '../utils/utils';
 
 export const storage = {
   getItem: (key: string): string | null => {
@@ -24,3 +24,5 @@ export const storage = {
     }
   },
 };
+
+

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Chrome, MessageSquare, Loader2 } from 'lucide-react';
-import { apiUrl } from '../../lib/utils';
+import { apiUrl } from '../../utils/utils';
 import { useAuthContext } from '../../contexts/AuthContext';
 
 export const AuthLogin: React.FC<any> = ({ form }) => {
@@ -124,3 +124,5 @@ export const AuthLogin: React.FC<any> = ({ form }) => {
     </div>
   );
 };
+
+

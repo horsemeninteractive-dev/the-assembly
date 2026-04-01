@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from 'react';
-import { User } from '../types';
-import { MUSIC_TRACKS, SOUND_PACKS } from '../lib/audio';
-import { getProxiedUrl } from '../lib/utils';
+import { User } from '../../shared/types';
+import { MUSIC_TRACKS, SOUND_PACKS } from '../utils/audio';
+import { getProxiedUrl } from '../utils/utils';
 import * as aiSpeech from '../services/aiSpeech';
 import { socket } from '../socket';
 
@@ -108,3 +108,5 @@ export function useAudioEngine({
 
   return { playSound, playMusic, stopMusic };
 }
+
+

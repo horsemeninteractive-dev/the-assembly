@@ -1,13 +1,13 @@
 import { Server, Socket } from 'socket.io';
-import { GameEngine } from '../gameEngine.ts';
-import { logger } from '../logger.ts';
+import { GameEngine } from '../gameEngine';
+import { logger } from '../logger';
 import {
   adminUpdateUserSchema,
   kickPlayerSchema,
-} from '../schemas.ts';
-import { getUserById, updateSystemConfig, saveUser } from '../supabaseService.ts';
-import { SystemConfig } from '../../src/types.ts';
-import { getUserSocketId, getSocketId } from '../redis.ts';
+} from '../game/schemas';
+import { getUserById, updateSystemConfig, saveUser } from '../supabaseService';
+import { SystemConfig } from '../../shared/types';
+import { getUserSocketId, getSocketId } from '../redis';
 
 /**
  * Handlers for administrative and host management actions like kicking players,
@@ -133,3 +133,4 @@ export function registerAdminHandlers(
     socket.emit('adminClearRedisSuccess', 'Successfully purged all Redis room state.');
   });
 }
+

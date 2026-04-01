@@ -1,6 +1,6 @@
-import { adminDb, db, isConfigured, withRetry } from './core.ts';
-import { UserInternal } from '../../src/types.ts';
-import { mapSupabaseToUser } from './users.ts';
+import { adminDb, db, isConfigured, withRetry } from './core';
+import { UserInternal } from '../../shared/types';
+import { mapSupabaseToUser } from './users';
 
 export async function getFriends(userId: string): Promise<UserInternal[]> {
   if (isConfigured) {
@@ -94,3 +94,4 @@ export async function getPendingFriendRequests(userId: string): Promise<UserInte
   }
   return [];
 }
+

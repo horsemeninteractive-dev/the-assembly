@@ -1,6 +1,6 @@
 import { Express } from 'express';
 import { Server } from 'socket.io';
-import { GameEngine } from '../gameEngine.ts';
+import { GameEngine } from '../gameEngine';
 
 export interface RouteContext {
   app: Express;
@@ -9,3 +9,4 @@ export interface RouteContext {
   userSockets: Map<string, string>;
   stripe: any;
 }
+
