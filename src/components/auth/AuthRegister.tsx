@@ -25,7 +25,7 @@ export const AuthRegister: React.FC<any> = ({ form }) => {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Registration failed');
+      if (!response.ok) throw new Error(data.message || data.error || 'Registration failed');
 
       handleAuthSuccess(data.user, data.token);
     } catch (err: any) {

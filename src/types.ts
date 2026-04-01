@@ -1,3 +1,26 @@
+export type ErrorCode =
+  | 'UNAUTHORIZED'
+  | 'FORBIDDEN'
+  | 'RATE_LIMITED'
+  | 'ROOM_FULL'
+  | 'GAME_IN_PROGRESS'
+  | 'INVALID_REQUEST'
+  | 'NOT_FOUND'
+  | 'BANNED'
+  | 'ALREADY_EXISTS'
+  | 'MAINTENANCE_MODE'
+  | 'INTERNAL_ERROR'
+  | 'ROOM_LOCKED'
+  | 'SERVER_CAPACITY'
+  | 'RESOURCE_REMAINING'
+  | 'DETAINED'
+  | 'INVALID_ACTION';
+
+export interface StructuredError {
+  code: ErrorCode;
+  message: string;
+}
+
 export type Role = 'Civil' | 'State' | 'Overseer';
 export type TitleRole =
   | 'Assassin'
@@ -333,6 +356,7 @@ export interface GameState {
     playerId?: string;
     historyCaptured?: boolean;
     trackerReady?: boolean;
+    isChaos?: boolean;
   };
   round: number;
   presidentialOrder?: string[];

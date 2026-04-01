@@ -48,17 +48,17 @@ export async function validateToken(token: string): Promise<UserInternal | null>
 }
 
 export async function requireAdmin(req: Request, res: Response, next: NextFunction) {
-  const token = req.headers.authorization?.split(' ')[1];
+  const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'No token' });
   const user = await validateToken(token);
   if (!user) return res.status(401).json({ error: 'Invalid or expired session' });
   if (!user.isAdmin) return res.status(403).json({ error: 'Forbidden' });
-  (req as any).user = user;
+  req.user = user;
   next();
 }
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {
-  const token = req.headers.authorization?.split(' ')[1];
+  const token = req.cookies?.token || req.headers.authorization?.split(' ')[1];
   if (!token) return res.status(401).json({ error: 'No token' });
   try {
     const user = await validateToken(token);

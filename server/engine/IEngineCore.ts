@@ -12,6 +12,7 @@
 
 import { Server } from 'socket.io';
 import { GameState, Player, Policy, GamePhase, TitleAbilityData, SystemConfig } from '../../src/types.ts';
+import type { PostRoundContinuation } from './TitleRoleResolver.ts';
 
 // ── Forward declarations for sub-engine shapes ───────────────────────────────
 
@@ -63,7 +64,7 @@ export interface IRoundManager {
 export interface ITitleRoleResolver {
   assignTitleRoles(state: GameState): void;
   runPostRoundTitleAbilities(s: GameState, roomId: string): void;
-  continuePostRoundAfter(s: GameState, roomId: string, after: string): void;
+  continuePostRoundAfter(s: GameState, roomId: string, after: PostRoundContinuation): void;
   handleTitleAbility(s: GameState, roomId: string, abilityData: TitleAbilityData): Promise<void>;
 }
 

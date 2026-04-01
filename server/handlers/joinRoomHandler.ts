@@ -9,7 +9,7 @@ import { logger } from '../logger.ts';
 
 import { joinRoomSchema } from '../schemas.ts';
 import v8 from 'v8';
-import { getUserSocketId, setUserSocketId } from '../redis.ts';
+import { getUserSocketId, getSocketId, setUserSocketId, checkRoomCreationLimit, recordRoomCreation } from '../redis.ts';
 
 const MAX_ROOM_CAPACITY = parseInt(process.env.MAX_ROOM_CAPACITY || '100');
 
@@ -47,7 +47,7 @@ export async function handleJoinRoom(
   if (typeof roomId !== 'string' || roomId.length < 1 || roomId.length > 40) return;
   if (typeof rawName !== 'string') return;
   if (userId && userId !== socket.data.userId) {
-    socket.emit('error', 'Unauthorized: User ID mismatch.');
+    socket.emit('error', { code: 'UNAUTHORIZED', message: 'User ID mismatch.' });
     return;
   }
   const name = rawName
@@ -63,7 +63,7 @@ export async function handleJoinRoom(
   const safeTimer = actionTimer === 0 ? 0 : Math.max(30, Math.min(120, actionTimer || 60));
   const user = userId ? await getUserById(userId) : null;
   if (user?.isBanned) {
-    socket.emit('error', 'Your account has been restricted.');
+    socket.emit('error', { code: 'BANNED', message: 'Your account has been restricted.' });
     socket.disconnect();
     return;
   }
@@ -71,7 +71,7 @@ export async function handleJoinRoom(
   let state = engine.rooms.get(roomId);
   
   if (!state && engine.rooms.size >= MAX_ROOM_CAPACITY) {
-    socket.emit('error', 'Server at capacity. Too many active rooms.');
+    socket.emit('error', { code: 'SERVER_CAPACITY', message: 'Server at capacity. Too many active rooms.' });
     return;
   }
 
@@ -91,17 +91,28 @@ export async function handleJoinRoom(
 
   if (!state) {
     if (currentConfig.maintenanceMode && !user?.isAdmin) {
-      socket.emit(
-        'error',
-        'The server is currently undergoing maintenance. New rooms cannot be created at this time.'
-      );
+      socket.emit('error', { 
+        code: 'MAINTENANCE_MODE', 
+        message: 'The server is currently undergoing maintenance. New rooms cannot be created at this time.' 
+      });
       return;
     }
+    if (userId) {
+      const { allowed, reason } = await checkRoomCreationLimit(userId);
+      if (!allowed && !user?.isAdmin) {
+        socket.emit('error', reason);
+        return;
+      }
+    }
+
     // Generating a 6-char invite code if private
     const code =
       privacy === 'private'
         ? randomBytes(3).toString('hex').toUpperCase().slice(0, 6)
         : undefined;
+
+    if (userId) await recordRoomCreation(userId);
+
     state = {
       roomId,
       players: [],
@@ -228,27 +239,32 @@ export async function handleJoinRoom(
   if (userId) {
     socket.data.userId = userId;
     userSockets.set(userId, socket.id);
-    await setUserSocketId(userId, socket.id);
-    const friends = await getFriends(userId);
-    for (const friend of friends) {
-      const friendSocketId = await getUserSocketId(friend.id);
-      if (friendSocketId) {
-        io.to(friendSocketId).emit('userStatusChanged', { userId, isOnline: true, roomId });
-        let friendRoomId: string | undefined;
-        for (const [rId, s] of engine.rooms.entries()) {
-          if (s.players.some((p) => p.userId === friend.id && !p.isDisconnected)) {
-            friendRoomId = rId;
-            break;
+    
+    // Background task — don't block the join path for social notifications
+    const notifyTask = (async () => {
+      try {
+        await setUserSocketId(userId, socket.id);
+        const friends = await getFriends(userId);
+        for (const friend of friends) {
+          const friendSocketId = await getSocketId(friend.id, userSockets);
+          if (friendSocketId) {
+            io.to(friendSocketId).emit('userStatusChanged', { userId, isOnline: true, roomId });
+            // find friend's room for status consistency
+            let friendRoomId: string | undefined;
+            for (const [rId, s] of engine.rooms.entries()) {
+              if (s.players.some((p) => p.userId === friend.id && !p.isDisconnected)) {
+                friendRoomId = rId;
+                break;
+              }
+            }
+            socket.emit('userStatusChanged', { userId: friend.id, isOnline: true, roomId: friendRoomId });
           }
         }
-        socket.emit('userStatusChanged', {
-          userId: friend.id,
-          isOnline: true,
-          roomId: friendRoomId,
-        });
+      } catch (err) {
+        logger.warn({ err }, 'Deferred join-room notification task failed');
       }
-    }
-    const user = await getUserById(userId);
+    })();
+
     if (user) avatarUrl = user.avatarUrl;
   }
 

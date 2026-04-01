@@ -6,6 +6,7 @@ import { requireAuth, sanitizeUser, JWT_SECRET } from './shared.ts';
 import { logger } from '../logger.ts';
 import { updateEmailSchema, updateUsernameSchema } from '../schemas.ts';
 import { getUser, getUserByEmail, saveUser, getMatchHistory } from '../supabaseService.ts';
+import { ACHIEVEMENT_MAP } from '../../src/lib/achievements.ts';
 
 export function registerUserRoutes({ app, engine }: RouteContext): void {
   const profileLimiter = rateLimit({
@@ -105,8 +106,8 @@ export function registerUserRoutes({ app, engine }: RouteContext): void {
       return res.status(403).json({ error: 'Forbidden' });
     }
 
-    const limit = parseInt(req.query.limit as string) || 20;
-    const offset = parseInt(req.query.offset as string) || 0;
+    const limit = Math.min(100, Math.max(1, parseInt(req.query.limit as string) || 20));
+    const offset = Math.max(0, parseInt(req.query.offset as string) || 0);
 
     const history = await getMatchHistory(req.params.userId, limit, offset);
     res.json({ history });
@@ -141,9 +142,14 @@ export function registerUserRoutes({ app, engine }: RouteContext): void {
     const earned = new Set(
       (user.earnedAchievements ?? []).map((a: any) => (typeof a === 'string' ? a : a.id))
     );
-    const valid = pinnedAchievements.filter((id: string) => earned.has(id)).slice(0, 3);
 
-    user.pinnedAchievements = valid;
+    for (const id of pinnedAchievements) {
+      if (typeof id !== 'string') return res.status(400).json({ error: 'Achievement IDs must be strings' });
+      if (!ACHIEVEMENT_MAP.has(id)) return res.status(400).json({ error: `Unrecognized achievement ID: ${id}` });
+      if (!earned.has(id)) return res.status(400).json({ error: `You have not earned achievement: ${id}` });
+    }
+
+    user.pinnedAchievements = pinnedAchievements.slice(0, 3);
     await saveUser(user);
     const safe = sanitizeUser(user);
     res.json({ user: safe });

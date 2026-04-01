@@ -379,10 +379,8 @@ export function useWebRTC({
           setIsVoiceActive(false);
           setIsVideoActive(false);
         });
-    } else if (localStream) {
-      if (localStreamRef.current) {
-        localStreamRef.current.getTracks().forEach((t) => t.stop());
-      }
+    } else if (localStreamRef.current) {
+      localStreamRef.current.getTracks().forEach((t) => t.stop());
       localStreamRef.current = null;
       setLocalStream(null);
       
@@ -394,7 +392,7 @@ export function useWebRTC({
         });
       });
     }
-  }, [isVoiceActive, isVideoActive, me?.id, localStream, socket, setIsVoiceActive, setIsVideoActive]);
+  }, [isVoiceActive, isVideoActive, me?.id, socket, setIsVoiceActive, setIsVideoActive]);
 
   useEffect(() => {
     return () => {

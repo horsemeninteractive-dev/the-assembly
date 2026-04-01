@@ -15,6 +15,8 @@ import { CHAT } from '../aiChatPhrases.ts';
 import { addLog, ensureDeckHas } from './utils.ts';
 import type { IEngineCore } from './IEngineCore.ts';
 
+export type PostRoundContinuation = 'Auditor' | 'Assassin' | 'Handler';
+
 export class TitleRoleResolver {
   constructor(private readonly engine: IEngineCore) {}
 
@@ -90,7 +92,7 @@ export class TitleRoleResolver {
   }
 
   /** Continue post-round sequence starting after the given ability. */
-  continuePostRoundAfter(s: GameState, roomId: string, after: TitleRole): void {
+  continuePostRoundAfter(s: GameState, roomId: string, after: PostRoundContinuation): void {
     if (s.phase === 'GameOver') return;
 
     if (after === 'Auditor') {

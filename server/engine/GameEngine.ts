@@ -26,7 +26,7 @@ import { stateClient, roomKey, ROOM_TTL_SECONDS, isRedisConfigured } from '../re
 import { GameBroadcaster } from './GameBroadcaster.ts';
 import { AIEngine } from './AIEngine.ts';
 import { RoundManager } from './RoundManager.ts';
-import { TitleRoleResolver } from './TitleRoleResolver.ts';
+import { TitleRoleResolver, PostRoundContinuation } from './TitleRoleResolver.ts';
 import { MatchCloser } from './MatchCloser.ts';
 import { PauseManager } from './PauseManager.ts';
 import type { IEngineCore } from './IEngineCore.ts';
@@ -234,7 +234,7 @@ export class GameEngine implements IEngineCore {
     this.titleRoleResolver.runPostRoundTitleAbilities(s, roomId);
   }
 
-  continuePostRoundAfter(s: GameState, roomId: string, after: any): void {
+  continuePostRoundAfter(s: GameState, roomId: string, after: PostRoundContinuation): void {
     this.titleRoleResolver.continuePostRoundAfter(s, roomId, after);
   }
 
@@ -294,7 +294,14 @@ export class GameEngine implements IEngineCore {
   async restoreFromRedis(): Promise<void> {
     if (!isRedisConfigured || !stateClient) return;
 
-    const keys = await stateClient.keys('room:*');
+    let cursor = '0';
+    const keys: string[] = [];
+    do {
+      const [nextCursor, batch] = await stateClient.scan(cursor, 'MATCH', 'room:*', 'COUNT', 100);
+      cursor = nextCursor;
+      keys.push(...batch);
+    } while (cursor !== '0');
+
     if (keys.length === 0) return;
 
     logger.info({ count: keys.length }, 'Beginning room restoration from Redis...');
@@ -338,7 +345,7 @@ export class GameEngine implements IEngineCore {
 
       this.rooms.set(roomId, state);
 
-      if (state.actionTimerEnd !== undefined) {
+      if (!state.isPaused && state.actionTimerEnd !== undefined) {
         const remaining = state.actionTimerEnd - Date.now();
         if (remaining > 0) {
           const handle = setTimeout(async () => {

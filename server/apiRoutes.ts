@@ -5,6 +5,7 @@ import { GameEngine } from './gameEngine.ts';
 
 import { RouteContext } from './routes/types.ts';
 import { registerAuthRoutes } from './routes/authRoutes.ts';
+import { registerOAuthRoutes } from './routes/oauthRoutes.ts';
 import { registerUserRoutes } from './routes/userRoutes.ts';
 import { registerFriendRoutes } from './routes/friendRoutes.ts';
 import { registerRoomRoutes } from './routes/roomRoutes.ts';

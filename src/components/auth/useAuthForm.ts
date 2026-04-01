@@ -85,7 +85,7 @@ export function useAuthForm({ onAuthSuccess }: AuthFlowProps) {
         if (!response.ok) {
           const data = await response.json().catch(() => ({}));
           throw new Error(
-            data.error || 'The game server rejected the login attempt. Please try again.'
+            data.message || data.error || 'The game server rejected the login attempt. Please try again.'
           );
         }
 
@@ -140,7 +140,7 @@ export function useAuthForm({ onAuthSuccess }: AuthFlowProps) {
         );
         if (!response.ok) {
           const data = await response.json().catch(() => ({}));
-          throw new Error(data.error || `Failed to reach auth server for ${provider}`);
+          throw new Error(data.message || data.error || `Failed to reach auth server for ${provider}`);
         }
         const { url } = await response.json();
         await discordSdk.commands.openExternalLink({ url });

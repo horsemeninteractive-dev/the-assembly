@@ -26,7 +26,7 @@ export const AuthLogin: React.FC<any> = ({ form }) => {
       });
 
       const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Authentication failed');
+      if (!response.ok) throw new Error(data.message || data.error || 'Authentication failed');
 
       handleAuthSuccess(data.user, data.token);
     } catch (err: any) {

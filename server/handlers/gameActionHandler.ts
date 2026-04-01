@@ -14,7 +14,7 @@ import {
   signalSchema,
 } from '../schemas.ts';
 import { sendFriendRequest, acceptFriendRequest } from '../supabaseService.ts';
-import { getUserSocketId } from '../redis.ts';
+import { getUserSocketId, getSocketId } from '../redis.ts';
 
 /**
  * Handlers for standard in-game actions like voting, policy declaration, 
@@ -30,7 +30,7 @@ export function registerGameActionHandlers(
 
   socket.on('vote', (payload) => {
     const result = voteSchema.safeParse(payload);
-    if (!result.success) return socket.emit('error', 'Invalid vote data.');
+    if (!result.success) return socket.emit('error', { code: 'INVALID_REQUEST', message: 'Invalid vote data.' });
     const vote = result.data;
 
     const roomId = getRoom();
@@ -42,7 +42,7 @@ export function registerGameActionHandlers(
     if (!player || !player.isAlive || player.hasActed) return;
 
     if (state.detainedPlayerId === player.id) {
-      socket.emit('error', 'You are detained by the Interdictor and cannot vote this round.');
+      socket.emit('error', { code: 'DETAINED', message: 'You are detained by the Interdictor and cannot vote this round.' });
       return;
     }
 
@@ -62,7 +62,7 @@ export function registerGameActionHandlers(
 
   socket.on('nominateChancellor', (payload) => {
     const result = nominateChancellorSchema.safeParse(payload);
-    if (!result.success) return socket.emit('error', 'Invalid nomination data.');
+    if (!result.success) return socket.emit('error', { code: 'INVALID_REQUEST', message: 'Invalid nomination data.' });
     const chancellorId = result.data;
 
     const roomId = getRoom();
@@ -78,7 +78,7 @@ export function registerGameActionHandlers(
 
   socket.on('presidentDiscard', (payload) => {
     const result = presidentDiscardSchema.safeParse(payload);
-    if (!result.success) return socket.emit('error', 'Invalid discard data.');
+    if (!result.success) return socket.emit('error', { code: 'INVALID_REQUEST', message: 'Invalid discard data.' });
     const idx = result.data;
 
     const roomId = getRoom();
@@ -445,14 +445,15 @@ export function registerGameActionHandlers(
                         state.spectatorQueue.some((q) => q.id === to);
     if (!isConnected) return;
 
-    io.to(to).emit('signal', { from: socket.id, fromId, signal });
+    if (!socket.data.userId) return;
+    io.to(to).emit('signal', { from: socket.id, fromId: socket.data.userId, signal });
   });
 
   socket.on('sendFriendRequest', async (targetUserId) => {
     const userId = socket.data.userId;
     if (!userId) return;
     await sendFriendRequest(userId, targetUserId);
-    const targetSocketId = await getUserSocketId(targetUserId);
+    const targetSocketId = await getSocketId(targetUserId, userSockets);
     if (targetSocketId) {
       io.to(targetSocketId).emit('friendRequestReceived', { fromUserId: userId });
     }
@@ -462,7 +463,7 @@ export function registerGameActionHandlers(
     const userId = socket.data.userId;
     if (!userId) return;
     await acceptFriendRequest(userId, targetUserId);
-    const targetSocketId = await getUserSocketId(targetUserId);
+    const targetSocketId = await getSocketId(targetUserId, userSockets);
     if (targetSocketId) {
       io.to(targetSocketId).emit('friendRequestAccepted', { fromUserId: userId });
     }

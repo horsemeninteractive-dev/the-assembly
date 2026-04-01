@@ -10,7 +10,7 @@ import { Browser } from '@capacitor/browser';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
+  const [token, setToken] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [isInteracted, setIsInteracted] = useState(false);
   const [isDiscord, setIsDiscord] = useState(() => {
@@ -29,7 +29,6 @@ export function useAuth() {
   const handleAuthSuccess = useCallback((userData: User, authToken: string) => {
     setUser(userData);
     setToken(authToken);
-    localStorage.setItem('token', authToken);
     socket.emit('userConnected', { userId: userData.id, token: authToken });
     try {
       if (document.documentElement.requestFullscreen) {
@@ -46,7 +45,7 @@ export function useAuth() {
   const handleLogout = useCallback(() => {
     setUser(null);
     setToken(null);
-    localStorage.removeItem('token');
+    fetch(apiUrl('/api/logout'), { method: 'POST' }).catch(() => {});
     setIsInteracted(false);
   }, []);
 
@@ -110,7 +109,7 @@ export function useAuth() {
         const instanceId = discordSdk?.instanceId;
 
         let currentUser: User | null = null;
-        let currentToken: string | null = localStorage.getItem('token');
+        let currentToken: string | null = null;
 
         if (instanceId && DISCORD_CLIENT_ID) {
           setIsDiscord(true);
@@ -131,24 +130,21 @@ export function useAuth() {
               const data = await response.json();
               currentUser = data.user;
               currentToken = data.token;
-              localStorage.setItem('token', data.token);
             }
           } catch (err) {
             debugWarn('Discord auto-login failed or was denied.');
           }
         }
 
-        if (!currentUser && currentToken) {
+        if (!currentUser) {
           try {
-            const res = await fetch(apiUrl('/api/me'), {
-              headers: { Authorization: `Bearer ${currentToken}` },
-            });
+            const res = await fetch(apiUrl('/api/me'));
             if (res.ok) {
               const data = await res.json();
-              if (data.user) currentUser = data.user;
-            } else {
-              currentToken = null;
-              localStorage.removeItem('token');
+              if (data.user) {
+                currentUser = data.user;
+                currentToken = data.token;
+              }
             }
           } catch (err) {
             debugError('Session restore failed:', err);
@@ -198,7 +194,28 @@ export function useAuth() {
     const params = new URLSearchParams(window.location.search);
     const urlToken = params.get('token');
     const urlUser = params.get('user');
-    if (urlToken && urlUser) {
+    const urlCode = params.get('code');
+
+    const handleCodeExchange = async (code: string) => {
+      try {
+        const res = await fetch(apiUrl('/api/auth/exchange'), {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ code }),
+        });
+        if (res.ok) {
+          const data = await res.json();
+          handleAuthSuccess(data.user, data.token);
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+      } catch (e) {
+        debugError('Code exchange failed', e);
+      }
+    };
+
+    if (urlCode) {
+      handleCodeExchange(urlCode);
+    } else if (urlToken && urlUser) {
       try {
         const userData = JSON.parse(decodeURIComponent(urlUser));
         handleAuthSuccess(userData, urlToken);
@@ -217,7 +234,21 @@ export function useAuth() {
         const url = new URL(event.url);
         const urlToken = url.searchParams.get('token');
         const urlUser = url.searchParams.get('user');
-        if (urlToken && urlUser) {
+        const urlCode = url.searchParams.get('code');
+
+        if (urlCode) {
+          if (Capacitor.isNativePlatform()) Browser.close().catch(() => {});
+          fetch(apiUrl('/api/auth/exchange'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ code: urlCode }),
+          })
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.user && data.token) handleAuthSuccess(data.user, data.token);
+            })
+            .catch((e) => debugError('Capacitor Code exchange failed', e));
+        } else if (urlToken && urlUser) {
           if (Capacitor.isNativePlatform()) Browser.close().catch(() => {});
           const userData = JSON.parse(decodeURIComponent(urlUser));
           handleAuthSuccess(userData, urlToken);

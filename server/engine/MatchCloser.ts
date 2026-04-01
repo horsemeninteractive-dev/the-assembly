@@ -10,8 +10,9 @@
 import { randomUUID } from 'crypto';
 import { GameState, UserInternal, RecentlyPlayedEntry } from '../../src/types.ts';
 import { logger } from '../logger.ts';
-import { getUserById, saveUser, saveMatchResult, incrementGlobalWin } from '../supabaseService.ts';
+import { getUserById, saveUser, saveMatchResult, incrementGlobalWin, saveMatchAndUserAtomic } from '../supabaseService.ts';
 import { calculateXpGain } from '../../src/lib/xp.ts';
+import { inFlightWrites } from '../../server.ts';
 import { checkAchievements } from '../achievements.ts';
 import { ACHIEVEMENT_MAP } from '../../src/lib/achievements.ts';
 import { AGENDA_MAP } from '../personalAgendas.ts';
@@ -45,7 +46,14 @@ export class MatchCloser {
     s.log.push(`Game over: ${reason}`);
     if (s.log.length > 50) s.log.shift();
     this.engine.clearActionTimer(roomId);
-    await this.updateUserStats(s, winner);
+    
+    // Register the asynchronous stat updates in the global in-flight write Set for graceful shutdown
+    const writePromise = this.updateUserStats(s, winner)
+      .catch(err => logger.error({ err }, 'updateUserStats failure during endGame'))
+      .finally(() => inFlightWrites.delete(writePromise));
+    
+    inFlightWrites.add(writePromise);
+
     if (winner) await incrementGlobalWin(winner);
     this.engine.broadcastState(roomId);
   }
@@ -270,10 +278,9 @@ export class MatchCloser {
         .slice(0, 20);
     }
 
-    await Promise.all([
-      ...validUsers.map((u) => saveUser(u)),
-      ...results.map((r) => saveMatchResult(r.matchRecord)),
-    ]);
+    await Promise.all(
+      results.map((r) => saveMatchAndUserAtomic(r.user, r.matchRecord))
+    );
 
     for (const r of results) {
       const { password: _, ...safe } = r.user;

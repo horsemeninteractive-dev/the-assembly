@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { User, GameState, PrivateInfo, RoomPrivacy } from '../types';
+import { User, GameState, PrivateInfo, RoomPrivacy, StructuredError } from '../types';
 import { socket } from '../socket';
 import { apiUrl, debugLog, debugWarn, debugError } from '../lib/utils';
 import * as aiSpeech from '../services/aiSpeech';
@@ -82,8 +82,9 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
       setJoined(true);
     });
     socket.on('privateInfo', (info: PrivateInfo) => setPrivateInfo(info));
-    socket.on('error', (msg: string) => {
-      setError(msg);
+    socket.on('error', (err: string | StructuredError) => {
+      const message = typeof err === 'string' ? err : err.message;
+      setError(message);
       setTimeout(() => setError(null), 3000);
     });
     socket.on('userUpdate', (updatedUser: User) => setUser(updatedUser));

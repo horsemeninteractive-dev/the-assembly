@@ -11,13 +11,16 @@
 import { Server } from 'socket.io';
 import { GameState, Policy, SystemConfig } from '../../src/types.ts';
 import { logger } from '../logger.ts';
-import { stateClient, roomKey, ROOM_TTL_SECONDS, isRedisConfigured } from '../redis.ts';
+import { stateClient, roomKey, ROOM_TTL_SECONDS, isRedisConfigured, recordRoomDeletion } from '../redis.ts';
 import { getPlayerAgenda, AGENDA_MAP } from '../personalAgendas.ts';
-import { getUserById } from '../supabaseService.ts';
+import { getUsersByIds } from '../supabaseService.ts';
 
 export class GameBroadcaster {
   /** Pending delayed emissions for spectators (anti-cheat). */
   private delayedSpectatorEmissions: Map<string, Set<ReturnType<typeof setTimeout>>> = new Map();
+
+  /** Debounce timers for Redis writes to reduce serialisation pressure. */
+  private redisDebounceTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
 
   constructor(
     private readonly io: Server,
@@ -146,13 +149,23 @@ export class GameBroadcaster {
       }
     }
 
-    // Persist state to Redis on every broadcast (write-through cache).
+    // Persist state to Redis, debounced to 500ms to reduce write/serialization pressure.
     if (isRedisConfigured && stateClient) {
-      stateClient
-        .set(roomKey(roomId), JSON.stringify(state), 'EX', ROOM_TTL_SECONDS)
-        .catch((err) =>
-          logger.error({ roomId, err: err.message }, 'Failed to persist room to Redis')
-        );
+      if (this.redisDebounceTimers.has(roomId)) {
+        clearTimeout(this.redisDebounceTimers.get(roomId));
+      }
+      const timer = setTimeout(() => {
+        this.redisDebounceTimers.delete(roomId);
+        const currentState = this.rooms.get(roomId);
+        if (!currentState || !stateClient) return; // Room was deleted in between the debounce window
+
+        stateClient
+          .set(roomKey(roomId), JSON.stringify(currentState), 'EX', ROOM_TTL_SECONDS)
+          .catch((err) =>
+            logger.error({ roomId, err: err.message }, 'Failed to persist room to Redis')
+          );
+      }, 500);
+      this.redisDebounceTimers.set(roomId, timer);
     }
   }
 
@@ -161,8 +174,18 @@ export class GameBroadcaster {
   // ---------------------------------------------------------------------------
 
   deleteRoom(roomId: string): void {
+    const state = this.rooms.get(roomId);
+    if (state && state.hostUserId) {
+      recordRoomDeletion(state.hostUserId).catch(() => {});
+    }
     this.rooms.delete(roomId);
     this.clearDelayedSpectatorEmissions(roomId);
+
+    if (this.redisDebounceTimers.has(roomId)) {
+      clearTimeout(this.redisDebounceTimers.get(roomId));
+      this.redisDebounceTimers.delete(roomId);
+    }
+
     if (isRedisConfigured && stateClient) {
       stateClient
         .del(roomKey(roomId))
@@ -210,12 +233,11 @@ export class GameBroadcaster {
       return;
     }
     try {
-      const elos = await Promise.all(
-        humanPlayers.map(async (p) => {
-          const user = await getUserById(p.userId!);
-          return user?.stats?.elo ?? 1000;
-        })
-      );
+      const users = await getUsersByIds(humanPlayers.map((p) => p.userId!));
+      const elos = humanPlayers.map((p) => {
+        const user = users.find((u) => u.id === p.userId);
+        return user?.stats?.elo ?? 1000;
+      });
       state.averageElo = Math.round(elos.reduce((a, b) => a + b, 0) / elos.length);
     } catch (err) {
       logger.error({ roomId: state.roomId, err }, 'Failed to update average ELO');

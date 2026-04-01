@@ -12,6 +12,7 @@ import { createServer as createViteServer } from 'vite';
 import { randomUUID, randomBytes, createHash } from 'crypto';
 import fs from 'fs';
 import { z } from 'zod';
+import cookieParser from 'cookie-parser';
 
 interface SocketData {
   userId?: string;
@@ -36,15 +37,20 @@ import {
   getSystemConfig,
   updateSystemConfig,
   saveUser,
+  isStripeEventProcessed,
+  recordStripeEvent,
 } from './server/supabaseService.ts';
-import { pubClient, subClient, isRedisConfigured, setUserSocketId, getUserSocketId, removeUserSocketId, refreshUserStatus } from './server/redis.ts';
+import { pubClient, subClient, isRedisConfigured, setUserSocketId, getSocketId, getUserSocketId, removeUserSocketId, refreshUserStatus } from './server/redis.ts';
 import { SystemConfig } from './src/types.ts';
-import Stripe from 'stripe';
+import { registerStripeWebhook, stripe } from './server/handlers/stripeHandler.ts';
+import { registerSocketAuthMiddleware } from './server/handlers/socketAuthHandler.ts';
+import { registerPresenceHandlers } from './server/handlers/presenceHandler.ts';
+
+/** Global set to track in-flight database asynchronous writes during graceful shutdown. */
+export const inFlightWrites = new Set<Promise<any>>();
 
 import { registerGameActionHandlers } from './server/handlers/gameActionHandler.ts';
 import { registerAdminHandlers } from './server/handlers/adminHandler.ts';
-
-const stripe = new Stripe(env.STRIPE_SECRET_KEY || '');
 
 const PORT = env.PORT;
 
@@ -150,8 +156,6 @@ async function startServer() {
             'https://*.supabase.co',
             'https://theassembly.web.app',
             'wss://theassembly.web.app',
-            'https://the-assembly-874660478794.us-west1.run.app',
-            'wss://the-assembly-874660478794.us-west1.run.app',
             'https://*.a.run.app',
             'wss://*.a.run.app',
             'https://*.discord.com',
@@ -175,6 +179,7 @@ async function startServer() {
     })
   );
   app.set('trust proxy', 1);
+  app.use(cookieParser());
   app.use(
     cors({
       origin: (origin, callback) => {
@@ -186,52 +191,7 @@ async function startServer() {
   );
 
   // Stripe webhook must be placed BEFORE express.json() to get the raw body
-  app.post('/api/webhook/stripe', express.raw({ type: 'application/json' }), async (req, res) => {
-    if (!process.env.STRIPE_SECRET_KEY) {
-      return res.status(503).json({ error: 'Payment service not configured.' });
-    }
-    const sig = req.headers['stripe-signature'];
-    const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET;
-
-    if (!sig || !webhookSecret) {
-      logger.error('Missing Stripe signature or webhook secret');
-      return res.status(400).send('Webhook Error: Missing signature or secret');
-    }
-
-    let event: Stripe.Event;
-
-    try {
-      event = stripe.webhooks.constructEvent(req.body, sig, webhookSecret);
-    } catch (err: any) {
-      logger.error({ err: err.message }, 'Stripe Webhook Error');
-      return res.status(400).send(`Webhook Error: ${err.message}`);
-    }
-
-    // Handle the event
-    if (event.type === 'checkout.session.completed') {
-      const session = event.data.object as Stripe.Checkout.Session;
-      const userId = session.metadata?.userId;
-      const cpAmount = parseInt(session.metadata?.cpAmount || '0', 10);
-
-      if (userId && cpAmount > 0) {
-        logger.info({ userId, cpAmount }, 'Crediting CP to user via Stripe');
-        const user = await getUserById(userId);
-        if (user) {
-          user.cabinetPoints = (user.cabinetPoints ?? 0) + cpAmount;
-          const { saveUser } = await import('./server/supabaseService.ts');
-          await saveUser(user);
-
-          // Notify the user via socket if they are online
-          const socketId = await getUserSocketId(userId);
-          if (socketId) {
-            io.to(socketId).emit('userUpdate', user);
-          }
-        }
-      }
-    }
-
-    res.json({ received: true });
-  });
+  registerStripeWebhook(app, () => io, () => userSockets);
 
   app.use(express.json());
 
@@ -393,155 +353,20 @@ async function startServer() {
   });
 
   io.on('connection', (socket) => {
-    const GAME_ACTIONS = [
-      'userConnected',
-      'joinRoom',
-      'toggleReady',
-      'startLobbyTimer',
-      'startGame',
-      'signal',
-      'sendFriendRequest',
-      'acceptFriendRequest',
-      'nominateChancellor',
-      'vote',
-      'presidentDiscard',
-      'chancellorPlay',
-      'declarePolicies',
-      'performExecutiveAction',
-      'useTitleAbility',
-      'vetoRequest',
-      'vetoResponse',
-      'playAgain',
-      'joinQueue',
-      'leaveQueue',
-      'kickPlayer',
-      'toggleLock',
-      'hostStartGame',
-      'leaveRoom',
-      'updateMediaState',
-      'adminDeleteRoom',
-      'adminBroadcast',
-      'adminUpdateUser',
-      'adminUpdateConfig',
-      'adminClearRedis',
-    ];
-
-    socket.use(([event, ...args]: any[], next: (err?: Error) => void) => {
-      if (event === 'disconnect') return next();
-
-      const now = Date.now();
-      const isChat = event === 'sendMessage';
-      const isGameAction = GAME_ACTIONS.includes(event);
-
-      if (!isChat && !isGameAction) return next();
-
-      // Bucket configs
-      const CAPACITY = isChat ? 5 : 10;
-      const REFILL_RATE = isChat ? 1 : 5; // tokens per second
-
-      // State keys
-      const lastKey = isChat ? 'lastChatLimitCheck' : 'lastGameLimitCheck';
-      const tokenKey = isChat ? 'chatTokens' : 'gameTokens';
-
-      const last = socket.data[lastKey] || now;
-      const tokens = socket.data[tokenKey] ?? CAPACITY;
-
-      const elapsed = now - last;
-      const regained = (elapsed / 1000) * REFILL_RATE;
-      const currentTokens = Math.min(CAPACITY, tokens + regained);
-
-      if (currentTokens < 1) {
-        logger.warn(
-          { event, userId: socket.data.userId || 'unauth', socketId: socket.id },
-          `Throttling ${isChat ? 'chat' : 'game action'} event due to rate limit`
-        );
-        return next(new Error('Rate limit exceeded. Please slow down.'));
-      }
-
-      socket.data[tokenKey] = currentTokens - 1;
-      socket.data[lastKey] = now;
-      next();
-    });
+    registerSocketAuthMiddleware(socket);
 
     const getRoom = (): string | undefined => Array.from(socket.rooms).find((r) => r !== socket.id);
 
     // Call modular handlers to register event listeners
-    // Periodically refresh presence in Redis
-    const staleInterval = setInterval(async () => {
-      if (socket.data.userId) await refreshUserStatus(socket.data.userId);
-    }, 60000);
-    socket.data._presenceInterval = staleInterval;
-
+    registerPresenceHandlers(socket, io, engine, userSockets);
     registerGameActionHandlers(socket, io, engine, userSockets);
     registerAdminHandlers(socket, io, engine, userSockets, configRef);
-
-
-
-    socket.on('userConnected', async ({ userId, token }: { userId: string; token: string }) => {
-      const user = await validateToken(token);
-      if (!user || user.id !== userId) {
-        socket.emit('error', 'Unauthorized: User ID mismatch or invalid token.');
-        socket.disconnect();
-        return;
-      }
-      if (user?.isBanned) {
-        socket.emit('error', 'Your account has been restricted.');
-        socket.disconnect();
-        return;
-      }
-      socket.data.userId = userId;
-      socket.data.isAdmin = user?.isAdmin || false;
-      userSockets.set(userId, socket.id);
-      await setUserSocketId(userId, socket.id);
-
-      const friends = await getFriends(userId);
-      for (const friend of friends) {
-        const friendSocketId = await getUserSocketId(friend.id);
-        if (friendSocketId) {
-          // Find which room the friend is in (if any)
-          let friendRoomId: string | undefined;
-          for (const [rId, state] of engine.rooms.entries()) {
-            if (state.players.some((p) => p.userId === friend.id && !p.isDisconnected)) {
-              friendRoomId = rId;
-              break;
-            }
-          }
-          io.to(friendSocketId).emit('userStatusChanged', { userId, isOnline: true });
-          socket.emit('userStatusChanged', {
-            userId: friend.id,
-            isOnline: true,
-            roomId: friendRoomId,
-          });
-        }
-      }
-    });
 
     socket.on('joinRoom', async (payload: any) => 
       await handleJoinRoom(socket, io, engine, userSockets, configRef.current, payload)
     );
 
-    socket.on('disconnecting', async () => {
-    if (socket.data.userId) {
-      const userId = socket.data.userId;
-      if (userSockets.get(userId) === socket.id) {
-        userSockets.delete(userId);
-        await removeUserSocketId(userId);
-        const friends = await getFriends(userId);
-        for (const friend of friends) {
-          const friendSocketId = await getUserSocketId(friend.id);
-          if (friendSocketId)
-            io.to(friendSocketId).emit('userStatusChanged', { userId, isOnline: false });
-        }
-      }
-    }
-    if (socket.data._presenceInterval) clearInterval(socket.data._presenceInterval);
 
-      for (const roomId of socket.rooms) {
-        if (roomId !== socket.id) {
-          await engine.handleLeave(socket, roomId);
-        }
-      }
-    });
   });
 
   if (process.env.NODE_ENV !== 'production') {
@@ -585,6 +410,14 @@ async function gracefulShutdown() {
     );
     io.close();
   }
+
+  // Gracefully await all in-flight asynchronous database writes (stats, record checks, etc.)
+  if (inFlightWrites.size > 0) {
+    logger.info({ count: inFlightWrites.size }, 'Awaiting in-flight database writes...');
+    await Promise.allSettled([...inFlightWrites]);
+    logger.info('In-flight writes completed');
+  }
+
   if (httpServer) {
     httpServer.close(() => {
       logger.info('HTTP server closed');

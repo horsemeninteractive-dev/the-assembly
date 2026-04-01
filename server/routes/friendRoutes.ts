@@ -12,7 +12,7 @@ import {
   getUserById,
   removeFriend,
 } from '../supabaseService.ts';
-import { getUserSocketId } from '../redis.ts';
+import { getUserSocketId, getSocketId } from '../redis.ts';
 
 export function registerFriendRoutes({ app, io, engine, userSockets }: RouteContext): void {
   app.get('/api/friends/status', requireAuth, async (req: Request, res: Response) => {
@@ -21,7 +21,7 @@ export function registerFriendRoutes({ app, io, engine, userSockets }: RouteCont
       const friends = await getFriends(user.id);
       const statuses: Record<string, { isOnline: boolean; roomId?: string }> = {};
       for (const friend of friends) {
-        const friendSocketId = await getUserSocketId(friend.id);
+        const friendSocketId = await getSocketId(friend.id, userSockets);
         if (friendSocketId) {
           let roomId: string | undefined;
           for (const [rId, state] of engine.rooms.entries()) {
@@ -108,7 +108,7 @@ export function registerFriendRoutes({ app, io, engine, userSockets }: RouteCont
     const { roomId } = req.body;
     const user = req.user!;
 
-    const friendSocketId = await getUserSocketId(req.params.friendId);
+    const friendSocketId = await getSocketId(req.params.friendId, userSockets);
     if (friendSocketId) {
       io.to(friendSocketId).emit('friendInvite', {
         fromUserId: user.id,
