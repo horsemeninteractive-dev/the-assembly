@@ -6,7 +6,7 @@
  * Status is evaluated at game end from GameState alone.
  */
 
-import { GameState, Player, PersonalAgendaId, AgendaStatus, PersonalAgenda } from '../shared/types';
+import { GameState, Player, PersonalAgendaId, AgendaStatus, PersonalAgenda } from '../../shared/types';
 import { shuffle } from '../utils';
 
 // ---------------------------------------------------------------------------

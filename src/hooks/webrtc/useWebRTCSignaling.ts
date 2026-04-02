@@ -2,7 +2,7 @@ import { useEffect, useRef, useCallback } from 'react';
 import { Socket } from 'socket.io-client';
 import { GameState, Player } from '../../../shared/types';
 import { debugLog, debugWarn, debugError } from '../../utils/utils';
-import { SignalingPayload, PeerMeta } from '../../../shared/types';
+import { SignalingPayload, PeerMeta } from './types';
 
 interface UseWebRTCSignalingProps {
   socket: Socket;

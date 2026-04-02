@@ -6,4 +6,5 @@ export * from './stripe';
 export * from './config';
 export * from './achievements';
 export * from './shop';
+export * from './challenges';
 

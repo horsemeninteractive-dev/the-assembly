@@ -2,7 +2,7 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { Socket } from 'socket.io-client';
 import { GameState, Player } from '../../../shared/types';
 import { debugLog, debugWarn, debugError, apiUrl } from '../../utils/utils';
-import { PeerMeta } from '../../../shared/types';
+import { PeerMeta } from './types';
 
 interface UseWebRTCConnectionProps {
   gameState: GameState;

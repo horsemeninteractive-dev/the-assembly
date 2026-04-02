@@ -14,6 +14,8 @@ import { getUserById, saveUser, saveMatchResult, incrementGlobalWin, saveMatchAn
 import { calculateXpGain } from '../../src/utils/xp';
 import { inFlightWrites } from '../../server';
 import { checkAchievements } from '../achievements';
+import { refreshChallenges, saveChallengeData } from '../db/challenges';
+import { ChallengeContext, evaluateChallenges } from '../game/challenges';
 import { ACHIEVEMENT_MAP } from '../../src/utils/achievements';
 import { AGENDA_MAP } from '../game/personalAgendas';
 import { computeEloChange } from './utils';
@@ -88,6 +90,7 @@ export class MatchCloser {
       agendaCompleted: boolean;
       agendaName: string | undefined;
       newAchievementIds: string[];
+      completedChallengeIds: { id: import('../../shared/types').ChallengeId; xpReward: number; ipReward: number }[];
       opponentAverageElo: number;
       matchRecord: Parameters<typeof saveMatchResult>[0];
     };
@@ -128,6 +131,7 @@ export class MatchCloser {
       let cpEarned = 0;
       let agendaCompleted = false;
       let newAchievementIds: string[] = [];
+      let challengeResult: ReturnType<typeof evaluateChallenges> | undefined;
       const opponentAvgElo = p.role === 'Civil' ? avgStateElo : avgCivilElo;
 
       if (!isInconclusive) {
@@ -196,8 +200,17 @@ export class MatchCloser {
         const agendaIp = agendaCompleted ? (s.mode === 'Ranked' ? 40 : 20) : 0;
         const agendaXp = agendaCompleted ? 100 : 0;
 
+        // ── Challenge evaluation ─────────────────────────────────────────
+        const challengeCtx: ChallengeContext = { s, p, won, agendaCompleted };
+        const freshChallengeData = refreshChallenges(user);
+        const challengeResult = evaluateChallenges(freshChallengeData, challengeCtx);
+        user.challengeData = challengeResult.updatedChallengeData;
+
         xpEarned = Math.floor((xpGain + agendaXp + achievementXp) * xpMult);
         ipEarned = Math.floor((baseIp + agendaIp) * ipMult);
+        // Challenge rewards are fixed bonuses — not subject to multipliers
+        xpEarned += challengeResult.totalXp;
+        ipEarned += challengeResult.totalIp;
         cpEarned = achievementCp;
 
         user.stats.xp = oldXp + xpEarned;
@@ -226,6 +239,7 @@ export class MatchCloser {
           ? (AGENDA_MAP.get(p.personalAgenda)?.name ?? undefined)
           : undefined,
         newAchievementIds,
+        completedChallengeIds: challengeResult?.completedThisGame ?? [],
         opponentAverageElo: opponentAvgElo,
         matchRecord: {
           id: randomUUID(),
@@ -278,9 +292,12 @@ export class MatchCloser {
         .slice(0, 20);
     }
 
-    await Promise.all(
-      results.map((r) => saveMatchAndUserAtomic(r.user, r.matchRecord))
-    );
+    await Promise.all([
+      ...results.map((r) => saveMatchAndUserAtomic(r.user, r.matchRecord)),
+      ...results
+        .filter((r) => r.user.challengeData)
+        .map((r) => saveChallengeData(r.user.id, r.user.challengeData!)),
+    ]);
 
     for (const r of results) {
       const { password: _, ...safe } = r.user;
@@ -303,6 +320,7 @@ export class MatchCloser {
           civilDirectives: s.civilDirectives,
           stateDirectives: s.stateDirectives,
           newAchievements: r.newAchievementIds,
+          completedChallenges: r.completedChallengeIds,
         });
       }
     }

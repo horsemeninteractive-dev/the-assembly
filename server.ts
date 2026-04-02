@@ -4,7 +4,7 @@ import express from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
 import path from 'path';
-import { statsSchema } from './server/schemas.ts';
+import { statsSchema } from './server/game/schemas.ts';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
 import { createAdapter } from '@socket.io/redis-adapter';

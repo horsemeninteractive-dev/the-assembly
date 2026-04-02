@@ -32,6 +32,7 @@ import { HistoryTab } from './profile/HistoryTab';
 import { InventoryTab as Inventory } from './profile/InventoryTab';
 import { FriendsList } from './profile/FriendsTab';
 import { AdminTools } from './profile/AdminTab';
+import { ChallengesTab } from './profile/ChallengesTab';
 
 interface ProfileProps {
   user: User;
@@ -71,6 +72,7 @@ export const Profile: React.FC<ProfileProps> = ({
     | 'inventory'
     | 'history'
     | 'achievements'
+    | 'challenges'
     | 'admin'
   >('stats');
   
@@ -319,6 +321,7 @@ export const Profile: React.FC<ProfileProps> = ({
             { id: 'stats', label: 'Stats' },
             { id: 'inventory', label: 'Inventory' },
             { id: 'achievements', label: 'Medals' },
+            { id: 'challenges', label: 'Challenges' },
             { id: 'shop', label: 'Shop' },
             { id: 'pass', label: 'Pass' },
             { id: 'friends', label: 'Friends' },
@@ -353,6 +356,7 @@ export const Profile: React.FC<ProfileProps> = ({
           {activeTab === 'stats' && <StatsTab user={user} />}
           {activeTab === 'history' && <HistoryTab user={user} token={token} />}
           {activeTab === 'achievements' && <MedalsTab user={user} token={token} onUpdateUser={onUpdateUser} playSound={playSound} />}
+          {activeTab === 'challenges' && <ChallengesTab user={user} token={token} />}
           {activeTab === 'inventory' && <Inventory user={user} token={token} onUpdateUser={onUpdateUser} playSound={playSound} playPreview={playPreview} playingItemId={playingItemId} />}
           {activeTab === 'shop' && <ShopTab user={user} token={token} onUpdateUser={onUpdateUser} playSound={playSound} playPreview={playPreview} playingItemId={playingItemId} />}
           {activeTab === 'pass' && <PassTab user={user} token={token} onUpdateUser={onUpdateUser} playPreview={playPreview} playingItemId={playingItemId} setError={setError} />}

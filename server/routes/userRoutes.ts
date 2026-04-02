@@ -6,6 +6,7 @@ import { requireAuth, sanitizeUser, JWT_SECRET } from './shared';
 import { logger } from '../logger';
 import { updateEmailSchema, updateUsernameSchema } from '../game/schemas';
 import { getUser, getUserByEmail, saveUser, getMatchHistory } from '../supabaseService';
+import { refreshChallenges, buildChallengesResponse } from '../db/challenges';
 import { ACHIEVEMENT_MAP } from '../../src/utils/achievements';
 
 export function registerUserRoutes({ app, engine }: RouteContext): void {
@@ -222,6 +223,31 @@ export function registerUserRoutes({ app, engine }: RouteContext): void {
 
     const userWithoutPassword = sanitizeUser(user);
     res.json({ user: userWithoutPassword });
+  });
+
+  // ── Challenges ────────────────────────────────────────────────────────────
+
+  app.get('/api/challenges', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const user = req.user!;
+      const freshData = refreshChallenges(user);
+
+      const periodsChanged =
+        !user.challengeData ||
+        user.challengeData.dailyPeriod !== freshData.dailyPeriod ||
+        user.challengeData.weeklyPeriod !== freshData.weeklyPeriod ||
+        user.challengeData.seasonPeriod !== freshData.seasonPeriod;
+
+      if (periodsChanged) {
+        user.challengeData = freshData;
+        await saveUser(user);
+      }
+
+      res.json(buildChallengesResponse(freshData));
+    } catch (err) {
+      logger.error({ err }, 'GET /api/challenges error');
+      res.status(500).json({ error: 'Internal server error' });
+    }
   });
 }
 

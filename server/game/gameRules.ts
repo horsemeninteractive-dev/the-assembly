@@ -1,4 +1,4 @@
-import { GameState, Player, Policy, ExecutiveAction, Role } from '../shared/types';
+import { GameState, Player, Policy, ExecutiveAction, Role } from '../../shared/types';
 import { shuffle } from '../utils';
 
 /**

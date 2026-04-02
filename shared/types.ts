@@ -225,6 +225,7 @@ export interface UserInternal extends User {
   email?: string;
   googleId?: string;
   discordId?: string;
+  challengeData?: UserChallengeData;
 }
 
 export type RoomPrivacy = 'public' | 'friends' | 'private';
@@ -253,6 +254,46 @@ export interface SystemConfig {
 }
 
 export type AIPersonality = 'Honest' | 'Deceptive' | 'Chaotic' | 'Strategic' | 'Aggressive';
+
+export type ChallengeId = string;
+
+export interface ActiveChallenge {
+  id: ChallengeId;
+  progress: number;
+  completed: boolean;
+  completedAt?: string;
+}
+
+export interface UserChallengeData {
+  daily: ActiveChallenge[];
+  weekly: ActiveChallenge[];
+  seasonal: ActiveChallenge[];
+  dailyResetsAt: string;
+  weeklyResetsAt: string;
+  seasonEndsAt: string;
+  dailyPeriod: string;
+  weeklyPeriod: string;
+  seasonPeriod: string;
+}
+
+export interface EnrichedChallenge extends ActiveChallenge {
+  name: string;
+  description: string;
+  icon: string;
+  target: number;
+  xpReward: number;
+  ipReward: number;
+  tier: 'Daily' | 'Weekly' | 'Seasonal';
+}
+
+export interface ChallengesResponse {
+  daily: EnrichedChallenge[];
+  weekly: EnrichedChallenge[];
+  seasonal: EnrichedChallenge[];
+  dailyResetsAt: string;
+  weeklyResetsAt: string;
+  seasonEndsAt: string;
+}
 
 export interface Player {
   /** Stable unique ID for this player session (persists across reconnects) */
