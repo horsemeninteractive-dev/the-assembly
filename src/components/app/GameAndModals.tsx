@@ -28,6 +28,12 @@ export function GameRoomView({ updateAvailable, setIsProfileOpen }: { updateAvai
         onOpenProfile={() => setIsProfileOpen(true)} onJoinRoom={handleJoinRoom}
         setUser={setUser} setGameState={setGameState} setPrivateInfo={setPrivateInfo}
         updateAvailable={updateAvailable} playSound={playSound}
+        soundVolume={settings.soundVolume}
+        ttsVolume={settings.ttsVolume}
+        ttsVoice={settings.ttsVoice}
+        ttsEngine={settings.ttsEngine}
+        isAiVoiceEnabled={settings.isAiVoiceEnabled}
+        uiScaleSetting={settings.uiScaleSetting}
       />
     </ErrorBoundary>
   );

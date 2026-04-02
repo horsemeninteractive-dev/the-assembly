@@ -18,6 +18,7 @@ import { RoundHistory } from './game/panels/RoundHistory';
 import { ChatPanel } from './game/panels/ChatPanel';
 
 import { GameOverModal } from './game/modals/GameOverModal';
+import { DebriefSequence } from './game/DebriefSequence';
 import { InvestigationModal } from './game/modals/InvestigationModal';
 import { PolicyPeekModal } from './game/modals/PolicyPeekModal';
 import { DossierModal } from './game/modals/DossierModal';
@@ -29,7 +30,6 @@ import { useWebRTC } from '../hooks/useWebRTC';
 import { useGameSounds } from '../hooks/useGameSounds';
 import { usePostMatchHandler } from '../hooks/usePostMatchHandler';
 import { useLegislativeHandler } from '../hooks/useLegislativeHandler';
-import { useSettings } from '../contexts/SettingsContext';
 
 interface GameRoomProps {
   gameState: GameState;
@@ -45,6 +45,12 @@ interface GameRoomProps {
   setPrivateInfo: (info: PrivateInfo | null) => void;
   updateAvailable: boolean;
   playSound: (soundKey: string) => void;
+  soundVolume: number;
+  ttsVolume: number;
+  ttsVoice: string;
+  ttsEngine: string;
+  isAiVoiceEnabled: boolean;
+  uiScaleSetting: number;
 }
 
 export const GameRoom = ({
@@ -61,23 +67,21 @@ export const GameRoom = ({
   setPrivateInfo,
   updateAvailable,
   playSound,
+  soundVolume,
+  ttsVolume,
+  ttsVoice,
+  ttsEngine,
+  isAiVoiceEnabled,
+  uiScaleSetting,
 }: GameRoomProps) => {
-  const { 
-    isSoundOn, 
-    soundVolume, 
-    ttsVolume, 
-    ttsVoice, 
-    ttsEngine, 
-    isAiVoiceEnabled, 
-    uiScaleSetting 
-  } = useSettings();
-
   const me = gameState.players.find((p) => p.socketId === socket.id);
   const isSpectator = !me && gameState.spectators.some((s) => s.id === socket.id);
   const [inQueue, setInQueue] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const uiScale = useScaling(containerRef, { multiplier: uiScaleSetting });
 
+  // Add this inside the component to check against sound settings
+  const isSoundOn = localStorage.getItem('isSoundOn') !== 'false';
 
   // ── UI panels ────────────────────────────────────────────────────────────
   const [isLogOpen, setIsLogOpen] = useState(false);
@@ -87,6 +91,14 @@ export const GameRoom = ({
   const [isDossierOpen, setIsDossierOpen] = useState(false);
   const [isReferenceOpen, setIsReferenceOpen] = useState(false);
   const [postMatchResult, setPostMatchResult] = useState<PostMatchResult | null>(null);
+  const [showDebrief, setShowDebrief] = useState(false);
+
+  // Trigger debrief sequence when the game ends
+  useEffect(() => {
+    if (gameState.phase === 'GameOver') {
+      setShowDebrief(true);
+    }
+  }, [gameState.phase]);
   const [chatText, setChatText] = useState('');
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [lastSeenMessageCount, setLastSeenMessageCount] = useState(0);
@@ -400,16 +412,28 @@ export const GameRoom = ({
           {/* Overlays within main */}
           <PauseOverlay gameState={gameState} />
 
-          <GameOverModal
-            gameState={gameState}
-            privateInfo={privateInfo}
-            myId={me?.id}
-            postMatchResult={postMatchResult}
-            onPlayAgain={onPlayAgain}
-            onLeave={onLeaveRoom}
-            onOpenLog={() => setIsLogOpen(true)}
-            playSound={playSound}
-          />
+          {showDebrief && (
+            <DebriefSequence
+              gameState={gameState}
+              privateInfo={privateInfo}
+              myId={me?.id}
+              onComplete={() => setShowDebrief(false)}
+              playSound={playSound}
+            />
+          )}
+
+          {!showDebrief && (
+            <GameOverModal
+              gameState={gameState}
+              privateInfo={privateInfo}
+              myId={me?.id}
+              postMatchResult={postMatchResult}
+              onPlayAgain={onPlayAgain}
+              onLeave={onLeaveRoom}
+              onOpenLog={() => setIsLogOpen(true)}
+              playSound={playSound}
+            />
+          )}
         </div>
       </main>
 
@@ -500,5 +524,3 @@ export const GameRoom = ({
     </div>
   );
 };
-
-
