@@ -1,5 +1,5 @@
-import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import React, { useState, useRef, useEffect } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   X,
   Trophy,
@@ -15,7 +15,11 @@ import {
   User as UserIcon,
   Star,
   Coins,
-  Zap
+  Zap,
+  Share2,
+  Copy,
+  Twitter,
+  MessageCircle,
 } from 'lucide-react';
 import { User, CosmeticItem } from '../../shared/types';
 import { cn, getProxiedUrl, apiUrl } from '../utils/utils';
@@ -82,6 +86,50 @@ export const Profile: React.FC<ProfileProps> = ({
   const [isEditingName, setIsEditingName] = useState(false);
   const [newName, setNewName] = useState(user.username);
   const [isSavingName, setIsSavingName] = useState(false);
+
+  const [shareOpen, setShareOpen] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
+  const shareRef = useRef<HTMLDivElement>(null);
+
+  // Build the canonical public profile URL
+  const _profileOrigin = (() => {
+    const o = window.location.origin;
+    if (o.startsWith('capacitor://') || o.startsWith('http://localhost') || o.startsWith('https://localhost')) {
+      return 'https://theassembly.web.app';
+    }
+    return o;
+  })();
+  const profileUrl = `${_profileOrigin}/player/${encodeURIComponent(user.username)}`;
+
+  // Close share sheet on outside click
+  useEffect(() => {
+    if (!shareOpen) return;
+    const handler = (e: MouseEvent) => {
+      if (shareRef.current && !shareRef.current.contains(e.target as Node)) {
+        setShareOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [shareOpen]);
+
+  const handleCopyLink = () => {
+    navigator.clipboard.writeText(profileUrl).then(() => {
+      setShareCopied(true);
+      playSound('election_passed');
+      setTimeout(() => { setShareCopied(false); setShareOpen(false); }, 1800);
+    });
+  };
+
+  const handleShareNative = () => {
+    if (navigator.share) {
+      navigator.share({
+        title: `${user.username} on The Assembly`,
+        text: `Check out ${user.username}'s player profile — ${getRankLabel(user.stats.elo)} with a ${user.stats.gamesPlayed > 0 ? Math.round((user.stats.wins / user.stats.gamesPlayed) * 100) : 0}% win rate!`,
+        url: profileUrl,
+      }).then(() => setShareOpen(false)).catch(() => {});
+    }
+  };
 
   const handleUpdateUsername = async () => {
     if (!newName || newName === user.username) {
@@ -241,9 +289,102 @@ export const Profile: React.FC<ProfileProps> = ({
                       setError('');
                     }}
                     className="p-1 rounded-md text-ghost hover:text-primary hover:bg-white/5 transition-all"
+                    title="Edit username"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
+
+                  {/* Share Profile button + sheet */}
+                  <div ref={shareRef} className="relative">
+                    <button
+                      onClick={() => { playSound('click'); setShareOpen((v) => !v); }}
+                      title="Share profile"
+                      className={cn(
+                        'p-1 rounded-md transition-all',
+                        shareOpen
+                          ? 'text-primary bg-white/10'
+                          : 'text-ghost hover:text-primary hover:bg-white/5'
+                      )}
+                    >
+                      <Share2 className="w-3.5 h-3.5" />
+                    </button>
+
+                    <AnimatePresence>
+                      {shareOpen && (
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0.92, y: -4 }}
+                          animate={{ opacity: 1, scale: 1, y: 0 }}
+                          exit={{ opacity: 0, scale: 0.92, y: -4 }}
+                          transition={{ duration: 0.15 }}
+                          className="absolute left-0 top-8 z-50 w-56 bg-elevated border border-subtle rounded-2xl shadow-2xl overflow-hidden"
+                        >
+                          {/* URL preview */}
+                          <div className="px-3 pt-3 pb-2 border-b border-subtle">
+                            <div className="text-[9px] font-mono uppercase tracking-widest text-faint mb-1">Public Profile</div>
+                            <div className="text-[10px] font-mono text-muted truncate">{profileUrl.replace('https://', '')}</div>
+                          </div>
+
+                          {/* Actions */}
+                          <div className="p-1.5 space-y-0.5">
+                            <button
+                              onClick={handleCopyLink}
+                              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-mono text-secondary hover:text-primary hover:bg-white/5 transition-all text-left"
+                            >
+                              {shareCopied
+                                ? <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                                : <Copy className="w-3.5 h-3.5 shrink-0" />}
+                              {shareCopied ? 'Copied!' : 'Copy Link'}
+                            </button>
+
+                            <a
+                              href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(`Check out ${user.username}'s profile on The Assembly!`)}&url=${encodeURIComponent(profileUrl)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => { playSound('click'); setShareOpen(false); }}
+                              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-mono text-secondary hover:text-primary hover:bg-white/5 transition-all"
+                            >
+                              <Twitter className="w-3.5 h-3.5 shrink-0" />
+                              Share on X / Twitter
+                            </a>
+
+                            <a
+                              href={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(profileUrl)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => { playSound('click'); setShareOpen(false); }}
+                              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-mono text-secondary hover:text-primary hover:bg-white/5 transition-all"
+                            >
+                              <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                              </svg>
+                              Share on Facebook
+                            </a>
+
+                            <a
+                              href={`https://wa.me/?text=${encodeURIComponent(`Check out ${user.username}'s profile on The Assembly! ${profileUrl}`)}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              onClick={() => { playSound('click'); setShareOpen(false); }}
+                              className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-mono text-secondary hover:text-primary hover:bg-white/5 transition-all"
+                            >
+                              <MessageCircle className="w-3.5 h-3.5 shrink-0" />
+                              Share on WhatsApp
+                            </a>
+
+                            {typeof navigator.share === 'function' && (
+                              <button
+                                onClick={handleShareNative}
+                                className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-mono text-secondary hover:text-primary hover:bg-white/5 transition-all text-left"
+                              >
+                                <Share2 className="w-3.5 h-3.5 shrink-0" />
+                                More Options…
+                              </button>
+                            )}
+                          </div>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </>
               )}
               {error && isEditingName && (
