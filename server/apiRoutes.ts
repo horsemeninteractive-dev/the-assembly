@@ -12,6 +12,7 @@ import { registerRoomRoutes } from './routes/roomRoutes';
 import { registerShopRoutes } from './routes/shopRoutes';
 import { registerAdminRoutes } from './routes/adminRoutes';
 import { registerSystemRoutes } from './routes/systemRoutes';
+import { registerPublicRoutes } from './routes/publicRoutes';
 
 // Re-export common utilities so other files do not break.
 export { sanitizeUser, validateToken, requireAuth } from './routes/shared';
@@ -51,5 +52,6 @@ export function registerRoutes(
   registerShopRoutes(context);
   registerAdminRoutes(context);
   registerSystemRoutes(context);
+  registerPublicRoutes(context);
 }
 

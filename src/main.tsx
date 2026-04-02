@@ -79,19 +79,30 @@ import { SettingsProvider } from './contexts/SettingsContext.tsx';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { AudioProvider } from './contexts/AudioContext.tsx';
 import { GameProvider } from './contexts/GameContext.tsx';
+import { PlayerCard } from './components/PlayerCard.tsx';
 
-createRoot(document.getElementById('root')!).render(
-  <StrictMode>
-    <SettingsProvider>
-      <AuthProvider>
-        <AudioProvider>
-          <GameProvider>
-            <App />
-          </GameProvider>
-        </AudioProvider>
-      </AuthProvider>
-    </SettingsProvider>
-  </StrictMode>
-);
+// ── Route detection: /player/:username renders unauthenticated public profile ──
+const _playerRouteMatch = window.location.pathname.match(/^\/player\/([^/]+)\/?$/);
 
-
+if (_playerRouteMatch) {
+  const _playerUsername = decodeURIComponent(_playerRouteMatch[1]);
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <PlayerCard username={_playerUsername} />
+    </StrictMode>
+  );
+} else {
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <SettingsProvider>
+        <AuthProvider>
+          <AudioProvider>
+            <GameProvider>
+              <App />
+            </GameProvider>
+          </AudioProvider>
+        </AuthProvider>
+      </SettingsProvider>
+    </StrictMode>
+  );
+}
