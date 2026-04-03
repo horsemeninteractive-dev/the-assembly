@@ -11,6 +11,7 @@ import {
   Unlock,
   Play,
   ShieldAlert,
+  Smile,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Tooltip } from '../Tooltip';
@@ -48,6 +49,7 @@ export const ActionBar = ({
   isVideoActive,
   setIsVideoActive,
 }: ActionBarProps) => {
+  const [showReactions, setShowReactions] = React.useState(false);
   const isPresident = me?.isPresident;
   const isChancellor = me?.isChancellor;
 
@@ -181,7 +183,51 @@ export const ActionBar = ({
             {(user && (user.stats?.gamesPlayed ?? 0) < 5 && phaseHint()) || '\u00A0'}
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center">
+          <div className="relative">
+            <Tooltip content="Quick Reactions">
+              <button
+                aria-label="Toggle Reactions"
+                onMouseEnter={() => playSound('hover')}
+                onClick={() => {
+                  playSound('click');
+                  setShowReactions(!showReactions);
+                }}
+                className={cn(
+                  'p-[1vh] rounded-full transition-all',
+                  showReactions ? 'bg-primary text-deep scale-110' : 'bg-card text-muted hover:text-primary'
+                )}
+              >
+                <Smile className="w-[2vh] h-[2vh]" />
+              </button>
+            </Tooltip>
+
+            <AnimatePresence>
+              {showReactions && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8, y: 10 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, y: 10 }}
+                  className="absolute bottom-full mb-2 right-0 bg-elevated border border-subtle p-2 rounded-2xl flex gap-1 shadow-2xl z-[100]"
+                >
+                  {['👍', '👎', '😂', '🤔', '👀', '🤐', '🔥', '💀'].map((emoji) => (
+                    <button
+                      key={emoji}
+                      onClick={() => {
+                        playSound('click');
+                        socket.emit('sendReaction', emoji);
+                        setShowReactions(false);
+                      }}
+                      className="w-[4vh] h-[4vh] flex items-center justify-center rounded-xl hover:bg-white/10 transition-colors text-xl"
+                    >
+                      {emoji}
+                    </button>
+                  ))}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
           <Tooltip content={isVoiceActive ? 'Mute Mic' : 'Unmute Mic'}>
             <button
               aria-label={isVoiceActive ? 'Mute Mic' : 'Unmute Mic'}

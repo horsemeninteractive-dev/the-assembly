@@ -22,6 +22,15 @@ export interface ClanChallengeContext {
   agendaCompleted: boolean;
 }
 
+/**
+ * Calculates base clan XP rewarded for simply playing a match.
+ */
+export const calculateClanXpGain = (ctx: ClanChallengeContext): number => {
+  let xp = 20; // Base for playing
+  if (ctx.won) xp += 30; // Extra for win
+  return xp;
+};
+
 export interface ClanChallengeDef {
   id: ChallengeId;
   tier: 'Daily' | 'Weekly' | 'Seasonal';

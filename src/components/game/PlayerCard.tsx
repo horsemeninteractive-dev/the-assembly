@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
-import { motion } from 'motion/react';
-import { Users, Eye, Check, ShieldOff } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import { Users, Eye, Check, ShieldOff, WifiOff, AlertCircle } from 'lucide-react';
 import { socket } from '../../socket';
 import { GameState, Player } from '../../../shared/types';
 import { getFrameStyles, getVoteStyles } from '../../utils/cosmetics';
@@ -62,6 +62,7 @@ export interface PlayerCardProps {
   stream: MediaStream | null;
   isVideoActive: boolean;
   speakingPlayers: Record<string, boolean>;
+  reaction?: string;
   playSound: (key: string) => void;
   setSelectedPlayerId: (id: string | null) => void;
   me: Player | undefined;
@@ -81,6 +82,7 @@ export const PlayerCard = React.memo(
     stream,
     isVideoActive,
     speakingPlayers,
+    reaction,
     playSound,
     setSelectedPlayerId,
     me,
@@ -138,6 +140,22 @@ export const PlayerCard = React.memo(
           p.isChancellor && 'bg-blue-900/20 border-blue-500 shadow-lg shadow-blue-500/10'
         )}
       >
+        {/* Reaction Overlay */}
+        <AnimatePresence>
+          {reaction && (
+            <motion.div
+              initial={{ scale: 0, scaleY: 0, opacity: 0, y: 10 }}
+              animate={{ scale: 1, scaleY: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0, opacity: 0, y: -20 }}
+              transition={{ type: 'spring', stiffness: 260, damping: 20 }}
+              className="absolute top-2 right-2 z-50 pointer-events-none drop-shadow-lg"
+            >
+              <div className="bg-black/60 backdrop-blur-md border border-white/20 rounded-full px-2 py-1 flex items-center justify-center min-w-[2.5rem]">
+                <span className="text-xl leading-none">{reaction}</span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
         {/* Spectator role badges */}
         {isSpectator && roleInfo && (
           <div className="absolute top-0.5 right-0.5 z-20 flex flex-col gap-0.5 items-end pointer-events-none">
@@ -592,11 +610,33 @@ export const PlayerCard = React.memo(
             <ShieldOff className="w-[1.5vh] h-[1.5vh]" />
           </button>
         )}
-
         {/* Detained Chains Overlay */}
         {gameState.detainedPlayerId === p.id && (
           <div className="absolute inset-0 z-20 pointer-events-none rounded-xl overflow-hidden shadow-[inset_0_0_40px_rgba(147,51,234,0.4)] border-2 border-purple-500/50">
             <div className="absolute -inset-[100%] rotate-45 bg-detained-chains transition-opacity duration-300 opacity-70" />
+          </div>
+        )}
+
+        {/* Connection Status Indicator */}
+        {(p.isDisconnected || p.isLagging) && (
+          <div className="absolute inset-0 z-[60] pointer-events-none rounded-xl flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+            <div className="flex flex-col items-center gap-1">
+              {p.isDisconnected ? (
+                <>
+                  <WifiOff className="w-8 h-8 text-red-500 animate-pulse drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
+                  <span className="text-[10px] font-mono font-bold text-red-400 uppercase tracking-widest bg-black/80 px-2 py-0.5 rounded border border-red-500/30">
+                    Reconnecting
+                  </span>
+                </>
+              ) : (
+                <>
+                  <AlertCircle className="w-6 h-6 text-yellow-500 animate-bounce drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]" />
+                  <span className="text-[8px] font-mono font-bold text-yellow-400 uppercase tracking-widest bg-black/80 px-1.5 py-0.5 rounded border border-yellow-500/30">
+                    Poor Connection
+                  </span>
+                </>
+              )}
+            </div>
           </div>
         )}
       </motion.div>

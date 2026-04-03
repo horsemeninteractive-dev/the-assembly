@@ -12,6 +12,7 @@ import {
   nominateChancellorSchema,
   joinQueueSchema,
   signalSchema,
+  sendReactionSchema,
 } from '../game/schemas';
 import { sendFriendRequest, acceptFriendRequest } from '../supabaseService';
 import { getUserSocketId, getSocketId } from '../redis';
@@ -251,6 +252,40 @@ export function registerGameActionHandlers(
     });
     if (state.messages.length > 50) state.messages.shift();
     engine.broadcastState(roomId);
+  });
+  
+  socket.on('sendReaction', (payload) => {
+    const result = sendReactionSchema.safeParse(payload);
+    if (!result.success) return;
+    const reaction = result.data;
+
+    const roomId = getRoom();
+    if (!roomId) return;
+    const state = engine.rooms.get(roomId);
+    if (!state) return;
+
+    const player = state.players.find((p) => p.socketId === socket.id);
+    if (!player || !player.isAlive) return;
+
+    io.to(roomId).emit('reaction', { playerId: player.id, reaction });
+  });
+
+  socket.on('ping-server', (callback) => {
+    if (typeof callback === 'function') callback();
+  });
+
+  socket.on('setLagging', (isLagging) => {
+    const roomId = getRoom();
+    if (!roomId) return;
+    const state = engine.rooms.get(roomId);
+    if (!state) return;
+    const player = state.players.find((p) => p.socketId === socket.id);
+    if (!player) return;
+    
+    if (player.isLagging !== isLagging) {
+      player.isLagging = isLagging;
+      engine.broadcastState(roomId);
+    }
   });
 
   socket.on('playAgain', async () => {

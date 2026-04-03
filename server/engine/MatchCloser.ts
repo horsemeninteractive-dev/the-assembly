@@ -12,7 +12,7 @@ import { GameState, UserInternal, RecentlyPlayedEntry } from '../../shared/types
 import { logger } from '../logger';
 import { getUserById, saveUser, saveMatchResult, incrementGlobalWin, saveMatchAndUserAtomic } from '../supabaseService';
 import { contributeClanXp, getClanById, saveClanChallenges, incrementClanXp } from '../db/clans';
-import { refreshClanChallenges, evaluateClanChallenges, ClanChallengeContext } from '../game/clanChallenges';
+import { refreshClanChallenges, evaluateClanChallenges, ClanChallengeContext, calculateClanXpGain } from '../game/clanChallenges';
 import { calculateXpGain, getLevelFromXp } from '../../src/utils/xp';
 import { inFlightWrites } from '../../server';
 import { checkAchievements } from '../achievements';
@@ -93,12 +93,13 @@ export class MatchCloser {
       agendaName: string | undefined;
       newAchievementIds: string[];
       completedChallengeIds: { id: import('../../shared/types').ChallengeId; xpReward: number; ipReward: number }[];
+      clanXpEarned: number;
       opponentAverageElo: number;
       matchRecord: Parameters<typeof saveMatchResult>[0];
     };
     const results: PlayerResult[] = [];
     const clanChallengesToSave = new Map<string, import('../../shared/types').ClanChallengeData>();
-    const clanXpRewards = new Map<string, number>();
+    const userClanXp = new Map<string, number>(); // userId -> xp amount to contribute
 
     const civilElos = humanPlayers
       .filter((p) => p.role === 'Civil')
@@ -136,6 +137,7 @@ export class MatchCloser {
       let agendaCompleted = false;
       let newAchievementIds: string[] = [];
       let challengeResult: ReturnType<typeof evaluateChallenges> | undefined;
+      let clanXpEarned = 0;
       const opponentAvgElo = p.role === 'Civil' ? avgStateElo : avgCivilElo;
 
       if (!isInconclusive) {
@@ -244,9 +246,13 @@ export class MatchCloser {
               const clanResult = evaluateClanChallenges(clanData, clanCtx);
               clanChallengesToSave.set(clanId, clanResult.updated);
               
-              if (clanResult.xpReward > 0) {
-                clanXpRewards.set(clanId, (clanXpRewards.get(clanId) ?? 0) + clanResult.xpReward);
+              // New: Each game played contributes XP to the clan directly
+              const baseClanXp = calculateClanXpGain(clanCtx);
+              const totalContribution = baseClanXp + clanResult.xpReward;
+              if (totalContribution > 0) {
+                userClanXp.set(user.id, totalContribution);
               }
+              clanXpEarned = totalContribution;
             }
           } catch (err) {
             logger.error({ err, userId: user.id }, 'Clan challenge evaluation failed');
@@ -304,6 +310,7 @@ export class MatchCloser {
           : undefined,
         newAchievementIds,
         completedChallengeIds: challengeResult?.completedThisGame ?? [],
+        clanXpEarned,
         opponentAverageElo: opponentAvgElo,
         matchRecord: {
           id: randomUUID(),
@@ -369,8 +376,8 @@ export class MatchCloser {
       ...Array.from(clanChallengesToSave.entries()).map(([cid, data]) => 
         saveClanChallenges(cid, data)
       ),
-      ...Array.from(clanXpRewards.entries()).map(([cid, amount]) =>
-        incrementClanXp(cid, amount)
+      ...Array.from(userClanXp.entries()).map(([uid, amount]) =>
+        contributeClanXp(uid, amount)
       ),
     ]);
 
@@ -389,6 +396,8 @@ export class MatchCloser {
           opponentAverageElo: r.opponentAverageElo,
           xpEarned: r.xpEarned,
           ipEarned: r.ipEarned,
+          cpEarned: r.cpEarned,
+          clanXpEarned: r.clanXpEarned,
           agendaName: r.agendaName,
           agendaCompleted: r.agendaCompleted,
           rounds: s.round,

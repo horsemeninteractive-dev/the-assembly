@@ -161,7 +161,7 @@ export const GameOverModal = ({
                       </span>
                     </div>
 
-                    <div className="grid grid-cols-3 gap-2">
+                    <div className={cn("grid gap-2", postMatchResult.clanXpEarned ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-3")}>
                       {isRanked ? (
                         <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                           <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
@@ -209,6 +209,17 @@ export const GameOverModal = ({
                           +{postMatchResult.ipEarned}
                         </span>
                       </div>
+
+                      {postMatchResult.clanXpEarned !== undefined && postMatchResult.clanXpEarned > 0 && (
+                        <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
+                          <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
+                            <Shield className="w-3 h-3" /> Clan XP
+                          </div>
+                          <span className="text-blue-400 font-mono text-sm font-bold">
+                            +{postMatchResult.clanXpEarned}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}

@@ -20,6 +20,7 @@ interface PlayerGridProps {
   isVideoActive: boolean;
   isSpectator?: boolean;
   isHost?: boolean;
+  reactions: Record<string, { reaction: string; timestamp: number }>;
 }
 
 export const PlayerGrid = ({
@@ -35,6 +36,7 @@ export const PlayerGrid = ({
   isVideoActive,
   isSpectator = false,
   isHost = false,
+  reactions,
 }: PlayerGridProps) => {
   const isPresidentialCandidate = !!me?.isPresidentialCandidate;
   const isPresident = !!me?.isPresident;
@@ -77,6 +79,7 @@ export const PlayerGrid = ({
               stream={stream}
               isVideoActive={isVideoActive}
               speakingPlayers={speakingPlayers}
+              reaction={reactions[p.id]?.reaction}
               playSound={playSound}
               setSelectedPlayerId={setSelectedPlayerId}
               me={me}

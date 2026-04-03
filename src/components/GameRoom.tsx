@@ -176,6 +176,60 @@ export const GameRoom = ({
     setSpeakingPlayers,
   });
 
+  const [reactions, setReactions] = useState<Record<string, { reaction: string; timestamp: number }>>({});
+
+  useEffect(() => {
+    socket.on('reaction', ({ playerId, reaction }) => {
+      setReactions((prev) => ({
+        ...prev,
+        [playerId]: { reaction, timestamp: Date.now() },
+      }));
+      
+      // Auto-clear after 3 seconds
+      setTimeout(() => {
+        setReactions((prev) => {
+          const current = prev[playerId];
+          if (current && Date.now() - current.timestamp >= 3000) {
+            const next = { ...prev };
+            delete next[playerId];
+            return next;
+          }
+          return prev;
+        });
+      }, 3000);
+    });
+    
+    return () => {
+      socket.off('reaction');
+    };
+  }, []);
+
+  useEffect(() => {
+    // Monitor connection health via a simple ping-pong
+    const interval = setInterval(() => {
+      if (!socket.connected) return;
+      const start = Date.now();
+      
+      // If the server doesn't respond within 1.5s, mark as lagging
+      const timeout = setTimeout(() => {
+        socket.emit('setLagging', true);
+      }, 1500);
+
+      socket.emit('ping-server', () => {
+        clearTimeout(timeout);
+        const latency = Date.now() - start;
+        // Threshold: 300ms for lagging
+        if (latency > 300) {
+          socket.emit('setLagging', true);
+        } else {
+          socket.emit('setLagging', false);
+        }
+      });
+    }, 5000);
+    
+    return () => clearInterval(interval);
+  }, []);
+
   const [peekedPolicies, setPeekedPolicies] = useState<Policy[] | null>(null);
   const [peekTitle, setPeekTitle] = useState<string | undefined>(undefined);
   const [investigationResult, setInvestigationResult] = useState<{
@@ -311,6 +365,7 @@ export const GameRoom = ({
             gameState={gameState}
             me={me}
             speakingPlayers={speakingPlayers}
+            reactions={reactions}
             playSound={playSound}
             token={token || ''}
             selectedPlayerId={selectedPlayerId}

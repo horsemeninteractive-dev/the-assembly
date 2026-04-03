@@ -145,3 +145,5 @@ export const titleAbilityDataSchema = z.discriminatedUnion('use', [
   }),
 ]);
 
+export const sendReactionSchema = z.string().min(1).max(64);
+

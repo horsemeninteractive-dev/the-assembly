@@ -179,6 +179,7 @@ export interface PostMatchResult {
   xpEarned: number;
   ipEarned: number;
   cpEarned: number;
+  clanXpEarned?: number;
   agendaName?: string;
   agendaCompleted: boolean;
   rounds: number;
@@ -416,6 +417,7 @@ export interface Player {
   isMicOn?: boolean;
   isCamOn?: boolean;
   assassinKilledId?: string;
+  isLagging?: boolean;
   clanTag?: string; // populated from user.clan.tag at join time — display only
   clanEmblem?: ClanEmblem; // populated from user.clan.emblem at join time
 }
@@ -543,6 +545,7 @@ export interface GameState {
 }
 
 export interface ServerToClientEvents {
+  reaction: (data: { playerId: string; reaction: string }) => void;
   gameStateUpdate: (state: GameState) => void;
   error: (message: string) => void;
   privateInfo: (info: {
@@ -575,6 +578,9 @@ export interface ServerToClientEvents {
 }
 
 export interface ClientToServerEvents {
+  sendReaction: (reaction: string) => void;
+  setLagging: (isLagging: boolean) => void;
+  'ping-server': (callback: () => void) => void;
   userConnected: (data: { userId: string; token: string }) => void;
   joinRoom: (data: {
     roomId: string;
