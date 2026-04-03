@@ -41,6 +41,7 @@ export function registerPublicRoutes({ app }: RouteContext): void {
         earnedAchievementsCount: (user.earnedAchievements ?? []).length,
         activeFrame: user.activeFrame ?? null,
         activeBackground: user.activeBackground ?? null,
+        clan: user.clan ?? null,
       };
 
       // Cache for 60s to reduce DB load from viral sharing
@@ -48,6 +49,55 @@ export function registerPublicRoutes({ app }: RouteContext): void {
       res.json({ profile: publicProfile });
     } catch (err) {
       logger.error({ err }, 'Error fetching public player profile');
+      res.status(500).json({ error: 'Internal server error' });
+    }
+  });
+
+  /**
+   * GET /api/public/clan/:tag
+   * Returns public information about a clan.
+   */
+  app.get('/api/public/clan/:tag', publicLimiter, async (req: Request, res: Response) => {
+    try {
+      const { tag } = req.params;
+      const { getClanByTag, getClanMembers } = await import('../db/clans');
+
+      if (!tag || tag.length < 2 || tag.length > 5) {
+        return res.status(400).json({ error: 'Invalid clan tag' });
+      }
+
+      const clan = await getClanByTag(tag);
+      if (!clan) {
+        return res.status(404).json({ error: 'Clan not found' });
+      }
+
+      const members = await getClanMembers(clan.id);
+
+      // Map to safe public structure
+      const publicClan = {
+        id: clan.id,
+        tag: clan.tag,
+        name: clan.name,
+        description: clan.description,
+        emblem: clan.emblem,
+        xp: clan.xp,
+        level: clan.level,
+        memberCount: members.length,
+        createdAt: clan.createdAt,
+        members: members.map((m: any) => ({
+          username: m.username,
+          avatarUrl: m.avatarUrl,
+          activeFrame: m.activeFrame,
+          role: m.role,
+          xpContributed: m.xpContributed,
+          joinedAt: m.joinedAt,
+        })),
+      };
+
+      res.setHeader('Cache-Control', 'public, max-age=60, stale-while-revalidate=300');
+      res.json({ clan: publicClan });
+    } catch (err) {
+      logger.error({ err }, 'Error fetching public clan profile');
       res.status(500).json({ error: 'Internal server error' });
     }
   });

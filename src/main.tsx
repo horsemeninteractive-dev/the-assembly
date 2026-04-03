@@ -80,15 +80,24 @@ import { AuthProvider } from './contexts/AuthContext.tsx';
 import { AudioProvider } from './contexts/AudioContext.tsx';
 import { GameProvider } from './contexts/GameContext.tsx';
 import { PlayerCard } from './components/PlayerCard.tsx';
+import { ClanProfile } from './components/ClanProfile.tsx';
 
-// ── Route detection: /player/:username renders unauthenticated public profile ──
+// ── Route detection: Public profiles render unauthenticated ──
 const _playerRouteMatch = window.location.pathname.match(/^\/player\/([^/]+)\/?$/);
+const _clanRouteMatch = window.location.pathname.match(/^\/clan\/([^/]+)\/?$/);
 
 if (_playerRouteMatch) {
   const _playerUsername = decodeURIComponent(_playerRouteMatch[1]);
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
       <PlayerCard username={_playerUsername} />
+    </StrictMode>
+  );
+} else if (_clanRouteMatch) {
+  const _clanTag = decodeURIComponent(_clanRouteMatch[1]);
+  createRoot(document.getElementById('root')!).render(
+    <StrictMode>
+      <ClanProfile tag={_clanTag} />
     </StrictMode>
   );
 } else {

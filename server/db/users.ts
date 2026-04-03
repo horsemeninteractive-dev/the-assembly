@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import { randomUUID } from 'crypto';
 import { adminDb, isConfigured, withRetry } from './core';
-import { UserInternal } from '../../shared/types';
+import { UserInternal, ClanBadge } from '../../shared/types';
 import { logger } from '../logger';
 import { stateClient, isRedisConfigured } from '../redis';
 
@@ -57,6 +57,10 @@ export const SupabaseUserSchema = z.object({
   is_admin: z.boolean().nullable().default(false),
   is_banned: z.boolean().nullable().default(false),
   token_version: z.number().nullable().default(0),
+  challenges_data: z.any().nullable().optional(),
+  referral_code: z.string().nullable().optional(),
+  referred_by: z.string().nullable().optional(),
+  referral_processed: z.boolean().nullable().default(false),
 }).catchall(z.any());
 
 export function mapSupabaseToUser(data: any): UserInternal | null {
@@ -99,6 +103,23 @@ export function mapSupabaseToUser(data: any): UserInternal | null {
     isAdmin: !!validData.is_admin,
     isBanned: !!validData.is_banned,
     tokenVersion: validData.token_version ?? 0,
+    challengeData: (validData.challenges_data ?? undefined) as any,
+    referralCode: validData.referral_code ?? undefined,
+    referredBy: validData.referred_by ?? undefined,
+    referralProcessed: !!validData.referral_processed,
+    // Clan badge — populated when the query joins the clans table via clan_id
+    clan: data.clans
+      ? ({
+          id: data.clans.id,
+          tag: data.clans.tag,
+          name: data.clans.name,
+          emblem: {
+            iconId: data.clans.emblem_icon_id ?? 'Shield',
+            iconColor: data.clans.emblem_icon_color ?? '#FFFFFF',
+            bgColor: data.clans.emblem_bg_color ?? '#2A2A2A',
+          },
+        } as ClanBadge)
+      : undefined,
   };
 }
 
@@ -127,6 +148,10 @@ export function mapUserToSupabase(userData: UserInternal): Record<string, unknow
     is_banned: userData.isBanned,
     stats: userData.stats,
     token_version: userData.tokenVersion || 0,
+    challenges_data: userData.challengeData ?? null,
+    referral_code: userData.referralCode,
+    referred_by: userData.referredBy,
+    referral_processed: userData.referralProcessed,
   };
 }
 
@@ -134,7 +159,11 @@ export async function getUser(username: string): Promise<UserInternal | null> {
   if (isConfigured) {
     try {
       return await withRetry(async () => {
-        const { data, error } = await adminDb.from('users').select('*').eq('username', username).single();
+        const { data, error } = await adminDb
+          .from('users')
+          .select('*, clans:clan_id ( id, tag, name, emblem_icon_id, emblem_icon_color, emblem_bg_color )')
+          .eq('username', username)
+          .single();
         if (error) {
           if (error.code === 'PGRST116') return null;
           throw error;
@@ -152,7 +181,11 @@ export async function getUserById(id: string): Promise<UserInternal | null> {
   if (isConfigured) {
     try {
       return await withRetry(async () => {
-        const { data, error } = await adminDb.from('users').select('*').eq('id', id).single();
+        const { data, error } = await adminDb
+          .from('users')
+          .select('*, clans:clan_id ( id, tag, name, emblem_icon_id, emblem_icon_color, emblem_bg_color )')
+          .eq('id', id)
+          .single();
         if (error) {
           if (error.code === 'PGRST116') return null;
           throw error;
@@ -174,7 +207,10 @@ export async function getUsersByIds(ids: string[]): Promise<UserInternal[]> {
   if (isConfigured) {
     try {
       return await withRetry(async () => {
-        const { data, error } = await adminDb.from('users').select('*').in('id', ids);
+        const { data, error } = await adminDb
+          .from('users')
+          .select('*, clans:clan_id ( id, tag, name, emblem_icon_id, emblem_icon_color, emblem_bg_color )')
+          .in('id', ids);
         if (error) throw error;
         return (data as any[])
           .map(mapSupabaseToUser)
@@ -213,6 +249,19 @@ export async function getUserByDiscordId(discordId: string): Promise<UserInterna
   return null;
 }
 
+export async function getUserByReferralCode(code: string): Promise<UserInternal | null> {
+  if (!code) return null;
+  if (isConfigured) {
+    const { data, error } = await adminDb.from('users').select('*').eq('referral_code', code.toUpperCase()).single();
+    if (error) return null;
+    return mapSupabaseToUser(data);
+  }
+  for (const u of users.values()) {
+    if (u.referralCode?.toUpperCase() === code.toUpperCase()) return u;
+  }
+  return null;
+}
+
 export async function getUserByEmail(email: string): Promise<UserInternal | null> {
   if (isConfigured) {
     const { data, error } = await adminDb.from('users').select('*').eq('email', email).single();
@@ -237,8 +286,13 @@ export async function saveUser(userData: UserInternal): Promise<void> {
 }
 
 export function makeNewUser(overrides: Partial<UserInternal> = {}): UserInternal {
+  const id = overrides.id || randomUUID();
+  const referralCode =
+    overrides.referralCode ||
+    Math.random().toString(36).substring(2, 10).toUpperCase();
+
   return {
-    id: randomUUID(),
+    id,
     username: '',
     avatarUrl: undefined,
     stats: {
@@ -264,13 +318,18 @@ export function makeNewUser(overrides: Partial<UserInternal> = {}): UserInternal
       classicWins: 0,
       classicGames: 0,
     },
+    ownedCosmetics: [],
     cabinetPoints: 0,
     claimedRewards: [],
     earnedAchievements: [],
     pinnedAchievements: [],
     recentlyPlayedWith: [],
-    ownedCosmetics: ['music-ambient'],
+    isAdmin: false,
+    isBanned: false,
     tokenVersion: 0,
+    referralCode,
+    referredBy: undefined,
+    referralProcessed: false,
     ...overrides,
   };
 }

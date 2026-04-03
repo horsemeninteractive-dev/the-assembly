@@ -6,7 +6,7 @@ import { PurchaseCPModal } from '../PurchaseCPModal';
 import { TutorialModal } from '../TutorialModal';
 import { FriendRequestModal } from '../game/modals/FriendRequestModal';
 import { AnimatePresence, motion } from 'motion/react';
-import { Megaphone, X } from 'lucide-react';
+import { Megaphone, Shield, X } from 'lucide-react';
 import { useAuthContext } from '../../contexts/AuthContext';
 import { useAudioContext } from '../../contexts/AudioContext';
 import { useGameContext } from '../../contexts/GameContext';
@@ -43,7 +43,8 @@ export function ModalSection({ isPurchaseModalOpen, setIsPurchaseModalOpen }: { 
   const { token, showTutorial, handleTutorialComplete } = useAuthContext();
   const { playSound } = useAudioContext();
   const { 
-    pendingFriendRequest, setPendingFriendRequest, 
+    pendingFriendRequest, setPendingFriendRequest,
+    pendingClanInvite, setPendingClanInvite,
     adminBroadcast, setAdminBroadcast, 
     serverRestarting 
   } = useGameContext();
@@ -60,6 +61,36 @@ export function ModalSection({ isPurchaseModalOpen, setIsPurchaseModalOpen }: { 
         />
       )}
       <AnimatePresence>
+        {pendingClanInvite && (
+          <motion.div
+            key="clan-invite-toast"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-20 left-1/2 -translate-x-1/2 z-[10000] w-full max-w-sm px-4"
+          >
+            <div className="bg-card border border-brand/40 rounded-2xl p-4 shadow-xl flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-brand/10 border border-brand/30 flex items-center justify-center shrink-0">
+                <Shield className="w-4 h-4 text-brand" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-mono text-ghost uppercase tracking-wide">Clan invite</p>
+                <p className="text-sm text-primary leading-snug mt-0.5">
+                  <span className="font-medium">{pendingClanInvite.fromUsername}</span>
+                  {' invited you to '}
+                  <span className="font-medium font-mono">[{pendingClanInvite.clanTag}]</span>
+                </p>
+              </div>
+              <button
+                onClick={() => setPendingClanInvite(null)}
+                className="p-1 rounded-lg text-ghost hover:text-muted transition-colors shrink-0"
+                aria-label="Dismiss clan invite"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+          </motion.div>
+        )}
         {adminBroadcast && (
           <motion.div initial={{ opacity: 0, y: -50 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="fixed top-20 left-1/2 -translate-x-1/2 z-[10000] w-full max-w-md px-4">
             <div className="bg-yellow-900/90 border-2 border-yellow-500 text-yellow-100 rounded-3xl p-6 shadow-2xl backdrop-blur-xl flex gap-4 items-start">
@@ -94,5 +125,6 @@ export function ModalSection({ isPurchaseModalOpen, setIsPurchaseModalOpen }: { 
     </>
   );
 }
+
 
 

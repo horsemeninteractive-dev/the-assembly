@@ -14,6 +14,7 @@ import {
   getUser,
   getUserById,
   getUserByEmail,
+  getUserByReferralCode,
   saveUser,
   makeNewUser,
   createPasswordResetToken,
@@ -54,7 +55,7 @@ export function registerAuthRoutes({ app }: RouteContext): void {
     if (!result.success) {
       return res.status(400).json({ error: result.error.issues[0].message });
     }
-    const { username, password, email, avatarUrl } = result.data;
+    const { username, password, email, avatarUrl, ref } = result.data;
 
     if (await getUser(username)) {
       return res.status(400).json({ code: 'ALREADY_EXISTS', message: 'Username already exists' });
@@ -62,6 +63,18 @@ export function registerAuthRoutes({ app }: RouteContext): void {
     if (await getUserByEmail(email)) {
       return res.status(400).json({ code: 'ALREADY_EXISTS', message: 'Email already in use' });
     }
+
+    // Check for referral code
+    let referredBy: string | undefined = undefined;
+    const refCode = ref || (req.query.ref as string);
+    if (refCode) {
+      const referrer = await getUserByReferralCode(refCode);
+      if (referrer) {
+        referredBy = referrer.id;
+        logger.info(`User ${username} referred by ${referrer.username} (${refCode})`);
+      }
+    }
+
     const hashedPassword = await bcrypt.hash(password, 10);
     const newUser = makeNewUser({
       id: randomUUID(),
@@ -69,6 +82,7 @@ export function registerAuthRoutes({ app }: RouteContext): void {
       email,
       avatarUrl,
       password: hashedPassword,
+      referredBy,
     });
     await saveUser(newUser);
     const token = jwt.sign(

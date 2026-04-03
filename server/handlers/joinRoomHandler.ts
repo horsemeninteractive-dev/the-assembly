@@ -288,6 +288,7 @@ export async function handleJoinRoom(
     isAI: false,
     stateEnactments: 0,
     civilEnactments: 0,
+    ...(user?.clan ? { clanTag: user.clan.tag, clanEmblem: user.clan.emblem } : {}),
   };
 
   state.players.push(player);

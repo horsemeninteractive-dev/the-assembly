@@ -69,6 +69,7 @@ export const registerSchema = z.object({
   password: z.string().min(8),
   email: z.string().email('Invalid email address'),
   avatarUrl: z.string().url('Invalid avatar URL').max(2048).optional(),
+  ref: z.string().optional(),
 });
 
 export const loginSchema = z.object({

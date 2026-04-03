@@ -5,6 +5,7 @@ import { socket } from '../../socket';
 import { GameState, Player } from '../../../shared/types';
 import { getFrameStyles, getVoteStyles } from '../../utils/cosmetics';
 import { cn, getProxiedUrl } from '../../utils/utils';
+import { ClanEmblem } from '../clans/ClanEmblem';
 
 const VideoPlayer = React.memo(
   ({
@@ -396,7 +397,15 @@ export const PlayerCard = React.memo(
                 {p.name.replace(' (AI)', '')} {isMe && '(You)'}
               </div>
 
-              {/* Desktop badges */}
+              {/* Clan tag — shown under name when player has one */}
+              {p.clanTag && (
+                <div className="flex items-center gap-1 justify-center bg-card/40 rounded-full px-1.5 py-0.5 mt-0.5 border border-white/5">
+                  {p.clanEmblem && <ClanEmblem emblem={p.clanEmblem} size="xs" />}
+                  <div className="font-mono text-[7px] sm:text-[8px] text-ghost/70 truncate leading-none">
+                    {p.clanTag}
+                  </div>
+                </div>
+              )}
               <div
                 className={cn(
                   'flex flex-wrap gap-0.5 sm:gap-1 shrink-0',

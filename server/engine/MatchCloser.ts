@@ -11,7 +11,9 @@ import { randomUUID } from 'crypto';
 import { GameState, UserInternal, RecentlyPlayedEntry } from '../../shared/types';
 import { logger } from '../logger';
 import { getUserById, saveUser, saveMatchResult, incrementGlobalWin, saveMatchAndUserAtomic } from '../supabaseService';
-import { calculateXpGain } from '../../src/utils/xp';
+import { contributeClanXp, getClanById, saveClanChallenges, incrementClanXp } from '../db/clans';
+import { refreshClanChallenges, evaluateClanChallenges, ClanChallengeContext } from '../game/clanChallenges';
+import { calculateXpGain, getLevelFromXp } from '../../src/utils/xp';
 import { inFlightWrites } from '../../server';
 import { checkAchievements } from '../achievements';
 import { refreshChallenges, saveChallengeData } from '../db/challenges';
@@ -95,6 +97,8 @@ export class MatchCloser {
       matchRecord: Parameters<typeof saveMatchResult>[0];
     };
     const results: PlayerResult[] = [];
+    const clanChallengesToSave = new Map<string, import('../../shared/types').ClanChallengeData>();
+    const clanXpRewards = new Map<string, number>();
 
     const civilElos = humanPlayers
       .filter((p) => p.role === 'Civil')
@@ -203,8 +207,18 @@ export class MatchCloser {
         // ── Challenge evaluation ─────────────────────────────────────────
         const challengeCtx: ChallengeContext = { s, p, won, agendaCompleted };
         const freshChallengeData = refreshChallenges(user);
-        const challengeResult = evaluateChallenges(freshChallengeData, challengeCtx);
+        challengeResult = evaluateChallenges(freshChallengeData, challengeCtx);
         user.challengeData = challengeResult.updatedChallengeData;
+
+        if (challengeResult.completedThisGame.length > 0) {
+          logger.info({ 
+            userId: user.id, 
+            challenges: challengeResult.completedThisGame.map(c => c.id),
+            totalXp: challengeResult.totalXp
+          }, 'User completed individual challenges');
+        } else {
+          logger.debug({ userId: user.id }, 'No individual challenges completed this game');
+        }
 
         xpEarned = Math.floor((xpGain + agendaXp + achievementXp) * xpMult);
         ipEarned = Math.floor((baseIp + agendaIp) * ipMult);
@@ -213,7 +227,57 @@ export class MatchCloser {
         ipEarned += challengeResult.totalIp;
         cpEarned = achievementCp;
 
+        // ── Clan Challenge evaluation ────────────────────────────────────
+        if (user.clan?.id) {
+          try {
+            const clanId = user.clan.id;
+            let clanData = clanChallengesToSave.get(clanId);
+            if (!clanData) {
+              const fetchedClan = await getClanById(clanId);
+              if (fetchedClan) {
+                clanData = refreshClanChallenges(fetchedClan.challenges);
+              }
+            }
+
+            if (clanData) {
+              const clanCtx: ClanChallengeContext = { s, p, won, agendaCompleted };
+              const clanResult = evaluateClanChallenges(clanData, clanCtx);
+              clanChallengesToSave.set(clanId, clanResult.updated);
+              
+              if (clanResult.xpReward > 0) {
+                clanXpRewards.set(clanId, (clanXpRewards.get(clanId) ?? 0) + clanResult.xpReward);
+              }
+            }
+          } catch (err) {
+            logger.error({ err, userId: user.id }, 'Clan challenge evaluation failed');
+          }
+        }
+
+        const levelBefore = getLevelFromXp(oldXp);
         user.stats.xp = oldXp + xpEarned;
+        const levelAfter = getLevelFromXp(user.stats.xp);
+
+        // ── Referral milestone check ─────────────────────────────────────
+        if (levelBefore < 15 && levelAfter >= 15 && user.referredBy && !user.referralProcessed) {
+          try {
+            const referrer = await getUserById(user.referredBy);
+            if (referrer) {
+              const reward = 150;
+              referrer.cabinetPoints = (referrer.cabinetPoints || 0) + reward;
+              await saveUser(referrer);
+              logger.info({ 
+                userId: user.id, 
+                referrerId: referrer.id, 
+                reward 
+              }, `Referral milestone reached: ${user.username} hit lvl 15. Referrer ${referrer.username} rewarded.`);
+            }
+            user.referralProcessed = true;
+            user.cabinetPoints = (user.cabinetPoints || 0) + 150; // New player also gets reward
+          } catch (err) {
+            logger.error({ err, userId: user.id }, 'Referral processing error');
+          }
+        }
+        
         user.stats.points = oldIp + ipEarned;
       } else if (isLeaver) {
         user.stats.gamesPlayed++;
@@ -292,11 +356,22 @@ export class MatchCloser {
         .slice(0, 20);
     }
 
+    // ── Individual Writes ──────────────────────────────────────────────────
+    logger.info({ 
+      room: s.roomId, 
+      count: results.length,
+      clanChallenges: clanChallengesToSave.size 
+    }, 'Saving match results for all players');
+
     await Promise.all([
+      // saveMatchAndUserAtomic already includes challenges_data via mapUserToSupabase
       ...results.map((r) => saveMatchAndUserAtomic(r.user, r.matchRecord)),
-      ...results
-        .filter((r) => r.user.challengeData)
-        .map((r) => saveChallengeData(r.user.id, r.user.challengeData!)),
+      ...Array.from(clanChallengesToSave.entries()).map(([cid, data]) => 
+        saveClanChallenges(cid, data)
+      ),
+      ...Array.from(clanXpRewards.entries()).map(([cid, amount]) =>
+        incrementClanXp(cid, amount)
+      ),
     ]);
 
     for (const r of results) {

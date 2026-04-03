@@ -7,4 +7,5 @@ export * from './config';
 export * from './achievements';
 export * from './shop';
 export * from './challenges';
+export * from './clans';
 

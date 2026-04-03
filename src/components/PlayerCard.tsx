@@ -7,7 +7,8 @@ import {
 } from 'lucide-react';
 import { getRankTier, getRankLabel } from '../utils/ranks';
 import { ACHIEVEMENT_MAP } from '../utils/achievements';
-import { apiUrl, cn } from '../utils/utils';
+import { apiUrl, cn, getProxiedUrl } from '../utils/utils';
+import { ClanEmblem } from './clans/ClanEmblem';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -42,6 +43,16 @@ interface PublicProfile {
   earnedAchievementsCount: number;
   activeFrame: string | null;
   activeBackground: string | null;
+  clan: {
+    id: string;
+    tag: string;
+    name: string;
+    emblem: {
+      iconId: string;
+      iconColor: string;
+      bgColor: string;
+    };
+  } | null;
 }
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -363,7 +374,7 @@ export function PlayerCard({ username }: { username: string }) {
                   <div className={cn('shrink-0 w-20 h-20 rounded-2xl border-2 overflow-hidden', rankTier?.border ?? 'border-subtle')}>
                     {profile.avatarUrl ? (
                       <img
-                        src={profile.avatarUrl}
+                        src={getProxiedUrl(profile.avatarUrl)}
                         alt={profile.username}
                         className="w-full h-full object-cover"
                         onError={(e) => {
@@ -384,8 +395,22 @@ export function PlayerCard({ username }: { username: string }) {
                     <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-muted mb-0.5">
                       Player Profile
                     </div>
-                    <div className="text-2xl font-thematic tracking-wide text-primary leading-tight break-all">
-                      {profile.username}
+                    <div className="flex items-center gap-2">
+                      <div className="text-2xl font-thematic tracking-wide text-primary leading-tight break-all">
+                        {profile.username}
+                      </div>
+                      {profile.clan && (
+                        <a
+                          href={`/clan/${profile.clan.tag}`}
+                          className="flex items-center gap-1.5 px-2 py-0.5 rounded-lg bg-card border border-subtle hover:border-brand transition-colors group/clan"
+                          title={`${profile.clan.name} [${profile.clan.tag}]`}
+                        >
+                          <ClanEmblem emblem={profile.clan.emblem} size="xs" />
+                          <span className="text-[10px] font-mono font-bold text-ghost group-hover/clan:text-primary transition-colors">
+                            {profile.clan.tag}
+                          </span>
+                        </a>
+                      )}
                     </div>
 
                     {/* Rank badge */}

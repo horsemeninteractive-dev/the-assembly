@@ -37,6 +37,7 @@ import { InventoryTab as Inventory } from './profile/InventoryTab';
 import { FriendsList } from './profile/FriendsTab';
 import { AdminTools } from './profile/AdminTab';
 import { ChallengesTab } from './profile/ChallengesTab';
+import { ClanTab } from './profile/ClanTab';
 
 interface ProfileProps {
   user: User;
@@ -73,11 +74,13 @@ export const Profile: React.FC<ProfileProps> = ({
     | 'settings'
     | 'pass'
     | 'friends'
+    | 'clan'
     | 'inventory'
     | 'history'
     | 'achievements'
     | 'challenges'
     | 'admin'
+    | 'referrals'
   >('stats');
   
   const [error, setError] = useState('');
@@ -463,9 +466,11 @@ export const Profile: React.FC<ProfileProps> = ({
             { id: 'inventory', label: 'Inventory' },
             { id: 'achievements', label: 'Medals' },
             { id: 'challenges', label: 'Challenges' },
+            { id: 'clan', label: 'Clan' },
             { id: 'shop', label: 'Shop' },
             { id: 'pass', label: 'Pass' },
             { id: 'friends', label: 'Friends' },
+            { id: 'referrals', label: 'Referrals' },
             { id: 'history', label: 'History' },
             { id: 'settings', label: 'Settings' },
             ...(user.isAdmin ? [{ id: 'admin', label: 'Admin' }] : []),
@@ -502,12 +507,88 @@ export const Profile: React.FC<ProfileProps> = ({
           {activeTab === 'shop' && <ShopTab user={user} token={token} onUpdateUser={onUpdateUser} playSound={playSound} playPreview={playPreview} playingItemId={playingItemId} />}
           {activeTab === 'pass' && <PassTab user={user} token={token} onUpdateUser={onUpdateUser} playPreview={playPreview} playingItemId={playingItemId} setError={setError} />}
           {activeTab === 'friends' && <FriendsList user={user} token={token} roomId={roomId} onJoinRoom={onJoinRoom} mode={mode} playSound={playSound} />}
+          {activeTab === 'clan' && <ClanTab user={user} token={token} onUpdateUser={onUpdateUser} playSound={playSound} />}
           {activeTab === 'settings' && <SettingsTab user={user} token={token} onUpdateUser={onUpdateUser} playSound={playSound} settings={settings} />}
           {activeTab === 'admin' && <AdminTools adminId={user.id} token={token} />}
+          {activeTab === 'referrals' && <ReferralsTab user={user} playSound={playSound} />}
         </div>
       </motion.div>
     </div>
   );
 };
 
+function ReferralsTab({ user, playSound }: { user: User; playSound: (s: string) => void }) {
+  const [copied, setCopied] = React.useState(false);
+  const refLink = `https://theassembly.web.app/register?ref=${user.referralCode || user.id.substring(0, 8).toUpperCase()}`;
 
+  const copy = () => {
+    navigator.clipboard.writeText(refLink);
+    setCopied(true);
+    playSound('click');
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="space-y-6 max-w-lg mx-auto animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <div className="text-center space-y-2 mb-8">
+        <div className="w-16 h-16 bg-emerald-900/20 border border-emerald-500/30 rounded-3xl flex items-center justify-center mx-auto mb-4">
+          <Share2 className="w-8 h-8 text-emerald-400" />
+        </div>
+        <h2 className="text-2xl font-bold tracking-tight text-primary">Grow the Assembly</h2>
+        <p className="text-sm text-muted max-w-md mx-auto">
+          Invite new players to the secret chambers and earn rewards when they prove their loyalty.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 gap-4">
+        <div className="p-6 bg-elevated border border-subtle rounded-3xl space-y-4 relative overflow-hidden">
+          <div className="absolute top-0 right-0 p-4 opacity-10">
+            <Zap className="w-24 h-24 text-yellow-400" />
+          </div>
+          <div className="relative">
+            <h3 className="text-sm font-mono uppercase tracking-widest text-emerald-400 mb-1">Active Reward</h3>
+            <p className="text-lg font-semibold text-primary">150 Cabinet Points</p>
+            <p className="text-xs text-ghost mt-2 leading-relaxed">
+              Earned by <span className="text-primary font-bold underline">BOTH</span> you and your friend when they reach <span className="text-yellow-400 font-bold">Level 15</span>.
+            </p>
+          </div>
+        </div>
+
+        <div className="p-6 bg-elevated border border-brand/20 rounded-3xl space-y-4 shadow-xl shadow-brand/5">
+          <h3 className="text-xs font-mono uppercase tracking-widest text-faint">Your Referral Link</h3>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 bg-card border border-default px-4 py-3 rounded-2xl font-mono text-xs text-primary truncate">
+              {refLink}
+            </div>
+            <button
+              onClick={copy}
+              className={cn(
+                "p-3.5 rounded-2xl transition-all border",
+                copied 
+                  ? "bg-emerald-900/20 border-emerald-500/40 text-emerald-400 scale-95" 
+                  : "bg-surface border-default text-ghost hover:text-primary hover:border-brand"
+              )}
+            >
+              {copied ? <Check className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
+            </button>
+          </div>
+          <p className="text-[10px] font-mono text-faint uppercase text-center">
+            {copied ? "Link copied to clipboard!" : "Share this link with friends to start earning"}
+          </p>
+        </div>
+      </div>
+
+      <div className="p-6 bg-surface/50 border border-dotted border-default rounded-3xl mt-4">
+        <div className="flex items-start gap-3">
+          <Clock className="w-5 h-5 text-ghost mt-0.5 shrink-0" />
+          <div className="space-y-1">
+            <p className="text-xs font-semibold text-muted">Progress Tracking</p>
+            <p className="text-[11px] text-faint leading-relaxed">
+              Rewards are processed automatically once the referral target hits the level milestone. There is no limit to how many players you can refer.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

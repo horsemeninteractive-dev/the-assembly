@@ -196,6 +196,70 @@ export interface CosmeticItem {
   description?: string;
 }
 
+// ---------------------------------------------------------------------------
+// Clan types
+// ---------------------------------------------------------------------------
+
+export type ClanRole = 'owner' | 'officer' | 'member';
+
+export interface ClanEmblem {
+  iconId: string;
+  iconColor: string;
+  bgColor: string;
+}
+
+export interface ClanSummary {
+  id: string;
+  tag: string;
+  name: string;
+  description: string;
+  xp: number;
+  level: number;
+  emblem: ClanEmblem;
+  memberCount: number;
+}
+
+export interface Clan extends ClanSummary {
+  ownerId: string;
+  createdAt: string;
+  challenges?: ClanChallengeData;
+}
+
+export interface ClanMember {
+  clanId: string;
+  userId: string;
+  username: string;
+  avatarUrl?: string;
+  activeFrame?: string;
+  role: ClanRole;
+  xpContributed: number;
+  joinedAt: string;
+  isOnline: boolean;
+  currentRoomId?: string;
+}
+
+export interface ClanInvite {
+  id: string;
+  clanId: string;
+  clanName: string;
+  clanTag: string;
+  inviterId: string;
+  inviterName: string;
+  inviteeId: string;
+  status: 'pending' | 'accepted' | 'declined';
+  createdAt: string;
+}
+
+// Lightweight badge attached to User for in-game PlayerCard display
+export interface ClanBadge {
+  id: string;
+  tag: string;
+  name: string;
+  emblem: ClanEmblem;
+}
+
+// ---------------------------------------------------------------------------
+
 export interface User {
   id: string;
   username: string;
@@ -215,9 +279,12 @@ export interface User {
   earnedAchievements: Achievement[];
   pinnedAchievements: string[]; // up to 3 achievement IDs
   recentlyPlayedWith: RecentlyPlayedEntry[]; // up to 20 entries, most recent first
+  clan?: ClanBadge; // null when not in a clan
   isAdmin?: boolean;
   isBanned?: boolean;
   tokenVersion?: number;
+  referralCode?: string;
+  referredBy?: string;
 }
 
 export interface UserInternal extends User {
@@ -226,6 +293,7 @@ export interface UserInternal extends User {
   googleId?: string;
   discordId?: string;
   challengeData?: UserChallengeData;
+  referralProcessed?: boolean;
 }
 
 export type RoomPrivacy = 'public' | 'friends' | 'private';
@@ -265,6 +333,18 @@ export interface ActiveChallenge {
 }
 
 export interface UserChallengeData {
+  daily: ActiveChallenge[];
+  weekly: ActiveChallenge[];
+  seasonal: ActiveChallenge[];
+  dailyResetsAt: string;
+  weeklyResetsAt: string;
+  seasonEndsAt: string;
+  dailyPeriod: string;
+  weeklyPeriod: string;
+  seasonPeriod: string;
+}
+
+export interface ClanChallengeData {
   daily: ActiveChallenge[];
   weekly: ActiveChallenge[];
   seasonal: ActiveChallenge[];
@@ -336,6 +416,8 @@ export interface Player {
   isMicOn?: boolean;
   isCamOn?: boolean;
   assassinKilledId?: string;
+  clanTag?: string; // populated from user.clan.tag at join time — display only
+  clanEmblem?: ClanEmblem; // populated from user.clan.emblem at join time
 }
 
 export interface GameState {
@@ -477,6 +559,9 @@ export interface ServerToClientEvents {
   friendRequestAccepted: (data: { fromUserId: string }) => void;
   userStatusChanged: (data: { userId: string; isOnline: boolean; roomId?: string }) => void;
   friendInvite: (data: { fromUserId: string; fromUsername: string; roomId: string }) => void;
+  clanInviteReceived: (data: { inviteId: string; clanId: string; clanName: string; clanTag: string; fromUsername: string }) => void;
+  clanMemberJoined: (data: { clanId: string; userId: string; username: string }) => void;
+  clanXpUpdate: (data: { clanId: string; xp: number; level: number }) => void;
   powerUsed: (data: { role: string }) => void;
   queueDrained: () => void;
   postMatchResult: (result: PostMatchResult) => void;

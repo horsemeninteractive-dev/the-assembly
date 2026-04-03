@@ -18,6 +18,7 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
   const [error, setError] = useState<string | null>(null);
   const [pendingInvite, setPendingInvite] = useState<{ fromUsername: string; roomId: string } | null>(null);
   const [pendingFriendRequest, setPendingFriendRequest] = useState<{ fromUserId: string; fromUsername: string } | null>(null);
+  const [pendingClanInvite, setPendingClanInvite] = useState<{ inviteId: string; clanId: string; clanName: string; clanTag: string; fromUsername: string } | null>(null);
   const [adminBroadcast, setAdminBroadcast] = useState<{ message: string; sender: string } | null>(null);
   const [serverRestarting, setServerRestarting] = useState<string | null>(null);
 
@@ -117,6 +118,10 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
       playSound('notification');
       setTimeout(() => setAdminBroadcast(null), 10000);
     });
+    socket.on('clanInviteReceived', (data: { inviteId: string; clanId: string; clanName: string; clanTag: string; fromUsername: string }) => {
+      setPendingClanInvite(data);
+      playSound('notification');
+    });
     socket.on('serverRestarting', (message: string) => {
       setServerRestarting(message);
       setTimeout(() => {
@@ -139,6 +144,7 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
       socket.off('serverRestarting');
       socket.off('adminBroadcast');
       socket.off('hostChanged');
+      socket.off('clanInviteReceived');
     };
   }, [handleLeaveRoom, playSound, setUser]);
 
@@ -154,6 +160,8 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
     setPendingInvite,
     pendingFriendRequest,
     setPendingFriendRequest,
+    pendingClanInvite,
+    setPendingClanInvite,
     adminBroadcast,
     setAdminBroadcast,
     serverRestarting,
