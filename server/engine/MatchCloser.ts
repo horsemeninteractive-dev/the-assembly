@@ -162,6 +162,9 @@ export class MatchCloser {
         } else if (s.mode === 'Classic') {
           user.stats.classicGames = (user.stats.classicGames ?? 0) + 1;
           if (won) user.stats.classicWins = (user.stats.classicWins ?? 0) + 1;
+        } else if (s.mode === 'Crisis') {
+          user.stats.crisisGames = (user.stats.crisisGames ?? 0) + 1;
+          if (won) user.stats.crisisWins = (user.stats.crisisWins ?? 0) + 1;
         } else {
           user.stats.casualGames = (user.stats.casualGames ?? 0) + 1;
           if (won) user.stats.casualWins = (user.stats.casualWins ?? 0) + 1;

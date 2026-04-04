@@ -9,7 +9,7 @@ import { shuffle } from '../utils';
 // Generic helpers
 // ---------------------------------------------------------------------------
 
-export function pick<T>(arr: T[]): T | undefined {
+export function pick<T>(arr: T[] | readonly T[]): T | undefined {
   return arr.length === 0 ? undefined : arr[Math.floor(Math.random() * arr.length)];
 }
 

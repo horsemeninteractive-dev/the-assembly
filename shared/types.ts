@@ -28,7 +28,11 @@ export type TitleRole =
   | 'Broker'
   | 'Handler'
   | 'Auditor'
-  | 'Interdictor';
+  | 'Interdictor'
+  | 'Archivist'
+  | 'Herald'
+  | 'Quorum'
+  | 'Cipher';
 
 /** Typed payloads for each title ability action. */
 export type TitleAbilityData =
@@ -38,7 +42,11 @@ export type TitleAbilityData =
   | { use: true; role: 'Broker' }
   | { use: true; role: 'Handler' }
   | { use: true; role: 'Auditor' }
-  | { use: true; role: 'Interdictor'; targetId: string };
+  | { use: true; role: 'Interdictor'; targetId: string }
+  | { use: true; role: 'Archivist' }
+  | { use: true; role: 'Herald'; targetId: string; claim: string }
+  | { use: true; role: 'Quorum' }
+  | { use: true; role: 'Cipher'; targetId?: string; message: string };
 
 export type PersonalAgendaId =
   | 'chaos_agent'
@@ -85,7 +93,11 @@ export type TitlePromptContext =
   | { role: 'Strategist' }
   | { role: 'Broker' }
   | { role: 'Handler' }
-  | { role: 'Interdictor' };
+  | { role: 'Interdictor' }
+  | { role: 'Archivist' }
+  | { role: 'Herald' }
+  | { role: 'Quorum' }
+  | { role: 'Cipher' };
 export type GamePhase =
   | 'Lobby'
   | 'Nominate_Chancellor'
@@ -97,7 +109,11 @@ export type GamePhase =
   | 'Auditor_Action'
   | 'Assassin_Action'
   | 'Handler_Action'
+  | 'Herald_Action'
+  | 'Quorum_Action'
   | 'Executive_Action'
+  | 'Censure_Action'
+  | 'Snap_Election'
   | 'GameOver';
 export type ExecutiveAction =
   | 'Investigate'
@@ -105,7 +121,28 @@ export type ExecutiveAction =
   | 'Execution'
   | 'PolicyPeek'
   | 'None';
-export type GameMode = 'Casual' | 'Ranked' | 'Classic';
+export type GameMode = 'Casual' | 'Ranked' | 'Classic' | 'Crisis';
+
+export type EventCardId =
+  | 'state_of_emergency'
+  | 'blackout'
+  | 'snap_election'
+  | 'iron_mandate'
+  | 'open_session'
+  | 'censure_motion'
+  | 'veiled_proceedings'
+  | 'dead_mans_gambit'
+  | 'double_or_nothing';
+
+export type EventCardType = 'Immediate' | 'RoundDuration';
+
+export interface EventCard {
+  id: EventCardId;
+  name: string;
+  description: string;
+  type: EventCardType;
+  icon: string;
+}
 
 export interface Achievement {
   id: string;
@@ -144,6 +181,8 @@ export interface UserStats {
   casualGames: number;
   classicWins: number;
   classicGames: number;
+  crisisWins: number;
+  crisisGames: number;
 }
 
 export interface MatchSummary {
@@ -420,6 +459,8 @@ export interface Player {
   isLagging?: boolean;
   clanTag?: string; // populated from user.clan.tag at join time — display only
   clanEmblem?: ClanEmblem; // populated from user.clan.emblem at join time
+  cipherUsed?: boolean;
+  censureVoteId?: string;
 }
 
 export interface GameState {
@@ -470,7 +511,7 @@ export interface GameState {
     sender: string;
     text: string;
     timestamp: number;
-    type?: 'text' | 'declaration' | 'round_separator' | 'failed_election';
+    type?: 'text' | 'declaration' | 'round_separator' | 'failed_election' | 'system';
     declaration?: { civ: number; sta: number; type: 'President' | 'Chancellor' };
     round?: number;
   }[];
@@ -542,6 +583,26 @@ export interface GameState {
     executiveAction?: string;
   }[];
   averageElo?: number;
+  heraldLog?: { accuserId: string; targetId: string; claim: string; response: 'Confirmed' | 'Denied' }[];
+  heraldPendingResponse?: { targetId: string; claim: string };
+  isRevote?: boolean;
+  quorumRevotePending?: boolean;
+  snapElectionPhaseDone?: boolean;
+  // Crisis mode event card flags
+  activeEventCard?: EventCard;
+  eventCardLog?: EventCardId[];
+  electionTrackerFrozen?: boolean;
+  openSession?: boolean;
+  presidentDeclarationBlocked?: boolean;
+  censureMotionActive?: boolean;
+  censuredPlayerId?: string;
+  ghostVoterId?: string;
+  snapElectionActive?: boolean;
+  doubleTrackerOnFail?: boolean;
+  ironMandate?: boolean;
+  chatBlackout?: boolean;
+  snapElectionVolunteers?: string[];
+  chatBlackoutBuffer?: { senderId: string; senderName: string; text: string; timestamp: number }[];
 }
 
 export interface ServerToClientEvents {
@@ -575,6 +636,14 @@ export interface ServerToClientEvents {
   adminClearRedisSuccess: (message: string) => void;
   serverRestarting: (message: string) => void;
   hostChanged: (data: { newHostUserId: string }) => void;
+  archivistResult: (discard: Policy[]) => void;
+  heraldResponseRequired: (data: { targetId: string; claim: string }) => void;
+  heraldRecord: (data: { accuserId: string; targetId: string; claim: string; response: 'Confirmed' | 'Denied' }) => void;
+  cipherMessage: (data: { text: string }) => void;
+  eventCardDrawn: (card: EventCard) => void;
+  openSessionVotecast: (data: { playerId: string; vote: 'Aye' | 'Nay' }) => void;
+  ghostVoteReveal: (data: { playerId: string; vote: 'Aye' | 'Nay' }) => void;
+  blackoutReveal: (messages: { senderId: string; senderName: string; text: string; timestamp: number }[]) => void;
 }
 
 export interface ClientToServerEvents {
@@ -607,6 +676,7 @@ export interface ClientToServerEvents {
   chancellorPlay: (policyIdx: number) => void;
   performExecutiveAction: (targetId: string) => void;
   useTitleAbility: (abilityData: TitleAbilityData) => void;
+  heraldResponse: (response: 'Confirmed' | 'Denied') => void;
   sendMessage: (message: string) => void;
   declarePolicies: (data: {
     civ: number;
@@ -615,6 +685,8 @@ export interface ClientToServerEvents {
     drewSta?: number;
     type: 'President' | 'Chancellor';
   }) => void;
+  censureVote: (data: { targetId: string }) => void;
+  snapVolunteer: () => void;
   vetoRequest: () => void;
   vetoResponse: (agree: boolean) => void;
   voiceData: (data: ArrayBuffer) => void;

@@ -13,6 +13,8 @@ import {
   joinQueueSchema,
   signalSchema,
   sendReactionSchema,
+  heraldResponseSchema,
+  censureVoteSchema,
 } from '../game/schemas';
 import { sendFriendRequest, acceptFriendRequest } from '../supabaseService';
 import { getUserSocketId, getSocketId } from '../redis';
@@ -40,7 +42,8 @@ export function registerGameActionHandlers(
     if (!state || state.phase !== 'Voting') return;
 
     const player = state.players.find((p) => p.socketId === socket.id);
-    if (!player || !player.isAlive || player.hasActed) return;
+    if (!player || player.hasActed) return;
+    if (!player.isAlive && player.id !== state.ghostVoterId) return;
 
     if (state.detainedPlayerId === player.id) {
       socket.emit('error', { code: 'DETAINED', message: 'You are detained by the Interdictor and cannot vote this round.' });
@@ -50,10 +53,16 @@ export function registerGameActionHandlers(
     player.hasActed = true;
     player.vote = vote;
 
-    if (
-      state.players.filter((p) => p.isAlive && p.id !== state.detainedPlayerId && !p.vote)
-        .length === 0
-    ) {
+    if (state.openSession) {
+      io.to(roomId).emit('openSessionVotecast', { playerId: player.id, vote });
+    }
+
+    const aliveCount = state.players.filter((p) => p.isAlive && p.id !== state.detainedPlayerId).length;
+    const ghostVoted = state.ghostVoterId && state.players.find(p => p.id === state.ghostVoterId)?.vote ? 1 : 0;
+    const votesNeeded = aliveCount + (state.ghostVoterId ? 1 : 0);
+    const votesCast = state.players.filter(p => p.vote).length;
+
+    if (votesCast >= votesNeeded) {
       engine.handleVoteResult(state, roomId);
     } else {
       engine.broadcastState(roomId);
@@ -186,9 +195,38 @@ export function registerGameActionHandlers(
     if (!roomId) return;
     const state = engine.rooms.get(roomId);
     if (!state) return;
+
     const player = state.players.find((p) => p.socketId === socket.id);
-    if (!state.titlePrompt || !player || state.titlePrompt.playerId !== player.id) return;
+    if (!player) return;
+
+    // Cipher can use their power in parallel (no titlePrompt required)
+    if (abilityData.use && (abilityData as any).role === 'Cipher') {
+      await engine.handleTitleAbility(state, roomId, abilityData as any);
+      return;
+    }
+
+    if (!state.titlePrompt || state.titlePrompt.playerId !== player.id) return;
     await engine.handleTitleAbility(state, roomId, abilityData as any);
+  });
+
+  socket.on('heraldResponse', async (payload) => {
+    const result = heraldResponseSchema.safeParse(payload);
+    if (!result.success) return socket.emit('error', 'Invalid herald response data.');
+    const response = result.data;
+
+    const roomId = getRoom();
+    if (!roomId) return;
+    const state = engine.rooms.get(roomId);
+    if (!state || state.phase !== 'Herald_Action') return;
+
+    const player = state.players.find((p) => p.socketId === socket.id);
+    if (!player || player.id !== state.heraldPendingResponse?.targetId) return;
+
+    await engine.handleTitleAbility(state, roomId, {
+      use: true,
+      role: 'Herald',
+      agree: response === 'Confirmed',
+    } as any);
   });
 
   socket.on('vetoRequest', () => {
@@ -251,7 +289,22 @@ export function registerGameActionHandlers(
       type: 'text',
     });
     if (state.messages.length > 50) state.messages.shift();
-    engine.broadcastState(roomId);
+
+    if (state.chatBlackout) {
+      if (!state.chatBlackoutBuffer) state.chatBlackoutBuffer = [];
+      state.chatBlackoutBuffer.push({
+        senderId: player.id,
+        senderName: player.name,
+        text: sanitized,
+        timestamp: Date.now(),
+      });
+      // Do not broadcast to rivals; broadcast state will hide new messages if handled in client
+      // or we just don't broadcast state if we want total silence.
+      // But standard broadcastState is okay if the client UI filters them.
+      // Better to NOT broadcastState here to avoid leaking.
+    } else {
+      engine.broadcastState(roomId);
+    }
   });
   
   socket.on('sendReaction', (payload) => {
@@ -268,6 +321,52 @@ export function registerGameActionHandlers(
     if (!player || !player.isAlive) return;
 
     io.to(roomId).emit('reaction', { playerId: player.id, reaction });
+  });
+
+  socket.on('censureVote', (payload) => {
+    const result = censureVoteSchema.safeParse(payload);
+    if (!result.success) return;
+    const { targetId } = result.data;
+
+    const roomId = getRoom();
+    if (!roomId) return;
+    const state = engine.rooms.get(roomId);
+    if (!state || state.phase !== 'Censure_Action') return;
+
+    const player = state.players.find((p) => p.socketId === socket.id);
+    if (!player || !player.isAlive || player.hasActed) return;
+
+    // The current President cannot be censured
+    if (targetId === state.players[state.presidentIdx].id) {
+      socket.emit('error', 'The current President cannot be censured.');
+      return;
+    }
+
+    player.hasActed = true;
+    if (!player.censureVoteId) player.censureVoteId = targetId; // Need to add censureVoteId to Player type
+
+    const aliveCount = state.players.filter((p) => p.isAlive).length;
+    const votesCast = state.players.filter((p) => p.censureVoteId).length;
+
+    if (votesCast >= aliveCount) {
+      engine.roundManager.tallyCensure(state, roomId);
+    } else {
+      engine.broadcastState(roomId);
+    }
+  });
+
+  socket.on('snapVolunteer', () => {
+    const roomId = getRoom();
+    if (!roomId) return;
+    const state = engine.rooms.get(roomId);
+    if (!state || state.phase !== 'Snap_Election') return;
+
+    const player = state.players.find((p) => p.socketId === socket.id);
+    if (!player || !player.isAlive) return;
+
+    state.presidentIdx = state.players.indexOf(player);
+    state.snapElectionPhaseDone = true;
+    engine.startNomination(state, roomId);
   });
 
   socket.on('ping-server', (callback) => {

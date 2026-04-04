@@ -1,4 +1,4 @@
-const CACHE_NAME = 'assembly-v0.9.12'; // Bump version to force update
+const CACHE_NAME = 'assembly-v0.9.13'; // Bump version to force update
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

@@ -32,11 +32,13 @@ export function usePostMatchHandler({
     };
 
     socket.on('policyPeekResult', handlePeek);
+    socket.on('archivistResult', (policies: Policy[]) => handlePeek(policies, 'Archivist: Discard Pile'));
     socket.on('investigationResult', handleInvestigation);
     socket.on('postMatchResult', handlePostMatch);
 
     return () => {
       socket.off('policyPeekResult', handlePeek);
+      socket.off('archivistResult');
       socket.off('investigationResult', handleInvestigation);
       socket.off('postMatchResult', handlePostMatch);
     };

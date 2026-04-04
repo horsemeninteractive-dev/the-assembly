@@ -22,6 +22,8 @@ export const statsSchema = z.object({
   casualGames: z.number().int().min(0),
   classicWins: z.number().int().min(0),
   classicGames: z.number().int().min(0),
+  crisisWins: z.number().int().min(0),
+  crisisGames: z.number().int().min(0),
 });
 
 export const adminUpdateUserSchema = z.object({
@@ -44,7 +46,7 @@ export const joinRoomSchema = z.object({
   activeVotingStyle: z.string().optional(),
   maxPlayers: z.number().int().min(5).max(10).optional(),
   actionTimer: z.number().int().min(0).max(120).optional(),
-  mode: z.enum(['Casual', 'Ranked', 'Classic']).optional(),
+  mode: z.enum(['Casual', 'Ranked', 'Classic', 'Crisis']).optional(),
   isSpectator: z.boolean().optional(),
   privacy: z.enum(['public', 'private', 'friends']).optional(),
   inviteCode: z.string().optional(),
@@ -140,10 +142,29 @@ export const titleAbilityDataSchema = z.discriminatedUnion('use', [
   z.object({ use: z.literal(false) }),
   z.object({
     use: z.literal(true),
-    role: z.enum(['Assassin', 'Strategist', 'Broker', 'Handler', 'Auditor', 'Interdictor']),
+    role: z.enum([
+      'Assassin',
+      'Strategist',
+      'Broker',
+      'Handler',
+      'Auditor',
+      'Interdictor',
+      'Archivist',
+      'Herald',
+      'Quorum',
+      'Cipher',
+    ]),
     targetId: z.string().min(1).max(64).optional(),
+    claim: z.string().min(1).max(80).optional(),
+    message: z.string().min(1).max(80).optional(),
   }),
 ]);
 
+export const heraldResponseSchema = z.enum(['Confirmed', 'Denied']);
+
 export const sendReactionSchema = z.string().min(1).max(64);
+
+export const censureVoteSchema = z.object({
+  targetId: z.string().min(1).max(64),
+});
 

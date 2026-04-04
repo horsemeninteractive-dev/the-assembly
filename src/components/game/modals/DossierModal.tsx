@@ -17,8 +17,12 @@ const TITLE_ROLE_DESCRIPTIONS: Record<TitleRole, string> = {
   Strategist: 'Draw an extra policy (4 total) when you are President.',
   Broker: 'Force a re-nomination if the current one is unfavorable.',
   Handler: 'Swap the next two players in the presidential order.',
-  Auditor: 'Inspect the discarded policies.',
-  Interdictor: 'Detain a player for one round, preventing them from being nominated or voting.',
+  Auditor: 'Peek at the last 3 discarded policies after a legislative session.',
+  Interdictor: 'Detain a player for one round.',
+  Archivist: 'Inspect the entire Discard Pile once per game.',
+  Herald: 'Proclaim a player as Civil; they must publicly confirm or deny.',
+  Quorum: 'Call for an emergency re-vote during high-tension failed elections.',
+  Cipher: 'Send an anonymous dispatch to the room during the legislative phase.',
 };
 
 const AgendaStatusBadge = ({ status }: { status: AgendaStatus }) => {

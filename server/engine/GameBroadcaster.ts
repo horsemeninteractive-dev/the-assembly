@@ -65,11 +65,27 @@ export class GameBroadcaster {
       const isChancellor = player?.isChancellor === true;
 
       const tailoredPlayers = state.players.map((p) => {
-        const { role, titleRole, personalAgenda, ...rest } = p;
-        if (isGameOver) return { ...rest, role, titleRole, personalAgenda };
-        if (isAdmin || isSpectator) return { ...rest, role, titleRole, personalAgenda };
-        if (p.socketId === socketId) return { ...rest, role, titleRole, personalAgenda };
-        return rest;
+        const { role, titleRole, personalAgenda, vote, ...rest } = p;
+        
+        // Show all info if game is over, viewer is admin, or viewer is spectator
+        if (isGameOver || isAdmin || isSpectator) {
+          return { ...rest, role, titleRole, personalAgenda, vote };
+        }
+        
+        // Show current player their own private info and vote
+        if (p.socketId === socketId) {
+          return { ...rest, role, titleRole, personalAgenda, vote };
+        }
+        
+        // For other players:
+        // 1. Never show role/agenda/titleRole
+        // 2. ONLY show vote if 'Open Session' is active OR we are in the reveal phase
+        const showVote = state.openSession || state.phase === 'Voting_Reveal' || state.phase === 'GameOver';
+        
+        return { 
+          ...rest, 
+          vote: showVote ? vote : undefined 
+        };
       });
 
       const tailoredSpectatorRoles =
@@ -98,6 +114,7 @@ export class GameBroadcaster {
         chancellorPolicies: seeAllCards || isChancellor ? chancellorPolicies : [],
         presidentSaw: seeAllCards || isPresident ? presidentSaw : undefined,
         chancellorSaw: seeAllCards || isChancellor ? chancellorSaw : undefined,
+        messages: state.chatBlackout && !seeAllCards ? [] : state.messages,
       };
 
       const isRanked = state.mode === 'Ranked';

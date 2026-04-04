@@ -55,6 +55,9 @@ export class AIEngine {
         Broker: 'Nomination_Review',
         Strategist: 'Legislative_President',
         Auditor: 'Auditor_Action',
+        Archivist: 'Auditor_Action',
+        Herald: 'Herald_Action',
+        Quorum: 'Quorum_Action',
         Assassin: 'Assassin_Action',
         Handler: 'Handler_Action',
       };
@@ -82,6 +85,15 @@ export class AIEngine {
       case 'Legislative_President': {
         const president = s.players.find((p) => p.isPresident);
         if (president?.isAI) this.aiPresidentDiscard(s, roomId);
+
+        // Cipher parallel action: Cipher can act during Legislative_President
+        const cipher = s.players.find((p) => p.titleRole === 'Cipher' && !p.cipherUsed && p.isAlive && !p.isPresident);
+        if (cipher?.isAI && Math.random() > 0.6) {
+          setTimeout(() => {
+            const st = this.engine.rooms.get(roomId);
+            if (st && st.phase === 'Legislative_President') this.aiCipherDispatch(st, roomId, cipher);
+          }, 4000 + Math.random() * 6000);
+        }
         break;
       }
       case 'Legislative_Chancellor': {
@@ -94,6 +106,14 @@ export class AIEngine {
       case 'Executive_Action': {
         const president = s.players.find((p) => p.isPresident);
         if (president?.isAI) await this.aiExecutiveAction(s, roomId);
+        break;
+      }
+      case 'Censure_Action': {
+        this.aiCensureVotes(s, roomId);
+        break;
+      }
+      case 'Snap_Election': {
+        this.aiSnapVolunteer(s, roomId);
         break;
       }
     }
@@ -143,15 +163,16 @@ export class AIEngine {
     const president = s.players[s.presidentIdx];
 
     for (const ai of s.players.filter(
-      (p) => p.isAI && p.isAlive && !p.vote && p.id !== s.detainedPlayerId
+      (p) => p.isAI && (p.isAlive || p.id === s.ghostVoterId) && !p.vote && p.id !== s.detainedPlayerId
     )) {
       ai.vote = this.computeAIVote(ai, s, president, chancellor ?? null);
     }
 
-    const remaining = s.players.filter(
-      (p) => p.isAlive && p.id !== s.detainedPlayerId && !p.vote
-    ).length;
-    if (remaining === 0) this.engine.roundManager.tallyVotes(s, roomId);
+    const aliveVoters = s.players.filter((p) => p.isAlive && p.id !== s.detainedPlayerId);
+    const votesNeeded = aliveVoters.length + (s.ghostVoterId ? 1 : 0);
+    const votesCast = s.players.filter((p) => p.vote).length;
+
+    if (votesCast >= votesNeeded) this.engine.roundManager.tallyVotes(s, roomId);
     else this.engine.broadcastState(roomId);
   }
 
@@ -413,9 +434,92 @@ export class AIEngine {
         }
         break;
       }
+      case 'Archivist':
+        data = { use: true, role: 'Archivist' };
+        break;
+      case 'Herald': {
+        const targets = s.players.filter((p) => p.isAlive && p.id !== player.id);
+        const suspect = mostSuspicious(player, targets);
+        if (getSuspicion(player, suspect.id) > 0.6) {
+          data = {
+            use: true,
+            role: 'Herald',
+            targetId: suspect.id,
+            claim: `I assert that ${suspect.name} is Civil`,
+          };
+        }
+        break;
+      }
+      case 'Quorum': {
+        const chancellor = s.players.find((p) => p.isChancellorCandidate);
+        const suspiciousLevel = chancellor ? getSuspicion(player, chancellor.id) : 1;
+        // Only re-vote if we trust the chancellor candidate (suspicion < 0.4)
+        if (suspiciousLevel < 0.4) {
+          data = { use: true, role: 'Quorum' };
+        }
+        break;
+      }
     }
 
     await this.engine.titleRoleResolver.handleTitleAbility(s, roomId, data);
+  }
+
+  private aiCipherDispatch(s: GameState, roomId: string, ai: Player): void {
+    const targets = s.players.filter((p) => p.isAlive && p.id !== ai.id);
+    if (targets.length === 0) return;
+
+    let target: Player;
+    if (ai.role === 'Civil') {
+      target = leastSuspicious(ai, targets);
+    } else {
+      target = mostSuspicious(ai, targets);
+    }
+
+    const message = pick(CHAT.cipherDispatch)!;
+    this.engine.titleRoleResolver.handleTitleAbility(s, roomId, {
+      use: true,
+      role: 'Cipher',
+      targetId: target.id,
+      message,
+    });
+  }
+
+  private aiCensureVotes(s: GameState, roomId: string): void {
+    const aiPlayers = s.players.filter((p) => p.isAI && p.isAlive && !p.censureVoteId);
+    if (aiPlayers.length === 0) return;
+
+    for (const ai of aiPlayers) {
+      const targets = s.players.filter((p) => p.isAlive && p.id !== ai.id && p.id !== s.players[s.presidentIdx].id);
+      if (targets.length === 0) continue;
+
+      let target: Player;
+      if (ai.role === 'Civil' && ai.suspicion) {
+        target = mostSuspicious(ai, targets);
+      } else {
+        const civil = targets.filter((p) => p.role === 'Civil');
+        target = pick(civil) ?? pick(targets)!;
+      }
+      ai.censureVoteId = target.id;
+    }
+
+    const aliveCount = s.players.filter((p) => p.isAlive).length;
+    const votesCast = s.players.filter((p) => p.censureVoteId).length;
+
+    if (votesCast >= aliveCount) {
+      this.engine.roundManager.tallyCensure(s, roomId);
+    } else {
+      this.engine.broadcastState(roomId);
+    }
+  }
+
+  private aiSnapVolunteer(s: GameState, roomId: string): void {
+    const aiPlayers = s.players.filter((p) => p.isAI && p.isAlive);
+    const volunteer = aiPlayers.find((p) => (p.role === 'Overseer' || Math.random() > 0.7));
+    if (volunteer) {
+      s.presidentIdx = s.players.indexOf(volunteer);
+      s.snapElectionPhaseDone = true;
+      this.engine.roundManager.startNomination(s, roomId);
+    }
   }
 
   // ---------------------------------------------------------------------------
@@ -430,8 +534,19 @@ export class AIEngine {
   ): void {
     let text = lines[Math.floor(Math.random() * lines.length)];
     if (targetName) text = text.replace('{name}', targetName.replace(' (AI)', ''));
-    state.messages.push({ sender: ai.name, text, timestamp: Date.now(), type: 'text' });
-    if (state.messages.length > 50) state.messages.shift();
+    
+    if (state.chatBlackout) {
+      if (!state.chatBlackoutBuffer) state.chatBlackoutBuffer = [];
+      state.chatBlackoutBuffer.push({
+        senderId: ai.id,
+        senderName: ai.name,
+        text,
+        timestamp: Date.now(),
+      });
+    } else {
+      state.messages.push({ sender: ai.name, text, timestamp: Date.now(), type: 'text' });
+      if (state.messages.length > 50) state.messages.shift();
+    }
   }
 
   triggerAIReactions(

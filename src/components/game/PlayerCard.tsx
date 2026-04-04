@@ -87,7 +87,9 @@ export const PlayerCard = React.memo(
     setSelectedPlayerId,
     me,
   }: PlayerCardProps) => {
-    const prevVote = gameState.previousVotes?.[p.id];
+    const effectiveVote = p.vote || gameState.previousVotes?.[p.id];
+    // Don't show revealed vote flip for other players during normal voting 
+    const showVoteBack = (gameState.openSession && p.vote) || (gameState.phase === 'Voting_Reveal' && effectiveVote);
     const spectatorRole = isSpectator ? gameState.spectatorRoles?.[p.id] : undefined;
     const roleInfo = spectatorRole ? ROLE_LABELS[spectatorRole.role] : null;
 
@@ -190,6 +192,26 @@ export const PlayerCard = React.memo(
           </div>
         )}
 
+        {/* Herald Claim Badge */}
+        {gameState.heraldLog?.some(
+          (entry) => entry.targetId === p.id && entry.response === 'Confirmed'
+        ) && (
+          <div className="absolute top-0.5 left-8 z-20 pointer-events-none group/herald">
+            <div className="px-1 py-0.5 rounded text-[8px] font-bold leading-none border border-blue-500/30 bg-blue-900/90 text-blue-300 shadow-[0_0_8px_rgba(59,130,246,0.3)] animate-pulse">
+              CIVIL??
+            </div>
+          </div>
+        )}
+
+        {/* Quorum Revote Badge */}
+        {gameState.isRevote && p.isPresident && (
+          <div className="absolute -right-1 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
+            <div className="px-1 py-0.5 rounded-l text-[8px] font-mono leading-none bg-orange-900/90 text-orange-400 border border-orange-700/40 shadow-[0_0_10px_rgba(251,146,60,0.2)]">
+              REVOTE
+            </div>
+          </div>
+        )}
+
         {/* Declaration Indicators */}
         {(() => {
           // Only show declarations on cards once BOTH have declared
@@ -280,21 +302,24 @@ export const PlayerCard = React.memo(
 
         <motion.div
           animate={{
-            rotateY: prevVote ? 180 : 0,
-            scale: gameState.phase === 'Voting_Reveal' && prevVote ? [1, 1.05, 1] : 1,
+            rotateY: showVoteBack ? 180 : 0,
+            scale: (gameState.phase === 'Voting_Reveal' || gameState.openSession) && showVoteBack ? [1, 1.05, 1] : 1,
           }}
           transition={{
             duration: 0.6,
             type: 'spring',
             stiffness: 260,
             damping: 20,
-            delay: gameState.phase === 'Voting_Reveal' ? index * 0.15 : 0,
+            delay: (gameState.phase === 'Voting_Reveal' && !gameState.openSession) ? index * 0.15 : 0,
           }}
           className="w-full h-full relative preserve-3d"
         >
           {/* Front */}
           <div className="absolute inset-0 flex flex-col items-center justify-center backface-hidden">
             {stream && <VideoPlayer stream={stream} isMe={isMe} isVideoActive={showVideo} />}
+            {gameState.chatBlackout && showVideo && (
+              <div className="absolute inset-0 z-20 bg-blackout-static rounded-xl overflow-hidden pointer-events-none" />
+            )}
 
             <div
               className={cn(
@@ -403,27 +428,38 @@ export const PlayerCard = React.memo(
                 )}
               </div>
 
-              <div
-                className={cn(
-                  'font-thematic tracking-wide truncate px-1 leading-tight',
-                  stream && isVideoActive
-                    ? 'text-[7px] sm:text-[9px] bg-backdrop-sm rounded px-1'
-                    : 'text-[9px] sm:text-[11px]',
-                  p.isAlive ? 'text-primary/90' : 'text-ghost'
-                )}
-              >
-                {p.name.replace(' (AI)', '')} {isMe && '(You)'}
-              </div>
-
-              {/* Clan tag — shown under name when player has one */}
-              {p.clanTag && (
-                <div className="flex items-center gap-1 justify-center bg-card/40 rounded-full px-1.5 py-0.5 mt-0.5 border border-white/5">
-                  {p.clanEmblem && <ClanEmblem emblem={p.clanEmblem} size="xs" />}
-                  <div className="font-mono text-[7px] sm:text-[8px] text-ghost/70 truncate leading-none">
-                    {p.clanTag}
-                  </div>
+              <div className={cn(
+                "flex min-w-0 overflow-hidden",
+                showVideo ? "flex-row items-center gap-1" : "flex-col items-center"
+              )}>
+                <div
+                  className={cn(
+                    'font-thematic tracking-wide truncate px-1 leading-tight shrink-0 flex items-center gap-1',
+                    stream && isVideoActive
+                      ? 'text-[7px] sm:text-[9px] bg-backdrop-sm rounded px-1'
+                      : 'text-[9px] sm:text-[11px]',
+                    p.isAlive ? 'text-primary/90' : 'text-ghost'
+                  )}
+                >
+                  {p.name.replace(' (AI)', '')} {isMe && '(You)'}
+                  {p.isLagging && !p.isDisconnected && (
+                    <AlertCircle className="w-2 h-2 sm:w-3 sm:h-3 text-yellow-500 animate-pulse shrink-0" />
+                  )}
                 </div>
-              )}
+
+                {/* Clan tag — shown right of name when video active, under when not */}
+                {p.clanTag && (
+                  <div className={cn(
+                    "flex items-center gap-1 bg-card/40 rounded-full px-1.5 py-0.5 border border-white/5 shrink-0",
+                    showVideo ? "scale-[0.8] origin-left" : "mt-0.5"
+                  )}>
+                    {p.clanEmblem && <ClanEmblem emblem={p.clanEmblem} size="xs" />}
+                    <div className="font-mono text-[7px] sm:text-[8px] text-ghost/70 truncate leading-none">
+                      {p.clanTag}
+                    </div>
+                  </div>
+                )}
+              </div>
               <div
                 className={cn(
                   'flex flex-wrap gap-0.5 sm:gap-1 shrink-0',
@@ -448,6 +484,11 @@ export const PlayerCard = React.memo(
                 {!p.isAlive && (
                   <span className="px-1 sm:px-2 py-0.5 bg-red-900/20 text-red-500 font-mono uppercase rounded border border-red-900/50 text-[7px] sm:text-[9px]">
                     Eliminated
+                  </span>
+                )}
+                {gameState.censuredPlayerId === p.id && (
+                  <span className="px-1 sm:px-2 py-0.5 bg-red-900/40 text-red-400 font-mono uppercase rounded border border-red-500/50 text-[7px] sm:text-[9px] animate-pulse">
+                    Censured
                   </span>
                 )}
               </div>
@@ -487,7 +528,7 @@ export const PlayerCard = React.memo(
           <div
             className={cn(
               'absolute inset-0 flex flex-col items-center justify-center backface-hidden rotate-y-180 rounded-xl border-2 overflow-hidden',
-              getVoteStyles(p.activeVotingStyle, prevVote)
+              getVoteStyles(p.activeVotingStyle, effectiveVote)
             )}
           >
             {p.activeVotingStyle === 'vote-pass-0' && (
@@ -496,10 +537,10 @@ export const PlayerCard = React.memo(
               </div>
             )}
             <div className="text-2xl font-thematic uppercase tracking-widest leading-none">
-              {prevVote}
+              {effectiveVote}
             </div>
             <div className="text-[8px] font-mono uppercase mt-1">
-              ({prevVote === 'Aye' ? 'YES' : 'NO'})
+              ({effectiveVote === 'Aye' ? 'YES' : 'NO'})
             </div>
           </div>
         </motion.div>
@@ -574,6 +615,25 @@ export const PlayerCard = React.memo(
                   </button>
                 );
               }
+            } else if (gameState.titlePrompt.role === 'Herald') {
+              return (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    playSound('click');
+                    socket.emit('useTitleAbility', {
+                      use: true,
+                      role: 'Herald',
+                      targetId: p.id,
+                      claim: 'Civil',
+                    });
+                  }}
+                  aria-label={`Proclaim ${p.name.replace(' (AI)', '')} as Civil`}
+                  className="absolute inset-0 z-30 bg-emerald-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
+                >
+                  Proclaim Civil
+                </button>
+              );
             }
             return null;
           })()}
@@ -617,25 +677,14 @@ export const PlayerCard = React.memo(
           </div>
         )}
 
-        {/* Connection Status Indicator */}
-        {(p.isDisconnected || p.isLagging) && (
-          <div className="absolute inset-0 z-[60] pointer-events-none rounded-xl flex items-center justify-center bg-black/40 backdrop-blur-[1px]">
+        {/* Connection Status Indicator - Only show disconnected as full overlay */}
+        {p.isDisconnected && (
+          <div className="absolute inset-0 z-[60] pointer-events-none rounded-xl flex items-center justify-center bg-black/60 backdrop-blur-md">
             <div className="flex flex-col items-center gap-1">
-              {p.isDisconnected ? (
-                <>
-                  <WifiOff className="w-8 h-8 text-red-500 animate-pulse drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
-                  <span className="text-[10px] font-mono font-bold text-red-400 uppercase tracking-widest bg-black/80 px-2 py-0.5 rounded border border-red-500/30">
-                    Reconnecting
-                  </span>
-                </>
-              ) : (
-                <>
-                  <AlertCircle className="w-6 h-6 text-yellow-500 animate-bounce drop-shadow-[0_0_8px_rgba(234,179,8,0.6)]" />
-                  <span className="text-[8px] font-mono font-bold text-yellow-400 uppercase tracking-widest bg-black/80 px-1.5 py-0.5 rounded border border-yellow-500/30">
-                    Poor Connection
-                  </span>
-                </>
-              )}
+              <WifiOff className="w-8 h-8 text-red-500 animate-pulse drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
+              <span className="text-[10px] font-mono font-bold text-red-400 uppercase tracking-widest bg-black/80 px-2 py-0.5 rounded border border-red-500/30">
+                Reconnecting
+              </span>
             </div>
           </div>
         )}

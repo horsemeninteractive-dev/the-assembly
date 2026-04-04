@@ -40,21 +40,25 @@ export class RoundManager {
   // Action Timer
   // ═══════════════════════════════════════════════════════════════════════════
 
-  startActionTimer(roomId: string): void {
+  startActionTimer(roomId: string, durationMs?: number): void {
     const state = this.engine.rooms.get(roomId);
-    if (
-      !state ||
-      state.actionTimer === 0 ||
-      state.phase === 'Lobby' ||
-      state.phase === 'GameOver'
-    ) {
+    if (!state || state.phase === 'Lobby' || state.phase === 'GameOver') {
       if (state) state.actionTimerEnd = undefined;
       this.clearActionTimer(roomId);
       return;
     }
 
+    // Default to the room's configured timer if no override is provided.
+    // 0 means no timer.
+    const duration = durationMs !== undefined ? durationMs : state.actionTimer * 1000;
+    if (duration === 0) {
+      state.actionTimerEnd = undefined;
+      this.clearActionTimer(roomId);
+      return;
+    }
+
     this.clearActionTimer(roomId);
-    state.actionTimerEnd = Date.now() + state.actionTimer * 1000;
+    state.actionTimerEnd = Date.now() + duration;
 
     const handle = setTimeout(async () => {
       this.engine.actionTimers.delete(roomId);
@@ -62,7 +66,7 @@ export class RoundManager {
       if (!s || s.phase === 'Lobby' || s.phase === 'GameOver' || s.isPaused) return;
       s.actionTimerEnd = undefined;
       await this.onActionTimerExpired(s, roomId);
-    }, state.actionTimer * 1000);
+    }, duration);
 
     this.engine.actionTimers.set(roomId, handle);
   }
@@ -227,6 +231,9 @@ export class RoundManager {
     const prevId = state.presidentialOrder[prevPos];
     const prevIdx = state.players.findIndex((p) => p.id === prevId);
     state.presidentIdx = prevIdx !== -1 ? prevIdx : 0;
+    if (state.mode === 'Crisis') {
+      this.engine.crisisEngine.initDeck(roomId);
+    }
     addLog(state, 'Game started! Roles assigned.');
     this.nextRound(state, roomId, false);
   }
@@ -274,6 +281,9 @@ export class RoundManager {
       if (prevPres) prevPres.wasPresident = true;
       if (prevChan) prevChan.wasChancellor = true;
     }
+    if (state.activeEventCard) {
+      this.engine.crisisEngine.clearEventCard(state);
+    }
     this.resetPlayerActions(state);
     if (!skipAdvance) {
       if (state.handlerSwapPending !== undefined) {
@@ -294,6 +304,19 @@ export class RoundManager {
     state.round++;
     addLog(state, `--- Round ${state.round} Started ---`);
     ensureDeckHas(state, 4);
+    if (state.mode === 'Crisis') {
+      this.engine.crisisEngine.drawEventCard(state, roomId);
+      // Delay nomination if a crisis was drawn to let animation finish
+      if (state.activeEventCard) {
+        setTimeout(() => {
+          const s = this.engine.rooms.get(roomId);
+          if (s && s.phase !== 'GameOver') {
+            this.election.beginNomination(s, roomId);
+          }
+        }, 5000);
+        return;
+      }
+    }
     this.election.beginNomination(state, roomId);
   }
 
@@ -365,6 +388,10 @@ export class RoundManager {
 
   startNomination(state: GameState, roomId: string): void {
     this.election.beginNomination(state, roomId);
+  }
+
+  tallyCensure(s: GameState, roomId: string): void {
+    this.election.tallyCensure(s, roomId);
   }
 
   captureRoundHistory(s: GameState, policy: Policy, isChaos: boolean): void {

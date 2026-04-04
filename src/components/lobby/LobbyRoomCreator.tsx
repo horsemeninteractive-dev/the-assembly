@@ -12,7 +12,7 @@ interface LobbyRoomCreatorProps {
     roomId: string,
     maxPlayers?: number,
     actionTimer?: number,
-    mode?: 'Casual' | 'Ranked' | 'Classic',
+    mode?: 'Casual' | 'Ranked' | 'Classic' | 'Crisis',
     isSpectator?: boolean,
     privacy?: RoomPrivacy
   ) => void;
@@ -31,7 +31,7 @@ export const LobbyRoomCreator: React.FC<LobbyRoomCreatorProps> = ({
   const [newRoomName, setNewRoomName] = useState('');
   const [maxPlayers, setMaxPlayers] = useState(5);
   const [actionTimer, setActionTimer] = useState(60);
-  const [mode, setMode] = useState<'Casual' | 'Ranked' | 'Classic'>('Ranked');
+  const [mode, setMode] = useState<'Casual' | 'Ranked' | 'Classic' | 'Crisis'>('Ranked');
   const [privacy, setPrivacy] = useState<RoomPrivacy>('public');
 
   const handleCreateRoom = (e: React.FormEvent) => {
@@ -174,13 +174,30 @@ export const LobbyRoomCreator: React.FC<LobbyRoomCreatorProps> = ({
                   >
                     Classic
                   </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      playSound('click');
+                      setMode('Crisis');
+                    }}
+                    className={cn(
+                      'flex-1 py-[1vh] rounded-xl border text-responsive-xs font-mono uppercase tracking-widest transition-all',
+                      mode === 'Crisis'
+                        ? 'bg-purple-900/20 border-purple-500 text-purple-400'
+                        : 'bg-elevated border-subtle text-ghost'
+                    )}
+                  >
+                    Crisis
+                  </button>
                 </div>
                 <p className="text-[8px] text-ghost italic ml-1 pt-1">
                   {mode === 'Ranked'
                     ? 'ELO and full points awarded.'
                     : mode === 'Classic'
                       ? 'Standard roles/rules. No ELO, reduced points.'
-                      : 'No ELO changes, reduced points.'}
+                      : mode === 'Crisis'
+                        ? 'Round-based Event Cards. High risk, high points.'
+                        : 'No ELO changes, reduced points.'}
                 </p>
               </div>
 

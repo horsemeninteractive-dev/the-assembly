@@ -517,5 +517,14 @@ export const CHAT = {
     "This power is a burden I carry for all of you. It must be used.",
     "I am using this authority to bring clarity to a room clouded by doubt.",
   ],
+  // Anonymous Cipher dispatches
+  cipherDispatch: [
+    "A contact in the Secretariat suggests you are not what you seem.",
+    "The data stream is clear: stay the course and the Charter will prevail.",
+    "Vigilance is required. The shadows are deepening around the Assembly.",
+    "Do not trust the current administration. They are compromised.",
+    "The State's influence is localized. Look closer at your allies.",
+    "A coded message for you: the outcome of the next session is critical.",
+  ],
 } as const;
 

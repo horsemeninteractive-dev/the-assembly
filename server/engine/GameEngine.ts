@@ -29,6 +29,7 @@ import { RoundManager } from './RoundManager.ts';
 import { TitleRoleResolver, PostRoundContinuation } from './TitleRoleResolver.ts';
 import { MatchCloser } from './MatchCloser.ts';
 import { PauseManager } from './PauseManager.ts';
+import { CrisisEngine } from './CrisisEngine.ts';
 import type { IEngineCore } from './IEngineCore.ts';
 
 export type Deps = {
@@ -57,6 +58,7 @@ export class GameEngine implements IEngineCore {
   readonly titleRoleResolver: TitleRoleResolver;
   readonly matchCloser: MatchCloser;
   readonly pauseManager: PauseManager;
+  readonly crisisEngine: CrisisEngine;
 
   constructor({ io, getConfig }: Deps) {
     this.io = io;
@@ -68,6 +70,7 @@ export class GameEngine implements IEngineCore {
     this.titleRoleResolver = new TitleRoleResolver(this);
     this.matchCloser = new MatchCloser(this);
     this.pauseManager = new PauseManager(this);
+    this.crisisEngine = new CrisisEngine(this);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════
@@ -94,8 +97,8 @@ export class GameEngine implements IEngineCore {
     this.roundManager.clearActionTimer(roomId);
   }
 
-  startActionTimer(roomId: string): void {
-    this.roundManager.startActionTimer(roomId);
+  startActionTimer(roomId: string, durationMs?: number): void {
+    this.roundManager.startActionTimer(roomId, durationMs);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

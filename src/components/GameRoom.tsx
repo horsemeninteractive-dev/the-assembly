@@ -1,4 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
 import { socket } from '../socket';
 import { GameState, Role, Policy, User, PrivateInfo, PostMatchResult } from '../../shared/types';
 import { getBackgroundTexture } from '../utils/cosmetics';
@@ -12,6 +13,7 @@ import { PlayerGrid } from './game/PlayerGrid';
 import { ActionBar } from './game/ActionBar';
 import { PauseOverlay } from './game/PauseOverlay';
 import { PolicyAnimation } from './game/PolicyAnimation';
+import { CrisisAnimation } from './game/CrisisAnimation';
 
 import { AssemblyLog } from './game/panels/AssemblyLog';
 import { RoundHistory } from './game/panels/RoundHistory';
@@ -30,6 +32,7 @@ import { useWebRTC } from '../hooks/useWebRTC';
 import { useGameSounds } from '../hooks/useGameSounds';
 import { usePostMatchHandler } from '../hooks/usePostMatchHandler';
 import { useLegislativeHandler } from '../hooks/useLegislativeHandler';
+
 
 interface GameRoomProps {
   gameState: GameState;
@@ -260,6 +263,26 @@ export const GameRoom = ({
     showPolicyAnim,
     handleSubmitDeclaration,
   } = useLegislativeHandler({ gameState, me, socket });
+
+  const [activeCrisisToReveal, setActiveCrisisToReveal] = useState<typeof gameState.activeEventCard | null>(null);
+  const lastCrisisKeyRef = useRef<string>('');
+
+  const handleCrisisComplete = useCallback(() => {
+    setActiveCrisisToReveal(null);
+  }, []);
+
+  useEffect(() => {
+    if (!gameState.activeEventCard) {
+      lastCrisisKeyRef.current = '';
+      setActiveCrisisToReveal(null);
+      return;
+    }
+    const key = `${gameState.activeEventCard.id}-${gameState.round}`;
+    if (key !== lastCrisisKeyRef.current) {
+      lastCrisisKeyRef.current = key;
+      setActiveCrisisToReveal(gameState.activeEventCard);
+    }
+  }, [gameState.activeEventCard, gameState.round]);
 
   useGameSounds({
     gameState,
@@ -494,6 +517,18 @@ export const GameRoom = ({
 
       {/* Policy flip animation */}
       <PolicyAnimation gameState={gameState} show={showPolicyAnim} playSound={playSound} />
+
+      {/* Crisis event animation */}
+      <AnimatePresence>
+        {activeCrisisToReveal && (
+          <CrisisAnimation 
+            gameState={gameState} 
+            activeEvent={activeCrisisToReveal}
+            playSound={playSound} 
+            onComplete={handleCrisisComplete}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Panels */}
       <AssemblyLog

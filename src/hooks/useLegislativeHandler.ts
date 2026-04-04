@@ -81,12 +81,12 @@ export function useLegislativeHandler({
     const policyKey = `${gameState.lastEnactedPolicy.type}-${gameState.lastEnactedPolicy.playerId ?? ''}-${Math.floor(gameState.lastEnactedPolicy.timestamp / 1000)}`;
 
     let needed: 'President' | 'Chancellor' | null = null;
-    if (me.isPresident && presidentPromptedForRef.current !== policyKey) {
+    if (me.isPresident && !gameState.presidentDeclarationBlocked && presidentPromptedForRef.current !== policyKey) {
       presidentPromptedForRef.current = policyKey;
       needed = 'President';
     }
 
-    const presidentDeclared = gameState.declarations.some((d) => d.type === 'President');
+    const presidentDeclared = gameState.declarations.some((d) => d.type === 'President') || gameState.presidentDeclarationBlocked;
     if (me.isChancellor && presidentDeclared && chancellorPromptedForRef.current !== policyKey) {
       const policyEnactedThisTerm =
         (gameState.lastEnactedPolicy?.timestamp ?? 0) > chancellorSinceRef.current;

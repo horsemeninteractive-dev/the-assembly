@@ -15,6 +15,7 @@ export class ElectionManager {
           p.id !== presidentId &&
           p.id !== s.rejectedChancellorId &&
           p.id !== s.detainedPlayerId &&
+          p.id !== s.censuredPlayerId &&
           !p.wasChancellor &&
           !(alive > 5 && p.wasPresident)
       );
@@ -31,16 +32,40 @@ export class ElectionManager {
     s.chancellorSaw = undefined;
     s.lastEnactedPolicy = undefined;
     s.isStrategistAction = undefined;
+    s.heraldPendingResponse = undefined;
+    s.quorumRevotePending = undefined;
+    s.isRevote = undefined;
 
-    s.players[s.presidentIdx].isPresidentialCandidate = true;
-    addLog(s, `${s.players[s.presidentIdx].name} is the Presidential Candidate.`);
+    // Identify the Presidential Candidate immediately so they are visible during Crisis phases
+    const candidate = s.players[s.presidentIdx];
+    if (candidate) {
+      candidate.isPresidentialCandidate = true;
+      addLog(s, `${candidate.name} is the Presidential Candidate.`);
+    }
+
+    if (s.mode === 'Crisis' && s.censureMotionActive && !s.censuredPlayerId) {
+      this.round.enterPhase(s, roomId, 'Censure_Action');
+      return;
+    }
+
+    if (s.mode === 'Crisis' && s.snapElectionActive && !s.snapElectionPhaseDone) {
+      this.round.enterPhase(s, roomId, 'Snap_Election');
+      setTimeout(() => {
+        const state = this.round.engine.rooms.get(roomId);
+        if (state && state.phase === 'Snap_Election') {
+          state.snapElectionPhaseDone = true;
+          this.beginNomination(state, roomId);
+        }
+      }, 10000);
+      return;
+    }
 
     const interdictor = s.players.find(
       (p) =>
         p.titleRole === 'Interdictor' &&
         !p.titleUsed &&
         p.isAlive &&
-        p.id !== s.players[s.presidentIdx].id
+        p.id !== candidate?.id
     );
 
     if (interdictor && s.round > 1) {
@@ -52,7 +77,19 @@ export class ElectionManager {
       };
       this.round.enterPhase(s, roomId, 'Nomination_Review');
     } else {
-      this.round.enterPhase(s, roomId, 'Nominate_Chancellor');
+      const herald = s.players.find(
+        (p) => p.titleRole === 'Herald' && !p.titleUsed && p.isAlive && s.round > 1
+      );
+      if (herald) {
+        s.titlePrompt = {
+          playerId: herald.id,
+          role: 'Herald',
+          context: { role: 'Herald' },
+        };
+        this.round.enterPhase(s, roomId, 'Herald_Action');
+      } else {
+        this.round.enterPhase(s, roomId, 'Nominate_Chancellor');
+      }
     }
   }
 
@@ -125,6 +162,11 @@ export class ElectionManager {
 
     const aye = s.players.filter((p) => p.vote === 'Aye').length;
     const nay = s.players.filter((p) => p.vote === 'Nay').length;
+    
+    if (s.openSession) {
+      // In open session, votes were already emitted, but we clear them here
+    }
+
     s.players.forEach((p) => (p.vote = undefined));
 
     s.actionTimerEnd = Date.now() + 4000;
@@ -218,13 +260,47 @@ export class ElectionManager {
       }),
     });
 
-    s.electionTracker++;
-    if (s.electionTracker >= 3) {
-      await this.round.legislative.enactChaosPolicy(s, roomId);
+    const quorum = s.players.find(
+      (p) => p.titleRole === 'Quorum' && !p.titleUsed && p.isAlive && s.isRevote !== true
+    );
+
+    if (quorum) {
+      s.quorumRevotePending = true;
+      s.titlePrompt = {
+        playerId: quorum.id,
+        role: 'Quorum',
+        context: { role: 'Quorum' },
+      };
+      this.round.enterPhase(s, roomId, 'Quorum_Action');
     } else {
-      this.round.engine.aiEngine.triggerAIReactions(s, roomId, 'failed_vote');
-      this.round.nextRound(s, roomId, false);
+      if (!s.electionTrackerFrozen) {
+        s.electionTracker += s.doubleTrackerOnFail ? 2 : 1;
+      }
+      if (s.electionTracker >= 3) {
+        await this.round.legislative.enactChaosPolicy(s, roomId);
+      } else {
+        this.round.engine.aiEngine.triggerAIReactions(s, roomId, 'failed_vote');
+        this.round.nextRound(s, roomId, false);
+      }
     }
+  }
+
+  tallyCensure(s: GameState, roomId: string): void {
+    const tallies: Record<string, number> = {};
+    s.players.forEach((p) => {
+      if (p.censureVoteId) tallies[p.censureVoteId] = (tallies[p.censureVoteId] || 0) + 1;
+    });
+    let maxVotes = 0;
+    let winnerId: string | undefined;
+    for (const [pid, count] of Object.entries(tallies)) {
+      if (count > maxVotes) {
+        maxVotes = count;
+        winnerId = pid;
+      }
+    }
+    s.censuredPlayerId = winnerId;
+    s.players.forEach((p) => (p.censureVoteId = undefined));
+    this.round.startNomination(s, roomId);
   }
 }
 

@@ -12,6 +12,13 @@ import {
   Play,
   ShieldAlert,
   Smile,
+  AlertCircle,
+  EyeOff,
+  RotateCw,
+  Zap,
+  Shield,
+  UserMinus,
+  HelpCircle,
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Tooltip } from '../Tooltip';
@@ -50,6 +57,8 @@ export const ActionBar = ({
   setIsVideoActive,
 }: ActionBarProps) => {
   const [showReactions, setShowReactions] = React.useState(false);
+  const [showCipherInput, setShowCipherInput] = React.useState(false);
+  const [cipherMessage, setCipherMessage] = React.useState('');
   const isPresident = me?.isPresident;
   const isChancellor = me?.isChancellor;
 
@@ -81,10 +90,18 @@ export const ActionBar = ({
         return 'Chancellor is enacting a directive.';
       case 'Auditor_Action':
         return 'Auditor is inspecting the discard pile.';
+      case 'Herald_Action':
+        return 'Herald is making a public proclamation.';
+      case 'Quorum_Action':
+        return 'The Quorum is deciding on an emergency re-vote.';
       case 'Assassin_Action':
         return 'Assassin is choosing a target.';
       case 'Handler_Action':
         return 'Handler is using their power.';
+      case 'Censure_Action':
+        return 'The Assembly is debating a Censure Motion.';
+      case 'Snap_Election':
+        return 'Volunteers are stepping forward for the Snap Election.';
       case 'Executive_Action':
         switch (gameState.currentExecutiveAction) {
           case 'Investigate':
@@ -182,10 +199,76 @@ export const ActionBar = ({
           <div className="text-responsive-xs text-faint font-mono mt-1 leading-tight truncate min-h-[1.25em]">
             {(user && (user.stats?.gamesPlayed ?? 0) < 5 && phaseHint()) || '\u00A0'}
           </div>
+          {/* Cipher Parallel Action Button */}
+          {gameState.phase === 'Legislative_President' &&
+            me?.titleRole === 'Cipher' &&
+            !me.cipherUsed &&
+            !me.isPresident && (
+              <button
+                onClick={() => {
+                  playSound('click');
+                  setShowCipherInput(true);
+                }}
+                className="text-[10px] text-emerald-400 border border-emerald-400/30 px-2 py-0.5 rounded ml-2 hover:bg-emerald-400/10 transition-colors"
+                title="Send anonymous dispatch"
+              >
+                Cipher Active
+              </button>
+            )}
         </div>
+        
+        {/* Active Crisis Event Card (Integrated) */}
+        {gameState.activeEventCard && (
+          <Tooltip 
+            position="top"
+            content={
+              <div className="max-w-[200px] flex flex-col gap-1 py-1">
+                <div className="font-serif italic text-primary text-[12px] border-b border-white/10 pb-1 mb-1">
+                  {gameState.activeEventCard.name}
+                </div>
+                <div className="text-[10px] leading-relaxed text-zinc-300">
+                  {gameState.activeEventCard.description}
+                </div>
+              </div>
+            }
+          >
+            <motion.div 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 cursor-help"
+            >
+              <div className="shrink-0 text-primary">
+                {(() => {
+                  const id = gameState.activeEventCard.id;
+                  switch (id) {
+                    case 'state_of_emergency': return <AlertCircle className="w-3.5 h-3.5 text-red-400" />;
+                    case 'blackout': return <EyeOff className="w-3.5 h-3.5 text-zinc-400" />;
+                    case 'snap_election': return <RotateCw className="w-3.5 h-3.5 text-purple-400" />;
+                    case 'iron_mandate': return <Zap className="w-3.5 h-3.5 text-yellow-400" />;
+                    case 'open_session': return <Scale className="w-3.5 h-3.5 text-blue-400" />;
+                    case 'censure_motion': return <UserMinus className="w-3.5 h-3.5 text-white" />;
+                    case 'veiled_proceedings': return <Shield className="w-3.5 h-3.5 text-emerald-400" />;
+                    case 'dead_mans_gambit': return <HelpCircle className="w-3.5 h-3.5 text-cyan-400" />;
+                    case 'double_or_nothing': return <Zap className="w-3.5 h-3.5 text-orange-400" />;
+                    default: return <AlertCircle className="w-3.5 h-3.5 text-primary" />;
+                  }
+                })()}
+              </div>
+              <div className="min-w-0 max-w-[80px] sm:max-w-[120px]">
+                <div className="text-[8px] font-mono uppercase tracking-[0.15em] text-faint leading-none mb-0.5">
+                  Crisis Active
+                </div>
+                <div className="text-[11px] font-serif italic text-primary truncate leading-none">
+                  {gameState.activeEventCard.name}
+                </div>
+              </div>
+            </motion.div>
+          </Tooltip>
+        )}
+
         <div className="flex gap-2 items-center">
           <div className="relative">
-            <Tooltip content="Quick Reactions">
+            <Tooltip position="top" content="Quick Reactions">
               <button
                 aria-label="Toggle Reactions"
                 onMouseEnter={() => playSound('hover')}
@@ -228,7 +311,7 @@ export const ActionBar = ({
             </AnimatePresence>
           </div>
 
-          <Tooltip content={isVoiceActive ? 'Mute Mic' : 'Unmute Mic'}>
+          <Tooltip position="top" content={isVoiceActive ? 'Mute Mic' : 'Unmute Mic'}>
             <button
               aria-label={isVoiceActive ? 'Mute Mic' : 'Unmute Mic'}
               onMouseEnter={() => playSound('hover')}
@@ -248,7 +331,7 @@ export const ActionBar = ({
               )}
             </button>
           </Tooltip>
-          <Tooltip content={isVideoActive ? 'Stop Video' : 'Start Video'}>
+          <Tooltip position="top" content={isVideoActive ? 'Stop Video' : 'Start Video'}>
             <button
               aria-label={isVideoActive ? 'Stop Video' : 'Start Video'}
               onMouseEnter={() => playSound('hover')}
@@ -272,11 +355,84 @@ export const ActionBar = ({
       </div>
 
       {/* Action area - fixed height to prevent layout shift */}
-      <div className="px-[2vw] py-[1vh] sm:py-[1.5vh] h-[12vh] sm:h-[15vh] flex items-center justify-center">
+      <div className="px-[2vw] py-[1vh] sm:py-[1.5vh] h-[12vh] sm:h-[15vh] flex items-center justify-center relative">
+        {/* Cipher Input Overlay (Parallel) */}
+        {showCipherInput && (
+          <div className="absolute inset-0 z-50 bg-base/95 backdrop-blur-xl flex items-center justify-center px-4 animate-in fade-in zoom-in duration-300">
+            <div className="w-full max-w-lg flex flex-col gap-2">
+              <div className="flex items-center gap-2 mb-1">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] font-mono text-emerald-500 uppercase tracking-widest">
+                  Encrypted Dispatch Channel
+                </span>
+              </div>
+              <div className="flex gap-2">
+                <input
+                  autoFocus
+                  placeholder="Enter message (max 80 chars)..."
+                  maxLength={80}
+                  value={cipherMessage}
+                  onChange={(e) => setCipherMessage(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && cipherMessage.trim()) {
+                      playSound('click');
+                      socket.emit('useTitleAbility', {
+                        use: true,
+                        role: 'Cipher',
+                        message: cipherMessage.trim(),
+                      });
+                      setShowCipherInput(false);
+                      setCipherMessage('');
+                    } else if (e.key === 'Escape') {
+                      setShowCipherInput(false);
+                    }
+                  }}
+                  className="flex-1 bg-card border border-emerald-500/30 p-2 rounded-xl font-mono text-sm focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/20 outline-none transition-all placeholder:text-muted/40"
+                />
+                <button
+                  onClick={() => {
+                    if (cipherMessage.trim()) {
+                      playSound('click');
+                      socket.emit('useTitleAbility', {
+                        use: true,
+                        role: 'Cipher',
+                        message: cipherMessage.trim(),
+                      });
+                      setShowCipherInput(false);
+                      setCipherMessage('');
+                    }
+                  }}
+                  disabled={!cipherMessage.trim()}
+                  className="px-6 py-2 bg-emerald-600 hover:bg-emerald-550 text-white rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Send
+                </button>
+                <button
+                  onClick={() => setShowCipherInput(false)}
+                  className="px-4 py-2 bg-subtle hover:bg-muted-bg text-primary rounded-xl font-bold transition-all"
+                >
+                  Cancel
+                </button>
+              </div>
+              <div className="text-[9px] text-faint font-mono text-right uppercase tracking-[0.2em]">
+                {cipherMessage.length}/80 Characters
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Title Role Prompt */}
         {gameState.titlePrompt && gameState.titlePrompt.playerId === me?.id && (
           <div className="flex flex-col gap-[1vh] w-full justify-center h-full items-center">
-            {['Strategist', 'Broker', 'Handler', 'Auditor'].includes(gameState.titlePrompt.role) ? (
+            {[
+              'Strategist',
+              'Broker',
+              'Handler',
+              'Auditor',
+              'Archivist',
+              'Herald',
+              'Quorum',
+            ].includes(gameState.titlePrompt.role) ? (
               <>
                 <div className="text-responsive-xs font-mono uppercase tracking-widest text-muted text-center">
                   {gameState.titlePrompt.role === 'Strategist' &&
@@ -287,6 +443,12 @@ export const ActionBar = ({
                     'Use Handler power to swap the next two players in the presidential order?'}
                   {gameState.titlePrompt.role === 'Auditor' &&
                     'Use Auditor power to peek at the discard pile?'}
+                  {gameState.titlePrompt.role === 'Archivist' &&
+                    'Use Archivist power to peek at the discard pile?'}
+                  {gameState.titlePrompt.role === 'Herald' &&
+                    'Use Herald power to proclaim a player as Civil?'}
+                  {gameState.titlePrompt.role === 'Quorum' &&
+                    'Use Quorum power to call for an emergency re-vote?'}
                 </div>
                 <div className="flex gap-[2vw] w-full max-w-[30vh]">
                   <button
@@ -295,11 +457,7 @@ export const ActionBar = ({
                       playSound('click');
                       socket.emit('useTitleAbility', {
                         use: true,
-                        role: gameState.titlePrompt!.role as
-                          | 'Strategist'
-                          | 'Broker'
-                          | 'Handler'
-                          | 'Auditor',
+                        role: gameState.titlePrompt!.role as any,
                       });
                     }}
                     className="flex-1 py-[1vh] btn-primary rounded-xl font-bold hover:bg-subtle transition-all"
@@ -340,6 +498,38 @@ export const ActionBar = ({
             )}
           </div>
         )}
+
+        {/* Herald Pending Response UI */}
+        {gameState.phase === 'Herald_Action' &&
+          gameState.heraldPendingResponse?.targetId === me?.id && (
+            <div className="flex flex-col gap-[1vh] w-full justify-center h-full items-center">
+              <div className="text-responsive-xs font-mono uppercase tracking-widest text-primary text-center">
+                The Herald claims you are Civil. Do you confirm?
+              </div>
+              <div className="flex gap-[2vw] w-full max-w-[30vh]">
+                <button
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => {
+                    playSound('click');
+                    socket.emit('heraldResponse', 'Confirmed');
+                  }}
+                  className="flex-1 py-[1vh] bg-emerald-700/40 text-emerald-300 border border-emerald-500/50 rounded-xl font-bold hover:bg-emerald-700/60 transition-all shadow-lg shadow-emerald-500/10"
+                >
+                  Confirm
+                </button>
+                <button
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => {
+                    playSound('click');
+                    socket.emit('heraldResponse', 'Denied');
+                  }}
+                  className="flex-1 py-[1vh] bg-red-900/40 text-red-300 border border-red-500/50 rounded-xl font-bold hover:bg-red-900/60 transition-all shadow-lg shadow-red-500/10"
+                >
+                  Deny
+                </button>
+              </div>
+            </div>
+          )}
 
         {/* Voting */}
         {gameState.phase === 'Voting' && me?.isAlive && !me.vote && !gameState.titlePrompt && (
@@ -493,6 +683,65 @@ export const ActionBar = ({
             >
               Play Again
             </button>
+          </div>
+        )}
+
+        {/* Censure Vote */}
+        {gameState.phase === 'Censure_Action' && me?.isAlive && (
+          <div className="flex flex-col gap-[1vh] w-full justify-center h-full items-center">
+            <div className="text-responsive-xs font-mono uppercase tracking-widest text-muted text-center">
+              {me.censureVoteId 
+                ? `You have voted for ${gameState.players.find(p => p.id === me.censureVoteId)?.name || 'a player'}`
+                : 'Select a player to censure (exclude from next nomination)'}
+            </div>
+            <div className="flex flex-wrap gap-2 justify-center max-h-[10vh] overflow-y-auto w-full custom-scrollbar">
+              {gameState.players
+                .filter((p) => p.isAlive && p.id !== gameState.players[gameState.presidentIdx].id)
+                .map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => {
+                      playSound('click');
+                      socket.emit('censureVote', { targetId: p.id });
+                    }}
+                    className={cn(
+                      'px-3 py-1.5 rounded-lg text-responsive-xs font-mono uppercase tracking-wider border transition-all',
+                      me.censureVoteId === p.id
+                        ? 'bg-red-900/40 border-red-500 text-red-300'
+                        : 'bg-card border-subtle text-muted hover:border-ghost'
+                    )}
+                  >
+                    {p.name}
+                  </button>
+                ))}
+            </div>
+          </div>
+        )}
+
+        {/* Snap Election Volunteer */}
+        {gameState.phase === 'Snap_Election' && me?.isAlive && (
+          <div className="flex flex-col gap-[1vh] w-full justify-center h-full items-center">
+            <div className="text-responsive-xs font-mono uppercase tracking-widest text-muted text-center mb-1">
+              Any player may volunteer to be the next President.
+            </div>
+            {gameState.snapElectionVolunteers?.includes(me.id) ? (
+              <div className="px-8 py-3 rounded-2xl bg-purple-900/40 border border-purple-500/50 text-purple-200 font-bold uppercase tracking-widest animate-pulse">
+                Volunteered
+              </div>
+            ) : (
+              <button
+                onClick={() => {
+                  playSound('click');
+                  socket.emit('snapVolunteer');
+                }}
+                className="px-8 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold uppercase tracking-[0.2em] shadow-lg shadow-purple-500/20 transition-all hover:scale-105 active:scale-95"
+              >
+                Volunteer
+              </button>
+            )}
+            <div className="text-[10px] font-mono text-faint uppercase mt-1">
+              {gameState.snapElectionVolunteers?.length || 0} Ready to serve
+            </div>
           </div>
         )}
 

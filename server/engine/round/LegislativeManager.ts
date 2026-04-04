@@ -10,7 +10,7 @@ export class LegislativeManager {
 
   checkRoundEnd(s: GameState, roomId: string): void {
     if (s.phase !== 'Legislative_Chancellor') return;
-    const presDecl = s.declarations.some((d) => d.type === 'President');
+    const presDecl = s.declarations.some((d) => d.type === 'President') || s.presidentDeclarationBlocked;
     const chanDecl = s.declarations.some((d) => d.type === 'Chancellor');
     if (presDecl && chanDecl) this.onBothDeclared(s, roomId);
   }
@@ -136,16 +136,17 @@ export class LegislativeManager {
       const st = this.round.engine.rooms.get(roomId);
       if (!st || st.isPaused || st.phase === 'GameOver') return;
 
+      const amount = st.ironMandate ? 2 : 1;
       if (policy === 'Civil') {
-        st.civilDirectives++;
-        addLog(st, 'A Civil directive was enacted.');
+        st.civilDirectives += amount;
+        addLog(st, `A Civil directive was enacted${st.ironMandate ? ' (Iron Mandate: x2)' : ''}.`);
         if (!isChaos && playerId) {
           const chancellor = st.players.find((p: Player) => p.id === playerId);
           if (chancellor) chancellor.civilEnactments = (chancellor.civilEnactments ?? 0) + 1;
         }
       } else {
-        st.stateDirectives++;
-        addLog(st, `A State directive was enacted. Total: ${st.stateDirectives}`);
+        st.stateDirectives += amount;
+        addLog(st, `A State directive was enacted${st.ironMandate ? ' (Iron Mandate: x2)' : ''}. Total: ${st.stateDirectives}`);
         if (st.stateDirectives >= 5) st.vetoUnlocked = true;
         if (!isChaos && playerId) {
           const chancellor = st.players.find((p: Player) => p.id === playerId);
@@ -216,7 +217,7 @@ export class LegislativeManager {
     const presDeclared = s.declarations.some((d) => d.type === 'President');
     const chanDeclared = s.declarations.some((d) => d.type === 'Chancellor');
 
-    if (!presDeclared && (president.isAI || s.presidentTimedOut))
+    if (!presDeclared && (president.isAI || s.presidentTimedOut) && !s.presidentDeclarationBlocked)
       this.generateDeclaration(s, roomId, president, 'President');
     if (!chanDeclared && (chancellor.isAI || s.chancellorTimedOut))
       this.generateDeclaration(s, roomId, chancellor, 'Chancellor');
@@ -302,7 +303,7 @@ export class LegislativeManager {
 
     this.round.engine.broadcastState(roomId);
 
-    const presDecl = s.declarations.some((d) => d.type === 'President');
+    const presDecl = s.declarations.some((d) => d.type === 'President') || s.presidentDeclarationBlocked;
     const chanDecl = s.declarations.some((d) => d.type === 'Chancellor');
     if (presDecl && chanDecl) this.onBothDeclared(s, roomId);
   }

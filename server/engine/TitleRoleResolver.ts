@@ -15,7 +15,7 @@ import { CHAT } from './ai/aiChatPhrases';
 import { addLog, ensureDeckHas } from './utils';
 import type { IEngineCore } from './IEngineCore';
 
-export type PostRoundContinuation = 'Auditor' | 'Assassin' | 'Handler';
+export type PostRoundContinuation = 'Archivist' | 'Auditor' | 'Assassin' | 'Handler';
 
 export class TitleRoleResolver {
   constructor(private readonly engine: IEngineCore) {}
@@ -28,12 +28,12 @@ export class TitleRoleResolver {
     const n = state.players.length;
     const count = n <= 6 ? 2 : n <= 8 ? 3 : 4;
     const titles = shuffle<TitleRole>([
-      'Assassin',
-      'Strategist',
-      'Broker',
-      'Handler',
       'Auditor',
       'Interdictor',
+      'Archivist',
+      'Herald',
+      'Quorum',
+      'Cipher',
     ]);
     const players = shuffle([...state.players]);
     for (let i = 0; i < count; i++) {
@@ -52,6 +52,19 @@ export class TitleRoleResolver {
    */
   runPostRoundTitleAbilities(s: GameState, roomId: string): void {
     if (s.phase === 'GameOver') return;
+
+    const archivist = s.players.find(
+      (p) => p.titleRole === 'Archivist' && !p.titleUsed && p.isAlive
+    );
+    if (archivist) {
+      s.titlePrompt = {
+        playerId: archivist.id,
+        role: 'Archivist',
+        context: { role: 'Archivist' },
+      };
+      this.engine.enterPhase(s, roomId, 'Auditor_Action'); // Reusing Auditor_Action for Archivist overlay
+      return;
+    }
 
     const auditor = s.players.find((p) => p.titleRole === 'Auditor' && !p.titleUsed && p.isAlive);
     if (auditor) {
@@ -95,7 +108,20 @@ export class TitleRoleResolver {
   continuePostRoundAfter(s: GameState, roomId: string, after: PostRoundContinuation): void {
     if (s.phase === 'GameOver') return;
 
-    if (after === 'Auditor') {
+    if (after === 'Archivist') {
+      const auditor = s.players.find((p) => p.titleRole === 'Auditor' && !p.titleUsed && p.isAlive);
+      if (auditor) {
+        s.titlePrompt = {
+          playerId: auditor.id,
+          role: 'Auditor',
+          context: { role: 'Auditor', discardPile: s.discard.slice(-3) },
+        };
+        this.engine.enterPhase(s, roomId, 'Auditor_Action');
+        return;
+      }
+    }
+
+    if (after === 'Archivist' || after === 'Auditor') {
       const president = s.players[s.presidentIdx];
       if (president.titleRole === 'Assassin' && !president.titleUsed && president.isAlive) {
         s.titlePrompt = {
@@ -109,7 +135,7 @@ export class TitleRoleResolver {
       }
     }
 
-    if (after === 'Auditor' || after === 'Assassin') {
+    if (after === 'Archivist' || after === 'Auditor' || after === 'Assassin') {
       const handler = s.players.find(
         (p) => p.titleRole === 'Handler' && !p.titleUsed && p.isAlive
       );
@@ -137,19 +163,41 @@ export class TitleRoleResolver {
     roomId: string,
     abilityData: TitleAbilityData
   ): Promise<void> {
-    const prompt = s.titlePrompt;
+    let prompt = s.titlePrompt;
+    const data = abilityData as any; // Cast for union properties
+
+    // Parallel roles (Cipher) can act without a server-side prompt
+    if (!prompt && data.use && data.role === 'Cipher') {
+      prompt = { 
+        playerId: data.playerId || '', 
+        role: 'Cipher', 
+        context: { role: 'Cipher' } 
+      };
+    }
+
     if (!prompt) return;
 
-    const player = s.players.find((p) => p.id === prompt.playerId);
+    const player = s.players.find((p) => p.id === (prompt?.playerId || data.playerId));
     if (!player) {
-      s.titlePrompt = undefined;
+      if (s.titlePrompt) s.titlePrompt = undefined;
       return;
     }
 
-    s.titlePrompt = undefined;
+    if (s.titlePrompt && s.titlePrompt.role === prompt.role) {
+      s.titlePrompt = undefined;
+    }
 
     if (abilityData.use) {
-      player.titleUsed = true;
+      const activeRole = (abilityData as any).role as TitleRole;
+      const isHeraldResponse = activeRole === 'Herald' && s.heraldPendingResponse?.targetId === player.id;
+
+      if (!isHeraldResponse) {
+        if (activeRole !== 'Cipher') {
+          player.titleUsed = true;
+        } else {
+          player.cipherUsed = true;
+        }
+      }
       this.engine.io.to(roomId).emit('powerUsed', { role: prompt.role });
       if (player.isAI) this.engine.aiEngine.postAIChat(s, player, CHAT.powerUsage);
       await this.applyTitleAbility(s, roomId, player, prompt.role, abilityData);
@@ -291,8 +339,97 @@ export class TitleRoleResolver {
           };
           this.engine.enterPhase(s, roomId, 'Nomination_Review');
         } else {
+          // Check for Herald after Interdictor resolves
+          const herald = s.players.find(
+            (p) => p.titleRole === 'Herald' && !p.titleUsed && p.isAlive && s.round > 1
+          );
+          if (herald) {
+            s.titlePrompt = {
+              playerId: herald.id,
+              role: 'Herald',
+              context: { role: 'Herald' },
+            };
+            this.engine.enterPhase(s, roomId, 'Herald_Action');
+          } else {
+            this.engine.enterPhase(s, roomId, 'Nominate_Chancellor');
+          }
+        }
+        break;
+      }
+
+      case 'Archivist': {
+        this.engine.io.to(player.socketId).emit('archivistResult', s.discard);
+        addLog(s, `${player.name} (Archivist) reviewed the assembly records.`);
+        this.continuePostRoundAfter(s, roomId, 'Archivist');
+        break;
+      }
+
+      case 'Herald': {
+        if (!data.use || data.role !== 'Herald') break;
+        
+        // Handle target response
+        if (s.heraldPendingResponse && player.id === s.heraldPendingResponse.targetId) {
+          const herald = s.players.find(p => p.titleRole === 'Herald' && p.titleUsed);
+          const accuserId = herald?.id || '';
+          const confirmed = (data as any).agree;
+          const result = confirmed ? 'Confirmed' : 'Denied';
+          
+          if (!s.heraldLog) s.heraldLog = [];
+          s.heraldLog.push({
+            accuserId: accuserId,
+            targetId: player.id,
+            claim: s.heraldPendingResponse.claim,
+            response: result
+          });
+          
+          this.engine.io.to(roomId).emit('heraldRecord', {
+            accuserId: accuserId,
+            targetId: player.id,
+            claim: s.heraldPendingResponse.claim,
+            response: result
+          });
+          
+          addLog(s, `${player.name} ${result} the assertion by ${herald?.name || 'the Herald'}.`);
+          s.heraldPendingResponse = undefined;
+          this.engine.clearActionTimer(roomId);
+          this.engine.enterPhase(s, roomId, 'Nominate_Chancellor');
+          return;
+        }
+
+        // Handle initiating Herald
+        const target = s.players.find((p) => p.id === data.targetId && p.isAlive);
+        if (target) {
+          s.heraldPendingResponse = { targetId: target.id, claim: data.claim || 'Civil' };
+          s.titlePrompt = {
+            playerId: target.id,
+            role: 'Herald',
+            context: { role: 'Herald' },
+          };
+          this.engine.io.to(target.socketId).emit('heraldResponseRequired', { 
+            targetId: target.id, 
+            claim: data.claim || 'Civil' 
+          });
+          addLog(s, `${player.name} (Herald) issued a public assertion against ${target.name}.`);
+          this.engine.startActionTimer(roomId, 10000); // 10s countdown
+        } else {
           this.engine.enterPhase(s, roomId, 'Nominate_Chancellor');
         }
+        break;
+      }
+
+      case 'Quorum': {
+        s.isRevote = true;
+        s.quorumRevotePending = false;
+        addLog(s, `${player.name} (Quorum) called an emergency re-vote!`);
+        this.engine.enterPhase(s, roomId, 'Voting');
+        break;
+      }
+
+      case 'Cipher': {
+        if (!data.use || data.role !== 'Cipher' || !data.message) break;
+        // Broadcast anonymous message
+        this.engine.io.to(roomId).emit('cipherMessage', { text: data.message });
+        addLog(s, `[CIPHER DISPATCH]: "${data.message}"`);
         break;
       }
     }
@@ -324,6 +461,19 @@ export class TitleRoleResolver {
         break;
       case 'Auditor':
         this.continuePostRoundAfter(s, roomId, 'Auditor');
+        break;
+      case 'Archivist':
+        this.continuePostRoundAfter(s, roomId, 'Archivist');
+        break;
+      case 'Herald':
+        this.engine.enterPhase(s, roomId, 'Nominate_Chancellor');
+        break;
+      case 'Quorum':
+        s.quorumRevotePending = false;
+        this.engine.roundManager.nextRound(s, roomId, false);
+        break;
+      case 'Cipher':
+        // No action needed for decline in parallel flow
         break;
     }
   }

@@ -204,6 +204,45 @@ export function useWebRTC({
     }
   }, [me?.isAlive, isVoiceActive, isVideoActive, setIsVoiceActive, setIsVideoActive]);
 
+  // Handle Blackout voice stutter
+  useEffect(() => {
+    let interval: NodeJS.Timeout;
+    if (gameState.chatBlackout) {
+      interval = setInterval(() => {
+        // Randomly toggle local audio track to "break up" the voice
+        const localAudio = localStream?.getAudioTracks()[0];
+        if (localAudio) {
+          localAudio.enabled = Math.random() > 0.3; // 70% chance enabled, 30% chance stutter
+        }
+        
+        // Also toggle remote audio tracks
+        Object.values(remoteStreams).forEach((st) => {
+          const tr = st.getAudioTracks()[0];
+          if (tr) tr.enabled = Math.random() > 0.3;
+        });
+      }, 180); // Quick stutter intervals
+    } else {
+      // Restore all audio tracks to enabled when blackout ends
+      const localAudio = localStream?.getAudioTracks()[0];
+      if (localAudio) localAudio.enabled = true;
+      Object.values(remoteStreams).forEach((st) => {
+        const tr = st.getAudioTracks()[0];
+        if (tr) tr.enabled = true;
+      });
+    }
+
+    return () => {
+      clearInterval(interval);
+      // Final cleanup to ensure everything is enabled if effect unmounts
+      const localAudio = localStream?.getAudioTracks()[0];
+      if (localAudio) localAudio.enabled = true;
+      Object.values(remoteStreams).forEach((st) => {
+        const tr = st.getAudioTracks()[0];
+        if (tr) tr.enabled = true;
+      });
+    };
+  }, [gameState.chatBlackout, localStream, remoteStreams]);
+
   // Global Cleanup
   useEffect(() => {
     return () => {

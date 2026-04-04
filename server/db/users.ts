@@ -30,6 +30,8 @@ const UserStatsSchema = z.object({
   casualGames: z.number().default(0),
   classicWins: z.number().default(0),
   classicGames: z.number().default(0),
+  crisisWins: z.number().default(0),
+  crisisGames: z.number().default(0),
 }).catchall(z.any());
 
 export const SupabaseUserSchema = z.object({
@@ -317,6 +319,8 @@ export function makeNewUser(overrides: Partial<UserInternal> = {}): UserInternal
       casualGames: 0,
       classicWins: 0,
       classicGames: 0,
+      crisisWins: 0,
+      crisisGames: 0,
     },
     ownedCosmetics: [],
     cabinetPoints: 0,
@@ -411,7 +415,7 @@ export async function deletePasswordResetTokens(userId: string): Promise<void> {
   }
 }
 
-type LeaderboardMode = 'Overall' | 'Ranked' | 'Casual' | 'Classic';
+type LeaderboardMode = 'Overall' | 'Ranked' | 'Casual' | 'Classic' | 'Crisis';
 
 export async function getLeaderboard(
   mode: LeaderboardMode = 'Overall',
@@ -429,7 +433,9 @@ export async function getLeaderboard(
           ? 'stats->casualWins'
           : mode === 'Classic'
             ? 'stats->classicWins'
-            : 'stats->elo';
+            : mode === 'Crisis'
+              ? 'stats->crisisWins'
+              : 'stats->elo';
 
     return await withRetry(async () => {
       const { data, error } = await adminDb
@@ -456,6 +462,10 @@ export async function getLeaderboard(
     return allUsers
       .sort((a, b) => (b.stats.classicWins ?? 0) - (a.stats.classicWins ?? 0))
       .slice(safeOffset, safeOffset + safeLimit);
+  if (mode === 'Crisis')
+    return allUsers
+      .sort((a, b) => (b.stats.crisisWins ?? 0) - (a.stats.crisisWins ?? 0))
+      .slice(safeOffset, safeOffset + safeLimit);
   return allUsers
     .sort((a, b) => (b.stats.elo ?? 0) - (a.stats.elo ?? 0))
     .slice(safeOffset, safeOffset + safeLimit);
@@ -469,14 +479,16 @@ export async function getAllLeaderboards(
   ranked: any[];
   casual: any[];
   classic: any[];
+  crisis: any[];
 }> {
-  const [overall, ranked, casual, classic] = await Promise.all([
+  const [overall, ranked, casual, classic, crisis] = await Promise.all([
     getLeaderboard('Overall', limit, offset),
     getLeaderboard('Ranked', limit, offset),
     getLeaderboard('Casual', limit, offset),
     getLeaderboard('Classic', limit, offset),
+    getLeaderboard('Crisis', limit, offset),
   ]);
-  return { overall, ranked, casual, classic };
+  return { overall, ranked, casual, classic, crisis };
 }
 
 export async function searchUsers(

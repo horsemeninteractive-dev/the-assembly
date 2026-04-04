@@ -32,7 +32,7 @@ export interface IRoundManager {
   /** Direct entry point — phase transition, resets hasActed, fires timers + AI */
   enterPhase(s: GameState, roomId: string, phase: GamePhase): void;
   clearActionTimer(roomId: string): void;
-  startActionTimer(roomId: string): void;
+  startActionTimer(roomId: string, durationMs?: number): void;
   /** Safe public wrapper used by restoreFromRedis */
   fireActionTimerExpiry(s: GameState, roomId: string): Promise<void>;
   resetPlayerActions(s: GameState): void;
@@ -58,7 +58,15 @@ export interface IRoundManager {
   captureRoundHistory(s: GameState, policy: Policy, isChaos: boolean): void;
   resetRoom(roomId: string): Promise<void>;
   drainSpectatorQueue(roomId: string): Promise<void>;
+  tallyCensure(s: GameState, roomId: string): void;
   nextRound(state: GameState, roomId: string, successfulGovernment?: boolean, skipAdvance?: boolean): void;
+}
+
+export interface ICrisisEngine {
+  initDeck(roomId: string): void;
+  drawEventCard(s: GameState, roomId: string): void;
+  clearEventCard(s: GameState): void;
+  cleanup(roomId: string): void;
 }
 
 export interface ITitleRoleResolver {
@@ -95,10 +103,12 @@ export interface IEngineCore {
   readonly titleRoleResolver: ITitleRoleResolver;
   readonly matchCloser: IMatchCloser;
   readonly broadcaster: IGameBroadcaster;
+  readonly crisisEngine: ICrisisEngine;
 
   // Convenience pass-throughs exposed on the orchestrator
   broadcastState(roomId: string): void;
   enterPhase(s: GameState, roomId: string, phase: GamePhase): void;
+  startActionTimer(roomId: string, durationMs?: number): void;
   clearActionTimer(roomId: string): void;
   deleteRoom(roomId: string): void;
   updateRoomAverageElo(state: GameState): Promise<void>;

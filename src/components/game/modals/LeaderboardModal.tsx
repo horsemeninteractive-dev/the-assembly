@@ -11,7 +11,7 @@ interface LeaderboardModalProps {
   onClose: () => void;
 }
 
-type ModeTab = 'Overall' | 'Ranked' | 'Casual' | 'Classic';
+type ModeTab = 'Overall' | 'Ranked' | 'Casual' | 'Classic' | 'Crisis';
 type StatTab = 'Win%' | 'Games' | 'Wins' | 'ELO';
 
 const MODE_TABS: { id: ModeTab; label: string; color: string; activeBg: string }[] = [
@@ -34,6 +34,12 @@ const MODE_TABS: { id: ModeTab; label: string; color: string; activeBg: string }
     color: 'text-emerald-400',
     activeBg: 'bg-emerald-900/40 border-emerald-600/60',
   },
+  {
+    id: 'Crisis',
+    label: 'Crisis',
+    color: 'text-purple-400',
+    activeBg: 'bg-purple-900/40 border-purple-600/60',
+  },
 ];
 
 const positionDisplay = (index: number) => {
@@ -49,6 +55,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
     ranked: [],
     casual: [],
     classic: [],
+    crisis: [],
   });
   const [loading, setLoading] = useState(true);
   const [modeTab, setModeTab] = useState<ModeTab>('Overall');
