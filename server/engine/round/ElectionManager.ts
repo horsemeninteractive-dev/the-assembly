@@ -273,15 +273,19 @@ export class ElectionManager {
       };
       this.round.enterPhase(s, roomId, 'Quorum_Action');
     } else {
-      if (!s.electionTrackerFrozen) {
-        s.electionTracker += s.doubleTrackerOnFail ? 2 : 1;
-      }
-      if (s.electionTracker >= 3) {
-        await this.round.legislative.enactChaosPolicy(s, roomId);
-      } else {
-        this.round.engine.aiEngine.triggerAIReactions(s, roomId, 'failed_vote');
-        this.round.nextRound(s, roomId, false);
-      }
+      await this.handleElectionFailureContinuation(s, roomId);
+    }
+  }
+
+  async handleElectionFailureContinuation(s: GameState, roomId: string): Promise<void> {
+    if (!s.electionTrackerFrozen) {
+      s.electionTracker += s.doubleTrackerOnFail ? 2 : 1;
+    }
+    if (s.electionTracker >= 3) {
+      await this.round.legislative.enactChaosPolicy(s, roomId);
+    } else {
+      this.round.engine.aiEngine.triggerAIReactions(s, roomId, 'failed_vote');
+      this.round.nextRound(s, roomId, false);
     }
   }
 

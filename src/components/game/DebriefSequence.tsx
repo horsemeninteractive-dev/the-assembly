@@ -48,26 +48,26 @@ interface DebriefSequenceProps {
 const ROLE_STYLE = {
   Civil: {
     label: 'Civil',
-    text: 'text-blue-400',
-    border: 'border-blue-500/50',
-    bg: 'bg-blue-900/20',
-    glow: '0 0 40px rgba(59,130,246,0.35)',
+    text: 'text-blue-500 dark:text-blue-400',
+    border: 'border-blue-500/40 dark:border-blue-500/50',
+    bg: 'bg-blue-500/10 dark:bg-blue-900/20',
+    glow: '0 0 40px rgba(59,130,246,0.2)',
     ringColor: 'rgba(59,130,246,0.4)',
   },
   State: {
     label: 'State Agent',
-    text: 'text-red-400',
-    border: 'border-red-500/50',
-    bg: 'bg-red-900/20',
-    glow: '0 0 40px rgba(239,68,68,0.4)',
+    text: 'text-red-500 dark:text-red-400',
+    border: 'border-red-500/40 dark:border-red-500/50',
+    bg: 'bg-red-500/10 dark:bg-red-900/20',
+    glow: '0 0 40px rgba(239,68,68,0.25)',
     ringColor: 'rgba(239,68,68,0.45)',
   },
   Overseer: {
     label: 'The Overseer',
-    text: 'text-red-100',
-    border: 'border-red-400/70',
-    bg: 'bg-red-900/40',
-    glow: '0 0 60px rgba(239,68,68,0.7)',
+    text: 'text-red-600 dark:text-red-100',
+    border: 'border-red-500/60 dark:border-red-400/70',
+    bg: 'bg-red-500/15 dark:bg-red-900/40',
+    glow: '0 0 60px rgba(239,68,68,0.4)',
     ringColor: 'rgba(239,68,68,0.7)',
   },
 } as const;
@@ -177,10 +177,12 @@ function orderedPlayers(players: Player[]): Player[] {
 
 const IntroSlide = ({ gameState }: { gameState: GameState }) => {
   const isCivil = gameState.winner === 'Civil';
-  const color = isCivil ? 'text-blue-400' : 'text-red-400';
+  const color = isCivil 
+    ? 'text-blue-600 dark:text-blue-400' 
+    : 'text-red-600 dark:text-red-400';
   const glow = isCivil
-    ? 'drop-shadow-[0_0_30px_rgba(59,130,246,0.6)]'
-    : 'drop-shadow-[0_0_30px_rgba(239,68,68,0.6)]';
+    ? 'drop-shadow-[0_0_30px_rgba(59,130,246,0.4)] dark:drop-shadow-[0_0_30px_rgba(59,130,246,0.6)]'
+    : 'drop-shadow-[0_0_30px_rgba(239,68,68,0.4)] dark:drop-shadow-[0_0_30px_rgba(239,68,68,0.6)]';
   const subtitle = isCivil
     ? 'The Charter has been defended.'
     : 'The Secretariat has fallen to the State.';
@@ -241,10 +243,10 @@ const BigPlaysSlide = ({ plays }: { plays: BigPlay[] }) => (
           initial={{ opacity: 0, x: -24 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.5, delay: 0.3 + i * 0.25, ease: 'easeOut' }}
-          className="flex items-center gap-4 bg-white/5 border border-white/10 rounded-2xl px-5 py-4"
+          className="flex items-center gap-4 bg-card/60 dark:bg-white/5 border border-default rounded-2xl px-5 py-4 backdrop-blur-sm"
         >
-          <span className="text-muted shrink-0">{BIG_PLAY_ICON[play.icon]}</span>
-          <p className="text-sm text-secondary font-mono leading-snug">{play.text}</p>
+          <span className="text-secondary shrink-0">{BIG_PLAY_ICON[play.icon]}</span>
+          <p className="text-sm text-primary font-mono leading-snug">{play.text}</p>
         </motion.div>
       ))}
     </div>
@@ -525,16 +527,15 @@ export const DebriefSequence = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="absolute inset-0 z-[60] flex flex-col items-center justify-center cursor-pointer select-none"
-          style={{ background: 'radial-gradient(ellipse 80% 70% at 50% 50%, rgba(15,10,25,0.97) 0%, rgba(5,3,10,0.99) 100%)' }}
+          className="absolute inset-0 z-[60] flex flex-col items-center justify-center cursor-pointer select-none bg-base/95 backdrop-blur-xl"
           onClick={advance}
         >
           {/* Subtle spotlight */}
           <div
-            className="absolute inset-0 pointer-events-none"
+            className="absolute inset-0 pointer-events-none opacity-50 dark:opacity-100"
             style={{
               background:
-                'radial-gradient(ellipse 50% 45% at 50% 45%, rgba(255,255,255,0.025) 0%, transparent 70%)',
+                'radial-gradient(ellipse 50% 45% at 50% 45%, rgba(255,255,255,0.05) 0%, transparent 70%)',
             }}
           />
 
@@ -569,7 +570,7 @@ export const DebriefSequence = ({
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ delay: 1.5 }}
-            className="absolute bottom-8 flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-[0.25em] text-faint pointer-events-none"
+            className="absolute bottom-8 flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-[0.25em] text-muted opacity-60 pointer-events-none"
           >
             Tap to advance <ChevronRight className="w-3 h-3" />
           </motion.div>
@@ -577,13 +578,15 @@ export const DebriefSequence = ({
           {/* Progress dots */}
           <div className="absolute bottom-16 flex gap-1.5">
             {slides.map((_, i) => (
-              <div
-                key={i}
-                className={cn(
-                  'h-1 rounded-full transition-all duration-300',
-                  i === step ? 'w-4 bg-white/40' : i < step ? 'w-1 bg-white/20' : 'w-1 bg-white/10'
-                )}
-              />
+                <div
+                  key={i}
+                  className={cn(
+                    'h-1 rounded-full transition-all duration-300',
+                    i === step 
+                      ? 'w-4 bg-gray-600 dark:bg-white/40' 
+                      : i < step ? 'w-1 bg-gray-400 dark:bg-white/20' : 'w-1 bg-gray-300 dark:bg-white/10'
+                  )}
+                />
             ))}
           </div>
         </motion.div>

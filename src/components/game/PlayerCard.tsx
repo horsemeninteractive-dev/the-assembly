@@ -520,6 +520,11 @@ export const PlayerCard = React.memo(
                     {p.isChancellor ? 'Chan' : 'Nom'}
                   </span>
                 )}
+                {gameState.censuredPlayerId === p.id && (
+                  <span className="px-1 py-0.5 bg-red-900/40 text-red-400 font-mono uppercase rounded border border-red-500/50 text-[6px] animate-pulse">
+                    Censured
+                  </span>
+                )}
               </div>
             </div>
           </div>

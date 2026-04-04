@@ -60,6 +60,7 @@ export interface IRoundManager {
   drainSpectatorQueue(roomId: string): Promise<void>;
   tallyCensure(s: GameState, roomId: string): void;
   nextRound(state: GameState, roomId: string, successfulGovernment?: boolean, skipAdvance?: boolean): void;
+  handleElectionFailureContinuation(s: GameState, roomId: string): Promise<void>;
 }
 
 export interface ICrisisEngine {

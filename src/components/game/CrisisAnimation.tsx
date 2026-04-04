@@ -129,7 +129,7 @@ export const CrisisAnimation = ({ gameState, activeEvent, playSound, onComplete 
             </div>
 
             <div className="mt-3 text-[7px] font-mono uppercase tracking-widest opacity-40 shrink-0">
-              Global Modifier • Round {gameState.round}
+              Global Modifier • Round {gameState.phase === 'Event_Reveal' ? gameState.round + 1 : gameState.round}
             </div>
           </div>
         </motion.div>

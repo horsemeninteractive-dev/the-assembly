@@ -268,6 +268,8 @@ export class RoundManager {
     skipAdvance = false
   ): void {
     if (state.phase === 'GameOver') return;
+
+    // Phase 1: Cleanup and reset for the new round
     state.vetoRequested = false;
     state.rejectedChancellorId = undefined;
     state.detainedPlayerId = undefined;
@@ -285,6 +287,33 @@ export class RoundManager {
       this.engine.crisisEngine.clearEventCard(state);
     }
     this.resetPlayerActions(state);
+
+    // Crisis mode: Draw the card first, reveal it, then finalize transition
+    if (state.mode === 'Crisis') {
+      this.engine.crisisEngine.drawEventCard(state, roomId);
+      if (state.activeEventCard) {
+        this.enterPhase(state, roomId, 'Event_Reveal');
+        
+        setTimeout(() => {
+          const s = this.engine.rooms.get(roomId);
+          if (s && s.phase === 'Event_Reveal') {
+            this.finalizeNextRound(s, roomId, skipAdvance);
+          }
+        }, 5000);
+        return;
+      }
+    }
+
+    this.finalizeNextRound(state, roomId, skipAdvance);
+  }
+
+  private finalizeNextRound(
+    state: GameState,
+    roomId: string,
+    skipAdvance: boolean
+  ): void {
+    if (state.phase === 'GameOver') return;
+
     if (!skipAdvance) {
       if (state.handlerSwapPending !== undefined) {
         state.handlerSwapPending--;
@@ -301,22 +330,11 @@ export class RoundManager {
       }
       this.advancePresidentIdx(state);
     }
+
     state.round++;
     addLog(state, `--- Round ${state.round} Started ---`);
     ensureDeckHas(state, 4);
-    if (state.mode === 'Crisis') {
-      this.engine.crisisEngine.drawEventCard(state, roomId);
-      // Delay nomination if a crisis was drawn to let animation finish
-      if (state.activeEventCard) {
-        setTimeout(() => {
-          const s = this.engine.rooms.get(roomId);
-          if (s && s.phase !== 'GameOver') {
-            this.election.beginNomination(s, roomId);
-          }
-        }, 5000);
-        return;
-      }
-    }
+
     this.election.beginNomination(state, roomId);
   }
 
@@ -396,6 +414,10 @@ export class RoundManager {
 
   captureRoundHistory(s: GameState, policy: Policy, isChaos: boolean): void {
     this.legislative.captureRoundHistory(s, policy, isChaos);
+  }
+
+  handleElectionFailureContinuation(s: GameState, roomId: string): Promise<void> {
+    return this.election.handleElectionFailureContinuation(s, roomId);
   }
 
   // ═══════════════════════════════════════════════════════════════════════════

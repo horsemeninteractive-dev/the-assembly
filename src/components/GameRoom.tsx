@@ -484,6 +484,7 @@ export const GameRoom = ({
               setIsVoiceActive={setIsVoiceActive}
               isVideoActive={isVideoActive}
               setIsVideoActive={setIsVideoActive}
+              isDebriefing={showDebrief}
             />
           )}
 

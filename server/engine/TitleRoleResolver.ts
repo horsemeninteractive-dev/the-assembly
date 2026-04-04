@@ -202,7 +202,7 @@ export class TitleRoleResolver {
       if (player.isAI) this.engine.aiEngine.postAIChat(s, player, CHAT.powerUsage);
       await this.applyTitleAbility(s, roomId, player, prompt.role, abilityData);
     } else {
-      this.onTitleAbilityDeclined(s, roomId, player, prompt.role);
+      await this.onTitleAbilityDeclined(s, roomId, player, prompt.role);
     }
 
     this.engine.broadcastState(roomId);
@@ -435,12 +435,12 @@ export class TitleRoleResolver {
     }
   }
 
-  private onTitleAbilityDeclined(
+  private async onTitleAbilityDeclined(
     s: GameState,
     roomId: string,
     player: Player,
     role: TitleRole
-  ): void {
+  ): Promise<void> {
     switch (role) {
       case 'Strategist':
         ensureDeckHas(s, 3);
@@ -470,7 +470,7 @@ export class TitleRoleResolver {
         break;
       case 'Quorum':
         s.quorumRevotePending = false;
-        this.engine.roundManager.nextRound(s, roomId, false);
+        await this.engine.roundManager.handleElectionFailureContinuation(s, roomId);
         break;
       case 'Cipher':
         // No action needed for decline in parallel flow

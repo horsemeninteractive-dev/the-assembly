@@ -6,9 +6,16 @@ interface TooltipProps {
   children: React.ReactElement;
   className?: string;
   position?: 'top' | 'bottom' | 'left' | 'right';
+  align?: 'start' | 'center' | 'end';
 }
 
-export const Tooltip = ({ content, children, className, position = 'bottom' }: TooltipProps) => {
+export const Tooltip = ({ 
+  content, 
+  children, 
+  className, 
+  position = 'bottom',
+  align = 'center' 
+}: TooltipProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -43,9 +50,15 @@ export const Tooltip = ({ content, children, className, position = 'bottom' }: T
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [isVisible]);
 
+  const alignStyles = {
+    start: 'left-0',
+    center: 'left-1/2 -translate-x-1/2',
+    end: 'right-0',
+  };
+
   const positionClasses = {
-    top: 'bottom-full left-1/2 -translate-x-1/2 mb-2',
-    bottom: 'top-full left-1/2 -translate-x-1/2 mt-2',
+    top: cn('bottom-full mb-2', alignStyles[align]),
+    bottom: cn('top-full mt-2', alignStyles[align]),
     left: 'right-full top-1/2 -translate-y-1/2 mr-2',
     right: 'left-full top-1/2 -translate-y-1/2 ml-2',
   };
@@ -53,7 +66,7 @@ export const Tooltip = ({ content, children, className, position = 'bottom' }: T
   return (
     <div
       ref={containerRef}
-      className="relative inline-block"
+      className={cn('relative inline-block', isVisible && 'z-[100]')}
       onMouseEnter={show}
       onMouseLeave={hide}
       onTouchStart={handleTouchStart}

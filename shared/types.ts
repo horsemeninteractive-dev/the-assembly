@@ -114,6 +114,7 @@ export type GamePhase =
   | 'Executive_Action'
   | 'Censure_Action'
   | 'Snap_Election'
+  | 'Event_Reveal'
   | 'GameOver';
 export type ExecutiveAction =
   | 'Investigate'

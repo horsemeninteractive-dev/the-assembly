@@ -40,6 +40,7 @@ interface ActionBarProps {
   setIsVoiceActive: (active: boolean) => void;
   isVideoActive: boolean;
   setIsVideoActive: (active: boolean) => void;
+  isDebriefing: boolean;
 }
 
 export const ActionBar = ({
@@ -55,6 +56,7 @@ export const ActionBar = ({
   setIsVoiceActive,
   isVideoActive,
   setIsVideoActive,
+  isDebriefing,
 }: ActionBarProps) => {
   const [showReactions, setShowReactions] = React.useState(false);
   const [showCipherInput, setShowCipherInput] = React.useState(false);
@@ -102,6 +104,8 @@ export const ActionBar = ({
         return 'The Assembly is debating a Censure Motion.';
       case 'Snap_Election':
         return 'Volunteers are stepping forward for the Snap Election.';
+      case 'Event_Reveal':
+        return 'Crisis Event Incoming...';
       case 'Executive_Action':
         switch (gameState.currentExecutiveAction) {
           case 'Investigate':
@@ -221,6 +225,7 @@ export const ActionBar = ({
         {gameState.activeEventCard && (
           <Tooltip 
             position="top"
+            align="end"
             content={
               <div className="max-w-[200px] flex flex-col gap-1 py-1">
                 <div className="font-serif italic text-primary text-[12px] border-b border-white/10 pb-1 mb-1">
@@ -667,7 +672,7 @@ export const ActionBar = ({
           )}
 
         {/* GameOver summary */}
-        {gameState.phase === 'GameOver' && (
+        {gameState.phase === 'GameOver' && !isDebriefing && (
           <div className="flex flex-col gap-[1vh] w-full max-w-xs h-full justify-center">
             <div className="text-center p-[1vh] sm:p-[2vh] rounded-2xl border-2 mb-2 bg-card border-default text-muted">
               <div className="text-responsive-xl font-thematic tracking-wide uppercase">
@@ -745,9 +750,9 @@ export const ActionBar = ({
           </div>
         )}
 
-        {/* Lobby ready */}
         {gameState.phase === 'Lobby' &&
           !gameState.titlePrompt &&
+          !isDebriefing &&
           (() => {
             const isHost = !!(user?.id && gameState.hostUserId === user.id);
             const readyCount = gameState.players.filter((p) => !p.isAI && p.isReady).length;
