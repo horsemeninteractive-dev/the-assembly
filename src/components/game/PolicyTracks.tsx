@@ -66,7 +66,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
             <Scale className="w-[1.4vh] h-[1.4vh]" />
             <span>Civil</span>
           </div>
-          <span className="text-[1.2vh] font-semibold text-blue-400">{gameState.civilDirectives}</span>
+          <span className="text-[1.8vh] sm:text-[2vh] font-bold leading-none text-blue-400">{gameState.civilDirectives}</span>
         </div>
         <div className="flex gap-1">
           {[...Array(5)].map((_, i) => {
@@ -137,7 +137,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
       {/* State Track */}
       <div className="space-y-[0.5vh]">
         <div className="flex items-center justify-between uppercase tracking-widest text-red-500/70 font-light">
-          <span className="text-[1.2vh] font-semibold text-red-500">{gameState.stateDirectives}</span>
+          <span className="text-[1.8vh] sm:text-[2vh] font-bold leading-none text-red-500">{gameState.stateDirectives}</span>
           <div className="flex items-center gap-1 text-responsive-xs">
             <span>State</span>
             <Eye className="w-[1.4vh] h-[1.4vh]" />
@@ -241,7 +241,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
       >
         <span 
           className={cn(
-            "text-responsive-xs uppercase tracking-[0.2em] transition-colors duration-300",
+            "text-[9px] sm:text-[10px] uppercase tracking-[0.2em] transition-colors duration-300",
             gameState.electionTracker >= 3 ? "text-red-400 font-semibold shadow-red-500/50 drop-shadow-[0_0_5px_rgba(239,68,68,0.5)]" :
             gameState.electionTracker === 2 ? "text-orange-400 font-light" :
             gameState.electionTracker === 1 ? "text-amber-500 font-light" :

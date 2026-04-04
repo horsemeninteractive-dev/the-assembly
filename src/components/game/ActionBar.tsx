@@ -427,7 +427,7 @@ export const ActionBar = ({
         )}
 
         {/* Title Role Prompt */}
-        {gameState.titlePrompt && gameState.titlePrompt.playerId === me?.id && (
+        {gameState.titlePrompt && gameState.titlePrompt.playerId === me?.id && !gameState.heraldPendingResponse && (
           <div className="flex flex-col gap-[1vh] w-full justify-center h-full items-center">
             {[
               'Strategist',
@@ -537,9 +537,9 @@ export const ActionBar = ({
           )}
 
         {/* Voting */}
-        {gameState.phase === 'Voting' && me?.isAlive && !me.vote && !gameState.titlePrompt && (
+        {gameState.phase === 'Voting' && (me?.isAlive || gameState.ghostVoterId === me?.id) && !me?.vote && !gameState.titlePrompt && (
           <div className="flex gap-[1vw] sm:gap-[2vw] w-full justify-center h-full items-center">
-            {gameState.detainedPlayerId === me.id ? (
+            {gameState.detainedPlayerId === me?.id ? (
               <div className="text-purple-400 font-mono text-responsive-xs uppercase tracking-widest text-center animate-pulse">
                 You are detained and cannot vote this round
               </div>

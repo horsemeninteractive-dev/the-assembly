@@ -136,8 +136,8 @@ export const PlayerCard = React.memo(
           p.isAlive
             ? 'bg-surface-card backdrop-blur-sm border-subtle'
             : 'bg-[radial-gradient(circle_at_center,_rgba(127,29,29,0.4)_0%,_rgba(0,0,0,0.8)_100%)] border-red-900/60 opacity-80 grayscale-[0.5] shadow-[inset_0_0_40px_rgba(0,0,0,0.6)]',
-          p.isPresidentialCandidate && 'border-yellow-500/80 ring-2 ring-yellow-500/40 animate-pulse bg-yellow-900/10 z-20',
-          p.isChancellorCandidate && 'border-blue-500/80 ring-2 ring-blue-500/40 opacity-90 z-20',
+          p.isPresidentialCandidate && gameState.phase !== 'Voting_Reveal' && 'border-yellow-500/80 ring-2 ring-yellow-500/40 animate-pulse bg-yellow-900/10 z-20',
+          p.isChancellorCandidate && gameState.phase !== 'Voting_Reveal' && 'border-blue-500/80 ring-2 ring-blue-500/40 opacity-90 z-20',
           p.isPresident && 'bg-yellow-900/30 border-yellow-400 shadow-[0_0_25px_-5px_rgba(234,179,8,0.5)] border-2 ring-1 ring-yellow-500/30 z-30',
           p.isChancellor && 'bg-blue-900/30 border-blue-400 shadow-[0_0_25px_-5px_rgba(59,130,246,0.5)] border-2 ring-1 ring-blue-500/30 z-30'
         )}
@@ -221,11 +221,12 @@ export const PlayerCard = React.memo(
 
         {/* Declaration Indicators */}
         {(() => {
-          // Only show declarations on cards once BOTH have declared
-          const bothDeclared =
-            gameState.declarations.some((d) => d.type === 'President') &&
-            gameState.declarations.some((d) => d.type === 'Chancellor');
-          if (!bothDeclared) return null;
+          // Show declarations once both have declared (or Chancellor alone if President blocked)
+          const chanDeclared = gameState.declarations.some((d) => d.type === 'Chancellor');
+          const presDeclared = gameState.declarations.some((d) => d.type === 'President');
+          const declarationsComplete = (presDeclared && chanDeclared) || (gameState.presidentDeclarationBlocked && chanDeclared);
+          
+          if (!declarationsComplete) return null;
 
           const playerDecls = gameState.declarations.filter((d) => d.playerId === p.id);
           const presDecl = playerDecls.find((d) => d.type === 'President');
