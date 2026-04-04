@@ -26,10 +26,10 @@ const getEventIcon = (id: EventCardId) => {
 
 const getEventColor = (id: EventCardId) => {
   switch (id) {
-    case 'state_of_emergency': return 'border-red-500/50 bg-red-900/20 text-red-100';
-    case 'blackout': return 'border-zinc-500/50 bg-zinc-900/20 text-zinc-100';
+    case 'state_of_emergency': return 'border-red-500/80 bg-red-900/30 text-red-100 shadow-[0_0_15px_rgba(239,68,68,0.3)] animate-pulse-slow';
+    case 'blackout': return 'border-zinc-700/50 bg-black/50 text-zinc-100';
     case 'snap_election': return 'border-purple-500/50 bg-purple-900/20 text-purple-100';
-    case 'iron_mandate': return 'border-yellow-500/50 bg-yellow-900/20 text-yellow-100';
+    case 'iron_mandate': return 'border-yellow-500/60 bg-yellow-900/20 text-yellow-100 overflow-hidden animate-shine';
     case 'open_session': return 'border-blue-500/50 bg-blue-900/20 text-blue-100';
     case 'censure_motion': return 'border-zinc-500/50 bg-zinc-800/40 text-zinc-100';
     case 'veiled_proceedings': return 'border-emerald-500/50 bg-emerald-900/20 text-emerald-100';
@@ -79,8 +79,13 @@ export const CrisisEventDisplay: React.FC<CrisisEventDisplayProps> = ({ activeEv
           </div>
           
           {/* Subtle scanning lines or effect */}
-          <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none">
+          <div className="absolute inset-0 overflow-hidden rounded-2xl pointer-events-none -z-10">
             <div className="absolute inset-0 bg-gradient-to-t from-white/5 to-transparent opacity-30" />
+            
+            {activeEvent.id === 'blackout' && (
+              <div className="absolute inset-0 bg-blackout-static opacity-60 mix-blend-screen" />
+            )}
+
             <motion.div 
                animate={{ y: ["0%", "200%"] }}
                transition={{ duration: 4, repeat: Infinity, ease: "linear" }}

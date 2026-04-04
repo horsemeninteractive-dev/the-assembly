@@ -2,6 +2,7 @@ import React from 'react';
 import { Shield, Trophy, Check, Star, Flame, Zap, Heart, Scroll, Calendar } from 'lucide-react';
 import { User } from '../../../shared/types';
 import { getRankTier, getRankLabel } from '../../utils/ranks';
+import { RankIcon } from '../icons';
 import { cn } from '../../utils/utils';
 
 export const StatCard = ({
@@ -41,9 +42,7 @@ export function StatsTab({ user }: StatsTabProps) {
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <span className="text-3xl leading-none">
-              {getRankTier(user.stats.elo).icon}
-            </span>
+            <RankIcon tier={getRankTier(user.stats.elo).name} className="w-10 h-10" />
             <div>
               <div className="text-[10px] font-mono text-muted uppercase tracking-widest mb-0.5">
                 Ranked Rating

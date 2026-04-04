@@ -84,7 +84,7 @@ const BIG_PLAY_ICON: Record<BigPlay['icon'], React.ReactNode> = {
 /** Duration (ms) each slide auto-advances after. */
 function slideDuration(slide: Slide): number {
   if (slide.kind === 'bigplays') return Math.max(3200, slide.plays.length * 1000 + 1200);
-  if (slide.kind === 'player') return 2200;
+  if (slide.kind === 'player') return slide.player.role === 'Overseer' ? 3500 : 2600;
   if (slide.kind === 'finale') return 3000;
   return 3200; // intro
 }
@@ -177,9 +177,7 @@ function orderedPlayers(players: Player[]): Player[] {
 
 const IntroSlide = ({ gameState }: { gameState: GameState }) => {
   const isCivil = gameState.winner === 'Civil';
-  const color = isCivil 
-    ? 'text-blue-600 dark:text-blue-400' 
-    : 'text-red-600 dark:text-red-400';
+  const color = 'text-primary';
   const glow = isCivil
     ? 'drop-shadow-[0_0_30px_rgba(59,130,246,0.4)] dark:drop-shadow-[0_0_30px_rgba(59,130,246,0.6)]'
     : 'drop-shadow-[0_0_30px_rgba(239,68,68,0.4)] dark:drop-shadow-[0_0_30px_rgba(239,68,68,0.6)]';
@@ -199,10 +197,10 @@ const IntroSlide = ({ gameState }: { gameState: GameState }) => {
       </motion.p>
 
       <motion.h1
-        initial={{ opacity: 0, y: 20, scale: 0.9 }}
-        animate={{ opacity: 1, y: 0, scale: 1 }}
-        transition={{ duration: 0.8, delay: 0.6, ease: [0.16, 1, 0.3, 1] }}
-        className={cn('font-thematic text-5xl lg:text-7xl uppercase tracking-widest leading-tight', color, glow)}
+        initial={{ opacity: 0, y: 20, scale: 0.95, letterSpacing: '0.4em' }}
+        animate={{ opacity: 1, y: 0, scale: 1, letterSpacing: '0.15em' }}
+        transition={{ duration: 1.6, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        className={cn('font-thematic text-4xl sm:text-5xl lg:text-7xl uppercase leading-tight px-4', color, glow)}
       >
         {gameState.winReason ?? (isCivil ? 'Charter Restored' : 'State Supremacy')}
       </motion.h1>
@@ -274,7 +272,17 @@ const PlayerSlide = ({
   const displayName = player.name.replace(' (AI)', '');
 
   return (
-    <div className="flex flex-col items-center gap-6 px-8 text-center">
+    <div className="flex flex-col items-center gap-6 px-8 text-center relative z-10 w-full h-full justify-center">
+      {/* Intense red flash for Overseer reveal */}
+      {role === 'Overseer' && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: [0, 0.4, 0] }}
+          transition={{ delay: 1.1, duration: 1.5, ease: 'easeOut' }}
+          className="fixed inset-0 bg-red-600 mix-blend-overlay pointer-events-none -z-10"
+        />
+      )}
+
       {/* Progress indicator */}
       <motion.p
         initial={{ opacity: 0 }}
@@ -288,7 +296,7 @@ const PlayerSlide = ({
       <motion.div
         initial={{ scale: 0.7, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
         className="relative"
       >
         <div
@@ -316,7 +324,7 @@ const PlayerSlide = ({
       <motion.div
         initial={{ opacity: 0, y: 8 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.2, duration: 0.4 }}
+        transition={{ delay: 0.1, duration: 0.3 }}
         className="flex flex-col items-center gap-1"
       >
         <span className={cn('text-xl lg:text-2xl font-thematic tracking-wide', isMe && 'text-yellow-400')}>
@@ -333,7 +341,7 @@ const PlayerSlide = ({
       <motion.div
         initial={{ opacity: 0, scale: 0.8, y: 6 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        transition={{ delay: 0.55, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+        transition={{ delay: 1.1, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         className={cn(
           'px-5 py-2 rounded-xl border text-xs font-mono uppercase tracking-[0.2em] font-bold',
           style.text,
@@ -350,7 +358,7 @@ const PlayerSlide = ({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 0.85 }}
+          transition={{ delay: 1.4 }}
           className="flex items-center gap-2 text-[10px] font-mono text-red-400/80 uppercase tracking-[0.2em]"
         >
           <Shield className="w-3 h-3" />
@@ -363,7 +371,7 @@ const PlayerSlide = ({
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ delay: 1.1 }}
+          transition={{ delay: 1.6 }}
           className={cn(
             'flex items-center gap-2 text-[10px] font-mono uppercase tracking-widest px-3 py-1.5 rounded-lg border',
             agendaStatus === 'completed'
@@ -527,7 +535,7 @@ export const DebriefSequence = ({
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           transition={{ duration: 0.5 }}
-          className="absolute inset-0 z-[60] flex flex-col items-center justify-center cursor-pointer select-none bg-base/95 backdrop-blur-xl"
+          className="absolute inset-0 z-[60] flex flex-col items-center justify-center cursor-pointer select-none bg-backdrop backdrop-blur-xl"
           onClick={advance}
         >
           {/* Subtle spotlight */}

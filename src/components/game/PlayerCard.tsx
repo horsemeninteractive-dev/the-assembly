@@ -1,6 +1,6 @@
 import React, { useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Users, Eye, Check, ShieldOff, WifiOff, AlertCircle } from 'lucide-react';
+import { Users, Eye, Check, ShieldOff, WifiOff, AlertCircle, Skull } from 'lucide-react';
 import { socket } from '../../socket';
 import { GameState, Player } from '../../../shared/types';
 import { getFrameStyles, getVoteStyles } from '../../utils/cosmetics';
@@ -135,13 +135,20 @@ export const PlayerCard = React.memo(
           'relative p-[0.5vh] sm:p-[1vh] rounded-xl border transition-all duration-300 flex flex-col items-center justify-center min-h-0 cursor-pointer overflow-hidden group',
           p.isAlive
             ? 'bg-surface-card backdrop-blur-sm border-subtle'
-            : 'bg-base/50 border-transparent opacity-50 grayscale',
-          p.isPresidentialCandidate && 'border-yellow-500/50 ring-1 ring-yellow-500/20',
-          p.isChancellorCandidate && 'border-blue-500/50 ring-1 ring-blue-500/20',
-          p.isPresident && 'bg-yellow-900/20 border-yellow-500 shadow-lg shadow-yellow-500/10',
-          p.isChancellor && 'bg-blue-900/20 border-blue-500 shadow-lg shadow-blue-500/10'
+            : 'bg-[radial-gradient(circle_at_center,_rgba(127,29,29,0.4)_0%,_rgba(0,0,0,0.8)_100%)] border-red-900/60 opacity-80 grayscale-[0.5] shadow-[inset_0_0_40px_rgba(0,0,0,0.6)]',
+          p.isPresidentialCandidate && 'border-yellow-500/80 ring-2 ring-yellow-500/40 animate-pulse bg-yellow-900/10 z-20',
+          p.isChancellorCandidate && 'border-blue-500/80 ring-2 ring-blue-500/40 opacity-90 z-20',
+          p.isPresident && 'bg-yellow-900/30 border-yellow-400 shadow-[0_0_25px_-5px_rgba(234,179,8,0.5)] border-2 ring-1 ring-yellow-500/30 z-30',
+          p.isChancellor && 'bg-blue-900/30 border-blue-400 shadow-[0_0_25px_-5px_rgba(59,130,246,0.5)] border-2 ring-1 ring-blue-500/30 z-30'
         )}
       >
+        {/* Dead state overlay marker */}
+        {!p.isAlive && (
+          <div className="absolute inset-0 pointer-events-none z-10 overflow-hidden opacity-40 select-none">
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-0.5 bg-red-700 rotate-[15deg] shadow-[0_0_8px_rgba(239,68,68,0.4)]" />
+             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200%] h-0.5 bg-red-700 rotate-[-15deg] shadow-[0_0_8px_rgba(239,68,68,0.4)]" />
+          </div>
+        )}
         {/* Reaction Overlay */}
         <AnimatePresence>
           {reaction && (
@@ -185,9 +192,9 @@ export const PlayerCard = React.memo(
 
         {/* Not-Overseer marker */}
         {p.isProvenNotOverseer && (
-          <div className="absolute top-0.5 left-0.5 z-20 pointer-events-none">
-            <div className="px-1 py-0.5 rounded text-[8px] font-bold leading-none border border-white/20 bg-emerald-900/80 text-emerald-300">
-              NO
+          <div className="absolute top-0.5 left-0.5 z-20 pointer-events-none" title="Proven Not Overseer">
+            <div className="p-0.5 rounded border border-white/20 bg-emerald-900/80 text-emerald-300">
+              <ShieldOff className="w-2.5 h-2.5" />
             </div>
           </div>
         )}
@@ -196,9 +203,9 @@ export const PlayerCard = React.memo(
         {gameState.heraldLog?.some(
           (entry) => entry.targetId === p.id && entry.response === 'Confirmed'
         ) && (
-          <div className="absolute top-0.5 left-8 z-20 pointer-events-none group/herald">
+          <div className="absolute top-0.5 left-6 z-20 pointer-events-none group/herald" title="Herald Proclamation (Unverified)">
             <div className="px-1 py-0.5 rounded text-[8px] font-bold leading-none border border-blue-500/30 bg-blue-900/90 text-blue-300 shadow-[0_0_8px_rgba(59,130,246,0.3)] animate-pulse">
-              CIVIL??
+              C?
             </div>
           </div>
         )}
@@ -368,13 +375,13 @@ export const PlayerCard = React.memo(
                   {!p.isAlive && (
                     <div
                       className={cn(
-                        'absolute inset-0 flex items-center justify-center bg-backdrop-sm',
+                        'absolute inset-0 flex items-center justify-center bg-red-900/40 backdrop-blur-[1px]',
                         isManyPlayers ? 'rounded-lg' : 'rounded-xl'
                       )}
                     >
-                      <Eye
+                      <Skull
                         className={cn(
-                          'text-red-600 drop-shadow-[0_0_5px_rgba(220,38,38,0.8)]',
+                          'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)] animate-pulse-slow',
                           isManyPlayers ? 'w-4 h-4 sm:w-8 sm:h-8' : 'w-6 h-6 sm:w-8 sm:h-8'
                         )}
                       />
@@ -434,7 +441,7 @@ export const PlayerCard = React.memo(
               )}>
                 <div
                   className={cn(
-                    'font-thematic tracking-wide truncate px-1 leading-tight shrink-0 flex items-center gap-1',
+                    'font-thematic tracking-wide font-semibold truncate px-1 leading-tight shrink-0 flex items-center gap-1',
                     stream && isVideoActive
                       ? 'text-[7px] sm:text-[9px] bg-backdrop-sm rounded px-1'
                       : 'text-[9px] sm:text-[11px]',
@@ -454,7 +461,7 @@ export const PlayerCard = React.memo(
                     showVideo ? "scale-[0.8] origin-left" : "mt-0.5"
                   )}>
                     {p.clanEmblem && <ClanEmblem emblem={p.clanEmblem} size="xs" />}
-                    <div className="font-mono text-[7px] sm:text-[8px] text-ghost/70 truncate leading-none">
+                    <div className="font-light text-[7px] sm:text-[8px] text-ghost/70 truncate leading-none">
                       {p.clanTag}
                     </div>
                   </div>

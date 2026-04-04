@@ -14,6 +14,7 @@ import { User } from '../../../shared/types';
 import { cn, getProxiedUrl } from '../../utils/utils';
 import { getFrameStyles, getBackgroundTexture } from '../../utils/cosmetics';
 import { getRankTier, getRankLabel } from '../../utils/ranks';
+import { RankIcon } from '../icons';
 import { CLIENT_VERSION } from '../../sharedConstants';
 
 interface LobbyHeaderProps {
@@ -102,7 +103,7 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
               getRankTier(user.stats.elo).border
             )}
           >
-            <span className="text-responsive-xs">{getRankTier(user.stats.elo).icon}</span>
+            <RankIcon tier={getRankTier(user.stats.elo).name} className="w-[2vh] h-[2vh] shrink-0" />
             <div className="flex flex-col leading-none">
               <span
                 className={cn(
@@ -241,7 +242,7 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
             getRankTier(user.stats.elo).border
           )}
         >
-          <span className="text-xs">{getRankTier(user.stats.elo).icon}</span>
+          <RankIcon tier={getRankTier(user.stats.elo).name} className="w-3.5 h-3.5 shrink-0" />
           <span className="text-[10px] font-mono text-primary font-bold">
             {user.stats.elo} ELO
           </span>

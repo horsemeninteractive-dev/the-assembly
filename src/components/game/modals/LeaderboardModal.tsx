@@ -4,6 +4,7 @@ import { X, Trophy, Shield, Zap, Star } from 'lucide-react';
 import { cn } from '../../../utils/utils';
 import { User } from '../../../../shared/types';
 import { getRankTier, getRankLabel } from '../../../utils/ranks';
+import { RankIcon } from '../../icons';
 import { getProxiedUrl, apiUrl } from '../../../utils/utils';
 
 interface LeaderboardModalProps {
@@ -239,7 +240,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
                   {/* Stat value */}
                   {statTab === 'ELO' ? (
                     <div className="flex items-center gap-1.5 shrink-0">
-                      <span className="text-sm leading-none">{tier.icon}</span>
+                      <RankIcon tier={tier.name} className="w-4 h-4 shrink-0" />
                       <div className="text-right">
                         <div className={cn('text-xs font-mono font-bold', tier.color)}>
                           {getRankLabel(u.stats?.elo ?? 1000)}
@@ -280,9 +281,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
               </div>
               {statTab === 'ELO' ? (
                 <div className="flex items-center gap-1.5 shrink-0">
-                  <span className="text-sm">
-                    {getRankTier(currentUserData.stats?.elo ?? 1000).icon}
-                  </span>
+                  <RankIcon tier={getRankTier(currentUserData.stats?.elo ?? 1000).name} className="w-5 h-5 shrink-0" />
                   <div className="text-right">
                     <div
                       className={cn(

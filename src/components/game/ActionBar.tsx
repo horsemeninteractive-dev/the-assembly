@@ -182,7 +182,7 @@ export const ActionBar = ({
       {/* Phase status */}
       <div className="px-[2vw] py-[1.5vh] bg-white/5 border-b border-subtle flex justify-between items-center">
         <div className="min-w-0 flex-1 mr-2 flex flex-col justify-center">
-          <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono mb-1">
+          <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-light mb-1">
             Current Phase
           </div>
           <div className="min-h-[1.5em] overflow-hidden">
@@ -200,7 +200,7 @@ export const ActionBar = ({
             </AnimatePresence>
           </div>
           {/* Phase hints — always render the block to maintain 3-line height */}
-          <div className="text-responsive-xs text-faint font-mono mt-1 leading-tight truncate min-h-[1.25em]">
+          <div className="text-responsive-xs text-faint font-light mt-1 leading-tight truncate min-h-[1.25em]">
             {(user && (user.stats?.gamesPlayed ?? 0) < 5 && phaseHint()) || '\u00A0'}
           </div>
           {/* Cipher Parallel Action Button */}
@@ -260,7 +260,7 @@ export const ActionBar = ({
                 })()}
               </div>
               <div className="min-w-0 max-w-[80px] sm:max-w-[120px]">
-                <div className="text-[8px] font-mono uppercase tracking-[0.15em] text-faint leading-none mb-0.5">
+                <div className="text-[8px] font-light uppercase tracking-[0.15em] text-faint leading-none mb-0.5">
                   Crisis Active
                 </div>
                 <div className="text-[11px] font-serif italic text-primary truncate leading-none">

@@ -44,6 +44,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
   const [filterCasual, setFilterCasual] = useState(true);
   const [filterRanked, setFilterRanked] = useState(true);
   const [filterClassic, setFilterClassic] = useState(true);
+  const [filterCrisis, setFilterCrisis] = useState(true);
   const [filterJoinable, setFilterJoinable] = useState(false);
   const [filterInProgress, setFilterInProgress] = useState(true);
   const [sortBy, setSortBy] = useState<'players' | 'newest'>('newest');
@@ -57,6 +58,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
       if (!filterCasual && room.mode === 'Casual') return false;
       if (!filterRanked && room.mode === 'Ranked') return false;
       if (!filterClassic && room.mode === 'Classic') return false;
+      if (!filterCrisis && room.mode === 'Crisis') return false;
       if (filterJoinable && room.phase !== 'Lobby') return false;
       if (!filterInProgress && room.phase !== 'Lobby') return false;
       return true;
@@ -116,19 +118,25 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
               label: 'Casual',
               active: filterCasual,
               toggle: () => setFilterCasual((v) => !v),
-              color: 'border-blue-500/60 text-blue-400 bg-blue-900/20',
+              color: 'bg-blue-600 border-blue-400 text-white shadow-[0_0_10px_rgba(37,99,235,0.4)]',
             },
             {
               label: 'Ranked',
               active: filterRanked,
               toggle: () => setFilterRanked((v) => !v),
-              color: 'border-yellow-500/60 text-yellow-400 bg-yellow-900/20',
+              color: 'bg-yellow-500 border-yellow-300 text-black shadow-[0_0_10px_rgba(234,179,8,0.4)]',
             },
             {
               label: 'Classic',
               active: filterClassic,
               toggle: () => setFilterClassic((v) => !v),
-              color: 'border-emerald-500/60 text-emerald-400 bg-emerald-900/20',
+              color: 'bg-emerald-600 border-emerald-400 text-white shadow-[0_0_10px_rgba(5,150,105,0.4)]',
+            },
+            {
+              label: 'Crisis',
+              active: filterCrisis,
+              toggle: () => setFilterCrisis((v) => !v),
+              color: 'bg-purple-600 border-purple-400 text-white shadow-[0_0_10px_rgba(147,51,234,0.4)]',
             },
           ].map((f) => (
             <button
@@ -139,16 +147,10 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                 f.toggle();
               }}
               className={cn(
-                'flex items-center gap-1 px-2 py-1 rounded-lg border text-[9px] font-mono uppercase tracking-widest transition-all shrink-0',
-                f.active ? f.color : 'border-subtle text-ghost bg-elevated'
+                'px-3 py-1.5 rounded-full border text-[9px] font-mono uppercase tracking-widest transition-all shrink-0',
+                f.active ? f.color : 'border-subtle text-ghost bg-elevated hover:bg-surface'
               )}
             >
-              <div
-                className={cn(
-                  'w-1.5 h-1.5 rounded-sm border',
-                  f.active ? 'bg-current border-current' : 'border-ghost'
-                )}
-              />
               {f.label}
             </button>
           ))}
@@ -164,7 +166,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                 setFilterJoinable((v) => !v);
                 if (!filterJoinable) setFilterInProgress(false);
               },
-              color: 'border-emerald-500/60 text-emerald-400 bg-emerald-900/20',
+              color: 'bg-emerald-600 border-emerald-400 text-white shadow-[0_0_10px_rgba(5,150,105,0.4)]',
             },
             {
               label: 'Active',
@@ -173,7 +175,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                 setFilterInProgress((v) => !v);
                 if (!filterInProgress) setFilterJoinable(false);
               },
-              color: 'border-red-500/60 text-red-400 bg-red-900/20',
+              color: 'bg-red-600 border-red-400 text-white shadow-[0_0_10px_rgba(220,38,38,0.4)]',
             },
           ].map((f) => (
             <button
@@ -183,16 +185,10 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                 f.toggle();
               }}
               className={cn(
-                'flex items-center gap-1 px-2 py-1 rounded-lg border text-[9px] font-mono uppercase tracking-widest transition-all shrink-0',
-                f.active ? f.color : 'border-subtle text-ghost bg-elevated'
+                'px-3 py-1.5 rounded-full border text-[9px] font-mono uppercase tracking-widest transition-all shrink-0',
+                f.active ? f.color : 'border-subtle text-ghost bg-elevated hover:bg-surface'
               )}
             >
-              <div
-                className={cn(
-                  'w-1.5 h-1.5 rounded-sm border',
-                  f.active ? 'bg-current border-current' : 'border-ghost'
-                )}
-              />
               {f.label}
             </button>
           ))}
@@ -260,6 +256,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                   setFilterCasual(true);
                   setFilterRanked(true);
                   setFilterClassic(true);
+                  setFilterCrisis(true);
                   setFilterJoinable(false);
                   setFilterInProgress(true);
                 }}
@@ -285,8 +282,19 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                   onJoinRoom(room.id);
                 }
               }}
-              className="group relative bg-surface border border-subtle rounded-2xl p-[2vh] text-left transition-all hover:border-red-900/50 hover:shadow-2xl hover:shadow-red-900/5 cursor-pointer"
+              className="group relative bg-surface border border-subtle rounded-2xl p-[2vh] pl-[calc(2vh+4px)] text-left transition-all hover:border-red-900/50 hover:shadow-2xl hover:shadow-red-900/5 cursor-pointer overflow-hidden"
             >
+              {/* Modal Scannability Stripe */}
+              <div 
+                className={cn(
+                  "absolute left-0 top-0 bottom-0 w-[4px]",
+                  room.mode === 'Ranked' ? "bg-yellow-500" :
+                  room.mode === 'Classic' ? "bg-emerald-500" :
+                  room.mode === 'Crisis' ? "bg-purple-500" :
+                  "bg-blue-500"
+                )}
+              />
+
               <div className="flex items-start justify-between mb-[2vh]">
                 <div className="w-[6vh] h-[6vh] bg-elevated border border-subtle rounded-2xl flex items-center justify-center group-hover:bg-red-900/10 group-hover:border-red-900/30 transition-colors">
                   <Users className="w-[3vh] h-[3vh] text-ghost group-hover:text-red-500 transition-colors" />
@@ -309,7 +317,9 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                         ? 'bg-yellow-900/10 border-yellow-900/30 text-yellow-500'
                         : room.mode === 'Classic'
                           ? 'bg-emerald-900/10 border-emerald-900/30 text-emerald-500'
-                          : 'bg-blue-900/10 border-blue-900/30 text-blue-400'
+                          : room.mode === 'Crisis'
+                            ? 'bg-purple-900/10 border-purple-900/30 text-purple-400'
+                            : 'bg-blue-900/10 border-blue-900/30 text-blue-400'
                     )}
                   >
                     {room.mode}

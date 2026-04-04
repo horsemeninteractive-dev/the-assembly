@@ -39,6 +39,7 @@ export function registerSystemRoutes({ app, engine }: RouteContext): void {
       ranked: strip(boards.ranked),
       casual: strip(boards.casual),
       classic: strip(boards.classic),
+      crisis: strip(boards.crisis),
     });
   });
 
