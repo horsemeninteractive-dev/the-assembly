@@ -396,9 +396,11 @@ export class TitleRoleResolver {
           return;
         }
 
-        // Handle initiating Herald
+        // Handle initiating Herald — only consume titleUsed if a valid target exists
         const target = s.players.find((p) => p.id === data.targetId && p.isAlive);
         if (target) {
+          // Mark as used now (power was fired). If the target never responds (timeout),
+          // the decline path in onTitleAbilityDeclined restores titleUsed=false.
           s.heraldPendingResponse = { targetId: target.id, claim: data.claim || 'Civil' };
           s.titlePrompt = {
             playerId: target.id,
@@ -412,6 +414,8 @@ export class TitleRoleResolver {
           addLog(s, `${player.name} (Herald) issued a public assertion against ${target.name}.`);
           this.engine.startActionTimer(roomId, 10000); // 10s countdown
         } else {
+          // No valid target — do not consume the power
+          player.titleUsed = false;
           this.engine.enterPhase(s, roomId, 'Nominate_Chancellor');
         }
         break;
@@ -465,9 +469,19 @@ export class TitleRoleResolver {
       case 'Archivist':
         this.continuePostRoundAfter(s, roomId, 'Archivist');
         break;
-      case 'Herald':
+      case 'Herald': {
+        if (s.heraldPendingResponse) {
+          // Target's response timed out — restore the Herald's power
+          const herald = s.players.find(p => p.titleRole === 'Herald');
+          if (herald) {
+            herald.titleUsed = false;
+            addLog(s, `[Timer] ${player.name} did not respond to the Herald's assertion. Power refunded.`);
+          }
+          s.heraldPendingResponse = undefined;
+        }
         this.engine.enterPhase(s, roomId, 'Nominate_Chancellor');
         break;
+      }
       case 'Quorum':
         s.quorumRevotePending = false;
         await this.engine.roundManager.handleElectionFailureContinuation(s, roomId);

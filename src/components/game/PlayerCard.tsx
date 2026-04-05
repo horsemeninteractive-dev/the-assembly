@@ -401,16 +401,31 @@ export const PlayerCard = React.memo(
                     )}
                 </div>
 
-                {/* Mobile role badges */}
-                <div className="sm:hidden absolute top-0 -right-1 flex flex-col gap-0.5 z-10">
+                {/* Mobile-only avatar corner badges — replaces text badges below name */}
+                <div className="sm:hidden absolute -top-1 -right-1 flex flex-col gap-0.5 z-10 items-end">
                   {(p.isPresident || p.isPresidentialCandidate) && (
-                    <div className="w-3 h-3 bg-yellow-500 rounded-sm border border-deep flex items-center justify-center shadow-sm">
-                      <span className="text-[7px] font-bold text-black leading-none">P</span>
+                    <div className="w-4 h-4 bg-yellow-500 rounded-sm border border-black/40 flex items-center justify-center shadow-md">
+                      <span className="text-[8px] font-bold text-black leading-none">P</span>
                     </div>
                   )}
                   {(p.isChancellor || p.isChancellorCandidate) && (
-                    <div className="w-3 h-3 bg-blue-500 rounded-sm border border-deep flex items-center justify-center shadow-sm">
-                      <span className="text-[7px] font-bold text-primary leading-none">C</span>
+                    <div className="w-4 h-4 bg-blue-500 rounded-sm border border-black/40 flex items-center justify-center shadow-md">
+                      <span className="text-[8px] font-bold text-white leading-none">C</span>
+                    </div>
+                  )}
+                  {gameState.detainedPlayerId === p.id && (
+                    <div className="w-4 h-4 bg-purple-600 rounded-sm border border-black/40 flex items-center justify-center shadow-md">
+                      <span className="text-[8px] font-bold text-white leading-none">D</span>
+                    </div>
+                  )}
+                  {gameState.censuredPlayerId === p.id && (
+                    <div className="w-4 h-4 bg-red-600 rounded-sm border border-black/40 flex items-center justify-center shadow-md animate-pulse">
+                      <span className="text-[8px] font-bold text-white leading-none">X</span>
+                    </div>
+                  )}
+                  {gameState.ghostVoterId === p.id && (
+                    <div className="w-4 h-4 bg-slate-700 rounded-sm border border-white/20 flex items-center justify-center shadow-md">
+                      <span className="text-[8px] font-bold text-slate-300 leading-none">G</span>
                     </div>
                   )}
                 </div>
@@ -501,39 +516,6 @@ export const PlayerCard = React.memo(
                 )}
               </div>
 
-              {/* Mobile badges */}
-              <div
-                className={cn(
-                  'sm:hidden flex flex-wrap gap-0.5 mt-0.5 justify-center',
-                  stream && isVideoActive && 'hidden'
-                )}
-              >
-                {!p.isAlive && (
-                  <span className="px-1 py-0.5 bg-red-900/20 text-red-500 font-mono uppercase rounded text-[6px]">
-                    Dead
-                  </span>
-                )}
-                {gameState.detainedPlayerId === p.id && (
-                  <span className="px-1 py-0.5 bg-purple-900/20 text-purple-500 font-mono uppercase rounded text-[6px]">
-                    Detained
-                  </span>
-                )}
-                {(p.isPresident || p.isPresidentialCandidate) && (
-                  <span className="px-1 py-0.5 bg-yellow-900/20 text-yellow-500 font-mono uppercase rounded text-[6px]">
-                    {p.isPresident ? 'Pres' : 'Cand'}
-                  </span>
-                )}
-                {(p.isChancellor || p.isChancellorCandidate) && (
-                  <span className="px-1 py-0.5 bg-blue-900/20 text-blue-500 font-mono uppercase rounded text-[6px]">
-                    {p.isChancellor ? 'Chan' : 'Nom'}
-                  </span>
-                )}
-                {gameState.censuredPlayerId === p.id && (
-                  <span className="px-1 py-0.5 bg-red-900/40 text-red-400 font-mono uppercase rounded border border-red-500/50 text-[6px] animate-pulse">
-                    Censured
-                  </span>
-                )}
-              </div>
             </div>
           </div>
 
@@ -590,6 +572,7 @@ export const PlayerCard = React.memo(
         {gameState.titlePrompt &&
           me &&
           gameState.titlePrompt.playerId === me.id &&
+          !gameState.heraldPendingResponse &&
           !isMe &&
           p.isAlive &&
           (() => {

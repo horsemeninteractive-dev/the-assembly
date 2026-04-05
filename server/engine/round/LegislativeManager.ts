@@ -136,7 +136,7 @@ export class LegislativeManager {
       const st = this.round.engine.rooms.get(roomId);
       if (!st || st.isPaused || st.phase === 'GameOver') return;
 
-      const amount = st.ironMandate ? 2 : 1;
+      const amount = (st.ironMandate && !isChaos) ? 2 : 1;
       if (policy === 'Civil') {
         st.civilDirectives += amount;
         addLog(st, `A Civil directive was enacted${st.ironMandate ? ' (Iron Mandate: x2)' : ''}.`);

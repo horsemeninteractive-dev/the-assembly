@@ -177,7 +177,9 @@ function orderedPlayers(players: Player[]): Player[] {
 
 const IntroSlide = ({ gameState }: { gameState: GameState }) => {
   const isCivil = gameState.winner === 'Civil';
-  const color = 'text-primary';
+  const color = isCivil
+    ? 'text-blue-400'
+    : 'text-red-500';
   const glow = isCivil
     ? 'drop-shadow-[0_0_30px_rgba(59,130,246,0.4)] dark:drop-shadow-[0_0_30px_rgba(59,130,246,0.6)]'
     : 'drop-shadow-[0_0_30px_rgba(239,68,68,0.4)] dark:drop-shadow-[0_0_30px_rgba(239,68,68,0.6)]';

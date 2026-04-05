@@ -109,6 +109,11 @@ export class RoundManager {
             p.vote = Math.random() > 0.3 ? 'Aye' : 'Nay';
           }
         }
+        // Also auto-cast for the Dead Man's Gambit ghost voter (dead player, excluded by isAlive)
+        if (s.ghostVoterId) {
+          const ghost = s.players.find(p => p.id === s.ghostVoterId && !p.vote);
+          if (ghost) ghost.vote = Math.random() > 0.3 ? 'Aye' : 'Nay';
+        }
         addLog(s, '[Timer] Voting timed out. Remaining votes auto-cast.');
         this.election.tallyVotes(s, roomId);
         break;
@@ -137,6 +142,12 @@ export class RoundManager {
             await this.executive.apply(s, roomId, target.id);
           }
         }
+        break;
+      }
+      case 'Censure_Action': {
+        // No handler from players — tally whatever votes exist and continue
+        addLog(s, '[Timer] Censure vote timed out. Tallying partial results.');
+        this.election.tallyCensure(s, roomId);
         break;
       }
     }
@@ -293,6 +304,8 @@ export class RoundManager {
       this.engine.crisisEngine.drawEventCard(state, roomId);
       if (state.activeEventCard) {
         this.enterPhase(state, roomId, 'Event_Reveal');
+        // Suppress the action-timer countdown during the reveal — it has no handler
+        this.clearActionTimer(roomId);
         
         setTimeout(() => {
           const s = this.engine.rooms.get(roomId);
@@ -329,6 +342,18 @@ export class RoundManager {
         state.lastPresidentIdx = -1;
       }
       this.advancePresidentIdx(state);
+    } else {
+      // Even on skipAdvance (e.g. SpecialElection), decrement the Handler swap counter
+      // so the swap doesn't last an extra round beyond its intended window.
+      if (state.handlerSwapPending !== undefined) {
+        state.handlerSwapPending--;
+        if (state.handlerSwapPending <= 0 && state.presidentialOrder && state.handlerSwapPositions) {
+          const [p1, p2] = state.handlerSwapPositions;
+          [state.presidentialOrder[p1], state.presidentialOrder[p2]] = [state.presidentialOrder[p2], state.presidentialOrder[p1]];
+          state.handlerSwapPending = undefined;
+          state.handlerSwapPositions = undefined;
+        }
+      }
     }
 
     state.round++;
@@ -473,7 +498,28 @@ export class RoundManager {
       handlerSwapPending: undefined,
       handlerSwapPositions: undefined,
       isStrategistAction: undefined,
+      // Crisis mode flags — always clear on reset regardless of current mode
+      activeEventCard: undefined,
+      electionTrackerFrozen: undefined,
+      openSession: undefined,
+      presidentDeclarationBlocked: undefined,
+      censureMotionActive: undefined,
+      censuredPlayerId: undefined,
+      ghostVoterId: undefined,
+      snapElectionActive: undefined,
+      snapElectionPhaseDone: undefined,
+      doubleTrackerOnFail: undefined,
+      ironMandate: undefined,
+      chatBlackout: undefined,
+      chatBlackoutBuffer: undefined,
     });
+    // Reinit or clean up the Crisis deck
+    if (state.mode === 'Crisis') {
+      this.engine.crisisEngine.cleanup(roomId);
+      this.engine.crisisEngine.initDeck(roomId);
+    } else {
+      this.engine.crisisEngine.cleanup(roomId);
+    }
     state.players = state.players.filter((p) => !p.isAI && !p.isDisconnected);
     state.players.forEach((p) => {
       p.role = undefined;

@@ -46,7 +46,7 @@ export async function handleJoinRoom(
   // Validation & Sanitisation
   if (typeof roomId !== 'string' || roomId.length < 1 || roomId.length > 40) return;
   if (typeof rawName !== 'string') return;
-  if (userId && userId !== socket.data.userId) {
+  if (userId && socket.data.userId && userId !== socket.data.userId) {
     socket.emit('error', { code: 'UNAUTHORIZED', message: 'User ID mismatch.' });
     return;
   }

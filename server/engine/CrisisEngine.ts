@@ -114,6 +114,7 @@ export class CrisisEngine {
     s.censuredPlayerId = undefined;
     s.ghostVoterId = undefined;
     s.snapElectionActive = undefined;
+    s.snapElectionPhaseDone = undefined;
     s.doubleTrackerOnFail = undefined;
     s.ironMandate = undefined;
     s.chatBlackout = undefined;

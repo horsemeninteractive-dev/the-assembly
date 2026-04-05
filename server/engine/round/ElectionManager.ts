@@ -281,6 +281,8 @@ export class ElectionManager {
     if (!s.electionTrackerFrozen) {
       s.electionTracker += s.doubleTrackerOnFail ? 2 : 1;
     }
+    // Consume Double or Nothing so a Quorum re-vote failure doesn't double-increment again
+    s.doubleTrackerOnFail = undefined;
     if (s.electionTracker >= 3) {
       await this.round.legislative.enactChaosPolicy(s, roomId);
     } else {
