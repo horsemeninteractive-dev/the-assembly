@@ -41,6 +41,8 @@ export async function handleJoinRoom(
     privacy,
     inviteCode,
     avatarUrl: clientAvatarUrl,
+    isPractice,
+    aiDifficulty,
   } = result.data;
 
   // Validation & Sanitisation
@@ -141,7 +143,15 @@ export async function handleJoinRoom(
       vetoUnlocked: false,
       vetoRequested: false,
       declarations: [],
+      isPractice: !!isPractice,
+      aiDifficulty: aiDifficulty || 'Normal',
     };
+    
+    if (state.isPractice) {
+      state.privacy = 'private';
+      state.log = [`Room ${roomId} created as a Solo Practice session.`];
+    }
+    
     engine.rooms.set(roomId, state);
   } else {
     // Room exists — check reconnect FIRST before any privacy gate
@@ -186,6 +196,11 @@ export async function handleJoinRoom(
     }
 
     // Enforce privacy — applies to both players and spectators
+    if (state.isPractice && userId !== state.hostUserId) {
+      socket.emit('error', 'This is a private practice session.');
+      return;
+    }
+
     if (state.privacy === 'private') {
       if (state.inviteCode && inviteCode?.toUpperCase() !== state.inviteCode) {
         socket.emit('error', 'Invalid invite code.');

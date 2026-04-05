@@ -210,7 +210,7 @@ export class RoundManager {
         wasPresident: false,
         wasChancellor: false,
         isAI: true,
-        difficulty: pick(['Casual', 'Normal', 'Elite']) as 'Casual' | 'Normal' | 'Elite',
+        difficulty: state.aiDifficulty || (pick(['Casual', 'Normal', 'Elite']) as 'Casual' | 'Normal' | 'Elite'),
         stateEnactments: 0,
         civilEnactments: 0,
       });

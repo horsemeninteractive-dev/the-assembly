@@ -58,7 +58,7 @@ export class MatchCloser {
     
     inFlightWrites.add(writePromise);
 
-    if (winner) await incrementGlobalWin(winner);
+    if (winner && !s.isPractice) await incrementGlobalWin(winner);
     this.engine.broadcastState(roomId);
   }
 
@@ -140,7 +140,7 @@ export class MatchCloser {
       let clanXpEarned = 0;
       const opponentAvgElo = p.role === 'Civil' ? avgStateElo : avgCivilElo;
 
-      if (!isInconclusive) {
+      if (!isInconclusive && !s.isPractice) {
         user.stats.gamesPlayed++;
         if (p.role === 'Civil') user.stats.civilGames++;
         else if (p.role === 'State') user.stats.stateGames++;
@@ -171,6 +171,9 @@ export class MatchCloser {
         }
 
         user.stats.elo = Math.max(0, user.stats.elo + eloChange);
+      } else if (!isInconclusive && s.isPractice) {
+        logger.info({ userId: user.id }, 'Practice mode: Bypassing persistent stat updates');
+      } else if (isLeaver) {
 
         const xpGain = calculateXpGain({
           win: won,
@@ -185,55 +188,62 @@ export class MatchCloser {
           }
         }
 
-        newAchievementIds = checkAchievements({ user, s, p, won, agendaCompleted });
-        let achievementXp = 0;
-        let achievementCp = 0;
-        if (newAchievementIds.length > 0) {
-          if (!user.earnedAchievements) user.earnedAchievements = [];
-          for (const id of newAchievementIds) {
-            user.earnedAchievements.push({ id, earnedAt: now });
-            const def = ACHIEVEMENT_MAP.get(id);
-            if (def) {
-              achievementXp += def.xpReward;
-              achievementCp += def.cpReward;
+        if (!s.isPractice) {
+          newAchievementIds = checkAchievements({ user, s, p, won, agendaCompleted });
+          let achievementXp = 0;
+          let achievementCp = 0;
+          if (newAchievementIds.length > 0) {
+            if (!user.earnedAchievements) user.earnedAchievements = [];
+            for (const id of newAchievementIds) {
+              user.earnedAchievements.push({ id, earnedAt: now });
+              const def = ACHIEVEMENT_MAP.get(id);
+              if (def) {
+                achievementXp += def.xpReward;
+                achievementCp += def.cpReward;
+              }
             }
+            user.cabinetPoints = (user.cabinetPoints ?? 0) + achievementCp;
           }
-          user.cabinetPoints = (user.cabinetPoints ?? 0) + achievementCp;
-        }
 
-        const config = this.engine.getConfig();
-        const xpMult = config.xpMultiplier || 1.0;
-        const ipMult = config.ipMultiplier || 1.0;
+          const config = this.engine.getConfig();
+          const xpMult = config.xpMultiplier || 1.0;
+          const ipMult = config.ipMultiplier || 1.0;
 
-        const baseIp = won ? (s.mode === 'Ranked' ? 100 : 40) : s.mode === 'Ranked' ? 25 : 10;
-        const agendaIp = agendaCompleted ? (s.mode === 'Ranked' ? 40 : 20) : 0;
-        const agendaXp = agendaCompleted ? 100 : 0;
+          const baseIp = won ? (s.mode === 'Ranked' ? 100 : 40) : s.mode === 'Ranked' ? 25 : 10;
+          const agendaIp = agendaCompleted ? (s.mode === 'Ranked' ? 40 : 20) : 0;
+          const agendaXp = agendaCompleted ? 100 : 0;
 
-        // ── Challenge evaluation ─────────────────────────────────────────
-        const challengeCtx: ChallengeContext = { s, p, won, agendaCompleted };
-        const freshChallengeData = refreshChallenges(user);
-        challengeResult = evaluateChallenges(freshChallengeData, challengeCtx);
-        user.challengeData = challengeResult.updatedChallengeData;
+          // ── Challenge evaluation ─────────────────────────────────────────
+          const challengeCtx: ChallengeContext = { s, p, won, agendaCompleted };
+          const freshChallengeData = refreshChallenges(user);
+          challengeResult = evaluateChallenges(freshChallengeData, challengeCtx);
+          user.challengeData = challengeResult.updatedChallengeData;
 
-        if (challengeResult.completedThisGame.length > 0) {
-          logger.info({ 
-            userId: user.id, 
-            challenges: challengeResult.completedThisGame.map(c => c.id),
-            totalXp: challengeResult.totalXp
-          }, 'User completed individual challenges');
+          if (challengeResult.completedThisGame.length > 0) {
+            logger.info({ 
+              userId: user.id, 
+              challenges: challengeResult.completedThisGame.map(c => c.id),
+              totalXp: challengeResult.totalXp
+            }, 'User completed individual challenges');
+          }
+
+          xpEarned = Math.floor((xpGain + agendaXp + achievementXp) * xpMult);
+          ipEarned = Math.floor((baseIp + agendaIp) * ipMult);
+          // Challenge rewards are fixed bonuses — not subject to multipliers
+          xpEarned += challengeResult.totalXp;
+          ipEarned += challengeResult.totalIp;
+          cpEarned = achievementCp;
         } else {
-          logger.debug({ userId: user.id }, 'No individual challenges completed this game');
+          // Practice mode rewards are heavily reduced (roughly 25% of normal)
+          // Also, no achievements or challenges can be completed
+          const practiceMult = 0.25;
+          xpEarned = Math.floor(xpGain * practiceMult);
+          ipEarned = Math.floor((won ? 10 : 5) * practiceMult);
+          logger.info({ userId: user.id }, 'Practice mode: Reduced rewards applied, achievements/challenges skipped');
         }
-
-        xpEarned = Math.floor((xpGain + agendaXp + achievementXp) * xpMult);
-        ipEarned = Math.floor((baseIp + agendaIp) * ipMult);
-        // Challenge rewards are fixed bonuses — not subject to multipliers
-        xpEarned += challengeResult.totalXp;
-        ipEarned += challengeResult.totalIp;
-        cpEarned = achievementCp;
 
         // ── Clan Challenge evaluation ────────────────────────────────────
-        if (user.clan?.id) {
+        if (user.clan?.id && !s.isPractice) {
           try {
             const clanId = user.clan.id;
             let clanData = clanChallengesToSave.get(clanId);

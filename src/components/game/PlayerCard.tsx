@@ -231,25 +231,37 @@ export const PlayerCard = React.memo(
           const playerDecls = gameState.declarations.filter((d) => d.playerId === p.id);
           const presDecl = playerDecls.find((d) => d.type === 'President');
           const chanDecl = playerDecls.find((d) => d.type === 'Chancellor');
+          
           if (!presDecl && !chanDecl) return null;
+
+          const isBlocked = presDecl?.isBlocked;
 
           return (
             <div className="absolute bottom-1.5 left-1.5 z-20 flex flex-col gap-1 pointer-events-none scale-[0.85] origin-bottom-left">
               {presDecl && (
                 <div className="flex flex-col gap-1">
                   {/* Drawn Row */}
-                  <div className="flex items-center gap-1 group/decl">
-                    <span className="text-[7px] font-mono font-bold text-yellow-500 w-2 shrink-0">
+                  <div className={cn("flex items-center gap-1 group/decl", isBlocked && "opacity-40")}>
+                    <span className={cn("text-[7px] font-mono font-bold w-2 shrink-0", isBlocked ? "text-muted" : "text-yellow-500")}>
                       D
                     </span>
                     <div className="flex gap-0.5">
-                      {[...Array(presDecl.drewCiv ?? 0)].map((_, i) => (
-                        <div
-                          key={`dc-${i}`}
-                          className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-blue-500/40 border border-blue-500/60 shadow-[0_0_4px_rgba(59,130,246,0.3)]"
-                        />
-                      ))}
-                      {[...Array(presDecl.drewSta ?? 0)].map((_, i) => (
+                      {isBlocked ? (
+                        [...Array(3)].map((_, i) => (
+                          <div
+                            key={`dcg-${i}`}
+                            className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-white/10 border border-white/20"
+                          />
+                        ))
+                      ) : (
+                        [...Array(presDecl?.drewCiv ?? 0)].map((_, i) => (
+                          <div
+                            key={`dc-${i}`}
+                            className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-blue-500/40 border border-blue-500/60 shadow-[0_0_4px_rgba(59,130,246,0.3)]"
+                          />
+                        ))
+                      )}
+                      {!isBlocked && [...Array(presDecl?.drewSta ?? 0)].map((_, i) => (
                         <div
                           key={`ds-${i}`}
                           className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-red-500/40 border border-red-500/60 shadow-[0_0_4px_rgba(239,68,68,0.3)]"
@@ -258,18 +270,27 @@ export const PlayerCard = React.memo(
                     </div>
                   </div>
                   {/* Passed Row */}
-                  <div className="flex items-center gap-1 group/decl">
-                    <span className="text-[7px] font-mono font-bold text-yellow-500 w-2 shrink-0">
+                  <div className={cn("flex items-center gap-1 group/decl", isBlocked && "opacity-40")}>
+                    <span className={cn("text-[7px] font-mono font-bold w-2 shrink-0", isBlocked ? "text-muted" : "text-yellow-500")}>
                       P
                     </span>
                     <div className="flex gap-0.5">
-                      {[...Array(presDecl.civ ?? 0)].map((_, i) => (
-                        <div
-                          key={`pc-${i}`}
-                          className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-blue-500/40 border border-blue-500/60 shadow-[0_0_4px_rgba(59,130,246,0.3)]"
-                        />
-                      ))}
-                      {[...Array(presDecl.sta ?? 0)].map((_, i) => (
+                      {isBlocked ? (
+                        [...Array(2)].map((_, i) => (
+                          <div
+                            key={`pcg-${i}`}
+                            className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-white/10 border border-white/20"
+                          />
+                        ))
+                      ) : (
+                        [...Array(presDecl?.civ ?? 0)].map((_, i) => (
+                          <div
+                            key={`pc-${i}`}
+                            className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-blue-500/40 border border-blue-500/60 shadow-[0_0_4px_rgba(59,130,246,0.3)]"
+                          />
+                        ))
+                      )}
+                      {!isBlocked && [...Array(presDecl?.sta ?? 0)].map((_, i) => (
                         <div
                           key={`ps-${i}`}
                           className="w-1.5 h-1.5 sm:w-2 sm:h-2 rounded-[1px] bg-red-500/40 border border-red-500/60 shadow-[0_0_4px_rgba(239,68,68,0.3)]"
@@ -428,6 +449,19 @@ export const PlayerCard = React.memo(
                       <span className="text-[8px] font-bold text-slate-300 leading-none">G</span>
                     </div>
                   )}
+                  {/* Herald Results */}
+                  {gameState.heraldLog?.filter((log) => log.targetId === p.id).map((log, i) => (
+                    <div
+                      key={`herald-mob-${i}`}
+                      className={cn(
+                        'w-4 h-4 rounded-sm border border-black/40 flex items-center justify-center shadow-md',
+                        log.response === 'Confirmed' ? 'bg-emerald-600' : 'bg-red-600'
+                      )}
+                      title={`${log.response} by Herald`}
+                    >
+                      <span className="text-[8px] font-bold text-white leading-none">H</span>
+                    </div>
+                  ))}
                 </div>
 
                 {p.activeFrame && (
@@ -514,6 +548,20 @@ export const PlayerCard = React.memo(
                     Censured
                   </span>
                 )}
+                {/* Herald Results Desktop */}
+                {gameState.heraldLog?.filter((log) => log.targetId === p.id).map((log, i) => (
+                  <span
+                    key={`herald-desk-${i}`}
+                    className={cn(
+                      "px-1 sm:px-2 py-0.5 font-mono uppercase rounded border text-[7px] sm:text-[9px]",
+                      log.response === 'Confirmed' 
+                        ? "bg-emerald-900/40 text-emerald-400 border-emerald-500/50" 
+                        : "bg-red-900/40 text-red-400 border-red-500/50"
+                    )}
+                  >
+                    Herald: {log.response}
+                  </span>
+                ))}
               </div>
 
             </div>
@@ -649,6 +697,34 @@ export const PlayerCard = React.memo(
               className="absolute inset-0 bg-red-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
             >
               {gameState.currentExecutiveAction}
+            </button>
+          )}
+
+        {/* Censure overlay */}
+        {gameState.phase === 'Censure_Action' &&
+          me?.isAlive &&
+          p.isAlive &&
+          p.id !== gameState.players[gameState.presidentIdx]?.id && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                playSound('click');
+                socket.emit('censureVote', { targetId: p.id });
+              }}
+              aria-label={`Vote to censure ${p.name.replace(' (AI)', '')}`}
+              className={cn(
+                'absolute inset-0 z-30 rounded-xl flex flex-col items-center justify-center font-serif italic text-white text-center px-2 transition-all duration-300',
+                me.censureVoteId === p.id
+                  ? 'bg-red-600/90 shadow-[inset_0_0_20px_rgba(255,255,255,0.2)]'
+                  : 'bg-red-900/60 hover:bg-red-900/80 backdrop-blur-[1px]'
+              )}
+            >
+              <span className="text-[10px] sm:text-[12px] uppercase tracking-wider not-italic font-bold mb-1">
+                {me.censureVoteId === p.id ? 'Selected' : 'Censure'}
+              </span>
+              <span className="text-[8px] sm:text-[9px] opacity-80 leading-tight">
+                {me.censureVoteId === p.id ? 'Tap another to change' : 'Exclude from nominations'}
+              </span>
             </button>
           )}
 

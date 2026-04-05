@@ -9,7 +9,7 @@ import {
   Users2,
 } from 'lucide-react';
 import { cn, getProxiedUrl } from '../../utils/utils';
-import { RoomInfo, RoomPrivacy } from '../../../shared/types';
+import { RoomInfo, RoomPrivacy, GameMode } from '../../../shared/types';
 
 interface LobbyRoomBrowserProps {
   rooms: RoomInfo[];
@@ -24,10 +24,13 @@ interface LobbyRoomBrowserProps {
     roomId: string,
     maxPlayers?: number,
     actionTimer?: number,
-    mode?: 'Casual' | 'Ranked' | 'Classic',
+    mode?: GameMode,
     isSpectator?: boolean,
     privacy?: RoomPrivacy,
-    inviteCode?: string
+    inviteCode?: string,
+    avatarUrl?: string,
+    isPractice?: boolean,
+    aiDifficulty?: 'Casual' | 'Normal' | 'Elite'
   ) => void;
   playSound: (soundKey: string) => void;
   onOpenCreate: () => void;

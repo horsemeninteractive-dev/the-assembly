@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { User, GameState, PrivateInfo, RoomPrivacy, StructuredError } from '../../shared/types';
+import { User, GameState, PrivateInfo, RoomPrivacy, StructuredError, GameMode } from '../../shared/types';
 import { socket } from '../socket';
 import { apiUrl, debugLog, debugWarn, debugError } from '../utils/utils';
 import * as aiSpeech from '../services/aiSpeech';
@@ -27,10 +27,13 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
       roomId: string,
       maxPlayers?: number,
       actionTimer?: number,
-      mode?: 'Casual' | 'Ranked' | 'Classic',
+      mode?: GameMode,
       isSpectator?: boolean,
       privacy?: RoomPrivacy,
-      inviteCode?: string
+      inviteCode?: string,
+      avatarUrl?: string,
+      isPractice?: boolean,
+      aiDifficulty?: 'Casual' | 'Normal' | 'Elite'
     ) => {
       if (user) {
         socket.emit('joinRoom', {
@@ -46,6 +49,9 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
           isSpectator,
           privacy,
           inviteCode,
+          avatarUrl: avatarUrl || user.avatarUrl,
+          isPractice,
+          aiDifficulty,
         });
       }
     },

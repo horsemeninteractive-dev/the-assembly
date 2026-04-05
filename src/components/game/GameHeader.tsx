@@ -77,7 +77,7 @@ export const GameHeader = ({
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5 sm:mt-1 flex-wrap">
             <span className="text-responsive-xs font-mono text-ghost uppercase tracking-[0.1em] sm:tracking-[0.2em] truncate">
-              {gameState.roomId}
+              {gameState.isPractice ? 'PRACTICE MODE' : gameState.roomId}
             </span>
             <span className="text-responsive-xs font-mono text-red-500/50 uppercase tracking-[0.1em] sm:tracking-[0.2em] flex items-center gap-1 shrink-0">
               <div className="w-1 h-1 rounded-full bg-red-500/50" />R{gameState.round}
@@ -88,7 +88,7 @@ export const GameHeader = ({
                 {timerRemaining}s
               </span>
             )}
-            {gameState.privacy === 'private' && gameState.inviteCode && (
+            {!gameState.isPractice && gameState.privacy === 'private' && gameState.inviteCode && (
               <Tooltip content="Share this code to invite players">
                 <span className="flex items-center gap-1 px-1.5 py-0.5 bg-card border border-default rounded text-responsive-xs font-mono text-primary tracking-[0.15em] shrink-0 cursor-default">
                   <Lock className="w-[1.2vh] h-[1.2vh] text-muted" />

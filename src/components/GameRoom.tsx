@@ -14,6 +14,7 @@ import { ActionBar } from './game/ActionBar';
 import { PauseOverlay } from './game/PauseOverlay';
 import { PolicyAnimation } from './game/PolicyAnimation';
 import { CrisisAnimation } from './game/CrisisAnimation';
+import { PresidentPickAnimation } from './game/PresidentPickAnimation';
 
 import { AssemblyLog } from './game/panels/AssemblyLog';
 import { RoundHistory } from './game/panels/RoundHistory';
@@ -272,17 +273,43 @@ export const GameRoom = ({
   }, []);
 
   useEffect(() => {
-    if (!gameState.activeEventCard) {
-      lastCrisisKeyRef.current = '';
-      setActiveCrisisToReveal(null);
-      return;
-    }
+    // Only SET the animation when a NEW card arrives — never clear it here.
+    // Dismissal is handled exclusively by the 5s internal timer via onComplete.
+    // Clearing from server state caused the double-play flicker.
+    if (!gameState.activeEventCard) return;
     const key = `${gameState.activeEventCard.id}-${gameState.round}`;
     if (key !== lastCrisisKeyRef.current) {
       lastCrisisKeyRef.current = key;
       setActiveCrisisToReveal(gameState.activeEventCard);
     }
   }, [gameState.activeEventCard, gameState.round]);
+
+  // Reset the key tracker when the game ends or resets so the next game can show cards again
+  useEffect(() => {
+    if (gameState.phase === 'Lobby') {
+      lastCrisisKeyRef.current = '';
+    }
+  }, [gameState.phase]);
+
+  // ── President pick animation ──────────────────────────────────────────────
+  const [showPresidentPick, setShowPresidentPick] = useState(false);
+  const hasShownPresidentPickRef = useRef(false);
+
+  useEffect(() => {
+    if (
+      gameState.round === 1 &&
+      gameState.phase === 'Nominate_Chancellor' &&
+      !hasShownPresidentPickRef.current
+    ) {
+      hasShownPresidentPickRef.current = true;
+      setShowPresidentPick(true);
+    }
+    // Reset for next game
+    if (gameState.phase === 'Lobby') {
+      hasShownPresidentPickRef.current = false;
+      setShowPresidentPick(false);
+    }
+  }, [gameState.round, gameState.phase]);
 
   useGameSounds({
     gameState,
@@ -523,6 +550,7 @@ export const GameRoom = ({
       <AnimatePresence>
         {activeCrisisToReveal && (
           <CrisisAnimation 
+            key={`crisis-anim-${lastCrisisKeyRef.current}`}
             gameState={gameState} 
             activeEvent={activeCrisisToReveal}
             playSound={playSound} 
@@ -530,6 +558,19 @@ export const GameRoom = ({
           />
         )}
       </AnimatePresence>
+
+      {/* First president roulette animation */}
+      {showPresidentPick && (() => {
+        const president = gameState.players.find((p) => p.isPresidentialCandidate || p.isPresident);
+        return president ? (
+          <PresidentPickAnimation
+            players={gameState.players}
+            presidentId={president.id}
+            playSound={playSound}
+            onComplete={() => setShowPresidentPick(false)}
+          />
+        ) : null;
+      })()}
 
       {/* Panels */}
       <AssemblyLog

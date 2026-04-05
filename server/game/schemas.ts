@@ -51,6 +51,8 @@ export const joinRoomSchema = z.object({
   privacy: z.enum(['public', 'private', 'friends']).optional(),
   inviteCode: z.string().optional(),
   avatarUrl: z.string().url().max(2048).optional(),
+  isPractice: z.boolean().optional(),
+  aiDifficulty: z.enum(['Casual', 'Normal', 'Elite']).optional(),
 });
 
 export const joinQueueSchema = z.object({

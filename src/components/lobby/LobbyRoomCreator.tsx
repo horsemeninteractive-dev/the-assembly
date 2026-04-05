@@ -14,7 +14,11 @@ interface LobbyRoomCreatorProps {
     actionTimer?: number,
     mode?: 'Casual' | 'Ranked' | 'Classic' | 'Crisis',
     isSpectator?: boolean,
-    privacy?: RoomPrivacy
+    privacy?: RoomPrivacy,
+    inviteCode?: string,
+    avatarUrl?: string,
+    isPractice?: boolean,
+    aiDifficulty?: 'Casual' | 'Normal' | 'Elite'
   ) => void;
   playSound: (soundKey: string) => void;
   maintenanceMode?: boolean;

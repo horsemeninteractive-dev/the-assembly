@@ -691,34 +691,13 @@ export const ActionBar = ({
           </div>
         )}
 
-        {/* Censure Vote */}
+        {/* Censure Vote Status */}
         {gameState.phase === 'Censure_Action' && me?.isAlive && (
           <div className="flex flex-col gap-[1vh] w-full justify-center h-full items-center">
-            <div className="text-responsive-xs font-mono uppercase tracking-widest text-muted text-center">
+            <div className="text-responsive-xs font-mono uppercase tracking-widest text-muted text-center max-w-lg px-4">
               {me.censureVoteId 
-                ? `You have voted for ${gameState.players.find(p => p.id === me.censureVoteId)?.name || 'a player'}`
-                : 'Select a player to censure (exclude from next nomination)'}
-            </div>
-            <div className="flex flex-wrap gap-2 justify-center max-h-[10vh] overflow-y-auto w-full custom-scrollbar">
-              {gameState.players
-                .filter((p) => p.isAlive && p.id !== gameState.players[gameState.presidentIdx].id)
-                .map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => {
-                      playSound('click');
-                      socket.emit('censureVote', { targetId: p.id });
-                    }}
-                    className={cn(
-                      'px-3 py-1.5 rounded-lg text-responsive-xs font-mono uppercase tracking-wider border transition-all',
-                      me.censureVoteId === p.id
-                        ? 'bg-red-900/40 border-red-500 text-red-300'
-                        : 'bg-card border-subtle text-muted hover:border-ghost'
-                    )}
-                  >
-                    {p.name}
-                  </button>
-                ))}
+                ? `Voted for ${gameState.players.find(p => p.id === me.censureVoteId)?.name || 'a player'}`
+                : 'Select a player on their card to censure (exclude from next nomination)'}
             </div>
           </div>
         )}

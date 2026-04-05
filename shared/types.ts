@@ -353,6 +353,7 @@ export interface RoomInfo {
   isLocked?: boolean;
   hostName?: string;
   spectatorCount?: number;
+  isPractice?: boolean;
 }
 
 export interface SystemConfig {
@@ -545,6 +546,7 @@ export interface GameState {
     drewSta?: number;
     type: 'President' | 'Chancellor';
     timestamp: number;
+    isBlocked?: boolean;
   }[];
   isPaused?: boolean;
   pauseReason?: string;
@@ -604,6 +606,8 @@ export interface GameState {
   chatBlackout?: boolean;
   snapElectionVolunteers?: string[];
   chatBlackoutBuffer?: { senderId: string; senderName: string; text: string; timestamp: number }[];
+  isPractice?: boolean;
+  aiDifficulty?: 'Casual' | 'Normal' | 'Elite';
 }
 
 export interface ServerToClientEvents {
@@ -665,6 +669,9 @@ export interface ClientToServerEvents {
     isSpectator?: boolean;
     privacy?: RoomPrivacy;
     inviteCode?: string;
+    avatarUrl?: string;
+    isPractice?: boolean;
+    aiDifficulty?: 'Casual' | 'Normal' | 'Elite';
   }) => void;
   leaveRoom: () => void;
   playAgain: () => void;

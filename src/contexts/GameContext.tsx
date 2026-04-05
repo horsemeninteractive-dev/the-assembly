@@ -2,7 +2,7 @@ import React, { createContext, useContext } from 'react';
 import { useSocketManager } from '../hooks/useSocketManager';
 import { useAuthContext } from './AuthContext';
 import { useAudioContext } from './AudioContext';
-import { GameState, PrivateInfo, RoomPrivacy } from '../../shared/types';
+import { GameState, PrivateInfo, RoomPrivacy, GameMode } from '../../shared/types';
 
 interface GameContextType {
   joined: boolean;
@@ -25,10 +25,13 @@ interface GameContextType {
     roomId: string,
     maxPlayers?: number,
     actionTimer?: number,
-    mode?: 'Casual' | 'Ranked' | 'Classic',
+    mode?: GameMode,
     isSpectator?: boolean,
     privacy?: RoomPrivacy,
-    inviteCode?: string
+    inviteCode?: string,
+    avatarUrl?: string,
+    isPractice?: boolean,
+    aiDifficulty?: 'Casual' | 'Normal' | 'Elite'
   ) => void;
   handleLeaveRoom: (onComplete?: () => void) => void;
 }

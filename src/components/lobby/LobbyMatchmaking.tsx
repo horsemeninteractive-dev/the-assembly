@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Shuffle, Plus } from 'lucide-react';
+import { Shuffle, Plus, Bot } from 'lucide-react';
+import { LobbyPracticeCreator } from './LobbyPracticeCreator';
 import { cn } from '../../utils/utils';
-import { User, RoomInfo } from '../../../shared/types';
+import { User, RoomInfo, GameMode, RoomPrivacy } from '../../../shared/types';
 
 interface LobbyMatchmakingProps {
   user: User;
   rooms: RoomInfo[];
   globalStats: { civilWins: number; stateWins: number };
-  onJoinRoom: (roomId: string) => void;
+  onJoinRoom: (
+    roomId: string,
+    maxPlayers?: number,
+    actionTimer?: number,
+    mode?: GameMode,
+    isSpectator?: boolean,
+    privacy?: RoomPrivacy,
+    inviteCode?: string,
+    avatarUrl?: string,
+    isPractice?: boolean,
+    aiDifficulty?: 'Casual' | 'Normal' | 'Elite'
+  ) => void;
   onOpenCreate: () => void;
   playSound: (soundKey: string) => void;
 }
@@ -24,6 +36,7 @@ export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
   const [quickJoinStatus, setQuickJoinStatus] = useState<'idle' | 'searching' | 'found' | 'none'>(
     'idle'
   );
+  const [isPracticeOpen, setIsPracticeOpen] = useState(false);
 
   const handleQuickJoin = () => {
     playSound('click');
@@ -146,7 +159,27 @@ export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
           <Plus className="w-[2.2vh] h-[2.2vh]" />
           Create Assembly
         </button>
+
+        <button
+          onMouseEnter={() => playSound('hover')}
+          onClick={() => {
+            playSound('click');
+            setIsPracticeOpen(true);
+          }}
+          className="flex-1 flex items-center justify-center gap-2 px-[4vw] py-[2vh] rounded-xl font-thematic text-responsive-xl transition-all shadow-xl bg-card border border-subtle text-muted hover:text-primary hover:border-default"
+        >
+          <Bot className="w-[2.2vh] h-[2.2vh]" />
+          Solo Practice
+        </button>
       </motion.div>
+
+      <LobbyPracticeCreator
+        isOpen={isPracticeOpen}
+        onClose={() => setIsPracticeOpen(false)}
+        user={user}
+        onJoinRoom={onJoinRoom}
+        playSound={playSound}
+      />
     </div>
   );
 };

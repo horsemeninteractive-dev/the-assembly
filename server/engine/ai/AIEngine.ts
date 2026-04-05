@@ -438,6 +438,18 @@ export class AIEngine {
         data = { use: true, role: 'Archivist' };
         break;
       case 'Herald': {
+        // If the AI is the target of a pending Herald response, they must respond
+        if (s.heraldPendingResponse?.targetId === player.id) {
+          const agree = player.role === 'Civil' || Math.random() > 0.3;
+          data = { 
+            use: true, 
+            role: 'Herald', 
+            agree 
+          } as any;
+          break;
+        }
+
+        // Otherwise (AI is the Herald), they initiate a proclamation
         const targets = s.players.filter((p) => p.isAlive && p.id !== player.id);
         const suspect = mostSuspicious(player, targets);
         if (getSuspicion(player, suspect.id) > 0.6) {

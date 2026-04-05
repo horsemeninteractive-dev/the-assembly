@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { User, RoomInfo, RoomPrivacy } from '../../shared/types';
+import { User, RoomInfo, RoomPrivacy, GameMode } from '../../shared/types';
 import { apiUrl, debugError } from '../utils/utils';
 import { LeaderboardModal } from './game/modals/LeaderboardModal';
 import { HowToPlayModal } from './HowToPlayModal';
@@ -18,10 +18,13 @@ interface LobbyProps {
     roomId: string,
     maxPlayers?: number,
     actionTimer?: number,
-    mode?: 'Casual' | 'Ranked' | 'Classic',
+    mode?: GameMode,
     isSpectator?: boolean,
     privacy?: RoomPrivacy,
-    inviteCode?: string
+    inviteCode?: string,
+    avatarUrl?: string,
+    isPractice?: boolean,
+    aiDifficulty?: 'Casual' | 'Normal' | 'Elite'
   ) => void;
   onLogout: () => void;
   onOpenProfile: () => void;

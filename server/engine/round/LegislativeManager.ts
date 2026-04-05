@@ -10,7 +10,26 @@ export class LegislativeManager {
 
   checkRoundEnd(s: GameState, roomId: string): void {
     if (s.phase !== 'Legislative_Chancellor') return;
-    const presDecl = s.declarations.some((d) => d.type === 'President') || s.presidentDeclarationBlocked;
+    
+    // If the president is blocked (e.g. Veiled Proceedings), add a dummy 'blocked' declaration
+    // so the UI knows to show the grey indicator and that declarations are 'complete'.
+    if (s.presidentDeclarationBlocked && !s.declarations.some(d => d.type === 'President')) {
+      const president = s.players.find((p) => p.isPresident);
+      if (president) {
+        s.declarations.push({
+          playerId: president.id,
+          playerName: president.name,
+          type: 'President',
+          civ: 0,
+          sta: 0,
+          timestamp: Date.now(),
+          isBlocked: true,
+        });
+        this.round.engine.broadcastState(roomId);
+      }
+    }
+
+    const presDecl = s.declarations.some((d) => d.type === 'President');
     const chanDecl = s.declarations.some((d) => d.type === 'Chancellor');
     if (presDecl && chanDecl) this.onBothDeclared(s, roomId);
   }
