@@ -127,10 +127,10 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: -20 }}
         transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-        className="relative w-full max-w-sm bg-surface border border-subtle rounded-3xl overflow-hidden shadow-2xl text-primary"
+        className="relative w-full max-w-sm bg-surface-glass border border-subtle rounded-3xl overflow-hidden shadow-2xl text-primary backdrop-blur-2xl"
       >
         {/* Header - Matching Profile.tsx */}
-        <div className="p-[3vh] bg-elevated border-b border-subtle flex flex-col items-center gap-[2vh]">
+        <div className="p-[3vh] bg-surface-glass/40 border-b border-subtle flex flex-col items-center gap-[2vh] backdrop-blur-md">
           <button
             onClick={onClose}
             className="absolute top-[3vh] right-[3vh] text-ghost hover:text-white transition-colors"
@@ -139,7 +139,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
           </button>
 
           <div className="relative">
-            <div className="w-[10vh] h-[10vh] rounded-3xl bg-card border border-default flex items-center justify-center overflow-hidden relative">
+            <div className="w-[10vh] h-[10vh] rounded-3xl bg-surface-glass/40 border border-default flex items-center justify-center overflow-hidden relative backdrop-blur-sm">
               {user.avatarUrl ? (
                 <img
                   src={getProxiedUrl(user.avatarUrl)}
@@ -303,7 +303,7 @@ const StatCard = ({
   value: string | number;
   icon?: React.ReactNode;
 }) => (
-  <div className="bg-elevated p-3 rounded-xl border border-subtle flex flex-col gap-1">
+  <div className="bg-surface-glass/40 p-3 rounded-xl border border-subtle flex flex-col gap-1 backdrop-blur-sm">
     <div className="flex items-center gap-1.5 text-ghost">
       {icon}
       <div className="text-[9px] uppercase tracking-wider font-mono">{label}</div>

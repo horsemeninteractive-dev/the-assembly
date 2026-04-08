@@ -64,7 +64,7 @@ export const LobbyRoomCreator: React.FC<LobbyRoomCreatorProps> = ({
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-md bg-surface border border-subtle rounded-3xl p-[4vh] shadow-2xl"
+            className="relative w-full max-w-md bg-surface-glass border border-subtle rounded-3xl p-[4vh] shadow-2xl backdrop-blur-2xl"
           >
             <h2 className="text-responsive-xl font-serif italic mb-[3vh]">
               Establish New Assembly

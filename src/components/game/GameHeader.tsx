@@ -60,7 +60,7 @@ export const GameHeader = ({
       initial={{ y: -50, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ type: 'spring', stiffness: 200, damping: 20 }}
-      className="h-[8vh] sm:h-[10vh] border-b border-subtle bg-surface-glass px-[2vw] sm:px-[4vw] flex items-center justify-between shrink-0 shadow-lg z-10"
+      className="h-[8vh] sm:h-[10vh] border-b border-subtle bg-surface-glass px-5 flex items-center justify-between shrink-0 shadow-lg z-10"
     >
       <div className="flex items-center gap-[1vw] sm:gap-[2vw]">
         <div className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] bg-elevated rounded-xl flex items-center justify-center border border-white/40 shrink-0 overflow-hidden">
@@ -72,8 +72,8 @@ export const GameHeader = ({
           />
         </div>
         <div className="flex flex-col min-w-0">
-          <div className="font-thematic text-responsive-sm sm:text-responsive-xl text-primary tracking-wide leading-none truncate">
-            The Assembly
+          <div className="font-thematic text-responsive-sm sm:text-responsive-xl text-primary tracking-wide leading-none truncate uppercase">
+            THE ASSEMBLY
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5 sm:mt-1 flex-wrap">
             <span className="text-responsive-xs font-mono text-ghost uppercase tracking-[0.1em] sm:tracking-[0.2em] truncate">

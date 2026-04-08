@@ -364,9 +364,11 @@ export function registerGameActionHandlers(
     const player = state.players.find((p) => p.socketId === socket.id);
     if (!player || !player.isAlive) return;
 
-    state.presidentIdx = state.players.indexOf(player);
-    state.snapElectionPhaseDone = true;
-    engine.startNomination(state, roomId);
+    if (!state.snapElectionVolunteers) state.snapElectionVolunteers = [];
+    if (!state.snapElectionVolunteers.includes(player.id)) {
+      state.snapElectionVolunteers.push(player.id);
+    }
+    engine.broadcastState(roomId);
   });
 
   socket.on('ping-server', (callback) => {

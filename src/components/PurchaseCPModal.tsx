@@ -74,10 +74,10 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             role="dialog"
             aria-modal="true"
-            className="relative w-full max-w-2xl bg-surface border border-subtle rounded-[2rem] overflow-hidden shadow-2xl flex flex-col max-h-[90vh]"
+            className="relative w-full max-w-2xl bg-surface-glass border border-subtle rounded-[2rem] overflow-hidden shadow-2xl flex flex-col max-h-[90vh] backdrop-blur-2xl"
           >
             {/* Header */}
-            <div className="p-6 bg-elevated border-b border-subtle flex items-center justify-between">
+            <div className="p-6 bg-surface-glass/40 border-b border-subtle flex items-center justify-between backdrop-blur-sm">
               <div className="flex items-center gap-4">
                 <div className="w-12 h-12 rounded-xl bg-purple-900/20 border border-purple-500/30 flex items-center justify-center shadow-[0_0_15px_rgba(168,85,247,0.2)]">
                   <Zap className="w-6 h-6 text-purple-500" />
@@ -118,7 +118,7 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({
                       'relative group p-6 rounded-3xl border text-left transition-all duration-300 overflow-hidden',
                       isLoading === pkg.id
                         ? 'border-purple-500 bg-purple-900/10'
-                        : 'border-subtle bg-card hover:border-purple-500/50 hover:bg-elevated',
+                        : 'border-subtle bg-surface-glass/40 hover:border-purple-500/50 hover:bg-surface-glass/60 backdrop-blur-sm',
                       pkg.popular && 'border-purple-500/30 shadow-[0_0_20px_rgba(168,85,247,0.05)]'
                     )}
                   >
@@ -129,7 +129,7 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({
                     )}
 
                     <div className="flex items-center gap-3 mb-4">
-                      <div className="w-10 h-10 rounded-lg bg-surface flex items-center justify-center border border-subtle group-hover:border-purple-500/30 transition-colors">
+                      <div className="w-10 h-10 rounded-lg bg-surface-glass/40 flex items-center justify-center border border-subtle group-hover:border-purple-500/30 transition-colors">
                         <Zap
                           className={cn(
                             'w-5 h-5',

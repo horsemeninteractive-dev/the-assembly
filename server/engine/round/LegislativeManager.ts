@@ -48,9 +48,12 @@ export class LegislativeManager {
     const action = getExecutiveAction(s);
     if (action === 'None') {
       this.round.nextRound(s, roomId, true);
+    } else if (action === 'PolicyPeek') {
+      s.lastExecutiveActionStateCount = s.stateDirectives;
+      this.round.executive.apply(s, roomId, ''); // Execute peek immediately
     } else {
       s.lastExecutiveActionStateCount = s.stateDirectives;
-      s.players.forEach((p) => (p.hasActed = false)); // Reset hasActed so actions don't silently fail
+      s.players.forEach((p: Player) => (p.hasActed = false)); 
       this.round.enterPhase(s, roomId, 'Executive_Action');
       addLog(s, `Presidential Executive Action required: ${action}`);
     }
@@ -279,22 +282,33 @@ export class LegislativeManager {
       }
     } else {
       let lie = false;
+      let lieCivil = false; // true = shift sta→civ (civil-direction lie)
       if (player.role !== 'Civil') {
         if (player.personality === 'Deceptive') lie = true;
         else if (player.personality === 'Aggressive')
           lie = Math.random() < AI_WEIGHTS.lying.Aggressive;
         else if (player.personality === 'Strategic')
-          lie = (s.stateDirectives ?? 0) >= AI_WEIGHTS.legislative.STRATEGIC_PASS_THRESHOLD;
+          // Only start lying with conviction once State has meaningful presence
+          lie = (s.stateDirectives ?? 0) >= 3;
         else if (player.personality === 'Chaotic')
           lie = Math.random() < AI_WEIGHTS.lying.Chaotic;
+      } else if (player.role === 'Civil') {
+        // Civil players occasionally lie to make themselves look more Civil
+        // (deflecting suspicion when a State policy was enacted)
+        if (enacted === 'State' && sta > 0 && Math.random() < 0.35) {
+          lieCivil = true;
+        }
       }
       if (lie && civ > 0) {
         if (enacted === 'Civil' && civ === 1) {
-          // Do not lie
+          // Do not lie — would be too obvious
         } else {
           civ--;
           sta++;
         }
+      } else if (lieCivil && sta > 0) {
+        sta--;
+        civ++;
       }
     }
 

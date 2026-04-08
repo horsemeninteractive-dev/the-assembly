@@ -25,6 +25,7 @@ interface LobbyHeaderProps {
   onOpenLeaderboard: () => void;
   onOpenHowToPlay: () => void;
   onLogout: () => void;
+  globalStats: { civilWins: number; stateWins: number };
   playSound: (soundKey: string) => void;
 }
 
@@ -36,8 +37,12 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
   onOpenLeaderboard,
   onOpenHowToPlay,
   onLogout,
+  globalStats,
   playSound,
 }) => {
+  const total = globalStats.civilWins + globalStats.stateWins || 1;
+  const civilPct = (globalStats.civilWins / total) * 100;
+  const statePct = (globalStats.stateWins / total) * 100;
   return (
     <motion.header
       initial={{ y: -50, opacity: 0 }}
@@ -45,7 +50,7 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
       transition={{ type: 'spring', stiffness: 200, damping: 20 }}
       className="border-b border-subtle bg-surface-glass sticky top-0 z-50 flex flex-col"
     >
-      <div className="h-[8vh] sm:h-[10vh] px-[4vw] flex items-center justify-between">
+      <div className="h-[8vh] sm:h-[10vh] px-5 flex items-center justify-between">
         <div className="flex items-center gap-[1vw] sm:gap-[2vw] min-w-0 flex-1">
           <div className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] bg-elevated rounded-xl flex items-center justify-center border border-white/40 shrink-0 overflow-hidden">
             <img
@@ -57,8 +62,8 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
           </div>
           <div className="min-w-0">
             <div className="flex items-baseline gap-2">
-              <h1 className="text-responsive-sm sm:text-responsive-xl font-thematic text-primary tracking-wide leading-none truncate">
-                The Assembly
+              <h1 className="text-responsive-sm sm:text-responsive-xl font-thematic text-primary tracking-wide leading-none truncate uppercase">
+                THE ASSEMBLY
               </h1>
               <span className="text-[8px] font-mono text-red-500/60 border border-red-900/40 rounded px-1 py-0.5 leading-none shrink-0">
                 {CLIENT_VERSION}
@@ -138,7 +143,7 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
           </div>
         </div>
 
-        <div className="flex items-center gap-[2vw] sm:gap-[3vw] flex-1 justify-end">
+        <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-end">
           <Tooltip content="My Profile">
             <button
               onMouseEnter={() => playSound('hover')}
@@ -186,18 +191,20 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
           </Tooltip>
 
           {/* Leaderboard — mobile only (desktop version is in the title group) */}
-          <Tooltip content="Leaderboard">
-            <button
-              onMouseEnter={() => playSound('hover')}
-              onClick={() => {
-                playSound('click');
-                onOpenLeaderboard();
-              }}
-              className="sm:hidden w-[4vh] h-[4vh] rounded-xl bg-card border border-default flex items-center justify-center hover:border-yellow-900/50 transition-colors"
-            >
-              <Trophy className="w-[2vh] h-[2vh] text-yellow-500" />
-            </button>
-          </Tooltip>
+          <div className="sm:hidden">
+            <Tooltip content="Leaderboard">
+              <button
+                onMouseEnter={() => playSound('hover')}
+                onClick={() => {
+                  playSound('click');
+                  onOpenLeaderboard();
+                }}
+                className="w-[4vh] h-[4vh] rounded-xl bg-card border border-default flex items-center justify-center hover:border-yellow-900/50 transition-all font-bold"
+              >
+                <Trophy className="w-[2vh] h-[2vh] text-yellow-500" />
+              </button>
+            </Tooltip>
+          </div>
 
           <Tooltip content="How to Play">
             <button
@@ -227,42 +234,52 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
         </div>
       </div>
 
-      {/* Mobile Stats Row (Visible only on mobile) */}
-      <div className="lg:hidden flex items-center justify-center gap-4 py-2 bg-elevated/20">
-        <div className="flex items-center gap-1.5">
-          <Coins className="w-3.5 h-3.5 text-emerald-500" />
-          <span className="text-[10px] font-mono text-emerald-500">{user.stats.points} IP</span>
-        </div>
-        <div className="w-px h-3 bg-subtle/30" />
+      <div className="lg:hidden flex flex-col items-center gap-2 py-3 bg-surface-glass border-t border-subtle backdrop-blur-xl">
+        {/* Stats row */}
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-1.5 font-mono text-[10px]">
+            <Coins className="w-3.5 h-3.5 text-emerald-500" />
+            <span className="text-emerald-500">{user.stats.points} IP</span>
+          </div>
+          <div className="w-px h-3 bg-subtle/30" />
 
-        <div
-          className={cn(
-            'flex items-center gap-1.5 px-2 py-0.5 rounded-lg border transition-all',
-            getRankTier(user.stats.elo).bg,
-            getRankTier(user.stats.elo).border
-          )}
-        >
-          <RankIcon tier={getRankTier(user.stats.elo).name} className="w-3.5 h-3.5 shrink-0" />
-          <span className="text-[10px] font-mono text-primary font-bold">
-            {user.stats.elo} ELO
-          </span>
+          <div className={cn(
+              'flex items-center gap-1.5 px-2 py-0.5 rounded-lg border transition-all text-[10px] font-mono font-bold',
+              getRankTier(user.stats.elo).bg,
+              getRankTier(user.stats.elo).border
+            )}>
+            <RankIcon tier={getRankTier(user.stats.elo).name} className="w-3.5 h-3.5 shrink-0" />
+            <span className="text-primary">{user.stats.elo} ELO</span>
+          </div>
+
+          <div className="w-px h-3 bg-subtle/30" />
+          <div className="flex items-center gap-1.5 font-mono text-[10px]">
+            <Zap className="w-3.5 h-3.5 text-purple-500" />
+            <span className="text-purple-500">{user.cabinetPoints || 0} CP</span>
+            <button
+              onClick={() => { playSound('click'); onOpenPurchase(); }}
+              className="w-4 h-4 rounded-full bg-purple-900/20 border border-purple-500/30 flex items-center justify-center hover:bg-purple-900/40 hover:border-purple-500/50 transition-all ml-0.5"
+            >
+              <Plus className="w-2.5 h-2.5 text-purple-400" />
+            </button>
+          </div>
         </div>
 
-        <div className="w-px h-3 bg-subtle/30" />
-        <div className="flex items-center gap-1.5">
-          <Zap className="w-3.5 h-3.5 text-purple-500" />
-          <span className="text-[10px] font-mono text-purple-500">
-            {user.cabinetPoints || 0} CP
-          </span>
-          <button
-            onClick={() => {
-              playSound('click');
-              onOpenPurchase();
-            }}
-            className="w-4 h-4 rounded-full bg-purple-900/20 border border-purple-500/30 flex items-center justify-center hover:bg-purple-900/40 hover:border-purple-500/50 transition-all ml-1"
-          >
-            <Plus className="w-2.5 h-2.5 text-purple-400" />
-          </button>
+        {/* Compact War Meter (Mobile Only) — expanded width */}
+        <div className="w-full max-w-[90%] mt-1 space-y-1">
+          <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-widest px-1">
+            <span className="text-blue-500 font-bold">Civil {civilPct.toFixed(1)}%</span>
+            <span className="text-primary/60 font-medium">
+              <span className="text-blue-500">{globalStats.civilWins}</span>
+              <span className="mx-1">v</span>
+              <span className="text-red-500">{globalStats.stateWins}</span>
+            </span>
+            <span className="text-red-500 font-bold">{statePct.toFixed(1)}% State</span>
+          </div>
+          <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden flex ring-1 ring-white/5">
+            <div className="bg-blue-600 h-full" style={{ width: `${civilPct}%` }} />
+            <div className="bg-red-600 h-full" style={{ width: `${statePct}%` }} />
+          </div>
         </div>
       </div>
     </motion.header>

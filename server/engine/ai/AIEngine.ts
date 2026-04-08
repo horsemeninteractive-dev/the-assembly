@@ -297,25 +297,41 @@ export class AIEngine {
     stateDir: number,
     civilDir: number
   ): number {
-    if (player.role === 'Civil' && civilDir === 4 && hand.includes('Civil'))
+    const hasCivil = hand.includes('Civil');
+    const hasState = hand.includes('State');
+
+    // ── Winning plays ─────────────────────────────────────────────────────────
+    // Civil chancellor secures an immediate Civil win
+    if (player.role === 'Civil' && civilDir === 4 && hasCivil)
       return hand.findIndex((p) => p === 'Civil');
-    if (
-      (player.role === 'State' || player.role === 'Overseer') &&
-      stateDir === 5 &&
-      hand.includes('State')
-    )
+
+    // State/Overseer chancellor secures an immediate State win
+    if ((player.role === 'State' || player.role === 'Overseer') && stateDir === 5 && hasState)
       return hand.findIndex((p) => p === 'State');
 
+    // ── Game-ending loss prevention ───────────────────────────────────────────
+    // Civil chancellor must NOT hand State a win by playing State when stateDir === 5
+    if (player.role === 'Civil' && stateDir === 5 && hasCivil)
+      return hand.findIndex((p) => p === 'Civil');
+
+    // State/Overseer chancellor must NOT hand Civil a win by playing Civil when civilDir === 4
+    if ((player.role === 'State' || player.role === 'Overseer') && civilDir === 4 && hasState)
+      return hand.findIndex((p) => p === 'State');
+
+    // ── Personality-weighted selection ────────────────────────────────────────
     let idx = -1;
     if (player.personality === 'Aggressive' && player.role !== 'Civil') {
-      idx = hand.findIndex((p) => p === 'Civil');
+      // Aggressive State players always push State enactments
+      idx = hasState ? hand.findIndex((p) => p === 'State') : hand.findIndex((p) => p === 'Civil');
     } else if (player.personality === 'Strategic' && player.role !== 'Civil') {
+      // Strategic State players play Civil to blend in while stateDir is low,
+      // switching to State once close to the winning threshold
       idx =
         stateDir < AI_WEIGHTS.legislative.STRATEGIC_PLAY_THRESHOLD
           ? hand.findIndex((p) => p === 'Civil')
           : hand.findIndex((p) => p === 'State');
     } else if (player.personality === 'Honest' || player.role === 'Civil') {
-      idx = hand.findIndex((p) => p === 'Civil');
+      idx = hasCivil ? hand.findIndex((p) => p === 'Civil') : hand.findIndex((p) => p === 'State');
     }
     return idx === -1 ? 0 : idx;
   }
@@ -525,13 +541,14 @@ export class AIEngine {
   }
 
   private aiSnapVolunteer(s: GameState, roomId: string): void {
+    if (!s.snapElectionVolunteers) s.snapElectionVolunteers = [];
     const aiPlayers = s.players.filter((p) => p.isAI && p.isAlive);
-    const volunteer = aiPlayers.find((p) => (p.role === 'Overseer' || Math.random() > 0.7));
-    if (volunteer) {
-      s.presidentIdx = s.players.indexOf(volunteer);
-      s.snapElectionPhaseDone = true;
-      this.engine.roundManager.startNomination(s, roomId);
+    for (const ai of aiPlayers) {
+      if ((ai.role === 'Overseer' || Math.random() > 0.7) && !s.snapElectionVolunteers.includes(ai.id)) {
+        s.snapElectionVolunteers.push(ai.id);
+      }
     }
+    this.engine.broadcastState(roomId);
   }
 
   // ---------------------------------------------------------------------------

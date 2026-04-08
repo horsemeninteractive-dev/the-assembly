@@ -9,10 +9,11 @@ import { AuthPasswordReset } from './auth/AuthPasswordReset';
 
 interface AuthProps {
   onAuthSuccess: (user: User, token: string) => void;
+  defaultMode?: 'login' | 'register';
 }
 
-export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
-  const form = useAuthForm({ onAuthSuccess });
+export const Auth: React.FC<AuthProps> = ({ onAuthSuccess, defaultMode }) => {
+  const form = useAuthForm({ onAuthSuccess, defaultMode });
   const { isLogin, view, setView, setResetToken, message } = form;
 
   useEffect(() => {
@@ -46,31 +47,45 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess }) => {
   }, [onAuthSuccess, setResetToken, setView]);
 
   return (
-    <div className="flex-1 w-full flex items-center justify-center p-4 font-sans">
+    <div className="flex-1 w-full relative flex items-center justify-center p-4 font-sans overflow-hidden">
+      {/* Hero background — same image as landing page */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/hero.png"
+          alt=""
+          aria-hidden="true"
+          className="w-full h-full object-cover"
+        />
+        {/* Overlay: dark vignette + blue-red split, matching landing page */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-950/25 via-transparent to-red-950/25" />
+      </div>
+
+      {/* Form card — glassmorphism so it reads over the artwork */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-md bg-surface border border-subtle rounded-3xl p-8 shadow-2xl"
+        className="relative z-10 w-full max-w-md bg-black/55 backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl"
       >
         <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-elevated rounded-2xl flex items-center justify-center border border-white/40 mb-4 overflow-hidden">
+          <div className="w-16 h-16 bg-black/60 rounded-2xl flex items-center justify-center border border-white/20 mb-4 overflow-hidden shadow-[0_0_30px_rgba(255,255,255,0.05)]">
             <img
               src={getProxiedUrl('https://storage.googleapis.com/secretchancellor/SC.png')}
-              alt="Secret Chancellor Logo"
+              alt="The Assembly Logo"
               className="w-full h-full object-contain p-2"
               referrerPolicy="no-referrer"
             />
           </div>
-          <h1 className="text-3xl font-thematic text-primary tracking-wide uppercase">
+          <h1 className="text-3xl font-thematic text-white tracking-wide uppercase">
             The Assembly
           </h1>
-          <p className="text-muted text-sm mt-1">
+          <p className="text-white/45 text-sm mt-1">
             {view !== 'auth' ? 'Account Recovery' : isLogin ? 'Welcome back, Delegate' : 'Register for the Assembly'}
           </p>
         </div>
 
         {message && view === 'auth' && (
-          <div className="mb-4 text-green-500 text-xs text-center font-mono bg-green-900/10 py-2 rounded-lg border border-green-900/20">
+          <div className="mb-4 text-green-400 text-xs text-center font-mono bg-green-900/15 py-2 rounded-lg border border-green-700/30">
             {message}
           </div>
         )}

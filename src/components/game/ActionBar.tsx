@@ -177,10 +177,10 @@ export const ActionBar = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3, duration: 0.4, ease: 'easeOut' }}
-      className="shrink-0 bg-elevated border-t border-subtle flex flex-col"
+      className="shrink-0 border-t border-subtle flex flex-col"
     >
       {/* Phase status */}
-      <div className="px-[2vw] py-[1.5vh] bg-white/5 border-b border-subtle flex justify-between items-center">
+      <div className="px-[2vw] py-[1.5vh] bg-surface-glass border-b border-subtle flex justify-between items-center">
         <div className="min-w-0 flex-1 mr-2 flex flex-col justify-center">
           <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-light mb-1">
             Current Phase
@@ -360,7 +360,7 @@ export const ActionBar = ({
       </div>
 
       {/* Action area - fixed height to prevent layout shift */}
-      <div className="px-[2vw] py-[1vh] sm:py-[1.5vh] h-[12vh] sm:h-[15vh] flex items-center justify-center relative">
+      <div className="px-[2vw] py-[1vh] sm:py-[1.5vh] h-[12vh] sm:h-[15vh] flex items-center justify-center relative bg-elevated">
         {/* Cipher Input Overlay (Parallel) */}
         {showCipherInput && (
           <div className="absolute inset-0 z-50 bg-base/95 backdrop-blur-xl flex items-center justify-center px-4 animate-in fade-in zoom-in duration-300">
@@ -836,7 +836,7 @@ export const ActionBar = ({
           playSound('click');
           onOpenLog();
         }}
-        className="h-[5vh] sm:h-[6vh] px-[2vw] flex items-center gap-3 bg-elevated hover:bg-surface transition-colors border-t border-subtle group"
+        className="h-[5vh] sm:h-[6vh] px-[2vw] flex items-center gap-3 bg-log-bar transition-colors border-t border-white/8 group"
       >
         <Scroll className="w-[2vh] h-[2vh] text-primary group-hover:text-red-500 transition-colors" />
         <div className="flex-1 text-responsive-xs text-muted truncate text-left italic">

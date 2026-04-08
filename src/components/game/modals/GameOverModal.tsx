@@ -91,7 +91,7 @@ export const GameOverModal = ({
             initial={{ opacity: 0, scale: 0.95, y: 40 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
-            className="relative w-full max-w-sm lg:max-w-5xl bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh] lg:max-h-[80vh] mt-[5vh] lg:mt-[5vh]"
+            className="relative w-full max-w-sm lg:max-w-5xl bg-surface-glass border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col max-h-[82vh] lg:max-h-[80vh] mt-[5vh] lg:mt-[5vh] backdrop-blur-2xl"
           >
             {/* Win banner */}
             <div
@@ -143,8 +143,8 @@ export const GameOverModal = ({
                     className={cn(
                       'rounded-2xl border p-4 shadow-inner',
                       postMatchResult.won
-                        ? 'bg-emerald-900/10 border-emerald-700/30'
-                        : 'bg-red-900/10 border-red-700/30'
+                        ? 'bg-emerald-900/10 border-emerald-700/30 backdrop-blur-sm'
+                        : 'bg-red-900/10 border-red-700/30 backdrop-blur-sm'
                     )}
                   >
                     <div className="flex items-center justify-between mb-3">
@@ -163,7 +163,7 @@ export const GameOverModal = ({
 
                     <div className={cn("grid gap-2", postMatchResult.clanXpEarned ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-3")}>
                       {isRanked ? (
-                        <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
+                        <div className="bg-surface-glass/40 rounded-xl p-2.5 text-center border border-subtle">
                           <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
                             <Trophy className="w-3 h-3" /> ELO
                           </div>
@@ -317,7 +317,7 @@ export const GameOverModal = ({
                         >
                           <div className="flex items-center justify-between">
                             <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 rounded-full bg-card flex items-center justify-center text-[12px] text-muted font-mono overflow-hidden border border-default shadow-sm shrink-0">
+                              <div className="w-8 h-8 rounded-full bg-surface-glass/40 flex items-center justify-center text-[12px] text-muted font-mono overflow-hidden border border-default shadow-sm shrink-0">
                                 {p.avatarUrl ? (
                                   <img
                                     src={getProxiedUrl(p.avatarUrl)}

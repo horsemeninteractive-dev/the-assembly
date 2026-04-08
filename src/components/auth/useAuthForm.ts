@@ -8,10 +8,11 @@ import { Browser } from '@capacitor/browser';
 
 export interface AuthFlowProps {
   onAuthSuccess: (user: User, token: string) => void;
+  defaultMode?: 'login' | 'register';
 }
 
-export function useAuthForm({ onAuthSuccess }: AuthFlowProps) {
-  const [isLogin, setIsLogin] = useState(true);
+export function useAuthForm({ onAuthSuccess, defaultMode }: AuthFlowProps) {
+  const [isLogin, setIsLogin] = useState(defaultMode !== 'register');
   const [view, setView] = useState<'auth' | 'forgot' | 'reset'>('auth');
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');

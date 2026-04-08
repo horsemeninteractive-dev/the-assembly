@@ -24,7 +24,7 @@ export const InvestigationModal = ({ result, onClose, playSound }: Investigation
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: -20 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="max-w-sm w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl p-8 text-center space-y-6"
+          className="max-w-sm w-full bg-surface-glass border border-default rounded-3xl overflow-hidden shadow-2xl p-8 text-center space-y-6 backdrop-blur-2xl"
         >
           <div className="w-16 h-16 bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto border border-yellow-900/50">
             {result.role === 'Civil' ? (

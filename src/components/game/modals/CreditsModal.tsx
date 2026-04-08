@@ -27,10 +27,10 @@ export const CreditsModal: React.FC<CreditsModalProps> = ({ onClose, playSound }
         initial={{ opacity: 0, scale: 0.9, y: 20 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        className="relative w-full max-w-2xl bg-surface border border-subtle rounded-3xl overflow-hidden shadow-2xl"
+        className="relative w-full max-w-2xl bg-surface-glass border border-subtle rounded-3xl overflow-hidden shadow-2xl backdrop-blur-2xl"
       >
         {/* Header */}
-        <div className="p-6 border-b border-subtle flex items-center justify-between bg-elevated/30">
+        <div className="p-6 border-b border-subtle flex items-center justify-between bg-surface-glass/40 backdrop-blur-sm">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 bg-red-900/20 rounded-xl flex items-center justify-center border border-red-500/30">
               <Shield className="w-5 h-5 text-red-500" />
@@ -102,7 +102,7 @@ export const CreditsModal: React.FC<CreditsModalProps> = ({ onClose, playSound }
             </div>
 
             {/* Design */}
-            <div className="bg-elevated/30 border border-subtle rounded-2xl p-6 space-y-4">
+            <div className="bg-surface-glass/40 border border-subtle rounded-2xl p-6 space-y-4 backdrop-blur-sm">
               <div className="flex items-center gap-2 text-primary">
                 <Palette className="w-4 h-4 text-purple-400" />
                 <h4 className="font-mono text-xs uppercase tracking-widest font-bold">
@@ -132,7 +132,7 @@ export const CreditsModal: React.FC<CreditsModalProps> = ({ onClose, playSound }
                 Unauthorized duplication, modification, or distribution is prohibited. This software
                 is provided "as is" without warranty of any kind, express or implied.
               </p>
-              <div className="bg-card p-4 rounded-xl border border-subtle">
+              <div className="bg-surface-glass/60 p-4 rounded-xl border border-subtle backdrop-blur-sm">
                 <p className="text-[10px] text-faint uppercase font-bold mb-2 tracking-widest">
                   Open Source Disclosure
                 </p>
@@ -146,7 +146,7 @@ export const CreditsModal: React.FC<CreditsModalProps> = ({ onClose, playSound }
         </div>
 
         {/* Footer */}
-        <div className="p-4 bg-elevated/50 border-t border-subtle text-center">
+        <div className="p-4 bg-surface-glass/60 border-t border-subtle text-center backdrop-blur-md">
           <p className="text-[10px] font-mono text-faint flex items-center justify-center gap-1">
             Made with <Heart className="w-2.5 h-2.5 text-red-500 fill-red-500" /> by Horsemen
             Interactive

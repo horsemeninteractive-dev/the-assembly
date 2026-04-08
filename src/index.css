@@ -286,8 +286,23 @@
   }
 
   [data-theme='light'] .bg-surface-glass {
-    background-color: rgba(255, 255, 255, 0.8);
+    background-color: rgba(240, 238, 236, 0.82);
     backdrop-filter: blur(20px);
+  }
+
+  /* ─── Assembly log bar — dark in both themes ──────────────────────── */
+  .bg-log-bar {
+    background-color: rgba(0, 0, 0, 0.75);
+  }
+  .bg-log-bar:hover {
+    background-color: rgba(0, 0, 0, 0.85);
+  }
+
+  [data-theme='light'] .bg-log-bar {
+    background-color: rgba(255, 255, 255, 0.97);
+  }
+  [data-theme='light'] .bg-log-bar:hover {
+    background-color: rgba(245, 243, 241, 1);
   }
 
   /* ─── Textured background ─────────────────────────────────────────── */
@@ -329,6 +344,15 @@
   .custom-scrollbar::-webkit-scrollbar-thumb {
     background: var(--color-scrollbar);
     border-radius: 10px;
+  }
+
+  /* Hide scrollbar visually but keep scroll functionality — used for horizontal filter strips */
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {

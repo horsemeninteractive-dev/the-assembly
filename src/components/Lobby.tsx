@@ -11,6 +11,7 @@ import { LobbyHeader } from './lobby/LobbyHeader';
 import { LobbyMatchmaking } from './lobby/LobbyMatchmaking';
 import { LobbyRoomBrowser } from './lobby/LobbyRoomBrowser';
 import { LobbyRoomCreator } from './lobby/LobbyRoomCreator';
+import { LobbyPracticeCreator } from './lobby/LobbyPracticeCreator';
 
 interface LobbyProps {
   user: User;
@@ -58,22 +59,21 @@ export const Lobby: React.FC<LobbyProps> = ({
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
+  const [isPracticeOpen, setIsPracticeOpen] = useState(false);
   const [pendingRequestCount, setPendingRequestCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
-  // Sound effects for modals
   useEffect(() => {
-    if (isCreating || isLeaderboardOpen || isHowToPlayOpen || isCreditsOpen) {
+    if (isCreating || isLeaderboardOpen || isHowToPlayOpen || isCreditsOpen || isPracticeOpen) {
       playSound('modal_open');
     }
-  }, [isCreating, isLeaderboardOpen, isHowToPlayOpen, isCreditsOpen]);
+  }, [isCreating, isLeaderboardOpen, isHowToPlayOpen, isCreditsOpen, isPracticeOpen]);
 
   const fetchRooms = async () => {
     try {
       const response = await fetch(apiUrl('/api/rooms'));
       const data = await response.json();
       setRooms(Array.isArray(data) ? data : []);
-
       const rejoinResponse = await fetch(apiUrl(`/api/rejoin-info?userId=${user.id}`));
       const rejoinData = await rejoinResponse.json();
       setRejoinInfo(rejoinData);
@@ -119,6 +119,7 @@ export const Lobby: React.FC<LobbyProps> = ({
 
   return (
     <div className="flex-1 w-full text-primary font-sans flex flex-col h-screen overflow-hidden">
+      {/* Header — logo, stats, icons all unchanged */}
       <LobbyHeader
         user={user}
         pendingRequestCount={pendingRequestCount}
@@ -127,20 +128,45 @@ export const Lobby: React.FC<LobbyProps> = ({
         onOpenLeaderboard={() => setIsLeaderboardOpen(true)}
         onOpenHowToPlay={() => setIsHowToPlayOpen(true)}
         onLogout={onLogout}
+        globalStats={globalStats}
         playSound={playSound}
       />
 
-      <main className="flex-1 overflow-y-auto custom-scrollbar">
-        <div className="max-w-6xl w-full mx-auto p-[4vw] flex flex-col gap-[4vh]">
-          <LobbyMatchmaking
-            user={user}
-            rooms={rooms}
-            globalStats={globalStats}
-            onJoinRoom={onJoinRoom}
-            onOpenCreate={() => setIsCreating(true)}
-            playSound={playSound}
-          />
+      {/* ── DESKTOP lg+: fixed-height sidebar + scrollable room pane ── */}
+      <div className="hidden lg:flex flex-1 min-h-0">
 
+        {/* Left sidebar — actions + war meter + credits */}
+        <motion.aside
+          initial={{ opacity: 0, x: -12 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.3, ease: 'easeOut' }}
+          className="w-64 xl:w-72 shrink-0 border-r border-subtle bg-base/85 backdrop-blur-2xl flex flex-col gap-0 overflow-y-auto custom-scrollbar"
+        >
+          <div className="flex flex-col gap-3 p-4 flex-1">
+            <p className="text-[8px] font-mono text-ghost uppercase tracking-[0.22em] px-1 pt-1">
+              Actions
+            </p>
+
+            <LobbyMatchmaking
+              user={user}
+              rooms={rooms}
+              globalStats={globalStats}
+              onJoinRoom={onJoinRoom}
+              onOpenCreate={() => setIsCreating(true)}
+              onOpenPractice={() => setIsPracticeOpen(true)}
+              playSound={playSound}
+            />
+          </div>
+
+        </motion.aside>
+
+        {/* Right pane — room browser fills height, scrolls internally */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.06, ease: 'easeOut' }}
+          className="flex-1 min-w-0 flex flex-col min-h-0"
+        >
           <LobbyRoomBrowser
             rooms={rooms}
             isLoading={isLoading}
@@ -149,30 +175,37 @@ export const Lobby: React.FC<LobbyProps> = ({
             playSound={playSound}
             onOpenCreate={() => setIsCreating(true)}
           />
+        </motion.div>
+      </div>
 
-          {isLeaderboardOpen && (
-            <LeaderboardModal
-              user={user}
-              onClose={() => {
-                playSound('modal_close');
-                setIsLeaderboardOpen(false);
-              }}
-            />
-          )}
-          <HowToPlayModal
-            isOpen={isHowToPlayOpen}
-            onClose={() => {
-              playSound('modal_close');
-              setIsHowToPlayOpen(false);
-            }}
+      {/* ── MOBILE <lg: single scrollable column ── */}
+      <main className="lg:hidden flex-1 overflow-y-auto custom-scrollbar">
+        <div className="w-full p-4 flex flex-col gap-4">
+          <LobbyMatchmaking
+            user={user}
+            rooms={rooms}
+            globalStats={globalStats}
+            onJoinRoom={onJoinRoom}
+            onOpenCreate={() => setIsCreating(true)}
+            onOpenPractice={() => setIsPracticeOpen(true)}
+            playSound={playSound}
+          />
+          <LobbyRoomBrowser
+            rooms={rooms}
+            isLoading={isLoading}
+            rejoinInfo={rejoinInfo}
+            onJoinRoom={onJoinRoom}
+            playSound={playSound}
+            onOpenCreate={() => setIsCreating(true)}
           />
         </div>
       </main>
 
-      <footer className="w-full py-6 shrink-0 border-t border-subtle bg-surface-glass backdrop-blur-md sticky bottom-0 z-50 px-[4vw]">
-        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+      {/* Unified Footer — paddings match header (px-5) */}
+      <footer className="w-full py-3 lg:py-4 border-t border-subtle bg-surface-glass backdrop-blur-xl px-5 shrink-0 z-20">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-elevated rounded-lg p-1 border border-subtle">
+            <div className="w-7 h-7 bg-elevated rounded-lg p-1 border border-subtle">
               <img
                 src="https://storage.googleapis.com/secretchancellor/HILogo.png"
                 alt="Horsemen Interactive"
@@ -180,40 +213,42 @@ export const Lobby: React.FC<LobbyProps> = ({
               />
             </div>
             <div>
-              <p className="text-[10px] font-mono text-muted uppercase tracking-widest leading-none">
-                Published by
-              </p>
-              <p className="text-xs font-serif italic text-primary leading-tight">
-                Horsemen Interactive
-              </p>
+              <p className="text-[9px] font-mono text-muted uppercase tracking-[0.2em] leading-none">Published by</p>
+              <p className="text-xs font-serif italic text-primary leading-tight">Horsemen Interactive</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-4">
             <button
               onMouseEnter={() => playSound('hover')}
-              onClick={() => {
-                playSound('click');
-                setIsCreditsOpen(true);
-              }}
-              className="text-[10px] font-mono text-red-500/80 hover:text-red-400 uppercase tracking-widest transition-colors"
+              onClick={() => { playSound('click'); setIsCreditsOpen(true); }}
+              className="text-[9px] font-mono text-red-500/80 hover:text-red-300 uppercase tracking-widest transition-colors"
             >
               Credits & Legal
             </button>
-            <div className="w-px h-3 bg-subtle" />
-            <p className="text-[10px] font-mono text-faint uppercase tracking-tighter">
-              © 2026 Horsemen Interactive. All Rights Reserved.
+            <div className="w-px h-3 bg-subtle hidden sm:block" />
+            <p className="text-[9px] font-mono text-ghost uppercase tracking-tighter">
+              © 2026 Horsemen Interactive
             </p>
           </div>
         </div>
       </footer>
-
+      {/* Modals */}
+      {isLeaderboardOpen && (
+        <LeaderboardModal
+          user={user}
+          onClose={() => { playSound('modal_close'); setIsLeaderboardOpen(false); }}
+        />
+      )}
+      <HowToPlayModal
+        isOpen={isHowToPlayOpen}
+        onClose={() => { playSound('modal_close'); setIsHowToPlayOpen(false); }}
+      />
       <AnimatePresence>
         {isCreditsOpen && (
           <CreditsModal onClose={() => setIsCreditsOpen(false)} playSound={playSound} />
         )}
       </AnimatePresence>
-
       <LobbyRoomCreator
         user={user}
         isOpen={isCreating}
@@ -221,8 +256,13 @@ export const Lobby: React.FC<LobbyProps> = ({
         onJoinRoom={onJoinRoom}
         playSound={playSound}
       />
+      <LobbyPracticeCreator
+        user={user}
+        isOpen={isPracticeOpen}
+        onClose={() => setIsPracticeOpen(false)}
+        onJoinRoom={onJoinRoom}
+        playSound={playSound}
+      />
     </div>
   );
 };
-
-

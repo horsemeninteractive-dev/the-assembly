@@ -49,6 +49,15 @@ const TabContent: React.FC<{ tab: TabId }> = ({ tab }) => {
             </ul>
           </div>
         </div>
+        <div className="bg-surface-glass border border-default rounded-xl p-4 space-y-3 backdrop-blur-md">
+          <div className="text-orange-400 text-xs font-mono uppercase tracking-widest border-b border-orange-500/20 pb-1.5 mb-2">
+            Crisis Mode (High Intensity)
+          </div>
+          <p className="text-tertiary text-xs leading-relaxed">
+            A chaotic variant featuring <span className="text-primary font-bold">Event Cards</span>. 
+            Every round, a random event is drawn that can freeze the election tracker, blackout the chat, or force immediate snap elections.
+          </p>
+        </div>
         <div className="bg-surface border border-default rounded-xl p-4 space-y-3">
           <div className="text-muted text-xs font-mono uppercase tracking-widest">Policy Deck</div>
           <p className="text-tertiary text-sm">
@@ -218,6 +227,26 @@ const TabContent: React.FC<{ tab: TabId }> = ({ tab }) => {
             when: 'After enactment',
             desc: 'Swap the next two players in the presidential rotation. The second becomes President before the first. Once used.',
           },
+          {
+            name: 'Herald',
+            when: 'After enactment',
+            desc: 'Publicly proclaim a living player as "Civil". They must instantly confirm or deny the claim in the logs. Once used.',
+          },
+          {
+            name: 'Archivist',
+            when: 'After enactment',
+            desc: 'Deep inspection: peek at the top 3 cards of the Draw Pile before the next round begins. Once used.',
+          },
+          {
+            name: 'Quorum',
+            when: 'After election fail',
+            desc: 'Emergency session: force an immediate re-vote on the last failed government, bypassing the next President. Once used.',
+          },
+          {
+            name: 'Cipher',
+            when: 'Any phase',
+            desc: 'Send a one-way encrypted message to any player. Only they can see the text you send. Once used.',
+          },
         ].map((role) => (
           <div key={role.name} className="bg-surface border border-default rounded-xl p-3">
             <div className="flex items-start justify-between gap-2 mb-1">
@@ -359,7 +388,7 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ isOpen, onClose 
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             role="dialog"
             aria-modal="true"
-            className="w-full max-w-lg bg-elevated border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+            className="w-full max-w-lg bg-surface-glass border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col backdrop-blur-2xl"
             style={{ maxHeight: '88dvh' }}
           >
             {/* Header */}

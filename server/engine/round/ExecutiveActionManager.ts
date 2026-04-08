@@ -15,15 +15,14 @@ export class ExecutiveActionManager {
     president.hasActed = true;
 
     const target = s.players.find((p) => p.id === targetId);
-    if (!target || !target.isAlive || target.id === president.id) return;
+    if (action !== 'PolicyPeek' && (!target || !target.isAlive || target.id === president.id)) return;
 
     switch (action) {
-      case 'Investigate': {
+      case 'Investigate': if (target) {
         const result = target.role === 'Civil' ? 'Civil' : 'State';
         addLog(s, `${president.name} investigated ${target.name}.`);
         updateSuspicionFromInvestigation(s, president.id, target.id, result);
         
-        // Emit to president
         if (president.socketId) {
           this.round.engine.io.to(president.socketId).emit('investigationResult', { 
             targetName: target.name, 
@@ -32,12 +31,13 @@ export class ExecutiveActionManager {
         }
         break;
       }
-      case 'SpecialElection':
+      case 'SpecialElection': if (target) {
         addLog(s, `${president.name} called a Special Election for ${target.name}.`);
         s.lastPresidentIdx = s.presidentIdx;
         s.presidentIdx = s.players.findIndex((p) => p.id === target.id);
         break;
-      case 'Execution':
+      }
+      case 'Execution': if (target) {
         target.isAlive = false;
         addLog(s, `${president.name} executed ${target.name}!`);
         if (target.role === 'Overseer') {
@@ -45,6 +45,7 @@ export class ExecutiveActionManager {
           return;
         }
         break;
+      }
       case 'PolicyPeek': {
         const top3 = s.deck.slice(0, 3);
         if (president.socketId) {

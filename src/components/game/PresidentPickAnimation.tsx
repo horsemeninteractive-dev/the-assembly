@@ -28,7 +28,7 @@ export const PresidentPickAnimation: React.FC<PresidentPickAnimationProps> = ({
 
   // We'll spin through all players several times then land on the president
   const SPINS = 3; // full rotations before slowing
-  const TOTAL_STEPS = SPINS * alivePlayers.length + safePresidentIdx + 1;
+  const TOTAL_STEPS = SPINS * alivePlayers.length + safePresidentIdx;
 
   const [currentIdx, setCurrentIdx] = useState(0);
   const [phase, setPhase] = useState<'spinning' | 'reveal' | 'done'>('spinning');

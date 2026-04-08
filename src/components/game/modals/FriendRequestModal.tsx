@@ -25,7 +25,7 @@ export const FriendRequestModal: React.FC<FriendRequestModalProps> = ({
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="relative w-full max-w-xs bg-surface border border-subtle rounded-2xl p-6 shadow-2xl text-primary"
+        className="relative w-full max-w-xs bg-surface-glass border border-subtle rounded-2xl p-6 shadow-2xl text-primary backdrop-blur-2xl"
       >
         <div className="flex flex-col items-center gap-4 text-center">
           <div className="w-12 h-12 bg-red-900/20 rounded-full flex items-center justify-center border border-red-900/50">

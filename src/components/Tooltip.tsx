@@ -76,7 +76,7 @@ export const Tooltip = ({
       {isVisible && (
         <div
           className={cn(
-            'absolute z-[100] px-3 py-2 bg-surface/95 backdrop-blur-md border border-default rounded-lg shadow-2xl pointer-events-none transition-opacity duration-200 min-w-[120px] max-w-[240px] text-left',
+            'absolute z-[100] px-3 py-2 bg-surface-glass backdrop-blur-xl border border-default rounded-lg shadow-2xl pointer-events-none transition-opacity duration-200 min-w-[120px] max-w-[240px] text-left',
             positionClasses[position],
             className
           )}

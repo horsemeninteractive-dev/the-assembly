@@ -133,7 +133,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-surface border border-default rounded-3xl p-6 max-w-lg w-full shadow-2xl flex flex-col max-h-[85vh]"
+        className="bg-surface-glass border border-default rounded-3xl p-6 max-w-lg w-full shadow-2xl flex flex-col max-h-[85vh] backdrop-blur-2xl"
       >
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
@@ -147,7 +147,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
         </div>
 
         {/* Mode Tabs (tier 1) */}
-        <div className="flex gap-1 p-1 bg-elevated rounded-xl border border-subtle mb-3">
+        <div className="flex gap-1 p-1 bg-surface-glass/40 rounded-xl border border-subtle mb-3 backdrop-blur-sm">
           {MODE_TABS.map((tab) => (
             <button
               key={tab.id}
@@ -211,7 +211,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
                     'flex items-center gap-3 p-3 rounded-xl border transition-colors',
                     isMe
                       ? 'bg-red-900/10 border-red-900/50'
-                      : 'bg-card border-subtle hover:border-default'
+                      : 'bg-surface-glass/40 border-subtle hover:border-default hover:bg-surface-glass/60'
                   )}
                 >
                   <div className="w-8 text-center font-mono text-muted text-sm shrink-0">
@@ -272,7 +272,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
             <div className="text-[10px] uppercase tracking-widest text-muted font-mono mb-2">
               Your Position
             </div>
-            <div className="flex items-center gap-3 p-3 bg-card rounded-xl border border-red-900/40">
+            <div className="flex items-center gap-3 p-3 bg-surface-glass/60 rounded-xl border border-red-900/40 backdrop-blur-sm">
               <div className="w-8 text-center font-mono text-muted text-sm shrink-0">
                 #{currentUserRank}
               </div>

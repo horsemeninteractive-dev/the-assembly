@@ -44,7 +44,7 @@ export const DeclarationModal = ({
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: -20 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="max-w-sm w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl p-8 space-y-6"
+          className="max-w-sm w-full bg-surface-glass border border-default rounded-3xl overflow-hidden shadow-2xl p-8 space-y-6 backdrop-blur-2xl"
         >
           <div className="text-center space-y-2">
             <h3 className="text-[10px] uppercase tracking-[0.2em] text-muted font-mono">
@@ -78,7 +78,7 @@ export const DeclarationModal = ({
                         'flex-1 py-3 rounded-xl border transition-all font-mono text-sm',
                         declDrawCiv === n
                           ? 'bg-blue-900/40 border-blue-500 text-blue-400'
-                          : 'bg-elevated border-subtle text-ghost'
+                          : 'bg-surface-glass/40 border-subtle text-ghost backdrop-blur-sm'
                       )}
                     >
                       {n}C
@@ -118,7 +118,7 @@ export const DeclarationModal = ({
                       'flex-1 py-3 rounded-xl border transition-all font-mono text-sm',
                       declCiv === n
                         ? 'bg-blue-900/40 border-blue-500 text-blue-400'
-                        : 'bg-elevated border-subtle text-ghost'
+                        : 'bg-surface-glass/40 border-subtle text-ghost backdrop-blur-sm'
                     )}
                   >
                     {n}C

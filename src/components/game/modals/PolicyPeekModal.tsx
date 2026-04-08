@@ -25,7 +25,7 @@ export const PolicyPeekModal = ({ policies, title, onClose, playSound }: PolicyP
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: -20 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="max-w-md w-full bg-surface border border-default rounded-3xl p-8 text-center space-y-8 shadow-2xl"
+          className="max-w-md w-full bg-surface-glass border border-default rounded-3xl p-8 text-center space-y-8 shadow-2xl backdrop-blur-2xl"
         >
           <div className="space-y-2">
             <div className="w-12 h-12 bg-yellow-900/20 rounded-full flex items-center justify-center mx-auto border border-yellow-900/50 mb-4">
@@ -47,7 +47,7 @@ export const PolicyPeekModal = ({ policies, title, onClose, playSound }: PolicyP
                   animate={{ rotateY: 0, opacity: 1 }}
                   transition={{ delay: i * 0.2 }}
                   className={cn(
-                    'w-20 h-28 rounded-xl border-2 flex flex-col items-center justify-center gap-2 shadow-xl',
+                    'w-20 h-28 rounded-xl border-2 flex flex-col items-center justify-center gap-2 shadow-xl backdrop-blur-sm',
                     p === 'Civil'
                       ? 'bg-blue-900/20 border-blue-500/50 text-blue-400'
                       : 'bg-red-900/20 border-red-500/50 text-red-500'

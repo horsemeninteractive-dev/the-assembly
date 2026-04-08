@@ -20,7 +20,7 @@ export const InviteModal: React.FC<InviteModalProps> = ({
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-surface border border-subtle rounded-2xl p-6 shadow-2xl text-primary max-w-sm w-full"
+        className="bg-surface-glass border border-subtle rounded-2xl p-6 shadow-2xl text-primary max-w-sm w-full backdrop-blur-2xl"
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="text-lg font-thematic flex items-center gap-2">

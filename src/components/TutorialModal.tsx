@@ -427,11 +427,11 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             role="dialog"
             aria-modal="true"
-            className="w-full max-w-md bg-elevated border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col"
+            className="w-full max-w-md bg-surface-glass border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col backdrop-blur-2xl"
             style={{ maxHeight: '90dvh' }}
           >
             {/* Header */}
-            <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-subtle shrink-0">
+            <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-subtle bg-surface-glass/40 shrink-0 backdrop-blur-sm">
               <div className="flex items-center gap-3">
                 <div className="text-muted">{current.icon}</div>
                 <div>

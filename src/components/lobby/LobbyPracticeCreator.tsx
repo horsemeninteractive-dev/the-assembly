@@ -70,7 +70,7 @@ export const LobbyPracticeCreator: React.FC<LobbyPracticeCreatorProps> = ({
             initial={{ opacity: 0, scale: 0.9, y: 20 }}
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
-            className="relative w-full max-w-md bg-surface border border-subtle rounded-3xl p-[4vh] shadow-2xl"
+            className="relative w-full max-w-md bg-surface-glass border border-subtle rounded-3xl p-[4vh] shadow-2xl backdrop-blur-2xl"
           >
             <div className="flex items-center gap-[2vh] mb-[3vh]">
               <div className="w-[8vh] h-[8vh] bg-red-900/10 border border-red-900/30 rounded-2xl flex items-center justify-center">

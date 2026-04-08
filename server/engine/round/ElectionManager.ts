@@ -54,6 +54,18 @@ export class ElectionManager {
         const state = this.round.engine.rooms.get(roomId);
         if (state && state.phase === 'Snap_Election') {
           state.snapElectionPhaseDone = true;
+          const volunteers = state.snapElectionVolunteers || [];
+          if (volunteers.length > 0) {
+            const winnerId = volunteers[Math.floor(Math.random() * volunteers.length)];
+            const winnerIdx = state.players.findIndex((p: Player) => p.id === winnerId);
+            if (winnerIdx !== -1) state.presidentIdx = winnerIdx;
+          } else {
+            // If no one volunteered, pick a random alive player
+            const alive = state.players.filter((p: Player) => p.isAlive);
+            const fallback = pick(alive);
+            if (fallback) state.presidentIdx = state.players.indexOf(fallback);
+          }
+          state.snapElectionVolunteers = [];
           this.beginNomination(state, roomId);
         }
       }, 10000);

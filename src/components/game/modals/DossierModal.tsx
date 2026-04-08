@@ -63,7 +63,7 @@ export const DossierModal = ({ isOpen, onClose, privateInfo, playSound }: Dossie
             animate={{ opacity: 1, rotateY: 0, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95, y: -20 }}
             transition={{ type: 'spring', damping: 20, stiffness: 200 }}
-            className="w-full bg-surface border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col preserve-3d"
+            className="w-full bg-surface-glass border border-default rounded-3xl overflow-hidden shadow-2xl flex flex-col preserve-3d backdrop-blur-2xl"
           >
             <div className="p-[3vh] space-y-[2vh] flex-1 flex flex-col min-h-0 backface-hidden">
               <div className="flex items-center justify-between shrink-0">
@@ -130,12 +130,12 @@ export const DossierModal = ({ isOpen, onClose, privateInfo, playSound }: Dossie
                     </div>
                     <div
                       className={cn(
-                        'p-[1.5vh] rounded-2xl border',
+                        'p-[1.5vh] rounded-2xl border backdrop-blur-sm',
                         privateInfo.personalAgenda?.status === 'completed'
                           ? 'bg-emerald-900/10 border-emerald-500/20'
                           : privateInfo.personalAgenda?.status === 'failed'
                             ? 'bg-red-900/10 border-red-500/20'
-                            : 'bg-card border-default'
+                            : 'bg-surface-glass/40 border-default'
                       )}
                     >
                       {privateInfo.personalAgenda ? (
@@ -180,7 +180,7 @@ export const DossierModal = ({ isOpen, onClose, privateInfo, playSound }: Dossie
                     <div className="text-responsive-xs uppercase tracking-widest text-muted border-b border-subtle pb-1">
                       Title Role
                     </div>
-                    <div className="bg-card p-[1.5vh] rounded-2xl border border-subtle">
+                    <div className="bg-surface-glass/40 p-[1.5vh] rounded-2xl border border-subtle backdrop-blur-sm">
                       {privateInfo.titleRole ? (
                         <div className="space-y-0.5">
                           <div className="text-responsive-sm font-bold text-primary uppercase tracking-wider">

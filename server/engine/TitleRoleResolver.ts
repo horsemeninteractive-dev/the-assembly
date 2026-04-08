@@ -413,6 +413,7 @@ export class TitleRoleResolver {
           });
           addLog(s, `${player.name} (Herald) issued a public assertion against ${target.name}.`);
           this.engine.startActionTimer(roomId, 10000); // 10s countdown
+          this.engine.aiEngine.processAITurns(roomId); // Trigger AI response
         } else {
           // No valid target — do not consume the power
           player.titleUsed = false;
