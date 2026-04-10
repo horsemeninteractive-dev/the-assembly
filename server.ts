@@ -187,6 +187,7 @@ async function startServer() {
         if (!origin || isAllowedOrigin(origin)) return callback(null, true);
         callback(new Error(`CORS: origin '${origin}' not allowed`));
       },
+      credentials: true,
     })
   );
 
@@ -205,6 +206,7 @@ async function startServer() {
         callback(new Error(`CORS: origin '${origin}' not allowed`));
       },
       methods: ['GET', 'POST'],
+      credentials: true,
     },
   });
 

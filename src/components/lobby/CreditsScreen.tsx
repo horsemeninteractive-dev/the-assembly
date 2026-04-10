@@ -97,9 +97,9 @@ export const CreditsScreen: React.FC<CreditsScreenProps> = ({ user, onClose, pla
           playSound('modal_close');
           onClose();
         }}
-        className="absolute top-8 right-8 z-[210] p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all group backdrop-blur-md"
+        className="absolute top-6 right-6 sm:top-8 sm:right-8 z-[210] p-3 sm:p-4 bg-white/5 hover:bg-white/10 border border-white/10 rounded-full transition-all group backdrop-blur-md"
       >
-        <X className="w-8 h-8 text-white/50 group-hover:text-white" />
+        <X className="w-6 h-6 sm:w-8 sm:h-8 text-white/50 group-hover:text-white" />
       </motion.button>
 
       <div className="relative z-[10] w-full h-full flex items-center justify-center pointer-events-none">
@@ -111,18 +111,18 @@ export const CreditsScreen: React.FC<CreditsScreenProps> = ({ user, onClose, pla
                animate={{ opacity: 1, scale: 1 }}
                exit={{ opacity: 0, scale: 1.2 }}
                transition={{ duration: 1.5 }}
-               className="flex flex-col items-center space-y-8 text-center"
+               className="flex flex-col items-center space-y-6 sm:space-y-8 text-center px-6"
              >
                <img
                  src="https://storage.googleapis.com/secretchancellor/SC.png"
                  alt="The Assembly"
-                 className="w-48 h-48 mx-auto drop-shadow-[0_0_50px_rgba(185,28,28,0.4)]"
+                 className="w-32 h-32 sm:w-48 h-48 mx-auto drop-shadow-[0_0_50px_rgba(185,28,28,0.4)]"
                />
-               <div className="space-y-4">
-                 <h1 className="text-7xl font-thematic text-white tracking-[0.3em] uppercase">
+               <div className="space-y-3 sm:space-y-4">
+                 <h1 className="text-4xl sm:text-7xl font-thematic text-white tracking-[0.15em] sm:tracking-[0.3em] uppercase">
                    The Assembly
                  </h1>
-                 <p className="text-2xl font-mono text-red-500 uppercase tracking-[0.5em]">
+                 <p className="text-lg sm:text-2xl font-mono text-red-500 uppercase tracking-[0.3em] sm:tracking-[0.5em]">
                    Credits
                  </p>
                </div>
@@ -130,9 +130,9 @@ export const CreditsScreen: React.FC<CreditsScreenProps> = ({ user, onClose, pla
           )}
 
           {current.type === 'credit' && (
-            <div key="credit-container" className="flex flex-col items-center justify-center w-full space-y-16">
+            <div key="credit-container" className="flex flex-col items-center justify-center w-full space-y-12 sm:space-y-16 px-6">
               {/* Section Title: Only animates when the section changes */}
-              <div className="h-12 flex items-center justify-center overflow-visible">
+              <div className="h-10 sm:h-12 flex items-center justify-center overflow-visible">
                 <AnimatePresence mode="wait">
                   <motion.h3
                     key={current.section}
@@ -143,15 +143,15 @@ export const CreditsScreen: React.FC<CreditsScreenProps> = ({ user, onClose, pla
                       duration: 1, 
                       ease: [0.22, 1, 0.36, 1] 
                     }}
-                    className="text-2xl font-mono text-red-600 uppercase tracking-[0.7em] text-center whitespace-nowrap"
+                    className="text-base sm:text-2xl font-mono text-red-600 uppercase tracking-[0.3em] sm:tracking-[0.7em] text-center"
                   >
                     {current.section}
                   </motion.h3>
                 </AnimatePresence>
               </div>
-
+ 
               {/* Name: Animates on every step */}
-              <div className="h-24 flex items-center justify-center overflow-visible">
+              <div className="h-20 sm:h-24 flex items-center justify-center overflow-visible">
                 <AnimatePresence mode="wait">
                   <motion.p
                     key={current.name}
@@ -162,7 +162,7 @@ export const CreditsScreen: React.FC<CreditsScreenProps> = ({ user, onClose, pla
                       duration: 1, 
                       ease: [0.22, 1, 0.36, 1]
                     }}
-                    className="text-6xl sm:text-8xl font-serif italic text-white leading-tight text-center"
+                    className="text-4xl sm:text-7xl lg:text-8xl font-serif italic text-white leading-tight text-center"
                   >
                     {current.name}
                   </motion.p>
@@ -178,13 +178,13 @@ export const CreditsScreen: React.FC<CreditsScreenProps> = ({ user, onClose, pla
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               transition={{ duration: 2 }}
-              className="flex flex-col items-center space-y-10 text-center"
+              className="flex flex-col items-center space-y-8 sm:space-y-10 text-center px-6"
             >
               <motion.div 
                 initial={{ scale: 0.9 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ duration: 2, ease: "easeOut" }}
-                className="w-72 h-72 mx-auto bg-white/5 rounded-[4rem] p-12 border border-white/10 backdrop-blur-2xl"
+                className="w-48 h-48 sm:w-72 sm:h-72 mx-auto bg-white/5 rounded-[3rem] sm:rounded-[4rem] p-8 sm:p-12 border border-white/10 backdrop-blur-2xl"
               >
                 <img
                   src="https://storage.googleapis.com/secretchancellor/HILogo.png"
@@ -192,17 +192,17 @@ export const CreditsScreen: React.FC<CreditsScreenProps> = ({ user, onClose, pla
                   className="w-full h-full object-contain"
                 />
               </motion.div>
-              <div className="space-y-6">
-                <h2 className="text-5xl font-serif italic text-white tracking-tight">Horsemen Interactive</h2>
-                <div className="flex items-center justify-center gap-10">
-                  <span className="w-20 h-px bg-white/20" />
-                  <Heart className="w-8 h-8 text-red-600 fill-red-600 animate-pulse" />
-                  <span className="w-20 h-px bg-white/20" />
+              <div className="space-y-4 sm:space-y-6">
+                <h2 className="text-3xl sm:text-5xl font-serif italic text-white tracking-tight">Horsemen Interactive</h2>
+                <div className="flex items-center justify-center gap-6 sm:gap-10">
+                  <span className="w-12 sm:w-20 h-px bg-white/20" />
+                  <Heart className="w-6 h-6 sm:w-8 sm:h-8 text-red-600 fill-red-600 animate-pulse" />
+                  <span className="w-12 sm:w-20 h-px bg-white/20" />
                 </div>
-                <p className="text-sm font-mono text-white/40 uppercase tracking-[0.5em] font-medium">
+                <p className="text-xs sm:text-sm font-mono text-white/40 uppercase tracking-[0.3em] sm:tracking-[0.5em] font-medium px-4">
                   Redefining the future of play.
                 </p>
-                <div className="pt-4">
+                <div className="pt-2 sm:pt-4">
                    <p className="text-[10px] font-mono text-white/20 uppercase tracking-[0.2em]">Based in the United Kingdom</p>
                 </div>
               </div>

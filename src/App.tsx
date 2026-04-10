@@ -41,9 +41,23 @@ export default function App() {
 
   // ── Landing / Auth view state ──────────────────────────────────
   const [unauthView, setUnauthView] = useState<UnauthView>(() => {
-    // If user arrives via a direct #auth hash (e.g. password reset redirect), skip landing
-    return window.location.hash === '#auth' ? 'auth-login' : 'landing';
+    // 1. Explicit auth hash (password resets, deep links)
+    if (window.location.hash === '#auth') return 'auth-login';
+    
+    // 2. Returning visitor check
+    const hasVisited = localStorage.getItem('assembly_has_visited');
+    if (hasVisited) return 'auth-login';
+
+    // 3. First time visitor defaults to landing
+    return 'landing';
   });
+
+  // Mark visitor as "having visited" once they've seen the landing page or logged in
+  useEffect(() => {
+    if (unauthView !== 'landing' || token || user) {
+      localStorage.setItem('assembly_has_visited', 'true');
+    }
+  }, [unauthView, token, user]);
 
   // Keep URL hash in sync with the current view
   const setViewWithHash = useCallback((view: UnauthView) => {
@@ -58,6 +72,7 @@ export default function App() {
   // Handle browser Back / Forward
   useEffect(() => {
     const onPop = () => {
+      // Only handle unauth navigation
       if (!token && !user) {
         setUnauthView(window.location.hash === '#auth' ? 'auth-login' : 'landing');
       }

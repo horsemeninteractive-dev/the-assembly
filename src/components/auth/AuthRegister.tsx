@@ -22,6 +22,7 @@ export const AuthRegister: React.FC<any> = ({ form }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password, email, avatarUrl }),
+        credentials: 'include',
       });
 
       const data = await response.json();

@@ -23,6 +23,7 @@ export const AuthLogin: React.FC<any> = ({ form }) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username, password }),
+        credentials: 'include',
       });
 
       const data = await response.json();

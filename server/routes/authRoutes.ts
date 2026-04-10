@@ -93,8 +93,8 @@ export function registerAuthRoutes({ app }: RouteContext): void {
     const userWithoutPassword = sanitizeUser(newUser);
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: true,
+      sameSite: 'none',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
     res.json({ user: userWithoutPassword, token });
@@ -115,8 +115,8 @@ export function registerAuthRoutes({ app }: RouteContext): void {
     const userWithoutPassword = sanitizeUser(user);
     res.cookie('token', token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict',
+      secure: true,
+      sameSite: 'none',
       maxAge: 30 * 24 * 60 * 60 * 1000,
     });
     res.json({ user: userWithoutPassword, token });

@@ -138,7 +138,7 @@ export function useAuth() {
 
         if (!currentUser) {
           try {
-            const res = await fetch(apiUrl('/api/me'));
+            const res = await fetch(apiUrl('/api/me'), { credentials: 'include' });
             if (res.ok) {
               const data = await res.json();
               if (data.user) {
@@ -202,6 +202,7 @@ export function useAuth() {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ code }),
+          credentials: 'include',
         });
         if (res.ok) {
           const data = await res.json();
@@ -242,6 +243,7 @@ export function useAuth() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ code: urlCode }),
+            credentials: 'include',
           })
             .then((res) => res.json())
             .then((data) => {
