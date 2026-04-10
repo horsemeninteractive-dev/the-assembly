@@ -12,6 +12,7 @@
     <link rel="apple-touch-icon" href="/pwa-192x192.png" />
     <link rel="icon" type="image/png" href="/pwa-192x192.png" />
     <link rel="shortcut icon" href="/pwa-192x192.png" />
+    <link href="https://fonts.googleapis.com/css2?family=Quantico:wght@400;700&display=swap" rel="stylesheet">
 
     <!-- Hardened Self-healing script to fix White Screen / Asset mismatch errors -->
     <script>
@@ -71,8 +72,128 @@
       })();
     </script>
   </head>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #07070a;
+      overflow: hidden;
+    }
+    #pwa-splash {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      background-color: #07070a;
+      transition: opacity 0.8s ease-out;
+    }
+    #pwa-splash .bg-container {
+      position: absolute;
+      inset: 0;
+      overflow: hidden;
+    }
+    #pwa-splash .hero-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      filter: blur(40px) brightness(0.7);
+      transform: scale(1.2);
+    }
+    #pwa-splash .overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0.4) 50%, rgba(0,10,20,0.3) 100%);
+      backdrop-filter: blur(20px);
+    }
+    #pwa-splash .brand-container {
+      position: relative;
+      z-index: 10;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    #pwa-splash .logo-box {
+      width: 100px;
+      height: 100px;
+      background: rgba(0,0,0,0.5);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 20px;
+      padding: 20px;
+      box-shadow: 0 0 30px rgba(0,0,0,0.5);
+      margin-bottom: 24px;
+    }
+    #pwa-splash .logo-img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+    #pwa-splash .brand-text {
+      color: white;
+      font-family: 'Quantico', sans-serif;
+      font-size: 26px;
+      text-transform: uppercase;
+      letter-spacing: 0.4em;
+      margin: 0;
+      opacity: 0.95;
+      text-shadow: 0 0 20px rgba(255,255,255,0.2);
+    }
+    #pwa-splash .loader-line {
+      width: 40px;
+      height: 1px;
+      background: rgba(185, 28, 28, 0.5);
+      margin-top: 12px;
+      animation: expand 2s infinite ease-in-out;
+    }
+    @keyframes expand {
+      0% { width: 0; opacity: 0; }
+      50% { width: 60px; opacity: 1; }
+      100% { width: 0; opacity: 0; }
+    }
+  </style>
   <body>
+    <div id="pwa-splash">
+      <div class="bg-container">
+        <img src="/hero.png" class="hero-img" alt="" />
+        <div class="overlay"></div>
+      </div>
+      <div class="brand-container">
+        <div class="logo-box">
+          <img src="https://storage.googleapis.com/secretchancellor/SC.png" class="logo-img" alt="Logo" />
+        </div>
+        <h1 class="brand-text">The Assembly</h1>
+        <div class="loader-line"></div>
+      </div>
+    </div>
     <div id="root"></div>
+    <script>
+      // Automatically hide the splash once React renders the app
+      window.addEventListener('load', function() {
+        // We wait for the App to signal it's ready, or we hide it after React has had time to boot
+        // For now, a simple observer for the root element
+        const root = document.getElementById('root');
+        const splash = document.getElementById('pwa-splash');
+        
+        const observer = new MutationObserver(function() {
+          if (root.innerHTML !== '') {
+            splash.style.opacity = '0';
+            setTimeout(() => splash.remove(), 800);
+            observer.disconnect();
+          }
+        });
+        observer.observe(root, { childList: true });
+        
+        // Safety timeout
+        setTimeout(() => { 
+           splash.style.opacity = '0';
+           setTimeout(() => splash.remove(), 800);
+           observer.disconnect();
+        }, 10000);
+      });
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

@@ -4,8 +4,8 @@
   "description": "A social deduction game of intrigue and politics for 5-10 players.",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#000000",
-  "theme_color": "#000000",
+  "background_color": "#07070a",
+  "theme_color": "#07070a",
   "icons": [
     {
       "src": "/pwa-192x192.png",

@@ -10,6 +10,7 @@ import { UpdateBanner } from './components/UpdateBanner';
 import { InviteModal } from './components/game/modals/InviteModal';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { EnterSplash } from './components/app/EnterSplash';
+import { AppSplash } from './components/app/AppSplash';
 import { LandingPage } from './components/app/LandingPage';
 import { LobbyView, ProfileModal } from './components/app/LobbyViews';
 import { GameRoomView, ModalSection } from './components/app/GameAndModals';
@@ -80,7 +81,7 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
 
-  if (loading) return <div className="min-h-screen bg-base flex items-center justify-center text-primary font-mono">Loading...</div>;
+  if (loading) return <AppSplash message="Authenticating" />;
 
   // Show the hero image for the default background (no custom selection)
   const hasCustomBg = user?.activeBackground && user.activeBackground !== 'default';
@@ -124,7 +125,7 @@ export default function App() {
                 </motion.div>
               )
             ) : !isInteracted ? (
-              <motion.div key="splash" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 w-full bg-texture flex items-center justify-center p-4"><EnterSplash user={user} onEnter={handleEnterAssembly} /></motion.div>
+              <motion.div key="splash" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 w-full flex items-center justify-center p-4"><EnterSplash user={user} onEnter={handleEnterAssembly} /></motion.div>
             ) : !joined || !gameState ? (
               <motion.div key="lobby" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col min-h-0">
                 <LobbyView setIsProfileOpen={setIsProfileOpen} setIsPurchaseModalOpen={setIsPurchaseModalOpen} />
