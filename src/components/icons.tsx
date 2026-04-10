@@ -3,9 +3,18 @@ import { Eye, Crown } from 'lucide-react';
 import { cn } from '../utils/utils';
 
 export const OverseerIcon = ({ className }: { className?: string }) => (
-  <div className={cn('relative', className)}>
-    <Eye className="w-full h-full" />
-    <Crown className="absolute -top-[45%] left-1/2 -translate-x-1/2 w-[70%] h-[70%] text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
+  <div className={cn('relative flex items-center justify-center p-1', className)}>
+    <svg 
+      viewBox="0 0 24 24" 
+      className="absolute inset-0 w-full h-full drop-shadow-[0_0_8px_currentColor]" 
+      fill="none" 
+      stroke="currentColor" 
+      strokeWidth="1.2"
+    >
+      <path d="M12 2L22 12L12 22L2 12L12 2" strokeLinecap="round" strokeLinejoin="round" />
+      <path d="M12 5L19 12L12 19L5 12L12 5" strokeOpacity="0.4" strokeWidth="0.6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+    <Eye className="w-[55%] h-[55%] drop-shadow-[0_0_4px_currentColor]" />
   </div>
 );
 
