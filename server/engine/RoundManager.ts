@@ -282,6 +282,7 @@ export class RoundManager {
 
     // Phase 1: Cleanup and reset for the new round
     state.vetoRequested = false;
+    state.vetoDenied = false;
     state.rejectedChancellorId = undefined;
     state.detainedPlayerId = undefined;
     if (successfulGovernment) {
@@ -494,6 +495,7 @@ export class RoundManager {
       lastExecutiveActionStateCount: 0,
       vetoUnlocked: false,
       vetoRequested: false,
+      vetoDenied: false,
       previousVotes: undefined,
       handlerSwapPending: undefined,
       handlerSwapPositions: undefined,

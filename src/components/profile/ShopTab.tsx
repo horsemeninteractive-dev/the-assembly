@@ -114,10 +114,7 @@ export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, pla
           const isUnlocked = isPassItem
             ? Math.floor(user.stats.gamesPlayed / 5) + 1 >= PASS_ITEM_LEVELS[item.id]
             : false;
-          const isOwned =
-            user.ownedCosmetics.includes(item.id) ||
-            item.id === 'music-ambient' ||
-            isUnlocked;
+          const isOwned = user.ownedCosmetics.includes(item.id) || isUnlocked;
 
           return (
             <div

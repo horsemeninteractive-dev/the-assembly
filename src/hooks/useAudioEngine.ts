@@ -43,8 +43,9 @@ export function useAudioEngine({
 
   const playMusic = useCallback((trackKey: string) => {
     if (!musicAudioRef.current) return;
-    const url = getProxiedUrl(MUSIC_TRACKS[trackKey] || MUSIC_TRACKS['music-ambient']);
+    const url = getProxiedUrl(MUSIC_TRACKS[trackKey] || MUSIC_TRACKS['music-default']);
     musicAudioRef.current.src = url;
+    musicAudioRef.current.load();
     musicAudioRef.current.play().catch(() => {});
   }, []);
 
@@ -57,8 +58,8 @@ export function useAudioEngine({
       musicAudioRef.current?.pause();
       return;
     }
-    const trackKey = user?.activeMusic || 'music-ambient';
-    const url = getProxiedUrl(MUSIC_TRACKS[trackKey] || MUSIC_TRACKS['music-ambient']);
+    const trackKey = user?.activeMusic || 'music-default';
+    const url = getProxiedUrl(MUSIC_TRACKS[trackKey] || MUSIC_TRACKS['music-default']);
 
     if (!musicAudioRef.current) {
       musicAudioRef.current = new Audio(url);

@@ -9,12 +9,16 @@
 const BASE = 'https://gamesounds.xyz/Kenney%27s%20Sound%20Pack';
 
 export const MUSIC_TRACKS: Record<string, string> = {
-  'music-ambient':
+  'music-default':
+    'https://storage.googleapis.com/secretchancellor/Shadows%20in%20the%20Marble%20Hall.mp3',
+  'music-parliament':
     'https://storage.googleapis.com/secretchancellor/Shadows%20Over%20Parliament.mp3',
   'music-fog': 'https://storage.googleapis.com/secretchancellor/Fog%20in%20the%20Alley.mp3',
   'music-tense': 'https://storage.googleapis.com/secretchancellor/Final%20Countdown.mp3',
   'music-victory':
     'https://storage.googleapis.com/secretchancellor/Triumph%20of%20the%20New%20Age.mp3',
+  'music-credits':
+    'https://storage.googleapis.com/secretchancellor/Shadows%20in%20the%20Marble%20Hall%20(Vocal%20version).mp3',
   'music-pass-0': 'https://storage.googleapis.com/secretchancellor/Static%20Noise.mp3',
 };
 

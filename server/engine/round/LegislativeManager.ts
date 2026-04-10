@@ -433,6 +433,7 @@ export class LegislativeManager {
       }
     } else {
       s.vetoRequested = false;
+      s.vetoDenied = true;
       const vetoChancellor = s.players.find((p: Player) => p.isChancellor);
       if (vetoChancellor) vetoChancellor.hasActed = false;
       addLog(s, `${player.name} (President) denied the Veto. Chancellor must enact a directive.`);

@@ -61,7 +61,7 @@ export const InventoryTab: React.FC<InventoryProps> = ({
     if (item.id.endsWith('-default')) return true;
 
     // Show owned or unlocked items
-    const isOwned = user.ownedCosmetics.includes(item.id) || item.id === 'music-ambient';
+    const isOwned = user.ownedCosmetics.includes(item.id);
     const isPassItem = !!PASS_ITEM_LEVELS[item.id];
     const isUnlocked = isPassItem
       ? getLevelFromXp(user.stats.xp) >= PASS_ITEM_LEVELS[item.id]

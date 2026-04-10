@@ -12,7 +12,7 @@ export function LobbyView({ setIsProfileOpen, setIsPurchaseModalOpen }: {
   setIsPurchaseModalOpen: (v: boolean) => void
 }) {
   const { user, token, handleLogout } = useAuthContext();
-  const { playSound } = useAudioContext();
+  const { playSound, playMusic, stopMusic } = useAudioContext();
   const { handleJoinRoom } = useGameContext();
   const { uiScaleSetting } = useSettings();
 
@@ -24,7 +24,11 @@ export function LobbyView({ setIsProfileOpen, setIsPurchaseModalOpen }: {
         user={user} onJoinRoom={handleJoinRoom} onLogout={handleLogout} 
         onOpenProfile={() => setIsProfileOpen(true)} 
         onOpenPurchase={() => setIsPurchaseModalOpen(true)} 
-        playSound={playSound} token={token || undefined} uiScaleSetting={uiScaleSetting} 
+        playSound={playSound}
+        playMusic={playMusic}
+        stopMusic={stopMusic}
+        token={token || undefined} 
+        uiScaleSetting={uiScaleSetting} 
       />
     </ErrorBoundary>
   );

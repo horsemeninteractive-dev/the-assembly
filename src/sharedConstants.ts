@@ -18,7 +18,7 @@ const getAppVersion = (): string => {
     }
   } catch {}
 
-  return 'v0.9.13'; // Fallback
+  return 'v0.9.14'; // Fallback
 };
 
 export const CLIENT_VERSION = getAppVersion();
@@ -94,10 +94,10 @@ export const DEFAULT_ITEMS: CosmeticItem[] = [
   },
   {
     id: 'music-default',
-    name: 'Default Music',
+    name: 'Shadows in the Hall',
     price: 0,
     type: 'music',
-    description: 'Standard Issue',
+    description: 'The standard atmospheric theme of the Assembly.',
   },
   {
     id: 'sound-default',
@@ -351,6 +351,13 @@ export const DEFAULT_ITEMS: CosmeticItem[] = [
     price: 4000,
     type: 'music',
     description: 'A grand orchestral anthem for the victors.',
+  },
+  {
+    id: 'music-parliament',
+    name: 'Shadows Over Parliament',
+    price: 500,
+    type: 'music',
+    description: 'The classic, moody theme of the old Assembly halls.',
   },
 
   // Sound Packs

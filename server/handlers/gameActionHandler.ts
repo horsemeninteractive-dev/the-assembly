@@ -236,7 +236,7 @@ export function registerGameActionHandlers(
     if (!state || state.phase !== 'Legislative_Chancellor') return;
 
     const player = state.players.find((p) => p.socketId === socket.id);
-    if (!player || !player.isChancellor || !player.isAlive || player.hasActed) return;
+    if (!player || !player.isChancellor || !player.isAlive || player.hasActed || state.vetoDenied) return;
     player.hasActed = true;
 
     if (state.vetoUnlocked) {
@@ -556,11 +556,12 @@ export function registerGameActionHandlers(
     engine.broadcastState(roomId);
   });
 
-  socket.on('leaveRoom', async () => {
+  socket.on('leaveRoom', async (payload?: { intentional?: boolean }) => {
     const roomId = getRoom();
     if (!roomId) return;
     const state = engine.rooms.get(roomId);
-    await engine.handleLeave(socket, roomId, true);
+    const intentional = payload?.intentional ?? true;
+    await engine.handleLeave(socket, roomId, intentional);
     if (state && (state.phase === 'Lobby' || state.phase === 'GameOver')) {
       await engine.drainSpectatorQueue(roomId);
     }

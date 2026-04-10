@@ -532,6 +532,7 @@ export interface GameState {
   detainedPlayerId?: string;
   vetoUnlocked: boolean;
   vetoRequested: boolean;
+  vetoDenied?: boolean;
   previousVotes?: { [playerId: string]: 'Aye' | 'Nay' };
   presidentSaw?: Policy[];
   chancellorSaw?: Policy[];
@@ -673,7 +674,7 @@ export interface ClientToServerEvents {
     isPractice?: boolean;
     aiDifficulty?: 'Casual' | 'Normal' | 'Elite';
   }) => void;
-  leaveRoom: () => void;
+  leaveRoom: (data?: { intentional?: boolean }) => void;
   playAgain: () => void;
   startGame: () => void;
   toggleReady: () => void;

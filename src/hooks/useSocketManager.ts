@@ -154,6 +154,37 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
     };
   }, [handleLeaveRoom, playSound, setUser]);
 
+  // Handle browser close / tab close / mobile app close
+  useEffect(() => {
+    const handleBeforeUnload = () => {
+      // Direct emit instead of handleLeaveRoom to avoid fetch/state updates during cleanup
+      // We use intentional: false so the server treats it as a potential reconnection case
+      socket.emit('leaveRoom', { intentional: false });
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, []);
+
+  // Handle app backgrounding (switching tasks)
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (document.hidden) {
+        // Player switched to a different app
+        if (joined && gameState?.roomId) {
+          socket.emit('leaveRoom', { intentional: false });
+        }
+      } else {
+        // Player returned to the app
+        if (joined && gameState?.roomId) {
+          handleJoinRoom(gameState.roomId);
+        }
+      }
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
+  }, [joined, gameState?.roomId, handleJoinRoom]);
+
   return {
     joined,
     setJoined,

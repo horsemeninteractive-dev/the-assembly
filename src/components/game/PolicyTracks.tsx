@@ -80,7 +80,12 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
                   backgroundColor: ['rgba(30, 58, 138, 0.2)', 'rgba(30, 58, 138, 0.7)', 'rgba(30, 58, 138, 0.4)'],
                   borderColor: ['rgba(59, 130, 246, 0.3)', 'rgba(59, 130, 246, 1)', 'rgba(59, 130, 246, 0.6)'],
                   boxShadow: ['0 0 0px rgba(59,130,246,0)', '0 0 20px rgba(59,130,246,0.5)', '0 0 8px rgba(59,130,246,0.2)']
-                } : { scale: 1 }}
+                } : { 
+                  scale: 1,
+                  backgroundColor: 'rgba(0, 0, 0, 0)',
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 0 0px rgba(0,0,0,0)'
+                }}
                 transition={{ duration: 0.8, times: [0, 0.3, 1] }}
                 className={cn(
                   'flex-1 h-[3vh] rounded-[2px] border transition-all duration-500 relative group',
@@ -163,7 +168,12 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
                   backgroundColor: ['rgba(127, 29, 29, 0.2)', 'rgba(127, 29, 29, 0.7)', 'rgba(127, 29, 29, 0.4)'],
                   borderColor: ['rgba(239, 68, 68, 0.3)', 'rgba(239, 68, 68, 1)', 'rgba(239, 68, 68, 0.6)'],
                   boxShadow: ['0 0 0px rgba(239, 68, 68, 0)', '0 0 20px rgba(239, 68, 68, 0.5)', '0 0 8px rgba(239, 68, 68, 0.2)']
-                } : { scale: 1 }}
+                } : { 
+                  scale: 1,
+                  backgroundColor: 'rgba(0, 0, 0, 0)',
+                  borderColor: 'rgba(255, 255, 255, 0.1)',
+                  boxShadow: '0 0 0px rgba(0,0,0,0)'
+                }}
                 transition={{ duration: 0.8, times: [0, 0.3, 1] }}
                 className={cn(
                   'flex-1 h-[3vh] rounded-[2px] border transition-all duration-500 relative group',

@@ -4,7 +4,8 @@ import { User, RoomInfo, RoomPrivacy, GameMode } from '../../shared/types';
 import { apiUrl, debugError } from '../utils/utils';
 import { LeaderboardModal } from './game/modals/LeaderboardModal';
 import { HowToPlayModal } from './HowToPlayModal';
-import { CreditsModal } from './game/modals/CreditsModal';
+import { LegalModal } from './game/modals/LegalModal';
+import { CreditsScreen } from './lobby/CreditsScreen';
 
 // Sub-components
 import { LobbyHeader } from './lobby/LobbyHeader';
@@ -31,6 +32,8 @@ interface LobbyProps {
   onOpenProfile: () => void;
   onOpenPurchase: () => void;
   playSound: (soundKey: string) => void;
+  playMusic?: (trackKey: string) => void;
+  stopMusic?: () => void;
   token?: string;
   uiScaleSetting?: number;
 }
@@ -42,6 +45,8 @@ export const Lobby: React.FC<LobbyProps> = ({
   onOpenProfile,
   onOpenPurchase,
   playSound,
+  playMusic,
+  stopMusic,
   token,
 }) => {
   const [rooms, setRooms] = useState<RoomInfo[]>([]);
@@ -59,15 +64,26 @@ export const Lobby: React.FC<LobbyProps> = ({
   const [isLeaderboardOpen, setIsLeaderboardOpen] = useState(false);
   const [isHowToPlayOpen, setIsHowToPlayOpen] = useState(false);
   const [isCreditsOpen, setIsCreditsOpen] = useState(false);
+  const [isLegalOpen, setIsLegalOpen] = useState(false);
   const [isPracticeOpen, setIsPracticeOpen] = useState(false);
   const [pendingRequestCount, setPendingRequestCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    if (isCreating || isLeaderboardOpen || isHowToPlayOpen || isCreditsOpen || isPracticeOpen) {
+    if (isCreating || isLeaderboardOpen || isHowToPlayOpen || isCreditsOpen || isPracticeOpen || isLegalOpen) {
       playSound('modal_open');
     }
-  }, [isCreating, isLeaderboardOpen, isHowToPlayOpen, isCreditsOpen, isPracticeOpen]);
+  }, [isCreating, isLeaderboardOpen, isHowToPlayOpen, isCreditsOpen, isPracticeOpen, isLegalOpen]);
+
+  useEffect(() => {
+    if (isCreditsOpen && playMusic) {
+      playMusic('music-credits');
+    } else if (!isCreditsOpen && playMusic) {
+      // Return to user's active music or default
+      const track = user?.activeMusic || 'music-default';
+      playMusic(track);
+    }
+  }, [isCreditsOpen, playMusic, user?.activeMusic]);
 
   const fetchRooms = async () => {
     try {
@@ -222,9 +238,17 @@ export const Lobby: React.FC<LobbyProps> = ({
             <button
               onMouseEnter={() => playSound('hover')}
               onClick={() => { playSound('click'); setIsCreditsOpen(true); }}
-              className="text-[9px] font-mono text-red-500/80 hover:text-red-300 uppercase tracking-widest transition-colors"
+              className="text-[9px] font-mono text-primary/80 hover:text-white uppercase tracking-widest transition-colors font-bold"
             >
-              Credits & Legal
+              Credits
+            </button>
+            <div className="w-px h-3 bg-subtle" />
+            <button
+              onMouseEnter={() => playSound('hover')}
+              onClick={() => { playSound('click'); setIsLegalOpen(true); }}
+              className="text-[9px] font-mono text-muted hover:text-primary uppercase tracking-widest transition-colors"
+            >
+              Legal Info
             </button>
             <div className="w-px h-3 bg-subtle hidden sm:block" />
             <p className="text-[9px] font-mono text-ghost uppercase tracking-tighter">
@@ -246,7 +270,12 @@ export const Lobby: React.FC<LobbyProps> = ({
       />
       <AnimatePresence>
         {isCreditsOpen && (
-          <CreditsModal onClose={() => setIsCreditsOpen(false)} playSound={playSound} />
+          <CreditsScreen user={user} onClose={() => setIsCreditsOpen(false)} playSound={playSound} />
+        )}
+      </AnimatePresence>
+      <AnimatePresence>
+        {isLegalOpen && (
+          <LegalModal onClose={() => setIsLegalOpen(false)} playSound={playSound} />
         )}
       </AnimatePresence>
       <LobbyRoomCreator

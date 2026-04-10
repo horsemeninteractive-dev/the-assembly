@@ -98,7 +98,7 @@ export class AIEngine {
       }
       case 'Legislative_Chancellor': {
         const chancellor = s.players.find((p) => p.isChancellor);
-        if (chancellor?.isAI && s.chancellorPolicies.length > 0) {
+        if (chancellor?.isAI && s.chancellorPolicies.length > 0 && !s.vetoRequested && !s.vetoDenied) {
           this.aiChancellorPlay(s, roomId);
         }
         break;
@@ -279,6 +279,17 @@ export class AIEngine {
     const chancellor = s.players.find((p) => p.isChancellor);
     if (!chancellor?.isAI || s.chancellorPolicies.length === 0) return;
 
+    if (s.vetoUnlocked && !s.vetoDenied) {
+      if (this.shouldAIChancellorVeto(chancellor, s.chancellorPolicies, s.stateDirectives, s.civilDirectives)) {
+        s.vetoRequested = true;
+        chancellor.hasActed = true;
+        addLog(s, `${chancellor.name} (Chancellor) requested a Veto.`);
+        this.engine.broadcastState(roomId);
+        this.scheduleAITurns(s, roomId);
+        return;
+      }
+    }
+
     const idx = this.choosePolicyToPlay(
       chancellor,
       s.chancellorPolicies,
@@ -289,6 +300,32 @@ export class AIEngine {
     s.discard.push(...s.chancellorPolicies);
     s.chancellorPolicies = [];
     this.engine.roundManager.enactPolicy(s, roomId, played, false, chancellor.id);
+  }
+
+  private shouldAIChancellorVeto(
+    player: Player,
+    hand: Policy[],
+    stateDir: number,
+    civilDir: number
+  ): boolean {
+    const hasCivil = hand.includes('Civil');
+    const hasState = hand.includes('State');
+    const stateInHand = hand.filter((p) => p === 'State').length;
+    const civilInHand = hand.filter((p) => p === 'Civil').length;
+
+    if (player.role === 'Civil') {
+      // Must veto if forced to play a winning policy for State
+      if (stateDir === 5 && !hasCivil) return true;
+      // Strongly prefer veto if both policies are State and State is close to winning
+      if (stateInHand === 2 && stateDir >= 4) return true;
+    } else {
+      // Must veto if forced to play a winning policy for Civil
+      if (civilDir === 4 && !hasState) return true;
+      // Strongly prefer veto if both policies are Civil and Civil is close to winning
+      if (civilInHand === 2 && civilDir >= 3) return true;
+    }
+
+    return false;
   }
 
   private choosePolicyToPlay(
