@@ -10,7 +10,10 @@ import { Browser } from '@capacitor/browser';
 
 export function useAuth() {
   const [user, setUser] = useState<User | null>(null);
-  const [token, setToken] = useState<string | null>(null);
+  const [token, setToken] = useState<string | null>(() => {
+    if (typeof window === 'undefined') return null;
+    return localStorage.getItem('assembly_token');
+  });
   const [loading, setLoading] = useState(true);
   const [isInteracted, setIsInteracted] = useState(false);
   const [isDiscord, setIsDiscord] = useState(() => {
@@ -29,6 +32,7 @@ export function useAuth() {
   const handleAuthSuccess = useCallback((userData: User, authToken: string) => {
     setUser(userData);
     setToken(authToken);
+    localStorage.setItem('assembly_token', authToken);
     socket.emit('userConnected', { userId: userData.id, token: authToken });
     try {
       if (document.documentElement.requestFullscreen) {
@@ -45,7 +49,8 @@ export function useAuth() {
   const handleLogout = useCallback(() => {
     setUser(null);
     setToken(null);
-    fetch(apiUrl('/api/logout'), { method: 'POST' }).catch(() => {});
+    localStorage.removeItem('assembly_token');
+    fetch(apiUrl('/api/logout'), { method: 'POST', credentials: 'include' }).catch(() => {});
     setIsInteracted(false);
   }, []);
 
@@ -138,13 +143,24 @@ export function useAuth() {
 
         if (!currentUser) {
           try {
-            const res = await fetch(apiUrl('/api/me'), { credentials: 'include' });
+            const currentTokenRef = token || localStorage.getItem('assembly_token');
+            const headers: Record<string, string> = {};
+            if (currentTokenRef) headers['Authorization'] = `Bearer ${currentTokenRef}`;
+
+            const res = await fetch(apiUrl('/api/me'), { 
+              headers,
+              credentials: 'include' 
+            });
             if (res.ok) {
               const data = await res.json();
               if (data.user) {
                 currentUser = data.user;
-                currentToken = data.token;
+                currentToken = data.token || currentTokenRef;
               }
+            } else if (res.status === 401) {
+              // Token expired or invalid
+              localStorage.removeItem('assembly_token');
+              setToken(null);
             }
           } catch (err) {
             debugError('Session restore failed:', err);
