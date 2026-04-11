@@ -32,7 +32,6 @@ export class ElectionManager {
     s.chancellorSaw = undefined;
     s.lastEnactedPolicy = undefined;
     s.isStrategistAction = undefined;
-    s.heraldPendingResponse = undefined;
     s.quorumRevotePending = undefined;
     s.isRevote = undefined;
 
@@ -89,19 +88,7 @@ export class ElectionManager {
       };
       this.round.enterPhase(s, roomId, 'Nomination_Review');
     } else {
-      const herald = s.players.find(
-        (p) => p.titleRole === 'Herald' && !p.titleUsed && p.isAlive && s.round > 1
-      );
-      if (herald) {
-        s.titlePrompt = {
-          playerId: herald.id,
-          role: 'Herald',
-          context: { role: 'Herald' },
-        };
-        this.round.enterPhase(s, roomId, 'Herald_Action');
-      } else {
-        this.round.enterPhase(s, roomId, 'Nominate_Chancellor');
-      }
+      this.round.enterPhase(s, roomId, 'Nominate_Chancellor');
     }
   }
 
@@ -181,23 +168,44 @@ export class ElectionManager {
 
     s.players.forEach((p) => (p.vote = undefined));
 
-    s.actionTimerEnd = Date.now() + 4000;
+    s.actionTimerEnd = Date.now() + 6000; // Longer for Defector window
     s.declarations = [];
     this.round.enterPhase(s, roomId, 'Voting_Reveal');
+
+    // Check for Defector
+    const defector = s.players.find(p => p.titleRole === 'Defector' && !p.titleUsed && p.isAlive && p.vote);
+    if (defector) {
+      // 2s delay after initial reveal before prompting defector
+      setTimeout(() => {
+        const state = this.round.engine.rooms.get(roomId);
+        if (state && state.phase === 'Voting_Reveal') {
+          state.titlePrompt = {
+            playerId: defector.id,
+            role: 'Defector',
+            context: { role: 'Defector' }
+          };
+          this.round.engine.broadcastState(roomId);
+        }
+      }, 2000);
+    }
 
     setTimeout(async () => {
       const st = this.round.engine.rooms.get(roomId);
       if (!st || st.phase !== 'Voting_Reveal') return;
       st.actionTimerEnd = undefined;
+      st.titlePrompt = undefined;
+      
+      const newAye = st.players.filter(p => st.previousVotes?.[p.id] === 'Aye').length;
+      const newNay = st.players.filter(p => st.previousVotes?.[p.id] === 'Nay').length;
       const votes = st.previousVotes;
       st.previousVotes = undefined;
 
-      if (aye > nay) {
-        await this.electionPassed(st, roomId, aye, nay, votes ?? {});
+      if (newAye > newNay) {
+        await this.electionPassed(st, roomId, newAye, newNay, votes ?? {});
       } else {
-        await this.electionFailed(st, roomId, aye, nay, votes ?? {});
+        await this.electionFailed(st, roomId, newAye, newNay, votes ?? {});
       }
-    }, 4000);
+    }, 6000);
   }
 
   private async electionPassed(

@@ -13,7 +13,6 @@ import {
   joinQueueSchema,
   signalSchema,
   sendReactionSchema,
-  heraldResponseSchema,
   censureVoteSchema,
 } from '../game/schemas';
 import { sendFriendRequest, acceptFriendRequest } from '../supabaseService';
@@ -209,25 +208,7 @@ export function registerGameActionHandlers(
     await engine.handleTitleAbility(state, roomId, abilityData as any);
   });
 
-  socket.on('heraldResponse', async (payload) => {
-    const result = heraldResponseSchema.safeParse(payload);
-    if (!result.success) return socket.emit('error', 'Invalid herald response data.');
-    const response = result.data;
 
-    const roomId = getRoom();
-    if (!roomId) return;
-    const state = engine.rooms.get(roomId);
-    if (!state || state.phase !== 'Herald_Action') return;
-
-    const player = state.players.find((p) => p.socketId === socket.id);
-    if (!player || player.id !== state.heraldPendingResponse?.targetId) return;
-
-    await engine.handleTitleAbility(state, roomId, {
-      use: true,
-      role: 'Herald',
-      agree: response === 'Confirmed',
-    } as any);
-  });
 
   socket.on('vetoRequest', () => {
     const roomId = getRoom();

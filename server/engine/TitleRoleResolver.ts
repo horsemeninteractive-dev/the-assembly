@@ -31,7 +31,7 @@ export class TitleRoleResolver {
       'Auditor',
       'Interdictor',
       'Archivist',
-      'Herald',
+      'Defector',
       'Quorum',
       'Cipher',
     ]);
@@ -188,11 +188,9 @@ export class TitleRoleResolver {
     }
 
     if (abilityData.use) {
-      const activeRole = (abilityData as any).role as TitleRole;
-      const isHeraldResponse = activeRole === 'Herald' && s.heraldPendingResponse?.targetId === player.id;
+      const isCipherAct = activeRole === 'Cipher';
 
-      if (!isHeraldResponse) {
-        if (activeRole !== 'Cipher') {
+      if (activeRole !== 'Cipher') {
           player.titleUsed = true;
         } else {
           player.cipherUsed = true;
@@ -309,7 +307,19 @@ export class TitleRoleResolver {
         break;
       }
 
-      case 'Interdictor': {
+      case 'Defector': {
+        if (!data.use || data.role !== 'Defector') break;
+        if (s.previousVotes && s.previousVotes[player.id]) {
+          const oldVote = s.previousVotes[player.id];
+          const newVote = (data as any).vote || (oldVote === 'Aye' ? 'Nay' : 'Aye');
+          s.previousVotes[player.id] = newVote as 'Aye' | 'Nay';
+          addLog(s, `The Defector secretly altered their vote.`);
+        }
+        // Resolving this prompt is handled in the ElectionManager loop
+        break;
+      }
+
+      case 'Archivist': {
         if (!data.use || data.role !== 'Interdictor') break;
         const president = s.players[s.presidentIdx];
         const target = s.players.find(
@@ -339,20 +349,8 @@ export class TitleRoleResolver {
           };
           this.engine.enterPhase(s, roomId, 'Nomination_Review');
         } else {
-          // Check for Herald after Interdictor resolves
-          const herald = s.players.find(
-            (p) => p.titleRole === 'Herald' && !p.titleUsed && p.isAlive && s.round > 1
-          );
-          if (herald) {
-            s.titlePrompt = {
-              playerId: herald.id,
-              role: 'Herald',
-              context: { role: 'Herald' },
-            };
-            this.engine.enterPhase(s, roomId, 'Herald_Action');
-          } else {
-            this.engine.enterPhase(s, roomId, 'Nominate_Chancellor');
-          }
+          this.round.enterPhase(s, roomId, 'Nominate_Chancellor');
+        }
         }
         break;
       }
@@ -364,63 +362,7 @@ export class TitleRoleResolver {
         break;
       }
 
-      case 'Herald': {
-        if (!data.use || data.role !== 'Herald') break;
-        
-        // Handle target response
-        if (s.heraldPendingResponse && player.id === s.heraldPendingResponse.targetId) {
-          const herald = s.players.find(p => p.titleRole === 'Herald' && p.titleUsed);
-          const accuserId = herald?.id || '';
-          const confirmed = (data as any).agree;
-          const result = confirmed ? 'Confirmed' : 'Denied';
-          
-          if (!s.heraldLog) s.heraldLog = [];
-          s.heraldLog.push({
-            accuserId: accuserId,
-            targetId: player.id,
-            claim: s.heraldPendingResponse.claim,
-            response: result
-          });
-          
-          this.engine.io.to(roomId).emit('heraldRecord', {
-            accuserId: accuserId,
-            targetId: player.id,
-            claim: s.heraldPendingResponse.claim,
-            response: result
-          });
-          
-          addLog(s, `${player.name} ${result} the assertion by ${herald?.name || 'the Herald'}.`);
-          s.heraldPendingResponse = undefined;
-          this.engine.clearActionTimer(roomId);
-          this.engine.enterPhase(s, roomId, 'Nominate_Chancellor');
-          return;
-        }
 
-        // Handle initiating Herald — only consume titleUsed if a valid target exists
-        const target = s.players.find((p) => p.id === data.targetId && p.isAlive);
-        if (target) {
-          // Mark as used now (power was fired). If the target never responds (timeout),
-          // the decline path in onTitleAbilityDeclined restores titleUsed=false.
-          s.heraldPendingResponse = { targetId: target.id, claim: data.claim || 'Civil' };
-          s.titlePrompt = {
-            playerId: target.id,
-            role: 'Herald',
-            context: { role: 'Herald' },
-          };
-          this.engine.io.to(target.socketId).emit('heraldResponseRequired', { 
-            targetId: target.id, 
-            claim: data.claim || 'Civil' 
-          });
-          addLog(s, `${player.name} (Herald) issued a public assertion against ${target.name}.`);
-          this.engine.startActionTimer(roomId, 10000); // 10s countdown
-          this.engine.aiEngine.processAITurns(roomId); // Trigger AI response
-        } else {
-          // No valid target — do not consume the power
-          player.titleUsed = false;
-          this.engine.enterPhase(s, roomId, 'Nominate_Chancellor');
-        }
-        break;
-      }
 
       case 'Quorum': {
         s.isRevote = true;
@@ -432,7 +374,8 @@ export class TitleRoleResolver {
 
       case 'Cipher': {
         if (!data.use || data.role !== 'Cipher' || !data.message) break;
-        // Broadcast anonymous message
+        // Broadcast anonymous message prominently
+        s.activeCipherMessage = { text: data.message, timestamp: Date.now() };
         this.engine.io.to(roomId).emit('cipherMessage', { text: data.message });
         addLog(s, `[CIPHER DISPATCH]: "${data.message}"`);
         break;
@@ -470,19 +413,9 @@ export class TitleRoleResolver {
       case 'Archivist':
         this.continuePostRoundAfter(s, roomId, 'Archivist');
         break;
-      case 'Herald': {
-        if (s.heraldPendingResponse) {
-          // Target's response timed out — restore the Herald's power
-          const herald = s.players.find(p => p.titleRole === 'Herald');
-          if (herald) {
-            herald.titleUsed = false;
-            addLog(s, `[Timer] ${player.name} did not respond to the Herald's assertion. Power refunded.`);
-          }
-          s.heraldPendingResponse = undefined;
-        }
-        this.engine.enterPhase(s, roomId, 'Nominate_Chancellor');
+      case 'Defector':
+        // If declined, result remains as is
         break;
-      }
       case 'Quorum':
         s.quorumRevotePending = false;
         await this.engine.roundManager.handleElectionFailureContinuation(s, roomId);

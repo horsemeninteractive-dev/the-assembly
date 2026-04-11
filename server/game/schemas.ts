@@ -152,17 +152,18 @@ export const titleAbilityDataSchema = z.discriminatedUnion('use', [
       'Auditor',
       'Interdictor',
       'Archivist',
-      'Herald',
+      'Defector',
       'Quorum',
       'Cipher',
     ]),
     targetId: z.string().min(1).max(64).optional(),
     claim: z.string().min(1).max(80).optional(),
     message: z.string().min(1).max(80).optional(),
+    vote: z.enum(['Aye', 'Nay']).optional(),
   }),
 ]);
 
-export const heraldResponseSchema = z.enum(['Confirmed', 'Denied']);
+
 
 export const sendReactionSchema = z.string().min(1).max(64);
 

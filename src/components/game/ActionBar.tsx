@@ -92,8 +92,8 @@ export const ActionBar = ({
         return 'Chancellor is enacting a directive.';
       case 'Auditor_Action':
         return 'Auditor is inspecting the discard pile.';
-      case 'Herald_Action':
-        return 'Herald is making a public proclamation.';
+      case 'Defector_Action':
+        return 'The Defector is considering a secret realignment.';
       case 'Quorum_Action':
         return 'The Quorum is deciding on an emergency re-vote.';
       case 'Assassin_Action':
@@ -177,8 +177,39 @@ export const ActionBar = ({
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: 0.3, duration: 0.4, ease: 'easeOut' }}
-      className="shrink-0 border-t border-subtle flex flex-col"
+      className="shrink-0 border-t border-subtle flex flex-col relative"
     >
+      <AnimatePresence>
+        {gameState.activeCipherMessage && (Date.now() - gameState.activeCipherMessage.timestamp < 8000) && (
+          <motion.div
+            initial={{ opacity: 0, y: -20, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, scale: 1.05 }}
+            className="absolute inset-x-0 bottom-full z-[100] px-[2vw] pb-[2vh] pointer-events-none"
+          >
+            <div className="bg-emerald-500/10 border border-emerald-500/30 backdrop-blur-2xl px-6 py-4 rounded-3xl shadow-2xl flex flex-col items-center justify-center text-center">
+              <div className="flex items-center gap-2 mb-2">
+                <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span className="text-[10px] sm:text-xs font-mono text-emerald-400 uppercase tracking-[0.3em] font-bold">
+                  Intercepted Anonymous Dispatch
+                </span>
+              </div>
+              <div className="text-responsive-sm sm:text-responsive-md text-emerald-100 font-serif italic leading-relaxed">
+                "{gameState.activeCipherMessage.text}"
+              </div>
+              <div className="mt-3 w-12 h-0.5 bg-emerald-500/20 rounded-full overflow-hidden">
+                <motion.div 
+                  initial={{ width: "100%" }}
+                  animate={{ width: "0%" }}
+                  transition={{ duration: 8, ease: "linear" }}
+                  className="h-full bg-emerald-500"
+                />
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Phase status */}
       <div className="px-[2vw] py-[1.5vh] bg-surface-glass border-b border-subtle flex justify-between items-center">
         <div className="min-w-0 flex-1 mr-2 flex flex-col justify-center">
@@ -411,7 +442,7 @@ export const ActionBar = ({
         )}
 
         {/* Title Role Prompt */}
-        {gameState.titlePrompt && gameState.titlePrompt.playerId === me?.id && !gameState.heraldPendingResponse && (
+        {gameState.titlePrompt && gameState.titlePrompt.playerId === me?.id && (
           <div className="flex flex-col gap-[1vh] w-full justify-center h-full items-center">
             {[
               'Strategist',
@@ -419,7 +450,7 @@ export const ActionBar = ({
               'Handler',
               'Auditor',
               'Archivist',
-              'Herald',
+              'Defector',
               'Quorum',
             ].includes(gameState.titlePrompt.role) ? (
               <>
@@ -434,8 +465,8 @@ export const ActionBar = ({
                     'Use Auditor power to peek at the discard pile?'}
                   {gameState.titlePrompt.role === 'Archivist' &&
                     'Use Archivist power to peek at the discard pile?'}
-                  {gameState.titlePrompt.role === 'Herald' &&
-                    'Use Herald power to proclaim a player as Civil?'}
+                  {gameState.titlePrompt.role === 'Defector' &&
+                    'Defect? Secretly flip your vote to the opposite result?'}
                   {gameState.titlePrompt.role === 'Quorum' &&
                     'Use Quorum power to call for an emergency re-vote?'}
                 </div>
@@ -451,7 +482,7 @@ export const ActionBar = ({
                     }}
                     className="flex-1 py-[1vh] btn-primary rounded-xl font-bold hover:bg-subtle transition-all"
                   >
-                    Yes
+                    {gameState.titlePrompt.role === 'Defector' ? 'Flip Vote' : 'Yes'}
                   </button>
                   <button
                     onMouseEnter={() => playSound('hover')}
@@ -488,37 +519,7 @@ export const ActionBar = ({
           </div>
         )}
 
-        {/* Herald Pending Response UI */}
-        {gameState.phase === 'Herald_Action' &&
-          gameState.heraldPendingResponse?.targetId === me?.id && (
-            <div className="flex flex-col gap-[1vh] w-full justify-center h-full items-center">
-              <div className="text-responsive-xs font-mono uppercase tracking-widest text-primary text-center">
-                The Herald claims you are Civil. Do you confirm?
-              </div>
-              <div className="flex gap-[2vw] w-full max-w-[30vh]">
-                <button
-                  onMouseEnter={() => playSound('hover')}
-                  onClick={() => {
-                    playSound('click');
-                    socket.emit('heraldResponse', 'Confirmed');
-                  }}
-                  className="flex-1 py-[1vh] bg-emerald-700/40 text-emerald-300 border border-emerald-500/50 rounded-xl font-bold hover:bg-emerald-700/60 transition-all shadow-lg shadow-emerald-500/10"
-                >
-                  Confirm
-                </button>
-                <button
-                  onMouseEnter={() => playSound('hover')}
-                  onClick={() => {
-                    playSound('click');
-                    socket.emit('heraldResponse', 'Denied');
-                  }}
-                  className="flex-1 py-[1vh] bg-red-900/40 text-red-300 border border-red-500/50 rounded-xl font-bold hover:bg-red-900/60 transition-all shadow-lg shadow-red-500/10"
-                >
-                  Deny
-                </button>
-              </div>
-            </div>
-          )}
+
 
         {/* Voting */}
         {gameState.phase === 'Voting' && (me?.isAlive || gameState.ghostVoterId === me?.id) && !me?.vote && !gameState.titlePrompt && (

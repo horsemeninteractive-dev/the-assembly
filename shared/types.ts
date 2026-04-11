@@ -30,7 +30,7 @@ export type TitleRole =
   | 'Auditor'
   | 'Interdictor'
   | 'Archivist'
-  | 'Herald'
+  | 'Defector'
   | 'Quorum'
   | 'Cipher';
 
@@ -44,7 +44,7 @@ export type TitleAbilityData =
   | { use: true; role: 'Auditor' }
   | { use: true; role: 'Interdictor'; targetId: string }
   | { use: true; role: 'Archivist' }
-  | { use: true; role: 'Herald'; targetId: string; claim: string }
+  | { use: true; role: 'Defector'; vote: 'Aye' | 'Nay' }
   | { use: true; role: 'Quorum' }
   | { use: true; role: 'Cipher'; targetId?: string; message: string };
 
@@ -95,7 +95,7 @@ export type TitlePromptContext =
   | { role: 'Handler' }
   | { role: 'Interdictor' }
   | { role: 'Archivist' }
-  | { role: 'Herald' }
+  | { role: 'Defector' }
   | { role: 'Quorum' }
   | { role: 'Cipher' };
 export type GamePhase =
@@ -109,7 +109,7 @@ export type GamePhase =
   | 'Auditor_Action'
   | 'Assassin_Action'
   | 'Handler_Action'
-  | 'Herald_Action'
+  | 'Defector_Action'
   | 'Quorum_Action'
   | 'Executive_Action'
   | 'Censure_Action'
@@ -609,6 +609,7 @@ export interface GameState {
   chatBlackoutBuffer?: { senderId: string; senderName: string; text: string; timestamp: number }[];
   isPractice?: boolean;
   aiDifficulty?: 'Casual' | 'Normal' | 'Elite';
+  activeCipherMessage?: { text: string; timestamp: number };
 }
 
 export interface ServerToClientEvents {

@@ -88,8 +88,8 @@ export const PlayerCard = React.memo(
     me,
   }: PlayerCardProps) => {
     const effectiveVote = p.vote || gameState.previousVotes?.[p.id];
-    // Show flip when voting is complete for a player, or when revealing
-    const showVoteBack = !!((gameState.openSession && p.vote) || (gameState.phase === 'Voting_Reveal' && effectiveVote) || (gameState.phase === 'Voting' && p.vote));
+    // Don't show revealed vote flip for other players during normal voting 
+    const showVoteBack = (gameState.openSession && p.vote) || (gameState.phase === 'Voting_Reveal' && effectiveVote);
     const spectatorRole = isSpectator ? gameState.spectatorRoles?.[p.id] : undefined;
     const roleInfo = spectatorRole ? ROLE_LABELS[spectatorRole.role] : null;
 
@@ -199,16 +199,7 @@ export const PlayerCard = React.memo(
           </div>
         )}
 
-        {/* Herald Claim Badge */}
-        {gameState.heraldLog?.some(
-          (entry) => entry.targetId === p.id && entry.response === 'Confirmed'
-        ) && (
-          <div className="absolute top-0.5 left-6 z-20 pointer-events-none group/herald" title="Herald Proclamation (Unverified)">
-            <div className="px-1 py-0.5 rounded text-[8px] font-bold leading-none border border-blue-500/30 bg-blue-900/90 text-blue-300 shadow-[0_0_8px_rgba(59,130,246,0.3)] animate-pulse">
-              C?
-            </div>
-          </div>
-        )}
+
 
         {/* Quorum Revote Badge */}
         {gameState.isRevote && p.isPresident && (
@@ -332,7 +323,7 @@ export const PlayerCard = React.memo(
         <motion.div
           animate={{
             rotateY: showVoteBack ? 180 : 0,
-            scale: showVoteBack ? [1, 1.05, 1] : 1,
+            scale: (gameState.phase === 'Voting_Reveal' || gameState.openSession) && showVoteBack ? [1, 1.05, 1] : 1,
           }}
           transition={{
             duration: 0.6,
@@ -359,57 +350,83 @@ export const PlayerCard = React.memo(
               )}
             >
               <div className={cn('relative shrink-0 p-1', showVideo && 'hidden')}>
-                <div
+                <motion.div
+                  animate={{
+                    rotateY: (gameState.phase === 'Voting' && p.vote && !gameState.openSession) ? 180 : 0,
+                  }}
+                  transition={{
+                    duration: 0.5,
+                    type: 'spring',
+                    stiffness: 260,
+                    damping: 20,
+                  }}
                   className={cn(
-                    'bg-card flex items-center justify-center relative',
+                    'bg-card relative preserve-3d',
                     !p.activeFrame && 'border border-default',
                     isManyPlayers
                       ? 'w-6 h-6 sm:w-12 sm:h-12 rounded-lg'
                       : 'w-10 h-10 sm:w-12 sm:h-12 rounded-xl'
                   )}
                 >
-                  {p.avatarUrl ? (
-                    <img
-                      src={getProxiedUrl(p.avatarUrl)}
-                      alt={p.name}
-                      className={cn(
-                        'w-full h-full object-cover',
-                        isManyPlayers ? 'rounded-lg' : 'rounded-xl'
-                      )}
-                    />
-                  ) : (
-                    <Users
-                      className={cn(
-                        'text-muted',
-                        isManyPlayers ? 'w-3 h-3 sm:w-6 sm:h-6' : 'w-5 h-5 sm:w-6 sm:h-6'
-                      )}
-                    />
-                  )}
-                  {p.activeFrame && (
-                    <div
-                      className={cn(
-                        'absolute inset-0 pointer-events-none',
-                        isManyPlayers ? 'rounded-lg' : 'rounded-xl',
-                        getFrameStyles(p.activeFrame)
-                      )}
-                    />
-                  )}
-                  {!p.isAlive && (
-                    <div
-                      className={cn(
-                        'absolute inset-0 flex items-center justify-center bg-red-900/40 backdrop-blur-[1px]',
-                        isManyPlayers ? 'rounded-lg' : 'rounded-xl'
-                      )}
-                    >
-                      <Skull
+                  {/* Front of Avatar */}
+                  <div className={cn(
+                    "absolute inset-0 backface-hidden overflow-hidden flex items-center justify-center bg-card",
+                    isManyPlayers ? 'rounded-lg' : 'rounded-xl'
+                  )}>
+                    {p.avatarUrl ? (
+                      <img
+                        src={getProxiedUrl(p.avatarUrl)}
+                        alt={p.name}
                         className={cn(
-                          'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)] animate-pulse-slow',
-                          isManyPlayers ? 'w-4 h-4 sm:w-8 sm:h-8' : 'w-6 h-6 sm:w-8 sm:h-8'
+                          'w-full h-full object-cover',
+                          isManyPlayers ? 'rounded-lg' : 'rounded-xl'
                         )}
                       />
-                    </div>
-                  )}
-                </div>
+                    ) : (
+                      <Users
+                        className={cn(
+                          'text-muted',
+                          isManyPlayers ? 'w-3 h-3 sm:w-6 sm:h-6' : 'w-5 h-5 sm:w-6 sm:h-6'
+                        )}
+                      />
+                    )}
+                    {p.activeFrame && (
+                      <div
+                        className={cn(
+                          'absolute inset-0 pointer-events-none',
+                          isManyPlayers ? 'rounded-lg' : 'rounded-xl',
+                          getFrameStyles(p.activeFrame)
+                        )}
+                      />
+                    )}
+                    {!p.isAlive && (
+                      <div
+                        className={cn(
+                          'absolute inset-0 flex items-center justify-center bg-red-900/40 backdrop-blur-[1px]',
+                          isManyPlayers ? 'rounded-lg' : 'rounded-xl'
+                        )}
+                      >
+                        <Skull
+                          className={cn(
+                            'text-red-500 drop-shadow-[0_0_8px_rgba(239,68,68,0.6)] animate-pulse-slow',
+                            isManyPlayers ? 'w-4 h-4 sm:w-8 sm:h-8' : 'w-6 h-6 sm:w-8 sm:h-8'
+                          )}
+                        />
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Back of Avatar (Green Check) */}
+                  <div className={cn(
+                    "absolute inset-0 backface-hidden rotate-y-180 flex items-center justify-center bg-emerald-600 border border-emerald-400 overflow-hidden shadow-inner",
+                    isManyPlayers ? 'rounded-lg' : 'rounded-xl'
+                  )}>
+                    <Check className={cn(
+                      "text-white drop-shadow-md",
+                      isManyPlayers ? "w-4 h-4 sm:w-6 sm:h-6" : "w-5 h-5 sm:w-8 sm:h-8"
+                    )} />
+                  </div>
+                </motion.div>
 
                 {/* Mobile-only avatar corner badges — replaces text badges below name */}
                 <div className="sm:hidden absolute -top-1 -right-1 flex flex-col gap-0.5 z-10 items-end">
@@ -438,19 +455,7 @@ export const PlayerCard = React.memo(
                       <span className="text-[8px] font-bold text-slate-300 leading-none">G</span>
                     </div>
                   )}
-                  {/* Herald Results */}
-                  {gameState.heraldLog?.filter((log) => log.targetId === p.id).map((log, i) => (
-                    <div
-                      key={`herald-mob-${i}`}
-                      className={cn(
-                        'w-4 h-4 rounded-sm border border-black/40 flex items-center justify-center shadow-md',
-                        log.response === 'Confirmed' ? 'bg-emerald-600' : 'bg-red-600'
-                      )}
-                      title={`${log.response} by Herald`}
-                    >
-                      <span className="text-[8px] font-bold text-white leading-none">H</span>
-                    </div>
-                  ))}
+
                 </div>
 
                 {p.activeFrame && (
@@ -537,20 +542,7 @@ export const PlayerCard = React.memo(
                     Censured
                   </span>
                 )}
-                {/* Herald Results Desktop */}
-                {gameState.heraldLog?.filter((log) => log.targetId === p.id).map((log, i) => (
-                  <span
-                    key={`herald-desk-${i}`}
-                    className={cn(
-                      "px-1 sm:px-2 py-0.5 font-mono uppercase rounded border text-[7px] sm:text-[9px]",
-                      log.response === 'Confirmed' 
-                        ? "bg-emerald-900/40 text-emerald-400 border-emerald-500/50" 
-                        : "bg-red-900/40 text-red-400 border-red-500/50"
-                    )}
-                  >
-                    Herald: {log.response}
-                  </span>
-                ))}
+
               </div>
 
             </div>
@@ -560,28 +552,20 @@ export const PlayerCard = React.memo(
           <div
             className={cn(
               'absolute inset-0 flex flex-col items-center justify-center backface-hidden rotate-y-180 rounded-xl border-2 overflow-hidden',
-              gameState.phase === 'Voting' && !gameState.openSession
-                ? 'bg-emerald-600/90 border-emerald-400'
-                : getVoteStyles(p.activeVotingStyle, effectiveVote)
+              getVoteStyles(p.activeVotingStyle, effectiveVote)
             )}
           >
-            {gameState.phase === 'Voting' && !gameState.openSession ? (
-              <Check className="w-10 h-10 sm:w-16 sm:h-16 text-white drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]" />
-            ) : (
-              <>
-                {p.activeVotingStyle === 'vote-pass-0' && (
-                  <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-xl">
-                    <div className="absolute inset-0 animate-purple-rain bg-purple-500/50" />
-                  </div>
-                )}
-                <div className="text-2xl font-thematic uppercase tracking-widest leading-none">
-                  {effectiveVote}
-                </div>
-                <div className="text-[8px] font-mono uppercase mt-1">
-                  ({effectiveVote === 'Aye' ? 'YES' : 'NO'})
-                </div>
-              </>
+            {p.activeVotingStyle === 'vote-pass-0' && (
+              <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-xl">
+                <div className="absolute inset-0 animate-purple-rain bg-purple-500/50" />
+              </div>
             )}
+            <div className="text-2xl font-thematic uppercase tracking-widest leading-none">
+              {effectiveVote}
+            </div>
+            <div className="text-[8px] font-mono uppercase mt-1">
+              ({effectiveVote === 'Aye' ? 'YES' : 'NO'})
+            </div>
           </div>
         </motion.div>
 
@@ -617,7 +601,6 @@ export const PlayerCard = React.memo(
         {gameState.titlePrompt &&
           me &&
           gameState.titlePrompt.playerId === me.id &&
-          !gameState.heraldPendingResponse &&
           !isMe &&
           p.isAlive &&
           (() => {
@@ -656,25 +639,7 @@ export const PlayerCard = React.memo(
                   </button>
                 );
               }
-            } else if (gameState.titlePrompt.role === 'Herald') {
-              return (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    playSound('click');
-                    socket.emit('useTitleAbility', {
-                      use: true,
-                      role: 'Herald',
-                      targetId: p.id,
-                      claim: 'Civil',
-                    });
-                  }}
-                  aria-label={`Proclaim ${p.name.replace(' (AI)', '')} as Civil`}
-                  className="absolute inset-0 z-30 bg-emerald-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
-                >
-                  Proclaim Civil
-                </button>
-              );
+
             }
             return null;
           })()}

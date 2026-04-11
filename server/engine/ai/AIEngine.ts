@@ -56,7 +56,7 @@ export class AIEngine {
         Strategist: 'Legislative_President',
         Auditor: 'Auditor_Action',
         Archivist: 'Auditor_Action',
-        Herald: 'Herald_Action',
+        Defector: 'Voting_Reveal',
         Quorum: 'Quorum_Action',
         Assassin: 'Assassin_Action',
         Handler: 'Handler_Action',
@@ -490,28 +490,24 @@ export class AIEngine {
       case 'Archivist':
         data = { use: true, role: 'Archivist' };
         break;
-      case 'Herald': {
-        // If the AI is the target of a pending Herald response, they must respond
-        if (s.heraldPendingResponse?.targetId === player.id) {
-          const agree = player.role === 'Civil' || Math.random() > 0.3;
-          data = { 
-            use: true, 
-            role: 'Herald', 
-            agree 
-          } as any;
-          break;
+      case 'Defector': {
+        const votes = s.previousVotes || {};
+        const oldVote = votes[player.id];
+        const aye = s.players.filter(p => votes[p.id] === 'Aye').length;
+        const nay = s.players.filter(p => votes[p.id] === 'Nay').length;
+
+        // If flipping can change the outcome to my team's favor
+        let shouldFlip = false;
+        if (player.role === 'Civil') {
+          if (aye === nay && oldVote === 'Nay') shouldFlip = true; // 5 Nay vs 5 Aye -> 6 Aye vs 4 Nay (Pass)
+          if (aye < nay && (nay - aye === 1) && oldVote === 'Nay') shouldFlip = true; // 5-6 -> 6-5
+        } else {
+          if (aye > nay && (aye - nay === 1) && oldVote === 'Aye') shouldFlip = true; // 6-5 -> 5-6
+          if (aye === nay && oldVote === 'Aye') shouldFlip = true; // 5-5 -> 4-6
         }
 
-        // Otherwise (AI is the Herald), they initiate a proclamation
-        const targets = s.players.filter((p) => p.isAlive && p.id !== player.id);
-        const suspect = mostSuspicious(player, targets);
-        if (getSuspicion(player, suspect.id) > 0.6) {
-          data = {
-            use: true,
-            role: 'Herald',
-            targetId: suspect.id,
-            claim: `I assert that ${suspect.name} is Civil`,
-          };
+        if (shouldFlip) {
+          data = { use: true, role: 'Defector', vote: oldVote === 'Aye' ? 'Nay' : 'Aye' };
         }
         break;
       }
