@@ -228,9 +228,9 @@ const TabContent: React.FC<{ tab: TabId }> = ({ tab }) => {
             desc: 'Swap the next two players in the presidential rotation. The second becomes President before the first. Once used.',
           },
           {
-            name: 'Herald',
-            when: 'After enactment',
-            desc: 'Publicly proclaim a living player as "Civil". They must instantly confirm or deny the claim in the logs. Once used.',
+            name: 'Defector',
+            when: 'Voting (Reveal)',
+            desc: 'Secretly change your vote after the initial reveal but before the result is finalized. This can flip a 5-5 tie into a 6-4 pass. Once used.',
           },
           {
             name: 'Archivist',

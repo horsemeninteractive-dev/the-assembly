@@ -281,6 +281,11 @@ const STEPS: TutorialStep[] = [
             },
             { name: 'Assassin', when: 'After enactment', desc: 'Secretly execute another player.' },
             {
+              name: 'Defector',
+              when: 'Voting Reveal',
+              desc: 'Secretly change your vote after the initial reveal to flip the outcome.',
+            },
+            {
               name: 'Handler',
               when: 'After enactment',
               desc: 'Swap the next two players in the presidential rotation.',

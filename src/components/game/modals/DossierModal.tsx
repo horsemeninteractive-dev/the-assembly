@@ -20,7 +20,7 @@ const TITLE_ROLE_DESCRIPTIONS: Record<TitleRole, string> = {
   Auditor: 'Peek at the last 3 discarded policies after a legislative session.',
   Interdictor: 'Detain a player for one round.',
   Archivist: 'Inspect the entire Discard Pile once per game.',
-  Herald: 'Proclaim a player as Civil; they must publicly confirm or deny.',
+  Defector: 'Secretly flip your vote after the initial reveal to change the outcome.',
   Quorum: 'Call for an emergency re-vote during high-tension failed elections.',
   Cipher: 'Send an anonymous dispatch to the room during the legislative phase.',
 };
