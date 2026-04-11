@@ -345,14 +345,14 @@ const PlayerSlide = ({
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ delay: 1.1, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
         className={cn(
-          'px-5 py-2 rounded-xl border text-xs font-mono uppercase tracking-[0.2em] font-bold',
+          'inline-flex items-center justify-center gap-1.5 px-5 py-2 rounded-xl border text-xs font-mono uppercase tracking-[0.2em] font-bold',
           style.text,
           style.border,
           style.bg
         )}
       >
-        {role === 'Overseer' ? <OverseerIcon className="inline w-3.5 h-3.5 mr-1.5 -mt-0.5" /> : null}
-        {style.label}
+        {role === 'Overseer' && <OverseerIcon className="w-4 h-4 shrink-0" />}
+        <span>{style.label}</span>
       </motion.div>
 
       {/* Title role */}

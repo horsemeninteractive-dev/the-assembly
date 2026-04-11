@@ -203,22 +203,6 @@ export const ActionBar = ({
           <div className="text-responsive-xs text-faint font-light mt-1 leading-tight truncate min-h-[1.25em]">
             {(user && (user.stats?.gamesPlayed ?? 0) < 5 && phaseHint()) || '\u00A0'}
           </div>
-          {/* Cipher Parallel Action Button */}
-          {gameState.phase === 'Legislative_President' &&
-            me?.titleRole === 'Cipher' &&
-            !me.cipherUsed &&
-            !me.isPresident && (
-              <button
-                onClick={() => {
-                  playSound('click');
-                  setShowCipherInput(true);
-                }}
-                className="text-[10px] text-emerald-400 border border-emerald-400/30 px-2 py-0.5 rounded ml-2 hover:bg-emerald-400/10 transition-colors"
-                title="Send anonymous dispatch"
-              >
-                Cipher Active
-              </button>
-            )}
         </div>
         
         {/* Active Crisis Event Card (Integrated) */}
@@ -665,9 +649,24 @@ export const ActionBar = ({
                 playSound('click');
                 socket.emit('vetoRequest');
               }}
-              className="absolute bottom-2 right-4 text-responsive-xs text-purple-400 font-mono uppercase tracking-widest hover:text-purple-300"
+              className="absolute bottom-1 sm:bottom-2 left-1/2 -translate-x-1/2 text-[9px] sm:text-[10px] text-purple-400 font-mono uppercase tracking-widest hover:text-purple-300 bg-black/40 px-3 py-0.5 rounded-full backdrop-blur-sm border border-purple-400/20"
             >
               Propose Veto
+            </button>
+          )}
+
+        {/* Cipher Power Button */}
+        {gameState.phase === 'Voting' &&
+          me?.titleRole === 'Cipher' &&
+          !me?.cipherUsed && (
+            <button
+              onClick={() => {
+                playSound('click');
+                setShowCipherInput(true);
+              }}
+              className="absolute bottom-1 sm:bottom-2 left-1/2 -translate-x-1/2 text-[9px] sm:text-[10px] text-emerald-400 font-mono uppercase tracking-widest hover:text-emerald-300 bg-black/40 px-3 py-0.5 rounded-full backdrop-blur-sm border border-emerald-400/20"
+            >
+              Send Anonymous Dispatch
             </button>
           )}
 

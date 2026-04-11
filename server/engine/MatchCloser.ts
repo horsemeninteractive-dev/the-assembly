@@ -173,7 +173,9 @@ export class MatchCloser {
         user.stats.elo = Math.max(0, user.stats.elo + eloChange);
       } else if (!isInconclusive && s.isPractice) {
         logger.info({ userId: user.id }, 'Practice mode: Bypassing persistent stat updates');
-      } else if (isLeaver) {
+      }
+      
+      if (!isLeaver) {
 
         const xpGain = calculateXpGain({
           win: won,

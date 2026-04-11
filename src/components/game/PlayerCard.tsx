@@ -88,8 +88,8 @@ export const PlayerCard = React.memo(
     me,
   }: PlayerCardProps) => {
     const effectiveVote = p.vote || gameState.previousVotes?.[p.id];
-    // Don't show revealed vote flip for other players during normal voting 
-    const showVoteBack = (gameState.openSession && p.vote) || (gameState.phase === 'Voting_Reveal' && effectiveVote);
+    // Show flip when voting is complete for a player, or when revealing
+    const showVoteBack = !!((gameState.openSession && p.vote) || (gameState.phase === 'Voting_Reveal' && effectiveVote) || (gameState.phase === 'Voting' && p.vote));
     const spectatorRole = isSpectator ? gameState.spectatorRoles?.[p.id] : undefined;
     const roleInfo = spectatorRole ? ROLE_LABELS[spectatorRole.role] : null;
 
@@ -332,7 +332,7 @@ export const PlayerCard = React.memo(
         <motion.div
           animate={{
             rotateY: showVoteBack ? 180 : 0,
-            scale: (gameState.phase === 'Voting_Reveal' || gameState.openSession) && showVoteBack ? [1, 1.05, 1] : 1,
+            scale: showVoteBack ? [1, 1.05, 1] : 1,
           }}
           transition={{
             duration: 0.6,
@@ -409,17 +409,6 @@ export const PlayerCard = React.memo(
                       />
                     </div>
                   )}
-                  {(gameState.phase === 'Voting' || gameState.phase === 'Voting_Reveal') &&
-                    p.vote && (
-                      <div
-                        className={cn(
-                          'sm:hidden absolute inset-0 flex items-center justify-center bg-green-500/40 backdrop-blur-[1px]',
-                          isManyPlayers ? 'rounded-lg' : 'rounded-xl'
-                        )}
-                      >
-                        <Check className="w-4 h-4 text-primary drop-shadow-[0_0_3px_rgba(0,0,0,0.5)]" />
-                      </div>
-                    )}
                 </div>
 
                 {/* Mobile-only avatar corner badges — replaces text badges below name */}
@@ -571,20 +560,28 @@ export const PlayerCard = React.memo(
           <div
             className={cn(
               'absolute inset-0 flex flex-col items-center justify-center backface-hidden rotate-y-180 rounded-xl border-2 overflow-hidden',
-              getVoteStyles(p.activeVotingStyle, effectiveVote)
+              gameState.phase === 'Voting' && !gameState.openSession
+                ? 'bg-emerald-600/90 border-emerald-400'
+                : getVoteStyles(p.activeVotingStyle, effectiveVote)
             )}
           >
-            {p.activeVotingStyle === 'vote-pass-0' && (
-              <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-xl">
-                <div className="absolute inset-0 animate-purple-rain bg-purple-500/50" />
-              </div>
+            {gameState.phase === 'Voting' && !gameState.openSession ? (
+              <Check className="w-10 h-10 sm:w-16 sm:h-16 text-white drop-shadow-[0_0_8px_rgba(0,0,0,0.5)]" />
+            ) : (
+              <>
+                {p.activeVotingStyle === 'vote-pass-0' && (
+                  <div className="absolute inset-0 overflow-hidden pointer-events-none rounded-xl">
+                    <div className="absolute inset-0 animate-purple-rain bg-purple-500/50" />
+                  </div>
+                )}
+                <div className="text-2xl font-thematic uppercase tracking-widest leading-none">
+                  {effectiveVote}
+                </div>
+                <div className="text-[8px] font-mono uppercase mt-1">
+                  ({effectiveVote === 'Aye' ? 'YES' : 'NO'})
+                </div>
+              </>
             )}
-            <div className="text-2xl font-thematic uppercase tracking-widest leading-none">
-              {effectiveVote}
-            </div>
-            <div className="text-[8px] font-mono uppercase mt-1">
-              ({effectiveVote === 'Aye' ? 'YES' : 'NO'})
-            </div>
           </div>
         </motion.div>
 
