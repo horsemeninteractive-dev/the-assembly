@@ -188,14 +188,14 @@ export class TitleRoleResolver {
     }
 
     if (abilityData.use) {
-      const isCipherAct = activeRole === 'Cipher';
+      const activeRole = prompt.role;
 
       if (activeRole !== 'Cipher') {
-          player.titleUsed = true;
-        } else {
-          player.cipherUsed = true;
-        }
+        player.titleUsed = true;
+      } else {
+        player.cipherUsed = true;
       }
+      
       this.engine.io.to(roomId).emit('powerUsed', { role: prompt.role });
       if (player.isAI) this.engine.aiEngine.postAIChat(s, player, CHAT.powerUsage);
       await this.applyTitleAbility(s, roomId, player, prompt.role, abilityData);
@@ -319,7 +319,7 @@ export class TitleRoleResolver {
         break;
       }
 
-      case 'Archivist': {
+      case 'Interdictor': {
         if (!data.use || data.role !== 'Interdictor') break;
         const president = s.players[s.presidentIdx];
         const target = s.players.find(
@@ -349,8 +349,7 @@ export class TitleRoleResolver {
           };
           this.engine.enterPhase(s, roomId, 'Nomination_Review');
         } else {
-          this.round.enterPhase(s, roomId, 'Nominate_Chancellor');
-        }
+          this.engine.enterPhase(s, roomId, 'Nominate_Chancellor');
         }
         break;
       }

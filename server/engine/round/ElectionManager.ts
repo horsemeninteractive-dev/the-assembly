@@ -195,8 +195,8 @@ export class ElectionManager {
       st.actionTimerEnd = undefined;
       st.titlePrompt = undefined;
       
-      const newAye = st.players.filter(p => st.previousVotes?.[p.id] === 'Aye').length;
-      const newNay = st.players.filter(p => st.previousVotes?.[p.id] === 'Nay').length;
+      const newAye = st.players.filter((p: any) => st.previousVotes?.[p.id] === 'Aye').length;
+      const newNay = st.players.filter((p: any) => st.previousVotes?.[p.id] === 'Nay').length;
       const votes = st.previousVotes;
       st.previousVotes = undefined;
 
