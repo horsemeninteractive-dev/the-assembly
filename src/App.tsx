@@ -136,6 +136,10 @@ export default function App() {
                   <Auth
                     onAuthSuccess={handleAuthSuccess}
                     defaultMode={unauthView === 'auth-register' ? 'register' : 'login'}
+                    onBackToLanding={() => {
+                      localStorage.removeItem('assembly_has_visited');
+                      setViewWithHash('landing');
+                    }}
                   />
                 </motion.div>
               )

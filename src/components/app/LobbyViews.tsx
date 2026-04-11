@@ -33,8 +33,18 @@ export function LobbyView({ setIsProfileOpen, setIsPurchaseModalOpen }: {
     </ErrorBoundary>
   );
 }
+import { GameMode } from '../../../shared/types';
 
-export function ProfileModal({ isOpen, onClose, setIsProfileOpen, setIsPurchaseModalOpen, roomId, mode }: any) {
+interface ProfileModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  setIsProfileOpen: (isOpen: boolean) => void;
+  setIsPurchaseModalOpen: (isOpen: boolean) => void;
+  roomId?: string;
+  mode?: GameMode;
+}
+
+export function ProfileModal({ isOpen, onClose, setIsProfileOpen, setIsPurchaseModalOpen, roomId, mode }: ProfileModalProps) {
   const { user, token, setUser } = useAuthContext();
   const { playSound, playMusic, stopMusic } = useAudioContext();
   const { handleJoinRoom, handleLeaveRoom } = useGameContext();

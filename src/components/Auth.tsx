@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { motion } from 'motion/react';
+import { ArrowLeft } from 'lucide-react';
 import { User } from '../../shared/types';
 import { getProxiedUrl } from '../utils/utils';
 import { useAuthForm } from './auth/useAuthForm';
@@ -10,9 +11,10 @@ import { AuthPasswordReset } from './auth/AuthPasswordReset';
 interface AuthProps {
   onAuthSuccess: (user: User, token: string) => void;
   defaultMode?: 'login' | 'register';
+  onBackToLanding?: () => void;
 }
 
-export const Auth: React.FC<AuthProps> = ({ onAuthSuccess, defaultMode }) => {
+export const Auth: React.FC<AuthProps> = ({ onAuthSuccess, defaultMode, onBackToLanding }) => {
   const form = useAuthForm({ onAuthSuccess, defaultMode });
   const { isLogin, view, setView, setResetToken, message } = form;
 
@@ -56,10 +58,20 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess, defaultMode }) => {
           aria-hidden="true"
           className="w-full h-full object-cover"
         />
-        {/* Overlay: dark vignette + blue-red split, matching landing page */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/40" />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-950/25 via-transparent to-red-950/25" />
+      {/* Overlay: dark vignette + blue-red split, matching landing page */}
+      <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/40" />
+      <div className="absolute inset-0 bg-gradient-to-r from-blue-950/25 via-transparent to-red-950/25" />
       </div>
+
+      {onBackToLanding && (
+        <button
+          onClick={onBackToLanding}
+          className="absolute top-6 left-6 z-50 flex items-center gap-2 p-2 rounded-xl text-white/50 hover:text-white hover:bg-white/5 transition-all"
+        >
+          <ArrowLeft className="w-5 h-5" />
+          <span className="text-xs font-mono tracking-widest uppercase font-bold hidden sm:inline">Back</span>
+        </button>
+      )}
 
       {/* Form card — glassmorphism so it reads over the artwork */}
       <motion.div

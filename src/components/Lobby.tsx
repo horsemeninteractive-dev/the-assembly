@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { User, RoomInfo, RoomPrivacy, GameMode } from '../../shared/types';
 import { apiUrl, debugError } from '../utils/utils';
@@ -6,6 +6,7 @@ import { LeaderboardModal } from './game/modals/LeaderboardModal';
 import { HowToPlayModal } from './HowToPlayModal';
 import { LegalModal } from './game/modals/LegalModal';
 import { CreditsScreen } from './lobby/CreditsScreen';
+import { useScaling } from '../hooks/useScaling';
 
 // Sub-components
 import { LobbyHeader } from './lobby/LobbyHeader';
@@ -48,6 +49,7 @@ export const Lobby: React.FC<LobbyProps> = ({
   playMusic,
   stopMusic,
   token,
+  uiScaleSetting = 1,
 }) => {
   const [rooms, setRooms] = useState<RoomInfo[]>([]);
   const [rejoinInfo, setRejoinInfo] = useState<{
@@ -68,6 +70,9 @@ export const Lobby: React.FC<LobbyProps> = ({
   const [isPracticeOpen, setIsPracticeOpen] = useState(false);
   const [pendingRequestCount, setPendingRequestCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const uiScale = useScaling(containerRef, { multiplier: uiScaleSetting });
 
   useEffect(() => {
     if (isCreating || isLeaderboardOpen || isHowToPlayOpen || isCreditsOpen || isPracticeOpen || isLegalOpen) {
@@ -134,8 +139,16 @@ export const Lobby: React.FC<LobbyProps> = ({
   }, []);
 
   return (
-    <div className="flex-1 w-full text-primary font-sans flex flex-col h-screen overflow-hidden">
-      {/* Header — logo, stats, icons all unchanged */}
+    <div ref={containerRef} className="flex-1 w-full text-primary font-sans h-[100dvh] relative overflow-hidden">
+      <div 
+        className="absolute top-0 left-0 flex flex-col origin-top-left transition-all duration-300"
+        style={{
+          transform: `scale(${uiScale})`,
+          width: `${100 / uiScale}%`,
+          height: `${100 / uiScale}%`,
+        }}
+      >
+        {/* Header — logo, stats, icons all unchanged */}
       <LobbyHeader
         user={user}
         pendingRequestCount={pendingRequestCount}
@@ -257,6 +270,8 @@ export const Lobby: React.FC<LobbyProps> = ({
           </div>
         </div>
       </footer>
+      </div>
+
       {/* Modals */}
       {isLeaderboardOpen && (
         <LeaderboardModal

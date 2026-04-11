@@ -4,17 +4,18 @@ import { getProxiedUrl } from '../../utils/utils';
 
 export function EnterSplash({ user, onEnter }: { user: any, onEnter: any }) {
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-hidden">
-      {/* Background Layer: Frosted Hero Art */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none bg-[#07070a]">
+    <div className="flex-1 w-full h-[100dvh] fixed inset-0 z-[100] flex items-center justify-center p-4 overflow-hidden">
+      {/* Hero background — same image as landing page */}
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[#07070a]">
         <img 
           src="/hero.png" 
           alt="" 
-          className="w-full h-full object-cover opacity-60 blur-xl scale-110" 
+          aria-hidden="true"
+          className="w-full h-full object-cover" 
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
-        <div className="absolute inset-0 bg-gradient-to-r from-blue-950/20 via-transparent to-red-950/20" />
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-3xl" />
+        {/* Overlay: dark vignette + blue-red split, matching landing page */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/60 to-black/40" />
+        <div className="absolute inset-0 bg-gradient-to-r from-blue-950/25 via-transparent to-red-950/25" />
       </div>
 
       {/* Main Content Card */}
@@ -22,7 +23,7 @@ export function EnterSplash({ user, onEnter }: { user: any, onEnter: any }) {
         initial={{ opacity: 0, scale: 0.95, y: 20 }} 
         animate={{ opacity: 1, scale: 1, y: 0 }} 
         transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
-        className="relative z-10 w-full max-w-xl bg-surface-glass border border-white/10 rounded-[3rem] p-10 lg:p-14 shadow-[0_0_80px_rgba(0,0,0,0.9)] text-center backdrop-blur-3xl"
+        className="relative z-10 w-full max-w-xl bg-black/55 backdrop-blur-xl border border-white/10 rounded-3xl p-10 lg:p-14 shadow-2xl text-center"
       >
         {/* Decorative Inner Glow */}
         <div className="absolute inset-0 bg-gradient-to-b from-blue-500/5 via-transparent to-red-500/5 pointer-events-none rounded-[3rem]" />

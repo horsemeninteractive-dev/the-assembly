@@ -71,12 +71,24 @@ export const LegalModal: React.FC<LegalModalProps> = ({ onClose, playSound }) =>
                 is provided "as is" without warranty of any kind, express or implied.
               </p>
               <div className="bg-surface-glass/60 p-4 rounded-xl border border-subtle backdrop-blur-sm">
-                <p className="text-[10px] text-faint uppercase font-bold mb-2 tracking-widest">
-                  Open Source Disclosure
+                <p className="text-[10px] text-faint uppercase font-bold mb-3 tracking-widest flex items-center gap-1.5">
+                  <Heart className="w-3 h-3 text-red-500" /> Open Source Acknowledgements
                 </p>
-                <p className="text-[10px]">
-                  This project utilizes various open-source libraries including React, TailwindCSS,
-                  Lucide, and Framer Motion. Full list of licenses available upon request.
+                <p className="text-[10px] mb-3">
+                  This game is made possible by the incredible work of the open source community. We gratefully acknowledge the use of the following core technologies:
+                </p>
+                <ul className="text-[10px] grid grid-cols-2 gap-1.5 text-primary/80">
+                  <li>• React</li>
+                  <li>• Socket.IO</li>
+                  <li>• Motion</li>
+                  <li>• Tailwind CSS</li>
+                  <li>• Lucide</li>
+                  <li>• Supabase</li>
+                  <li>• Stripe</li>
+                  <li>• Zod</li>
+                </ul>
+                <p className="text-[9px] text-faint mt-3 border-t border-subtle/50 pt-2">
+                  All respective trademarks and copyrights belong to their original creators. Detailed license information (MIT, ISC, Apache 2.0, etc.) is retained in the source components.
                 </p>
               </div>
             </div>

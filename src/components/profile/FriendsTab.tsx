@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { socket } from '../../socket';
-import { User, RecentlyPlayedEntry } from '../../../shared/types';
+import { User, RecentlyPlayedEntry, GameMode } from '../../../shared/types';
 import { cn, getProxiedUrl, apiUrl, debugError } from '../../utils/utils';
 import { getFrameStyles } from '../../utils/cosmetics';
 import { getLevelFromXp } from '../../utils/xp';
@@ -24,7 +24,7 @@ interface FriendsListProps {
   playSound: (sound: string) => void;
   roomId?: string;
   onJoinRoom?: (roomId: string) => void;
-  mode?: 'Casual' | 'Ranked' | 'Classic';
+  mode?: GameMode;
 }
 
 interface FriendWithStatus extends User {

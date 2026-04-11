@@ -21,7 +21,7 @@ import {
   Twitter,
   MessageCircle,
 } from 'lucide-react';
-import { User, CosmeticItem } from '../../shared/types';
+import { User, CosmeticItem, GameMode } from '../../shared/types';
 import { cn, getProxiedUrl, apiUrl } from '../utils/utils';
 import { getFrameStyles } from '../utils/cosmetics';
 import { getLevelFromXp, getXpInCurrentLevel, getXpForNextLevel } from '../utils/xp';
@@ -51,7 +51,7 @@ interface ProfileProps {
   settings: any;
   roomId?: string;
   onJoinRoom?: (roomId: string) => void;
-  mode?: 'Casual' | 'Ranked' | 'Classic';
+  mode?: GameMode;
 }
 
 export const Profile: React.FC<ProfileProps> = ({

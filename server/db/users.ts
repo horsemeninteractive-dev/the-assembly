@@ -435,7 +435,7 @@ export async function getLeaderboard(
             ? 'stats->classicWins'
             : mode === 'Crisis'
               ? 'stats->crisisWins'
-              : 'stats->elo';
+              : 'stats->wins';
 
     return await withRetry(async () => {
       const { data, error } = await adminDb
@@ -467,7 +467,7 @@ export async function getLeaderboard(
       .sort((a, b) => (b.stats.crisisWins ?? 0) - (a.stats.crisisWins ?? 0))
       .slice(safeOffset, safeOffset + safeLimit);
   return allUsers
-    .sort((a, b) => (b.stats.elo ?? 0) - (a.stats.elo ?? 0))
+    .sort((a, b) => (b.stats.wins ?? 0) - (a.stats.wins ?? 0))
     .slice(safeOffset, safeOffset + safeLimit);
 }
 

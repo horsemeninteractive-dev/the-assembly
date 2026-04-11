@@ -74,7 +74,8 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
 
   // When mode changes, set a sensible default stat
   useEffect(() => {
-    if (modeTab === 'Ranked' || modeTab === 'Overall') setStatTab('ELO');
+    if (modeTab === 'Ranked') setStatTab('ELO');
+    else if (modeTab === 'Overall') setStatTab('Wins');
     else setStatTab('Win%');
   }, [modeTab]);
 
