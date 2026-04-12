@@ -14,6 +14,7 @@ import { registerAdminRoutes } from './routes/adminRoutes';
 import { registerSystemRoutes } from './routes/systemRoutes';
 import { registerPublicRoutes } from './routes/publicRoutes';
 import { registerClanRoutes } from './routes/clanRoutes';
+import { registerPushRoutes } from './routes/pushRoutes';
 
 // Re-export common utilities so other files do not break.
 export { sanitizeUser, validateToken, requireAuth } from './routes/shared';
@@ -55,5 +56,6 @@ export function registerRoutes(
   registerSystemRoutes(context);
   registerPublicRoutes(context);
   registerClanRoutes(context);
+  registerPushRoutes(context);
 }
 

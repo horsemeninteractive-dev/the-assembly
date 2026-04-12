@@ -607,6 +607,9 @@ export interface GameState {
   chatBlackout?: boolean;
   snapElectionVolunteers?: string[];
   chatBlackoutBuffer?: { senderId: string; senderName: string; text: string; timestamp: number }[];
+  spectatorPredictions?: {
+    [userId: string]: { prediction: 'Civil' | 'State'; timestamp: number };
+  };
   isPractice?: boolean;
   aiDifficulty?: 'Casual' | 'Normal' | 'Elite';
   activeCipherMessage?: { text: string; timestamp: number };
@@ -725,4 +728,5 @@ export interface ClientToServerEvents {
   adminUpdateConfig: (config: Partial<SystemConfig>) => void;
   adminGetChatLogs: (roomId: string) => void;
   adminClearRedis: () => void;
+  spectatorPredict: (data: { prediction: 'Civil' | 'State' }) => void;
 }

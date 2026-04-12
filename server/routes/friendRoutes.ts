@@ -13,6 +13,7 @@ import {
   removeFriend,
 } from '../supabaseService';
 import { getUserSocketId, getSocketId } from '../redis';
+import { sendPushNotification } from '../pushService';
 
 export function registerFriendRoutes({ app, io, engine, userSockets }: RouteContext): void {
   app.get('/api/friends/status', requireAuth, async (req: Request, res: Response) => {
@@ -76,6 +77,14 @@ export function registerFriendRoutes({ app, io, engine, userSockets }: RouteCont
     const { targetUserId } = req.body;
     const user = req.user!;
     await sendFriendRequest(user.id, targetUserId);
+    
+    // Background push notification
+    sendPushNotification(targetUserId, {
+      title: 'New Friend Request',
+      body: `${user.username} sent you a friend request.`,
+      data: { url: '/?openTab=friends' }
+    });
+
     res.json({ success: true });
   });
 
@@ -83,6 +92,14 @@ export function registerFriendRoutes({ app, io, engine, userSockets }: RouteCont
     const { targetUserId } = req.body;
     const user = req.user!;
     await acceptFriendRequest(user.id, targetUserId);
+
+    // Background push notification
+    sendPushNotification(targetUserId, {
+      title: 'Friend Request Accepted',
+      body: `${user.username} accepted your friend request!`,
+      data: { url: '/?openTab=friends' }
+    });
+
     res.json({ success: true });
   });
 
@@ -116,6 +133,14 @@ export function registerFriendRoutes({ app, io, engine, userSockets }: RouteCont
         roomId,
       });
     }
+
+    // Always send push notification
+    sendPushNotification(req.params.friendId, {
+      title: 'Game Invitation',
+      body: `${user.username} invited you to join their game!`,
+      data: { url: `/?inviteCard=${roomId}` }
+    });
+
     res.json({ success: true });
   });
 }

@@ -39,6 +39,52 @@ export async function saveMatchResult(
   }
 }
 
+export async function saveGlobalMatch(match: {
+  id: string;
+  playedAt: string;
+  mode: string;
+  winner: string;
+  winReason: string;
+  roundHistory: any[];
+  players: any[];
+}): Promise<void> {
+  if (isConfigured) {
+    await withRetry(async () => {
+      const { error } = await adminDb.from('matches').insert({
+        id: match.id,
+        played_at: match.playedAt,
+        mode: match.mode,
+        winner: match.winner,
+        win_reason: match.winReason,
+        round_history: match.roundHistory,
+        players: match.players,
+      });
+      if (error) throw error;
+    }, 'saveGlobalMatch');
+  }
+}
+
+export async function getMatchById(matchId: string): Promise<any | null> {
+  if (isConfigured) {
+    const { data, error } = await adminDb
+      .from('matches')
+      .select('*')
+      .eq('id', matchId)
+      .single();
+    if (error || !data) return null;
+    return {
+      id: data.id,
+      playedAt: data.played_at,
+      mode: data.mode,
+      winner: data.winner,
+      winReason: data.win_reason,
+      roundHistory: data.round_history,
+      players: data.players,
+    };
+  }
+  return null;
+}
+
 export async function saveMatchAndUserAtomic(
   userData: UserInternal,
   match: Omit<MatchSummary, 'id'> & { id: string }
@@ -115,6 +161,7 @@ export async function getMatchHistory(
       rounds: r.rounds,
       civilDirectives: r.civil_directives,
       stateDirectives: r.state_directives,
+      matchId: r.match_id,
       agendaId: r.agenda_id,
       agendaName: r.agenda_name,
       agendaCompleted: r.agenda_completed,

@@ -49,6 +49,11 @@ const envSchema = z.object({
 
   // App URLs
   APP_URL: z.string().url().optional().default('https://theassembly.web.app'),
+
+  // Push Notifications
+  VAPID_PUBLIC_KEY: z.string().optional(),
+  VAPID_PRIVATE_KEY: z.string().optional(),
+  VAPID_EMAIL: z.string().email().optional(),
 });
 
 const parseResult = envSchema.safeParse(process.env);

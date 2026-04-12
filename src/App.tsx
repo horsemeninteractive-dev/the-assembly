@@ -4,6 +4,7 @@ import { useSettings } from './contexts/SettingsContext';
 import { useAuthContext } from './contexts/AuthContext';
 import { useAudioContext } from './contexts/AudioContext';
 import { useGameContext } from './contexts/GameContext';
+import { usePushNotifications } from './hooks/usePushNotifications';
 
 import { Auth } from './components/Auth';
 import { UpdateBanner } from './components/UpdateBanner';
@@ -38,6 +39,9 @@ export default function App() {
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isPurchaseModalOpen, setIsPurchaseModalOpen] = useState(false);
   const [updateAvailable, setUpdateAvailable] = useState(false);
+
+  // Initialize push notifications when authenticated
+  usePushNotifications(!!token && !!user && isInteracted);
 
   // ── Landing / Auth view state ──────────────────────────────────
   const [unauthView, setUnauthView] = useState<UnauthView>(() => {

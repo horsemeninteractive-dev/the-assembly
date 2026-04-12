@@ -1,18 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Clock, ChevronDown, ChevronUp, Target } from 'lucide-react';
+import { Clock, ChevronDown, ChevronUp, Target, History as HistoryIcon } from 'lucide-react';
 import { cn, apiUrl } from '../../utils/utils';
-import { User, MatchSummary } from '../../../shared/types';
+import { User, MatchSummary, GameState } from '../../../shared/types';
+import { ReplayModal } from '../game/modals/ReplayModal';
 
 interface HistoryTabProps {
   user: User;
   token: string;
+  playSound: (soundKey: string) => void;
 }
 
-export function HistoryTab({ user, token }: HistoryTabProps) {
+export function HistoryTab({ user, token, playSound }: HistoryTabProps) {
   const [matchHistory, setMatchHistory] = useState<MatchSummary[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [expandedMatch, setExpandedMatch] = useState<string | null>(null);
+
+  const [replayState, setReplayState] = useState<GameState | null>(null);
+  const [isReplayOpen, setIsReplayOpen] = useState(false);
+  const [fetchingReplayId, setFetchingReplayId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchHistory();
@@ -32,6 +38,38 @@ export function HistoryTab({ user, token }: HistoryTabProps) {
       console.error('Failed to load history');
     } finally {
       setHistoryLoading(false);
+    }
+  };
+
+  const handleWatchReplay = async (match: MatchSummary) => {
+    if (!match.matchId) return;
+    
+    try {
+      setFetchingReplayId(match.matchId);
+      playSound('click');
+      const res = await fetch(apiUrl(`/api/matches/${match.matchId}`), {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error();
+      const matchData = await res.json();
+      
+      // Construct a minimal GameState for the ReplayModal
+      const minimalState: Partial<GameState> = {
+        round: matchData.roundHistory?.length || 0,
+        roundHistory: matchData.roundHistory,
+        players: matchData.players,
+        winner: matchData.winner,
+        winReason: matchData.winReason,
+        mode: matchData.mode,
+        phase: 'GameOver'
+      };
+      
+      setReplayState(minimalState as GameState);
+      setIsReplayOpen(true);
+    } catch (err) {
+      console.error('Failed to load replay', err);
+    } finally {
+      setFetchingReplayId(null);
     }
   };
 
@@ -256,6 +294,23 @@ export function HistoryTab({ user, token }: HistoryTabProps) {
                       </div>
                     )}
 
+                    {/* Replay Button */}
+                    {match.matchId && (
+                      <button
+                        onClick={(e) => { e.stopPropagation(); handleWatchReplay(match); }}
+                        disabled={fetchingReplayId === match.matchId}
+                        className={cn(
+                          "w-full flex items-center justify-center gap-3 py-3 rounded-xl border transition-all font-thematic uppercase tracking-widest text-xs",
+                          fetchingReplayId === match.matchId
+                            ? "bg-surface text-faint border-default"
+                            : "bg-surface-glass text-primary border-primary/20 hover:bg-primary/10 hover:border-primary/40"
+                        )}
+                      >
+                        <HistoryIcon className={cn("w-4 h-4", fetchingReplayId === match.matchId && "animate-spin")} />
+                        {fetchingReplayId === match.matchId ? 'Decrypting Records...' : 'Watch Replay'}
+                      </button>
+                    )}
+
                     {/* Date/time */}
                     <div className="text-ghost text-[10px] font-mono text-right">
                       {dateStr} at {timeStr}
@@ -267,6 +322,15 @@ export function HistoryTab({ user, token }: HistoryTabProps) {
           </div>
         );
       })}
+
+      {replayState && (
+        <ReplayModal
+          gameState={replayState}
+          isOpen={isReplayOpen}
+          onClose={() => setIsReplayOpen(false)}
+          playSound={playSound}
+        />
+      )}
     </div>
   );
 }

@@ -17,15 +17,7 @@ import { Swords, Zap, AlertTriangle, Shield, Clock, Target, ChevronRight } from 
 import { GameState, Player, PrivateInfo } from '../../../shared/types';
 import { cn, getProxiedUrl } from '../../utils/utils';
 import { OverseerIcon } from '../icons';
-
-// ---------------------------------------------------------------------------
-// Types
-// ---------------------------------------------------------------------------
-
-interface BigPlay {
-  icon: 'swords' | 'zap' | 'alert' | 'shield' | 'clock' | 'target';
-  text: string;
-}
+import { extractBigPlays, BigPlay, BIG_PLAY_ICON } from '../../utils/game';
 
 type Slide =
   | { kind: 'intro' }
@@ -72,15 +64,6 @@ const ROLE_STYLE = {
   },
 } as const;
 
-const BIG_PLAY_ICON: Record<BigPlay['icon'], React.ReactNode> = {
-  swords: <Swords className="w-5 h-5" />,
-  zap: <Zap className="w-5 h-5" />,
-  alert: <AlertTriangle className="w-5 h-5" />,
-  shield: <Shield className="w-5 h-5" />,
-  clock: <Clock className="w-5 h-5" />,
-  target: <Target className="w-5 h-5" />,
-};
-
 /** Duration (ms) each slide auto-advances after. */
 function slideDuration(slide: Slide): number {
   if (slide.kind === 'bigplays') return Math.max(3200, slide.plays.length * 1000 + 1200);
@@ -89,77 +72,6 @@ function slideDuration(slide: Slide): number {
   return 3200; // intro
 }
 
-/** Derives key moments from game state without needing server-side additions. */
-function extractBigPlays(gameState: GameState): BigPlay[] {
-  const plays: BigPlay[] = [];
-  const rh = gameState.roundHistory ?? [];
-
-  // Assassination
-  const assassin = gameState.players.find((p) => p.assassinKilledId);
-  if (assassin) {
-    const killed = gameState.players.find((p) => p.id === assassin.assassinKilledId);
-    if (killed) {
-      plays.push({
-        icon: 'swords',
-        text: `${assassin.name.replace(' (AI)', '')} eliminated ${killed.name.replace(' (AI)', '')} as the Assassin`,
-      });
-    }
-  }
-
-  // Executive execution (player not alive, not via assassin)
-  const assassinatedIds = new Set(
-    gameState.players.filter((p) => p.assassinKilledId).map((p) => p.assassinKilledId!)
-  );
-  const executed = gameState.players.filter(
-    (p) => !p.isAlive && !assassinatedIds.has(p.id) && !p.assassinKilledId
-  );
-  if (executed.length > 0) {
-    const names = executed.map((p) => p.name.replace(' (AI)', '')).join(' and ');
-    plays.push({
-      icon: 'zap',
-      text: `${names} ${executed.length === 1 ? 'was' : 'were'} executed by presidential decree`,
-    });
-  }
-
-  // Chaos directives
-  const chaosCount = rh.filter((r) => r.chaos).length;
-  if (chaosCount > 0) {
-    plays.push({
-      icon: 'alert',
-      text:
-        chaosCount === 1
-          ? 'A chaos directive was forced upon the Assembly'
-          : `${chaosCount} chaos directives destabilised the Assembly`,
-    });
-  }
-
-  // Vetoes
-  const vetoCount = rh.filter((r) => r.failReason === 'veto').length;
-  if (vetoCount > 0) {
-    plays.push({
-      icon: 'shield',
-      text:
-        vetoCount === 1
-          ? 'The government invoked their veto power'
-          : `The veto was exercised ${vetoCount} times`,
-    });
-  }
-
-  // Marathon game
-  if (gameState.round > 9) {
-    plays.push({ icon: 'clock', text: `An epic ${gameState.round}-round battle of wills` });
-  }
-
-  // Deadlocked race
-  if (gameState.civilDirectives >= 4 && gameState.stateDirectives >= 4) {
-    plays.push({
-      icon: 'target',
-      text: 'Both factions held the Assembly in a knife-edge deadlock',
-    });
-  }
-
-  return plays.slice(0, 4);
-}
 
 /** Returns players ordered Civil → State → Overseer (building to the reveal). */
 function orderedPlayers(players: Player[]): Player[] {
@@ -237,18 +149,23 @@ const BigPlaysSlide = ({ plays }: { plays: BigPlay[] }) => (
       Key Moments
     </motion.p>
     <div className="w-full space-y-3">
-      {plays.map((play, i) => (
-        <motion.div
-          key={i}
-          initial={{ opacity: 0, x: -24 }}
-          animate={{ opacity: 1, x: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 + i * 0.25, ease: 'easeOut' }}
-          className="flex items-center gap-4 bg-card/60 dark:bg-white/5 border border-default rounded-2xl px-5 py-4 backdrop-blur-sm"
-        >
-          <span className="text-secondary shrink-0">{BIG_PLAY_ICON[play.icon]}</span>
-          <p className="text-sm text-primary font-mono leading-snug">{play.text}</p>
-        </motion.div>
-      ))}
+      {plays.map((play, i) => {
+        const Icon = BIG_PLAY_ICON[play.icon];
+        return (
+          <motion.div
+            key={i}
+            initial={{ opacity: 0, x: -24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3 + i * 0.25, ease: 'easeOut' }}
+            className="flex items-center gap-4 bg-card/60 dark:bg-white/5 border border-default rounded-2xl px-5 py-4 backdrop-blur-sm"
+          >
+            <span className="text-secondary shrink-0">
+              <Icon className="w-5 h-5" />
+            </span>
+            <p className="text-sm text-primary font-mono leading-snug">{play.text}</p>
+          </motion.div>
+        );
+      })}
     </div>
   </div>
 );

@@ -171,3 +171,7 @@ export const censureVoteSchema = z.object({
   targetId: z.string().min(1).max(64),
 });
 
+export const spectatorPredictSchema = z.object({
+  prediction: z.enum(['Civil', 'State']),
+});
+

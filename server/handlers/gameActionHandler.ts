@@ -14,6 +14,7 @@ import {
   signalSchema,
   sendReactionSchema,
   censureVoteSchema,
+  spectatorPredictSchema,
 } from '../game/schemas';
 import { sendFriendRequest, acceptFriendRequest } from '../supabaseService';
 import { getUserSocketId, getSocketId } from '../redis';
@@ -585,6 +586,42 @@ export function registerGameActionHandlers(
     if (targetSocketId) {
       io.to(targetSocketId).emit('friendRequestAccepted', { fromUserId: userId });
     }
+  });
+
+  socket.on('spectatorPredict', (payload) => {
+    const result = spectatorPredictSchema.safeParse(payload);
+    if (!result.success) return socket.emit('error', 'Invalid prediction data.');
+    const { prediction } = result.data;
+
+    const roomId = getRoom();
+    if (!roomId) return;
+    const state = engine.rooms.get(roomId);
+    if (!state || state.phase === 'Lobby' || state.phase === 'GameOver') return;
+
+    const me = state.spectators.find((s) => s.id === socket.id);
+    if (!me) return;
+
+    // Predictions must be placed before the end of Round 1
+    if (state.round > 1) {
+      socket.emit('error', 'Predictions are closed after the first round.');
+      return;
+    }
+
+    if (!state.spectatorPredictions) state.spectatorPredictions = {};
+
+    const key = socket.data.userId || socket.id;
+    if (state.spectatorPredictions[key]) {
+      socket.emit('error', 'You have already placed a prediction.');
+      return;
+    }
+
+    state.spectatorPredictions[key] = {
+      prediction,
+      timestamp: Date.now(),
+    };
+
+    state.log.push(`A spectator has predicted a ${prediction} victory.`);
+    engine.broadcastState(roomId);
   });
 }
 

@@ -55,6 +55,13 @@ export const GameHeader = ({
     ? Math.max(0, Math.ceil((gameState.actionTimerEnd - Date.now()) / 1000))
     : null;
 
+  const predictions = gameState.spectatorPredictions ? Object.values(gameState.spectatorPredictions) : [];
+  const civilPreds = predictions.filter(p => p.prediction === 'Civil').length;
+  const statePreds = predictions.filter(p => p.prediction === 'State').length;
+  const totalPreds = predictions.length;
+  const civilPercent = totalPreds > 0 ? Math.round((civilPreds / totalPreds) * 100) : 50;
+  const statePercent = 100 - civilPercent;
+
   return (
     <motion.header
       initial={{ y: -50, opacity: 0 }}
@@ -71,34 +78,34 @@ export const GameHeader = ({
             referrerPolicy="no-referrer"
           />
         </div>
-        <div className="flex flex-col min-w-0">
-          <div className="font-thematic text-responsive-sm sm:text-responsive-xl text-primary tracking-wide leading-none truncate uppercase">
-            THE ASSEMBLY
-          </div>
-          <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5 sm:mt-1 flex-wrap">
-            <span className="text-responsive-xs font-mono text-ghost uppercase tracking-[0.1em] sm:tracking-[0.2em] truncate">
-              {gameState.isPractice ? 'PRACTICE MODE' : gameState.roomId}
-            </span>
-            <span className="text-responsive-xs font-mono text-red-500/50 uppercase tracking-[0.1em] sm:tracking-[0.2em] flex items-center gap-1 shrink-0">
-              <div className="w-1 h-1 rounded-full bg-red-500/50" />R{gameState.round}
-            </span>
-            {timerRemaining !== null && (
-              <span className="text-responsive-xs font-mono text-yellow-500 uppercase tracking-[0.1em] sm:tracking-[0.2em] flex items-center gap-1 ml-1 sm:ml-2 shrink-0">
-                <div className="w-1 h-1 rounded-full bg-yellow-500 animate-pulse" />
-                {timerRemaining}s
-              </span>
-            )}
-            {!gameState.isPractice && gameState.privacy === 'private' && gameState.inviteCode && (
-              <Tooltip content="Share this code to invite players">
-                <span className="flex items-center gap-1 px-1.5 py-0.5 bg-card border border-default rounded text-responsive-xs font-mono text-primary tracking-[0.15em] shrink-0 cursor-default">
-                  <Lock className="w-[1.2vh] h-[1.2vh] text-muted" />
-                  {gameState.inviteCode}
-                </span>
-              </Tooltip>
-            )}
           </div>
         </div>
       </div>
+
+      {/* Spectator Prediction Tally (Center Piece) */}
+      {totalPreds > 0 && gameState.phase !== 'Lobby' && gameState.phase !== 'GameOver' && (
+        <div className="hidden md:flex flex-col items-center gap-1 min-w-[150px] lg:min-w-[200px]">
+          <div className="flex justify-between w-full text-[10px] font-mono uppercase tracking-widest text-faint">
+            <span className={cn(civilPercent > statePercent && "text-blue-400 font-bold")}>Civil {civilPercent}%</span>
+            <span className={cn(statePercent > civilPercent && "text-red-400 font-bold")}>State {statePercent}%</span>
+          </div>
+          <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden flex border border-white/5 backdrop-blur-sm">
+            <motion.div 
+              initial={{ width: '50%' }}
+              animate={{ width: `${civilPercent}%` }}
+              className="h-full bg-gradient-to-r from-blue-600 to-blue-400"
+            />
+            <motion.div 
+              initial={{ width: '50%' }}
+              animate={{ width: `${statePercent}%` }}
+              className="h-full bg-gradient-to-l from-red-600 to-red-400"
+            />
+          </div>
+          <div className="text-[9px] font-mono text-ghost/40 uppercase tracking-[0.2em] leading-none">
+            {totalPreds} Spectator {totalPreds === 1 ? 'Vote' : 'Votes'}
+          </div>
+        </div>
+      )}
 
       <div className="flex items-center gap-[1vw] sm:gap-[2vw]">
         {/* Chat */}

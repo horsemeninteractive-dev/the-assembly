@@ -500,7 +500,7 @@ export const Profile: React.FC<ProfileProps> = ({
         {/* Content Area */}
         <div className="flex-1 overflow-y-auto p-4 sm:p-8 custom-scrollbar">
           {activeTab === 'stats' && <StatsTab user={user} />}
-          {activeTab === 'history' && <HistoryTab user={user} token={token} />}
+          {activeTab === 'history' && <HistoryTab user={user} token={token} playSound={playSound} />}
           {activeTab === 'achievements' && <MedalsTab user={user} token={token} onUpdateUser={onUpdateUser} playSound={playSound} />}
           {activeTab === 'challenges' && <ChallengesTab user={user} token={token} />}
           {activeTab === 'inventory' && <Inventory user={user} token={token} onUpdateUser={onUpdateUser} playSound={playSound} playPreview={playPreview} playingItemId={playingItemId} />}

@@ -79,6 +79,7 @@ import { SettingsProvider } from './contexts/SettingsContext.tsx';
 import { AuthProvider } from './contexts/AuthContext.tsx';
 import { AudioProvider } from './contexts/AudioContext.tsx';
 import { GameProvider } from './contexts/GameContext.tsx';
+import { I18nProvider } from './contexts/I18nContext.tsx';
 import { PlayerCard } from './components/PlayerCard.tsx';
 import { ClanProfile } from './components/ClanProfile.tsx';
 
@@ -90,28 +91,34 @@ if (_playerRouteMatch) {
   const _playerUsername = decodeURIComponent(_playerRouteMatch[1]);
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <PlayerCard username={_playerUsername} />
+      <I18nProvider>
+        <PlayerCard username={_playerUsername} />
+      </I18nProvider>
     </StrictMode>
   );
 } else if (_clanRouteMatch) {
   const _clanTag = decodeURIComponent(_clanRouteMatch[1]);
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <ClanProfile tag={_clanTag} />
+      <I18nProvider>
+        <ClanProfile tag={_clanTag} />
+      </I18nProvider>
     </StrictMode>
   );
 } else {
   createRoot(document.getElementById('root')!).render(
     <StrictMode>
-      <SettingsProvider>
-        <AuthProvider>
-          <AudioProvider>
-            <GameProvider>
-              <App />
-            </GameProvider>
-          </AudioProvider>
-        </AuthProvider>
-      </SettingsProvider>
+      <I18nProvider>
+        <SettingsProvider>
+          <AuthProvider>
+            <AudioProvider>
+              <GameProvider>
+                <App />
+              </GameProvider>
+            </AudioProvider>
+          </AuthProvider>
+        </SettingsProvider>
+      </I18nProvider>
     </StrictMode>
   );
 }

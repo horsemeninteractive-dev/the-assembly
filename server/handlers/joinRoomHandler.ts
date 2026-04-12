@@ -10,6 +10,7 @@ import { logger } from '../logger';
 import { joinRoomSchema } from '../game/schemas';
 import v8 from 'v8';
 import { getUserSocketId, getSocketId, setUserSocketId, checkRoomCreationLimit, recordRoomCreation } from '../redis';
+import { sendPushNotification } from '../pushService';
 
 const MAX_ROOM_CAPACITY = parseInt(process.env.MAX_ROOM_CAPACITY || '100');
 
@@ -262,9 +263,20 @@ export async function handleJoinRoom(
         const friends = await getFriends(userId);
         for (const friend of friends) {
           const friendSocketId = await getSocketId(friend.id, userSockets);
-          if (friendSocketId) {
-            io.to(friendSocketId).emit('userStatusChanged', { userId, isOnline: true, roomId });
-            // find friend's room for status consistency
+            if (friendSocketId) {
+              io.to(friendSocketId).emit('userStatusChanged', { userId, isOnline: true, roomId });
+              
+              // Only push notification if the friend is NOT already in a room themselves 
+              // (otherwise it would be annoying while playing)
+              // Or just push anyway, but some filtering is good. 
+              // For now, let's just push to get the baseline engagement.
+              sendPushNotification(friend.id, {
+                title: 'Friend Online',
+                body: `${name} just joined room ${roomId}.`,
+                data: { url: `/?joinRoom=${roomId}` }
+              });
+
+              // find friend's room for status consistency
             let friendRoomId: string | undefined;
             for (const [rId, s] of engine.rooms.entries()) {
               if (s.players.some((p) => p.userId === friend.id && !p.isDisconnected)) {

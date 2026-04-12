@@ -10,7 +10,7 @@
 import { randomUUID } from 'crypto';
 import { GameState, UserInternal, RecentlyPlayedEntry } from '../../shared/types';
 import { logger } from '../logger';
-import { getUserById, saveUser, saveMatchResult, incrementGlobalWin, saveMatchAndUserAtomic } from '../supabaseService';
+import { getUserById, saveUser, saveMatchResult, incrementGlobalWin, saveMatchAndUserAtomic, saveGlobalMatch } from '../supabaseService';
 import { contributeClanXp, getClanById, saveClanChallenges, incrementClanXp } from '../db/clans';
 import { refreshClanChallenges, evaluateClanChallenges, ClanChallengeContext, calculateClanXpGain } from '../game/clanChallenges';
 import { calculateXpGain, getLevelFromXp } from '../../src/utils/xp';
@@ -79,6 +79,28 @@ export class MatchCloser {
 
     const validUsers = Array.from(userMap.values());
     const now = new Date().toISOString();
+    const globalMatchId = randomUUID();
+
+    // Save global match details once for replays
+    try {
+      await saveGlobalMatch({
+        id: globalMatchId,
+        playedAt: now,
+        mode: s.mode,
+        winner: winningSide ?? '',
+        winReason: s.winReason ?? '',
+        roundHistory: s.roundHistory ?? [],
+        players: s.players.map(p => ({
+            id: p.id,
+            name: p.name,
+            role: p.role,
+            avatarUrl: p.avatarUrl,
+            userId: p.userId
+        }))
+      });
+    } catch (err) {
+      logger.error({ err, matchId: globalMatchId }, 'Failed to save global match record');
+    }
 
     type PlayerResult = {
       playerId: string;
@@ -346,6 +368,7 @@ export class MatchCloser {
           xpEarned,
           ipEarned,
           cpEarned,
+          matchId: globalMatchId,
         },
       });
     }
@@ -395,6 +418,29 @@ export class MatchCloser {
         contributeClanXp(uid, amount)
       ),
     ]);
+
+    // ── Spectator Prediction Rewards ──────────────────────────────────────
+    if (s.spectatorPredictions && winningSide && !s.isPractice) {
+      const predictionEntries = Object.entries(s.spectatorPredictions);
+      for (const [userId, pred] of predictionEntries) {
+        if (pred.prediction === winningSide && userId.length > 30) {
+          try {
+            const u = await getUserById(userId);
+            if (u) {
+              u.stats.points += 50;
+              await saveUser(u);
+              const sid = await getUserSocketId(userId);
+              if (sid) {
+                const { password: _, ...safe } = u;
+                this.engine.io.to(sid).emit('userUpdate', safe as any);
+              }
+            }
+          } catch (err) {
+            logger.error({ err, userId }, 'Failed to reward spectator prediction');
+          }
+        }
+      }
+    }
 
     for (const r of results) {
       const { password: _, ...safe } = r.user;

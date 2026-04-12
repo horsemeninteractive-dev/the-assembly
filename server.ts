@@ -51,6 +51,7 @@ export const inFlightWrites = new Set<Promise<any>>();
 
 import { registerGameActionHandlers } from './server/handlers/gameActionHandler.ts';
 import { registerAdminHandlers } from './server/handlers/adminHandler.ts';
+import { challengeNotifier } from './server/challengeNotifier.ts';
 
 const PORT = env.PORT;
 
@@ -261,6 +262,16 @@ async function startServer() {
   });
 
   // Proxy route for external assets to bypass Discord's strict CSP
+  app.get('/api/matches/:id', async (req, res) => {
+    try {
+      const match = await getMatchById(req.params.id);
+      if (!match) return res.status(404).json({ error: 'Match not found' });
+      res.json(match);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch match' });
+    }
+  });
+
   app.get('/proxy', async (req, res) => {
     const url = req.query.url as string;
     if (!url) return res.status(400).send('URL is required');
@@ -369,6 +380,194 @@ async function startServer() {
     );
 
 
+  app.get('/m/:data', (req, res) => {
+    const encoded = req.params.data;
+    try {
+      const json = Buffer.from(encoded.replace(/-/g, '+').replace(/_/g, '/'), 'base64').toString();
+      const state = JSON.parse(json);
+
+      const winnerName = state.w === 'C' ? 'CIVIL' : 'STATE';
+      const factionText = `${state.f.C} Civil • ${state.f.S} State • ${state.f.O} Overseer`;
+      const momentsText = state.k.join(' • ');
+      
+      const title = `${winnerName} VICTORY | The Assembly`;
+      const desc = `Round ${state.rd} • ${factionText}\n${momentsText}`;
+
+      res.send(`
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>${title}</title>
+    
+    <!-- Open Graph / Meta Tags -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="${title}">
+    <meta property="og:description" content="${desc}">
+    <meta property="og:image" content="https://theassembly.web.app/hero.png">
+    
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="${title}">
+    <meta name="twitter:description" content="${desc}">
+    <meta name="twitter:image" content="https://theassembly.web.app/hero.png">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            margin: 0;
+            background: #050505;
+            color: #e2e8f0;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+        .container {
+            position: relative;
+            width: 100%;
+            max-width: 600px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(15, 15, 15, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 32px;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .bg-glow {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 300px;
+            height: 300px;
+            background: ${state.w === 'C' ? 'rgba(59, 130, 246, 0.15)' : 'rgba(239, 68, 68, 0.15)'};
+            filter: blur(100px);
+            z-index: -1;
+        }
+        h1 {
+            font-size: 10px;
+            letter-spacing: 0.5em;
+            text-transform: uppercase;
+            color: #64748b;
+            margin: 0 0 24px 0;
+        }
+        .result {
+            font-size: 48px;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            margin: 0 0 8px 0;
+            color: ${state.w === 'C' ? '#60a5fa' : '#ef4444'};
+            text-shadow: 0 0 30px ${state.w === 'C' ? 'rgba(59, 130, 246, 0.3)' : 'rgba(239, 68, 68, 0.3)'};
+        }
+        .reason {
+            font-size: 18px;
+            color: #94a3b8;
+            margin: 0 0 40px 0;
+        }
+        .stats {
+            display: flex;
+            justify-content: center;
+            gap: 24px;
+            margin-bottom: 40px;
+            padding: 24px;
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 20px;
+        }
+        .stat {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        .stat-label {
+            font-size: 10px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: #475569;
+        }
+        .stat-value {
+            font-size: 16px;
+            font-weight: 700;
+        }
+        .moments {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 40px;
+        }
+        .moment {
+            font-size: 14px;
+            color: #cbd5e1;
+            padding-left: 16px;
+            border-left: 2px solid ${state.w === 'C' ? '#3b82f6' : '#ef4444'};
+        }
+        .cta {
+            display: inline-block;
+            background: #ffffff;
+            color: #000000;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 14px;
+            transition: transform 0.2s;
+        }
+        .cta:hover {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-glow"></div>
+    <div class="container">
+        <h1>Mission Report</h1>
+        <div class="result">${state.w === 'C' ? 'Civil Victory' : 'State Victory'}</div>
+        <div class="reason">${state.r}</div>
+        
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-label">Rounds</span>
+                <span class="stat-value">${state.rd}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Civil</span>
+                <span class="stat-value">${state.f.C}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">State</span>
+                <span class="stat-value">${state.f.S}</span>
+            </div>
+            <div class="stat">
+                <span class="stat-label">Overseer</span>
+                <span class="stat-value">${state.f.O}</span>
+            </div>
+        </div>
+
+        <div class="moments">
+            ${state.k.map(m => `<div class="moment">${m}</div>`).join('')}
+        </div>
+
+        <a href="/" class="cta">ENTER THE ASSEMBLY</a>
+    </div>
+    
+    <script>
+        // Optional: redirect to home after a few seconds if you want
+        // setTimeout(() => { window.location.href = '/'; }, 10000);
+    </script>
+</body>
+</html>
+      `);
+    } catch (e) {
+      res.redirect('/');
+    }
   });
 
   if (process.env.NODE_ENV !== 'production') {

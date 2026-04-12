@@ -14,6 +14,9 @@ import {
   Coins,
   Medal,
   Flame,
+  Share2,
+  Twitter,
+  History,
 } from 'lucide-react';
 import { GameState, PrivateInfo, PostMatchResult } from '../../../../shared/types';
 import { cn, getProxiedUrl } from '../../../utils/utils';
@@ -21,6 +24,8 @@ import { OverseerIcon } from '../../icons';
 import { getLevelFromXp, getXpForNextLevel, getXpInCurrentLevel } from '../../../utils/xp';
 import { getRankTier, getRankLabel } from '../../../utils/ranks';
 import { ACHIEVEMENT_MAP, AchievementDef } from '../../../utils/achievements';
+import { generateShareUrl, getTwitterShareUrl } from '../../../utils/share';
+import { ReplayModal } from './ReplayModal';
 
 interface GameOverModalProps {
   gameState: GameState;
@@ -77,6 +82,24 @@ export const GameOverModal = ({
 
   const isRanked = postMatchResult?.mode === 'Ranked';
   const xpAfter = postMatchResult ? undefined : undefined; // we don't have the full xp value here, use userUpdate
+
+  const [copied, setCopied] = React.useState(false);
+  const [isReplayOpen, setIsReplayOpen] = React.useState(false);
+
+  const handleShare = () => {
+    const url = generateShareUrl(gameState);
+    navigator.clipboard.writeText(url);
+    setCopied(true);
+    playSound('click');
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleTwitterShare = () => {
+    const url = generateShareUrl(gameState);
+    const winner = gameState.winner === 'Civil' ? 'Civil' : 'State';
+    window.open(getTwitterShareUrl(url, winner), '_blank');
+    playSound('click');
+  };
 
   return (
     <AnimatePresence>
@@ -396,14 +419,48 @@ export const GameOverModal = ({
 
             {/* Pinned action buttons */}
             <div className="p-[3vh] pt-0 shrink-0 space-y-3">
-              <button
-                onMouseEnter={() => playSound('hover')}
-                onClick={onOpenLog}
-                className="w-full py-[1.2vh] bg-card text-tertiary border border-default rounded-xl hover:bg-hover hover:text-primary transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2"
-              >
-                <Scroll className="w-[2vh] h-[2vh]" />
-                View Assembly Log
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={onOpenLog}
+                  className="flex-1 py-[1.2vh] bg-card text-tertiary border border-default rounded-xl hover:bg-hover hover:text-primary transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2"
+                >
+                  <Scroll className="w-[2vh] h-[2vh]" />
+                  View Assembly Log
+                </button>
+                <button
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={() => setIsReplayOpen(true)}
+                  className="flex-1 py-[1.2vh] bg-surface-glass text-primary border border-primary/30 rounded-xl hover:bg-primary/10 transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2 border-primary/20"
+                >
+                  <History className="w-[2vh] h-[2vh]" />
+                  Reconstruct Match
+                </button>
+              </div>
+
+              <div className="flex gap-3">
+                <button
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={handleShare}
+                  className={cn(
+                    "flex-1 py-[1.2vh] border rounded-xl transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2",
+                    copied 
+                      ? "bg-emerald-900/20 border-emerald-500/40 text-emerald-400" 
+                      : "bg-card text-tertiary border-default hover:bg-hover hover:text-primary"
+                  )}
+                >
+                  <Share2 className="w-[2vh] h-[2vh]" />
+                  {copied ? 'Link Copied' : 'Copy Share Link'}
+                </button>
+                <button
+                  onMouseEnter={() => playSound('hover')}
+                  onClick={handleTwitterShare}
+                  className="px-[2vh] py-[1.2vh] bg-[#1DA1F2]/10 text-[#1DA1F2] border border-[#1DA1F2]/30 rounded-xl hover:bg-[#1DA1F2]/20 transition-all flex items-center justify-center"
+                  title="Share to X"
+                >
+                  <Twitter className="w-[2vh] h-[2vh] fill-current" />
+                </button>
+              </div>
 
               <div className="flex gap-3">
                 <button
@@ -425,6 +482,13 @@ export const GameOverModal = ({
           </motion.div>
         </motion.div>
       )}
+
+      <ReplayModal
+        gameState={gameState}
+        isOpen={isReplayOpen}
+        onClose={() => setIsReplayOpen(false)}
+        playSound={playSound}
+      />
     </AnimatePresence>
   );
 };

@@ -1,0 +1,76 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "success": "Success",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "back": "Back",
+    "save": "Save",
+    "close": "Close",
+    "leave": "Leave",
+    "ready": "Ready!",
+    "not_ready": "Ready Up",
+    "submit": "Submit"
+  },
+  "lobby": {
+    "title": "THE ASSEMBLY",
+    "create_room": "Create Room",
+    "join_room": "Join Room",
+    "rooms_available": "Rooms Available",
+    "practice_mode": "PRACTICE MODE",
+    "ranked": "Ranked",
+    "casual": "Casual",
+    "classic": "Classic"
+  },
+  "auth": {
+    "login": "Login",
+    "register": "Register",
+    "username": "Username",
+    "password": "Password",
+    "email": "Email",
+    "sign_in": "Sign In",
+    "sign_up": "Sign Up",
+    "forgot_password": "Forgot Password?",
+    "no_account": "Don't have an account?",
+    "have_account": "Already have an account?"
+  },
+  "game": {
+    "round": "Round {{round}}",
+    "phase": "Phase: {{phase}}",
+    "civil_directives": "Civil Directives",
+    "state_directives": "State Directives",
+    "winner": "{{faction}} Wins!",
+    "gameOver": "G A M E   O V E R",
+    "phases": {
+      "lobby": "Waiting for players ({{current}}/{{max}})...",
+      "nominate_chancellor": "{{name}} is nominating a Chancellor.",
+      "nomination_review": "The Assembly is reviewing the nomination.",
+      "interdictor_review": "Interdictor is choosing a target.",
+      "broker_review": "Broker is reviewing the nomination.",
+      "voting": "The Assembly is voting.",
+      "legislative_president": "President is reviewing directives.",
+      "strategist_deck": "Strategist is looking at the deck.",
+      "legislative_chancellor": "Chancellor is enacting a directive.",
+      "auditor_inspect": "Auditor is inspecting the discard pile.",
+      "defector_align": "The Defector is considering a secret realignment.",
+      "quorum_revote": "The Quorum is deciding on an emergency re-vote.",
+      "assassin_target": "Assassin is choosing a target."
+    },
+    "dossier": {
+      "title": "Your Secret Dossier",
+      "identity": "Secret Identity",
+      "identity_civil": "CIVIL",
+      "identity_overseer": "OVERSEER",
+      "identity_state": "STATE",
+      "agenda": "Personal Agenda",
+      "agenda_none": "No agenda assigned.",
+      "agenda_bonus": "Completing this awards bonus XP and IP equal to a faction win.",
+      "title_role": "Title Role",
+      "title_none": "No title role assigned.",
+      "faction_state": "State Faction",
+      "awaiting": "Awaiting role assignment...",
+      "close": "Close Dossier"
+    }
+  }
+}

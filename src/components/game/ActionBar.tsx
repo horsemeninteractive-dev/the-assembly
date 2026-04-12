@@ -26,6 +26,7 @@ import { socket } from '../../socket';
 import { GameState, Player, User } from '../../../shared/types';
 import { getPolicyStyles, getVoteStyles } from '../../utils/cosmetics';
 import { cn } from '../../utils/utils';
+import { useTranslation } from '../../contexts/I18nContext';
 
 interface ActionBarProps {
   gameState: GameState;
@@ -69,35 +70,37 @@ export const ActionBar = ({
     : gameState.log.filter((entry) => !entry.includes('DEBUG:'));
   const lastEntry = filteredLog[filteredLog.length - 1];
 
+  const { t } = useTranslation();
+
   const phaseLabel = () => {
     switch (gameState.phase) {
       case 'Lobby':
-        return `Waiting for players (${gameState.players.length}/${gameState.maxPlayers})...`;
+        return t('game.phases.lobby', { current: gameState.players.length, max: gameState.maxPlayers });
       case 'Nominate_Chancellor':
-        return `${gameState.players[gameState.presidentIdx]?.name} is nominating a Chancellor.`;
+        return t('game.phases.nominate_chancellor', { name: gameState.players[gameState.presidentIdx]?.name });
       case 'Nomination_Review':
         if (gameState.titlePrompt?.role === 'Interdictor')
-          return 'Interdictor is choosing a target.';
-        if (gameState.titlePrompt?.role === 'Broker') return 'Broker is reviewing the nomination.';
-        return 'The Assembly is reviewing the nomination.';
+          return t('game.phases.interdictor_review');
+        if (gameState.titlePrompt?.role === 'Broker') return t('game.phases.broker_review');
+        return t('game.phases.nomination_review');
       case 'Voting':
       case 'Voting_Reveal':
-        return 'The Assembly is voting.';
+        return t('game.phases.voting');
       case 'Legislative_President':
         if (gameState.titlePrompt?.role === 'Strategist')
-          return 'Strategist is looking at the deck.';
-        return 'President is reviewing directives.';
+          return t('game.phases.strategist_deck');
+        return t('game.phases.legislative_president');
       case 'Legislative_Chancellor':
         if (gameState.lastEnactedPolicy) return 'Players are declaring directives.';
-        return 'Chancellor is enacting a directive.';
+        return t('game.phases.legislative_chancellor');
       case 'Auditor_Action':
-        return 'Auditor is inspecting the discard pile.';
+        return t('game.phases.auditor_inspect');
       case 'Defector_Action':
-        return 'The Defector is considering a secret realignment.';
+        return t('game.phases.defector_align');
       case 'Quorum_Action':
-        return 'The Quorum is deciding on an emergency re-vote.';
+        return t('game.phases.quorum_revote');
       case 'Assassin_Action':
-        return 'Assassin is choosing a target.';
+        return t('game.phases.assassin_target');
       case 'Handler_Action':
         return 'Handler is using their power.';
       case 'Censure_Action':
@@ -726,6 +729,55 @@ export const ActionBar = ({
             <div className="text-[10px] font-mono text-faint uppercase mt-1">
               {gameState.snapElectionVolunteers?.length || 0} Ready to serve
             </div>
+          </div>
+        )}
+
+
+        {/* Spectator Prediction */}
+        {!me && gameState.phase !== 'Lobby' && gameState.phase !== 'GameOver' && gameState.round <= 1 && user && (
+          <div className="flex flex-col gap-[1vh] w-full justify-center h-full items-center p-4">
+            {gameState.spectatorPredictions?.[user.id] ? (
+              <div className="flex flex-col items-center gap-2">
+                <div className="text-primary font-mono text-responsive-xs uppercase tracking-[0.2em] text-center animate-pulse">
+                  Prediction Logged: {gameState.spectatorPredictions[user.id].prediction} Victory
+                </div>
+                <div className="text-[10px] text-faint font-light">
+                  50 IP will be credited if your faction prevails.
+                </div>
+              </div>
+            ) : (
+              <>
+                <div className="text-responsive-xs font-mono uppercase tracking-[0.15em] text-muted text-center mb-1">
+                  Predict Unity or Deception for <span className="text-yellow-500 font-bold">50 IP</span>
+                </div>
+                <div className="flex gap-[2vw] w-full max-w-[400px]">
+                  <button
+                    onClick={() => {
+                      playSound('click');
+                      socket.emit('spectatorPredict', { prediction: 'Civil' });
+                    }}
+                    className="flex-1 py-[1.2vh] sm:py-[1.5vh] bg-blue-600/10 border border-blue-500/30 hover:bg-blue-600/20 hover:border-blue-500/60 text-blue-400 rounded-xl font-bold uppercase tracking-[0.2em] transition-all shadow-lg shadow-blue-500/5 group"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <Scale className="w-3 h-3 group-hover:scale-110 transition-transform" />
+                      Civil
+                    </span>
+                  </button>
+                  <button
+                    onClick={() => {
+                      playSound('click');
+                      socket.emit('spectatorPredict', { prediction: 'State' });
+                    }}
+                    className="flex-1 py-[1.2vh] sm:py-[1.5vh] bg-red-600/10 border border-red-500/30 hover:bg-red-600/20 hover:border-red-500/60 text-red-400 rounded-xl font-bold uppercase tracking-[0.2em] transition-all shadow-lg shadow-red-500/5 group"
+                  >
+                    <span className="flex items-center justify-center gap-2">
+                      <Eye className="w-3 h-3 group-hover:scale-110 transition-transform" />
+                      State
+                    </span>
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         )}
 

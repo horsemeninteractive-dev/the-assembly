@@ -74,3 +74,52 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+// --- Push Notification Support ---
+
+self.addEventListener('push', (event) => {
+  let data = {};
+  try {
+    data = event.data ? event.data.json() : {};
+  } catch (e) {
+    console.error('Push data not JSON:', event.data.text());
+    data = { title: 'The Assembly', body: event.data.text() };
+  }
+
+  const title = data.title || 'The Assembly';
+  const options = {
+    body: data.body || 'Incoming dispatch from the high council...',
+    icon: data.icon || '/pwa-192x192.png',
+    badge: '/pwa-192x192.png',
+    data: data.data || {},
+    vibrate: [200, 100, 200],
+    tag: data.tag || 'general-notification',
+    renotify: true,
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  // Handle data.url for redirection
+  const targetUrl = event.notification.data.url 
+    ? new URL(event.notification.data.url, self.location.origin).href 
+    : self.location.origin;
+
+  event.waitUntil(
+    clients.matchAll({ type: 'window', includeUncontrolled: true }).then((windowClients) => {
+      // Check if there is already a window open with this URL
+      for (const client of windowClients) {
+        if (client.url === targetUrl && 'focus' in client) {
+          return client.focus();
+        }
+      }
+      // If no window is open, open a new one
+      if (clients.openWindow) {
+        return clients.openWindow(targetUrl);
+      }
+    })
+  );
+});
