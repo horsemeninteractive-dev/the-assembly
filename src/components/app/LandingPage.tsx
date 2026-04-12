@@ -3,6 +3,8 @@ import { motion, useScroll, useTransform } from 'motion/react';
 import { Scale, Eye, Crown, Vote, FileText, Users, Zap, Bot, Shield, Sparkles, ChevronDown } from 'lucide-react';
 import { OverseerIcon } from '../icons';
 import { getProxiedUrl } from '../../utils/utils';
+import { useTranslation } from '../../contexts/I18nContext';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 
 interface LandingPageProps {
   onPlayNow: () => void;
@@ -43,63 +45,64 @@ const SectionHeading: React.FC<{ label: string; title: string; subtitle?: string
   </motion.div>
 );
 
-/* ─── Game loop steps ────────────────────────────────────────────── */
-const LOOP_STEPS = [
-  {
-    num: '01',
-    label: 'Nomination',
-    color: 'from-yellow-600/20 to-yellow-900/5 border-yellow-500/25 text-yellow-400',
-    dot: 'bg-yellow-500',
-    desc: 'The President nominates a Chancellor. Who you trust — and who you nominate — reveals everything.',
-  },
-  {
-    num: '02',
-    label: 'Vote',
-    color: 'from-purple-600/20 to-purple-900/5 border-purple-500/25 text-purple-400',
-    dot: 'bg-purple-500',
-    desc: 'All players vote simultaneously. Public, inescapable, and open to interpretation.',
-  },
-  {
-    num: '03',
-    label: 'Legislative Session',
-    color: 'from-blue-600/20 to-blue-900/5 border-blue-500/25 text-blue-400',
-    dot: 'bg-blue-500',
-    desc: 'The President draws 3 policy cards, discards 1, passes 2 to the Chancellor. One will be enacted.',
-  },
-  {
-    num: '04',
-    label: 'Declarations',
-    color: 'from-emerald-600/20 to-emerald-900/5 border-emerald-500/25 text-emerald-400',
-    dot: 'bg-emerald-500',
-    desc: "Both sides declare what happened in the session. These statements can be lies — blatant, convincing lies.",
-  },
-  {
-    num: '05',
-    label: 'Executive Action',
-    color: 'from-red-600/20 to-red-900/5 border-red-500/25 text-red-400',
-    dot: 'bg-red-500',
-    desc: 'Enough State policies and the President wields power — investigations, detentions, executions.',
-  },
-];
-
-/* ─── Features ──────────────────────────────────────────────────── */
-const FEATURES = [
-  { icon: <Users className="w-5 h-5" />, label: '5–10 Players', desc: 'Scale from tight deduction to sprawling deception.' },
-  { icon: <Bot className="w-5 h-5" />, label: 'AI Players', desc: 'Fill empty seats with AI — each with its own personality.' },
-  { icon: <Zap className="w-5 h-5" />, label: 'Title Roles', desc: 'One-use powers — Interdictor, Assassin, Broker and more.' },
-  { icon: <FileText className="w-5 h-5" />, label: 'Personal Agendas', desc: '20 hidden objectives independent of your faction.' },
-  { icon: <Vote className="w-5 h-5" />, label: 'Crisis Mode', desc: 'Optional chaos directives that rewrite the rules mid-game.' },
-  { icon: <Shield className="w-5 h-5" />, label: 'Clan System', desc: 'Form a clan, set a banner, build a legacy.' },
-  { icon: <Crown className="w-5 h-5" />, label: 'Season Ranks', desc: 'Climb the ladder. Earn IP. Unlock cosmetics.' },
-  { icon: <Sparkles className="w-5 h-5" />, label: 'Free to Play', desc: 'All gameplay is free. Cosmetics are optional.' },
-];
-
 /* ─── Main component ─────────────────────────────────────────────── */
 export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) => {
+  const { t } = useTranslation();
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ container: containerRef });
   const heroParallax = useTransform(scrollYProgress, [0, 0.3], ['0%', '-15%']);
   const heroOpacity = useTransform(scrollYProgress, [0, 0.25], [1, 0]);
+
+  /* ─── Game loop steps ────────────────────────────────────────────── */
+  const LOOP_STEPS = [
+    {
+      num: '01',
+      label: t('game.phases.nomination', { name: '' }).split(' ')[2], // Extract label or just use t
+      color: 'from-yellow-600/20 to-yellow-900/5 border-yellow-500/25 text-yellow-400',
+      dot: 'bg-yellow-500',
+      desc: t('landing.loop.step_1'),
+    },
+    {
+      num: '02',
+      label: t('game.phases.voting').split(' ')[2],
+      color: 'from-purple-600/20 to-purple-900/5 border-purple-500/25 text-purple-400',
+      dot: 'bg-purple-500',
+      desc: t('landing.loop.step_2'),
+    },
+    {
+      num: '03',
+      label: t('landing.loop.label_3'),
+      color: 'from-blue-600/20 to-blue-900/5 border-blue-500/25 text-blue-400',
+      dot: 'bg-blue-500',
+      desc: t('landing.loop.step_3'),
+    },
+    {
+      num: '04',
+      label: t('landing.loop.label_4'),
+      color: 'from-emerald-600/20 to-emerald-900/5 border-emerald-500/25 text-emerald-400',
+      dot: 'bg-emerald-500',
+      desc: t('landing.loop.step_4'),
+    },
+    {
+      num: '05',
+      label: t('landing.loop.label_5'),
+      color: 'from-red-600/20 to-red-900/5 border-red-500/25 text-red-400',
+      dot: 'bg-red-500',
+      desc: t('landing.loop.step_5'),
+    },
+  ];
+
+  /* ─── Features ──────────────────────────────────────────────────── */
+  const FEATURES = [
+    { icon: <Users className="w-5 h-5" />, label: t('landing.features.item_1.label'), desc: t('landing.features.item_1.desc') },
+    { icon: <Bot className="w-5 h-5" />, label: t('landing.features.item_2.label'), desc: t('landing.features.item_2.desc') },
+    { icon: <Zap className="w-5 h-5" />, label: t('landing.features.item_3.label'), desc: t('landing.features.item_3.desc') },
+    { icon: <FileText className="w-5 h-5" />, label: t('landing.features.item_4.label'), desc: t('landing.features.item_4.desc') },
+    { icon: <Vote className="w-5 h-5" />, label: t('landing.features.item_5.label'), desc: t('landing.features.item_5.desc') },
+    { icon: <Shield className="w-5 h-5" />, label: t('landing.features.item_6.label'), desc: t('landing.features.item_6.desc') },
+    { icon: <Crown className="w-5 h-5" />, label: t('landing.features.item_7.label'), desc: t('landing.features.item_7.desc') },
+    { icon: <Sparkles className="w-5 h-5" />, label: t('landing.features.item_8.label'), desc: t('landing.features.item_8.desc') },
+  ];
 
   return (
     <div
@@ -118,23 +121,24 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
             referrerPolicy="no-referrer"
           />
           <span className="font-thematic text-white/80 text-sm uppercase tracking-[0.2em] hidden sm:block">
-            The Assembly
+            {t('common.title')}
           </span>
         </div>
         <div className="flex items-center gap-3">
+          <LanguageSwitcher variant="ghost" />
           <button
             id="nav-login"
             onClick={onLogin}
             className="text-white/60 hover:text-white text-sm font-mono transition-colors duration-200 px-3 py-1.5"
           >
-            Log In
+            {t('landing.nav.login')}
           </button>
           <button
             id="nav-play-now"
             onClick={onPlayNow}
             className="bg-white text-black text-sm font-thematic uppercase tracking-widest px-4 py-2 rounded-xl hover:bg-white/90 transition-all duration-200 shadow-lg shadow-black/40"
           >
-            Play Now
+            {t('landing.nav.play')}
           </button>
         </div>
       </nav>
@@ -183,7 +187,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
             transition={{ duration: 1.4, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
             className="text-5xl md:text-7xl font-thematic text-white uppercase mb-6 drop-shadow-2xl"
           >
-            The Assembly
+            {t('common.title')}
           </motion.h1>
 
           {/* Divider */}
@@ -200,10 +204,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, delay: 1.1 }}
-            className="text-white/60 text-lg md:text-xl font-sans italic mb-10 leading-relaxed"
+            className="text-white/60 text-lg md:text-xl font-sans italic mb-10 leading-relaxed whitespace-pre-line"
           >
-            A social deduction game of hidden roles, political intrigue,
-            <br className="hidden md:block" /> and impossible trust.
+            {t('landing.hero.tagline')}
           </motion.p>
 
           {/* CTAs */}
@@ -218,14 +221,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
               onClick={onPlayNow}
               className="relative overflow-hidden w-full sm:w-auto bg-white text-black font-thematic text-lg uppercase tracking-[0.2em] px-10 py-4 rounded-2xl hover:bg-white/90 transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.2)] hover:shadow-[0_0_60px_rgba(255,255,255,0.35)] animate-shine"
             >
-              Play Now — Free
+              {t('landing.hero.cta_play')}
             </button>
             <button
               id="hero-login"
               onClick={onLogin}
               className="w-full sm:w-auto bg-white/5 hover:bg-white/10 border border-white/20 hover:border-white/40 text-white font-thematic text-lg uppercase tracking-[0.2em] px-10 py-4 rounded-2xl transition-all duration-300"
             >
-              Log In
+              {t('landing.nav.login')}
             </button>
           </motion.div>
         </motion.div>
@@ -237,7 +240,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
           transition={{ delay: 2.5, duration: 1 }}
           className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/30"
         >
-          <span className="text-xs font-mono uppercase tracking-widest">Discover</span>
+          <span className="text-xs font-mono uppercase tracking-widest">{t('landing.hero.discover')}</span>
           <motion.div
             animate={{ y: [0, 8, 0] }}
             transition={{ duration: 1.5, repeat: Infinity, ease: 'easeInOut' }}
@@ -250,9 +253,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
       {/* ── What Is It ──────────────────────────────────────────── */}
       <Section id="about">
         <SectionHeading
-          label="What Is The Assembly?"
-          title="Hidden Roles. Public Stakes."
-          subtitle="A political thriller played out in real time. 5 to 10 players take on secret roles and must deceive, deduce, and outmanoeuvre one another across a series of high-pressure legislative rounds."
+          label={t('landing.about.label')}
+          title={t('landing.about.title')}
+          subtitle={t('landing.about.subtitle')}
         />
 
         {/* Featured stat cards */}
@@ -264,9 +267,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
           className="grid grid-cols-1 sm:grid-cols-3 gap-4"
         >
           {[
-            { value: '5–10', label: 'Players per game', accent: 'text-white' },
-            { value: '17', label: 'Policy cards stacked against you', accent: 'text-red-400' },
-            { value: '20', label: 'Personal agendas to complete', accent: 'text-emerald-400' },
+            { value: '5–10', label: t('landing.about.stat_players'), accent: 'text-white' },
+            { value: '17', label: t('landing.about.stat_policies'), accent: 'text-red-400' },
+            { value: '20', label: t('landing.about.stat_agendas'), accent: 'text-emerald-400' },
           ].map(({ value, label, accent }) => (
             <div
               key={label}
@@ -286,17 +289,17 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
           transition={{ duration: 0.8, delay: 0.2 }}
           className="mt-12 text-center text-white/35 text-sm font-sans italic leading-relaxed border-t border-white/8 pt-10"
         >
-          "The old world ended with The Crisis. Now, only The Assembly stands…<br />
-          <span className="text-white/50">Will you defend the Civil Charter, or will you build the new State?</span>"
+          "{t('landing.about.quote')}<br />
+          <span className="text-white/50">{t('landing.about.quote_cta')}</span>"
         </motion.blockquote>
       </Section>
 
       {/* ── Factions ────────────────────────────────────────────── */}
       <Section id="factions">
         <SectionHeading
-          label="Choose Your Side"
-          title="Two Factions. One Assembly."
-          subtitle="Every player is secretly assigned to a faction at the start of each game. The majority will not know who they can trust."
+          label={t('landing.factions.label')}
+          title={t('landing.factions.title')}
+          subtitle={t('landing.factions.subtitle')}
         />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -314,20 +317,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
                 <div className="w-10 h-10 rounded-xl bg-blue-500/15 border border-blue-500/25 flex items-center justify-center">
                   <Scale className="w-5 h-5 text-blue-400" />
                 </div>
-                <div className="font-thematic text-blue-400 text-xl uppercase tracking-wider">Civil</div>
+                <div className="font-thematic text-blue-400 text-xl uppercase tracking-wider">{t('landing.factions.civil.title')}</div>
               </div>
               <p className="text-white/55 text-sm leading-relaxed mb-5">
-                The majority. Isolated in your loyalty. You don't know who your allies are — only that the deck is stacked against you, and that someone at this table is a traitor.
+                {t('landing.factions.civil.desc')}
               </p>
               <div className="space-y-2">
-                <div className="text-xs font-mono uppercase tracking-widest text-white/30 mb-2">Win Conditions</div>
+                <div className="text-xs font-mono uppercase tracking-widest text-white/30 mb-2">{t('landing.factions.win_conditions')}</div>
                 <div className="flex items-center gap-2 text-sm text-white/60">
                   <div className="w-1.5 h-1.5 rounded-full bg-blue-400/60 shrink-0" />
-                  Enact 5 Civil directives
+                  {t('landing.factions.civil.win_1')}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-white/60">
                   <div className="w-1.5 h-1.5 rounded-full bg-blue-400/60 shrink-0" />
-                  Execute the Overseer
+                  {t('landing.factions.civil.win_2')}
                 </div>
               </div>
             </div>
@@ -347,20 +350,20 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
                 <div className="w-10 h-10 rounded-xl bg-red-500/15 border border-red-500/25 flex items-center justify-center">
                   <Eye className="w-5 h-5 text-red-400" />
                 </div>
-                <div className="font-thematic text-red-400 text-xl uppercase tracking-wider">State</div>
+                <div className="font-thematic text-red-400 text-xl uppercase tracking-wider">{t('landing.factions.state.title')}</div>
               </div>
               <p className="text-white/55 text-sm leading-relaxed mb-5">
-                The minority. Hidden among the Civil delegates, secretly coordinating. You know your allies. What you need is the right moment.
+                {t('landing.factions.state.desc')}
               </p>
               <div className="space-y-2">
-                <div className="text-xs font-mono uppercase tracking-widest text-white/30 mb-2">Win Conditions</div>
+                <div className="text-xs font-mono uppercase tracking-widest text-white/30 mb-2">{t('landing.factions.win_conditions')}</div>
                 <div className="flex items-center gap-2 text-sm text-white/60">
                   <div className="w-1.5 h-1.5 rounded-full bg-red-400/60 shrink-0" />
-                  Enact 6 State directives
+                  {t('landing.factions.state.win_1')}
                 </div>
                 <div className="flex items-center gap-2 text-sm text-white/60">
                   <div className="w-1.5 h-1.5 rounded-full bg-red-400/60 shrink-0" />
-                  Elect the Overseer as Chancellor
+                  {t('landing.factions.state.win_2')}
                 </div>
               </div>
             </div>
@@ -368,10 +371,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
             <div className="mx-6 md:mx-8 mb-6 md:mb-8 -mt-1 rounded-xl bg-red-950/40 border border-red-600/20 p-4">
               <div className="flex items-center gap-2 mb-1">
                 <OverseerIcon className="w-4 h-4 text-red-500" />
-                <span className="text-red-500 font-bold text-xs uppercase tracking-widest">The Overseer</span>
+                <span className="text-red-500 font-bold text-xs uppercase tracking-widest">{t('landing.factions.overseer.title')}</span>
               </div>
               <p className="text-white/40 text-xs leading-relaxed">
-                A State agent who may not know the other State players. Their election as Chancellor after 3 State directives ends the game immediately.
+                {t('landing.factions.overseer.desc')}
               </p>
             </div>
           </motion.div>
@@ -381,9 +384,9 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
       {/* ── Game Loop ───────────────────────────────────────────── */}
       <Section id="how-to-play">
         <SectionHeading
-          label="How It Plays"
-          title="One Round. Five Moments."
-          subtitle="Each round forces every player to participate, declare, and be judged. There is no hiding."
+          label={t('landing.loop.label')}
+          title={t('landing.loop.title')}
+          subtitle={t('landing.loop.subtitle')}
         />
 
         <div className="relative">
@@ -418,8 +421,8 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
       {/* ── Features ────────────────────────────────────────────── */}
       <Section id="features">
         <SectionHeading
-          label="What's Included"
-          title="More Than a Board Game."
+          label={t('landing.features.label')}
+          title={t('landing.features.title')}
         />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -454,10 +457,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
           <div className="relative z-10 p-10 md:p-16">
             <div className="w-12 h-px mx-auto mb-8" style={{ background: 'linear-gradient(to right, transparent, rgba(255,255,255,0.3), transparent)' }} />
             <h2 className="text-3xl md:text-5xl font-thematic text-white uppercase tracking-wide mb-4">
-              Take Your Seat.
+              {t('landing.cta.title')}
             </h2>
             <p className="text-white/50 text-base mb-10 max-w-sm mx-auto leading-relaxed">
-              Free to play. No downloads. The Assembly awaits.
+              {t('landing.cta.subtitle')}
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <button
@@ -465,14 +468,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
                 onClick={onPlayNow}
                 className="relative overflow-hidden bg-white text-black font-thematic text-lg uppercase tracking-[0.2em] px-10 py-4 rounded-2xl hover:bg-white/90 transition-all duration-300 shadow-[0_0_40px_rgba(255,255,255,0.15)] hover:shadow-[0_0_60px_rgba(255,255,255,0.3)] animate-shine"
               >
-                Create Account
+                {t('landing.cta.button')}
               </button>
               <button
                 id="cta-login"
                 onClick={onLogin}
                 className="bg-white/5 hover:bg-white/10 border border-white/15 hover:border-white/30 text-white font-thematic text-lg uppercase tracking-[0.2em] px-10 py-4 rounded-2xl transition-all duration-300"
               >
-                Log In
+                {t('landing.nav.login')}
               </button>
             </div>
           </div>

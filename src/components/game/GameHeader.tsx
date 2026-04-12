@@ -17,6 +17,7 @@ import { GameState, Player, Role, PrivateInfo } from '../../../shared/types';
 import { OverseerIcon } from '../icons';
 import { getFrameStyles } from '../../utils/cosmetics';
 import { cn, getProxiedUrl } from '../../utils/utils';
+import { useTranslation } from '../../contexts/I18nContext';
 
 interface GameHeaderProps {
   gameState: GameState;
@@ -51,6 +52,7 @@ export const GameHeader = ({
   onLeaveRoom,
   playSound,
 }: GameHeaderProps) => {
+  const { t } = useTranslation();
   const timerRemaining = gameState.actionTimerEnd
     ? Math.max(0, Math.ceil((gameState.actionTimerEnd - Date.now()) / 1000))
     : null;
@@ -78,16 +80,14 @@ export const GameHeader = ({
             referrerPolicy="no-referrer"
           />
         </div>
-          </div>
-        </div>
       </div>
 
       {/* Spectator Prediction Tally (Center Piece) */}
       {totalPreds > 0 && gameState.phase !== 'Lobby' && gameState.phase !== 'GameOver' && (
         <div className="hidden md:flex flex-col items-center gap-1 min-w-[150px] lg:min-w-[200px]">
           <div className="flex justify-between w-full text-[10px] font-mono uppercase tracking-widest text-faint">
-            <span className={cn(civilPercent > statePercent && "text-blue-400 font-bold")}>Civil {civilPercent}%</span>
-            <span className={cn(statePercent > civilPercent && "text-red-400 font-bold")}>State {statePercent}%</span>
+            <span className={cn(civilPercent > statePercent && "text-blue-400 font-bold")}>{t('game.game_header.prediction_civil', { percent: civilPercent })}</span>
+            <span className={cn(statePercent > civilPercent && "text-red-400 font-bold")}>{t('game.game_header.prediction_state', { percent: statePercent })}</span>
           </div>
           <div className="w-full h-1.5 bg-black/40 rounded-full overflow-hidden flex border border-white/5 backdrop-blur-sm">
             <motion.div 
@@ -102,14 +102,16 @@ export const GameHeader = ({
             />
           </div>
           <div className="text-[9px] font-mono text-ghost/40 uppercase tracking-[0.2em] leading-none">
-            {totalPreds} Spectator {totalPreds === 1 ? 'Vote' : 'Votes'}
+            {totalPreds === 1 
+              ? t('game.game_header.spectator_vote', { count: totalPreds }) 
+              : t('game.game_header.spectator_votes', { count: totalPreds })}
           </div>
         </div>
       )}
 
       <div className="flex items-center gap-[1vw] sm:gap-[2vw]">
         {/* Chat */}
-        <Tooltip content="Open Chat">
+        <Tooltip content={t('game.game_header.open_chat')}>
           <button
             onClick={() => {
               playSound('click');
@@ -126,7 +128,7 @@ export const GameHeader = ({
 
         {/* History */}
         {gameState.roundHistory && gameState.roundHistory.length > 0 && (
-          <Tooltip content="Round History">
+          <Tooltip content={t('game.game_header.round_history')}>
             <button
               onClick={() => {
                 playSound('click');
@@ -146,7 +148,7 @@ export const GameHeader = ({
 
         {/* Help / Reference */}
         {gameState.phase !== 'Lobby' && gameState.phase !== 'GameOver' && (
-          <Tooltip content="Phase Reference">
+          <Tooltip content={t('game.game_header.phase_reference')}>
             <button
               onClick={() => {
                 playSound('click');
@@ -161,7 +163,7 @@ export const GameHeader = ({
 
         {/* Dossier */}
         {gameState.phase !== 'Lobby' && (
-          <Tooltip content="Your Dossier">
+          <Tooltip content={t('game.game_header.your_dossier')}>
             <button
               onClick={() => {
                 playSound('click');
@@ -193,7 +195,7 @@ export const GameHeader = ({
         )}
 
         {/* Profile */}
-        <Tooltip content="My Profile">
+        <Tooltip content={t('game.game_header.my_profile')}>
           <button
             onClick={() => {
               playSound('click');
@@ -224,7 +226,7 @@ export const GameHeader = ({
         <div className="w-[1px] h-[2.5vh] sm:h-[3vh] bg-card mx-0.5 sm:mx-1" />
 
         {/* Leave */}
-        <Tooltip content="Leave Assembly">
+        <Tooltip content={t('game.game_header.leave_assembly')}>
           <button
             onClick={onLeaveRoom}
             className="p-[1vh] sm:p-[1.2vh] text-ghost hover:text-red-500 transition-colors bg-elevated border border-subtle rounded-xl"

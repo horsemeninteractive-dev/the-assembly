@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../contexts/I18nContext';
+import { LanguageSwitcher } from '../common/LanguageSwitcher';
 import { Pencil, Check, X, Clock } from 'lucide-react';
 import { cn, apiUrl } from '../../utils/utils';
 import { User } from '../../../shared/types';
@@ -12,6 +14,7 @@ interface SettingsTabProps {
 }
 
 export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: SettingsTabProps) {
+  const { t } = useTranslation();
   const [settingsTab, setSettingsTab] = useState<'general' | 'audio' | 'voice'>('general');
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState(user.email || '');
@@ -42,7 +45,7 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
       return;
     }
     if (!newEmail.includes('@')) {
-      setError('Invalid email address');
+      setError(t('common.error_invalid_email'));
       return;
     }
     setIsSavingEmail(true);
@@ -113,9 +116,9 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
       {/* Settings Sub-tabs */}
       <div className="flex gap-1 p-1 bg-elevated rounded-2xl border border-subtle mb-6">
         {[
-          { id: 'general', label: 'General' },
-          { id: 'audio', label: 'Audio' },
-          { id: 'voice', label: 'Voice' },
+          { id: 'general', label: t('profile.settings.tabs.general') },
+          { id: 'audio', label: t('profile.settings.tabs.audio') },
+          { id: 'voice', label: t('profile.settings.tabs.voice') },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -138,11 +141,21 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
       <div className="space-y-4">
         {settingsTab === 'general' && (
           <>
+            <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl overflow-visible">
+              <div>
+                <span className="text-sm font-mono text-primary">{t('profile.settings.general.language')}</span>
+                <p className="text-[10px] font-mono text-muted uppercase mt-0.5">
+                  {t('profile.settings.general.language_desc')}
+                </p>
+              </div>
+              <LanguageSwitcher variant="solid" />
+            </div>
+
             <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
               <div>
-                <span className="text-sm font-mono text-primary">Light Mode</span>
+                <span className="text-sm font-mono text-primary">{t('profile.settings.general.light_mode')}</span>
                 <p className="text-[10px] font-mono text-muted uppercase mt-0.5">
-                  Switches to a light colour scheme
+                  {t('profile.settings.general.light_mode_desc')}
                 </p>
               </div>
               <button
@@ -161,7 +174,7 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
               </button>
             </div>
             <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
-              <span className="text-sm font-mono text-primary">Fullscreen</span>
+              <span className="text-sm font-mono text-primary">{t('profile.settings.general.fullscreen')}</span>
               <button
                 onClick={toggleFullscreen}
                 className={cn(
@@ -179,7 +192,7 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
             </div>
             <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-mono text-primary">UI Scale</span>
+                <span className="text-sm font-mono text-primary">{t('profile.settings.general.ui_scale')}</span>
                 <span className="text-xs font-mono text-muted">
                   {Math.round(uiScaleSetting * 100)}%
                 </span>
@@ -194,15 +207,15 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
                 className="w-full accent-red-900"
               />
               <p className="text-[10px] font-mono text-ghost uppercase">
-                Adjusts the overall interface size
+                {t('profile.settings.general.ui_scale_desc')}
               </p>
             </div>
             <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
                 <div>
-                  <span className="text-sm font-mono text-primary">Recovery Email</span>
+                  <span className="text-sm font-mono text-primary">{t('profile.settings.general.recovery_email')}</span>
                   <p className="text-[10px] font-mono text-muted uppercase mt-0.5">
-                    Used for password recovery
+                    {t('profile.settings.general.recovery_email_desc')}
                   </p>
                 </div>
                 {!isEditingEmail && (
@@ -225,7 +238,7 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
                     type="email"
                     value={newEmail}
                     onChange={(e) => setNewEmail(e.target.value)}
-                    placeholder="Enter recovery email"
+                    placeholder={t('profile.settings.general.recovery_email_placeholder')}
                     onKeyDown={(e) => e.key === 'Enter' && handleUpdateEmail()}
                     className="flex-1 bg-card border border-primary text-primary px-3 py-1.5 rounded-lg text-sm font-mono focus:outline-none"
                     disabled={isSavingEmail}
@@ -260,7 +273,7 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
                       user.email ? 'text-primary' : 'text-red-400 italic'
                     )}
                   >
-                    {user.email || 'Not set — recovery unavailable'}
+                    {user.email || t('profile.settings.general.no_recovery_email')}
                   </span>
                 </div>
               )}
@@ -271,7 +284,7 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
         {settingsTab === 'audio' && (
           <>
             <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
-              <span className="text-sm font-mono text-primary">Music</span>
+              <span className="text-sm font-mono text-primary">{t('profile.settings.audio.music')}</span>
               <button
                 onClick={() => setIsMusicOn(!isMusicOn)}
                 className={cn(
@@ -288,7 +301,7 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
               </button>
             </div>
             <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
-              <span className="text-sm font-mono text-primary">Music Volume</span>
+              <span className="text-sm font-mono text-primary">{t('profile.settings.audio.music_volume')}</span>
               <input
                 type="range"
                 min="0"
@@ -299,7 +312,7 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
               />
             </div>
             <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
-              <span className="text-sm font-mono text-primary">Sound Effects</span>
+              <span className="text-sm font-mono text-primary">{t('profile.settings.audio.sfx')}</span>
               <button
                 onClick={() => setIsSoundOn(!isSoundOn)}
                 className={cn(
@@ -316,7 +329,7 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
               </button>
             </div>
             <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
-              <span className="text-sm font-mono text-primary">Sound Effects Volume</span>
+              <span className="text-sm font-mono text-primary">{t('profile.settings.audio.sfx_volume')}</span>
               <input
                 type="range"
                 min="0"
@@ -332,7 +345,7 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
         {settingsTab === 'voice' && (
           <>
             <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
-              <span className="text-sm font-mono text-primary">AI Voice Chat</span>
+              <span className="text-sm font-mono text-primary">{t('profile.settings.voice.ai_voice')}</span>
               <button
                 onClick={() => setIsAiVoiceEnabled(!isAiVoiceEnabled)}
                 className={cn(
@@ -350,13 +363,13 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
             </div>
 
             <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
-              <span className="text-sm font-mono text-primary">TTS Voice</span>
+              <span className="text-sm font-mono text-primary">{t('profile.settings.voice.tts_voice')}</span>
               <select
                 value={ttsVoice}
                 onChange={(e) => setTtsVoice(e.target.value)}
                 className="w-full bg-card text-primary p-2 rounded-xl text-sm font-mono border border-default"
               >
-                <option value="">Default</option>
+                <option value="">{t('profile.settings.voice.tts_default')}</option>
                 {voices.map((v) => (
                   <option key={v.name} value={v.name}>
                     {v.name} ({v.lang})
@@ -367,7 +380,7 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
 
             <div className="p-4 bg-elevated border border-subtle rounded-2xl space-y-2">
               <div className="flex justify-between items-center">
-                <span className="text-sm font-mono text-primary">Narrator Volume</span>
+                <span className="text-sm font-mono text-primary">{t('profile.settings.voice.narrator_volume')}</span>
                 <span className="text-xs font-mono text-muted">{ttsVolume}%</span>
               </div>
               <input
@@ -379,7 +392,7 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
                 className="w-full accent-emerald-900"
               />
               <p className="text-[10px] font-mono text-ghost uppercase mt-1">
-                Adjusts the loudness of the AI Narrator
+                {t('profile.settings.voice.narrator_volume_desc')}
               </p>
             </div>
           </>

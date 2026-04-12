@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../../../contexts/I18nContext';
 import { Search, Users, Shield, Ban, ChevronRight } from 'lucide-react';
 import { User } from '../../../../shared/types';
 import { cn, apiUrl, debugLog, debugError } from '../../../utils/utils';
@@ -22,6 +23,7 @@ export const AdminUserSearch: React.FC<AdminUserSearchProps> = ({
   adminId, token, searchQuery, setSearchQuery, results, setResults,
   selectedUser, setSelectedUser, loading, setLoading, hasSearched, setHasSearched
 }) => {
+  const { t } = useTranslation();
   const handleSearchUsers = async () => {
     if (!searchQuery.trim() || !adminId) return;
     setLoading(true);
@@ -53,7 +55,7 @@ export const AdminUserSearch: React.FC<AdminUserSearchProps> = ({
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearchUsers()}
-            placeholder="Search users by username or ID..."
+            placeholder={t('profile.admin.rooms.filter_placeholder')}
             className="w-full bg-white border border-subtle rounded-xl py-3 pl-10 pr-4 text-sm font-mono text-black placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-yellow-500/50 shadow-sm transition-all"
           />
         </div>
@@ -62,13 +64,13 @@ export const AdminUserSearch: React.FC<AdminUserSearchProps> = ({
           disabled={loading}
           className="bg-yellow-600 hover:bg-yellow-500 disabled:opacity-50 text-black px-8 rounded-xl font-thematic uppercase tracking-widest text-xs transition-all shadow-md active:scale-95 disabled:active:scale-100"
         >
-          {loading ? 'Searching...' : 'Search'}
+          {loading ? t('common.searching') : t('common.search')}
         </button>
       </div>
 
       <div className="space-y-2.5">
         <div className="text-[10px] font-mono text-faint uppercase font-bold tracking-[0.2em] mb-2 px-2">
-          Results
+          {t('common.results')}
         </div>
         {results.map((user) => (
           <button
@@ -112,7 +114,7 @@ export const AdminUserSearch: React.FC<AdminUserSearchProps> = ({
           <div className="py-16 text-center bg-elevated/20 border border-dashed border-subtle rounded-3xl">
             <Users className="w-8 h-8 text-ghost/20 mx-auto mb-3" />
             <p className="text-ghost text-[10px] font-mono uppercase tracking-widest italic">
-              {hasSearched ? 'No players found matching criteria' : 'Enter criteria above'}
+              {hasSearched ? t('social.friends.search_no_results', { query: searchQuery }) : t('profile.admin.logs.waiting')}
             </p>
           </div>
         )}

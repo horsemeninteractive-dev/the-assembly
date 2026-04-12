@@ -40,6 +40,7 @@ import {
   isStripeEventProcessed,
   recordStripeEvent,
 } from './server/supabaseService.ts';
+import { getMatchById } from './server/db/matches.ts';
 import { pubClient, subClient, isRedisConfigured, setUserSocketId, getSocketId, getUserSocketId, removeUserSocketId, refreshUserStatus } from './server/redis.ts';
 import { SystemConfig } from './shared/types.ts';
 import { registerStripeWebhook, stripe } from './server/handlers/stripeHandler.ts';
@@ -378,7 +379,7 @@ async function startServer() {
     socket.on('joinRoom', async (payload: any) => 
       await handleJoinRoom(socket, io, engine, userSockets, configRef.current, payload)
     );
-
+  });
 
   app.get('/m/:data', (req, res) => {
     const encoded = req.params.data;
@@ -552,7 +553,7 @@ async function startServer() {
         </div>
 
         <div class="moments">
-            ${state.k.map(m => `<div class="moment">${m}</div>`).join('')}
+            ${state.k.map((m: any) => `<div class="moment">${m}</div>`).join('')}
         </div>
 
         <a href="/" class="cta">ENTER THE ASSEMBLY</a>

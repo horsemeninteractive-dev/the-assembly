@@ -1,0 +1,1040 @@
+{
+  "common": {
+    "title": "L'ASSEMBLÉE",
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "success": "Succès",
+    "cancel": "Annuler",
+    "confirm": "Confirmer",
+    "back": "Retour",
+    "save": "Enregistrer",
+    "close": "Fermer",
+    "leave": "Quitter",
+    "ready": "Prêt !",
+    "not_ready": "Prêt",
+    "submit": "Soumettre",
+    "total": "Total",
+    "create": "Créer",
+    "active": "Actif",
+    "searching": "Recherche...",
+    "error_invalid_email": "Adresse e-mail invalide"
+  },
+  "auth": {
+    "back": "Retour",
+    "recovery_title": "Récupération de compte",
+    "welcome_back": "Bienvenue à nouveau, Délégué",
+    "register_assembly": "S'inscrire à l'Assemblée",
+    "form": {
+      "username": "Nom d'utilisateur",
+      "username_placeholder": "Identifiant de l'agent",
+      "email": "E-mail",
+      "password": "Clé sécurisée",
+      "forgot_password": "Clé oubliée ?",
+      "sign_in": "Se connecter",
+      "create_account": "Créer un compte",
+      "or_continue": "Ou continuer avec",
+      "register_prompt": "Vous n'avez pas de compte ? S'inscrire",
+      "login_prompt": "Vous avez déjà un compte ? Connexion",
+      "choose_avatar": "Choisissez Avatar"
+    }
+  },
+  "landing": {
+    "nav": {
+      "login": "Connectez-vous",
+      "play": "Jouez maintenant"
+    },
+    "hero": {
+      "tagline": "Un jeu de déduction sociale de rôles cachés, d'intrigues politiques,",
+      "cta_play": "et une confiance impossible.",
+      "discover": "Jouez maintenant — gratuitement"
+    },
+    "about": {
+      "label": "Découvrez",
+      "title": "Qu'est-ce que l'Assemblée ?",
+      "subtitle": "Un thriller politique joué en temps réel. 5 à 10 joueurs assument des rôles secrets et doivent se tromper, déduire et se déjouer les uns les autres au cours d'une série de cycles législatifs sous haute pression.",
+      "stat_players": "Joueurs par partie",
+      "stat_policies": "Cartes politiques empilées contre vous",
+      "stat_agendas": "Agendas personnels à compléter",
+      "quote": "Le vieux monde s'est terminé avec la crise. Désormais, seule L'Assemblée tient debout…",
+      "quote_cta": "Défendrez-vous la Charte Civile, ou bâtirez-vous le nouvel Etat ?"
+    },
+    "factions": {
+      "label": "Choisissez votre camp",
+      "title": "Deux factions. Une Assemblée.",
+      "subtitle": "Chaque joueur est secrètement assigné à une faction au début de chaque partie. La majorité ne saura pas à qui faire confiance.",
+      "civil": {
+        "title": "Civil",
+        "desc": "La majorité. Isolé dans votre fidélité. Vous ne savez pas qui sont vos alliés, seulement que les dés sont contre vous et que quelqu'un à cette table est un traître.",
+        "win_1": "Adopter 5 directives civiles",
+        "win_2": "Exécuter le surveillant"
+      },
+      "state": {
+        "title": "État",
+        "desc": "La minorité. Caché parmi les délégués civils, se coordonnant secrètement. Vous connaissez vos alliés. Ce dont vous avez besoin, c'est du bon moment.",
+        "win_1": "Adopter 6 directives de l'État",
+        "win_2": "Élire le surveillant comme chancelier"
+      },
+      "overseer": {
+        "title": "Le surveillant",
+        "desc": "Un agent de l'État qui ne connaît peut-être pas les autres acteurs de l'État. Leur élection au poste de chancelier après 3 directives de l'État met immédiatement un terme à la partie."
+      },
+      "win_conditions": "Conditions de victoire"
+    },
+    "loop": {
+      "label": "Comment ça se joue",
+      "title": "Un tour. Cinq instants.",
+      "subtitle": "Chaque tour oblige chaque joueur à participer, à déclarer et à être jugé. Il n'y a pas de cachette.",
+      "step_1": "Le Président nomme un Chancelier. Celui en qui vous avez confiance – et celui que vous nommez – révèle tout.",
+      "step_2": "Tous les joueurs votent simultanément. Public, incontournable et ouvert à l’interprétation.",
+      "label_3": "Session législative",
+      "step_3": "Le président pioche 3 cartes politiques, en défausse 1 et en passe 2 au chancelier. Un sera adopté.",
+      "label_4": "Déclarations",
+      "step_4": "Les deux parties déclarent ce qui s'est passé lors de la séance. Ces déclarations peuvent être des mensonges – des mensonges flagrants et convaincants.",
+      "label_5": "Action exécutive",
+      "step_5": "Assez de politiques d'État et le président exerce le pouvoir – enquêtes, détentions, exécutions."
+    },
+    "features": {
+      "label": "Ce qui est inclus",
+      "title": "Plus qu'un jeu de société.",
+      "item_1": {
+        "label": "5 à 10 joueurs",
+        "desc": "Passez de la déduction serrée à la tromperie tentaculaire."
+      },
+      "item_2": {
+        "label": "Joueurs IA",
+        "desc": "Remplissez les sièges vides d'IA, chacun avec sa propre personnalité."
+      },
+      "item_3": {
+        "label": "Rôles de titre",
+        "desc": "Pouvoirs à usage unique : Interdicteur, Assassin, Courtier et plus encore."
+      },
+      "item_4": {
+        "label": "Agendas personnels",
+        "desc": "20 objectifs cachés indépendants de votre faction."
+      },
+      "item_5": {
+        "label": "Mode crise",
+        "desc": "Directives de chaos facultatives qui réécrivent les règles en cours de partie."
+      },
+      "item_6": {
+        "label": "Système de clan",
+        "desc": "Formez un clan, définissez une bannière, construisez un héritage."
+      },
+      "item_7": {
+        "label": "Rangs de saison",
+        "desc": "Grimpez les échelons. Gagnez de la PI. Débloquez des produits cosmétiques."
+      },
+      "item_8": {
+        "label": "Jeu gratuit",
+        "desc": "Tout le gameplay est gratuit. Les cosmétiques sont facultatifs."
+      }
+    },
+    "cta": {
+      "title": "Prenez place.",
+      "subtitle": "Jouer gratuitement. Aucun téléchargement. L’Assemblée attend.",
+      "button": "Créer un compte"
+    }
+  },
+  "lobby": {
+    "header": {
+      "subtitle": "Lobby de l'Assemblée",
+      "leaderboard": "Classement",
+      "profile": "Mon profil",
+      "view_profile": "Afficher le profil",
+      "how_to_play": "Comment jouer",
+      "logout": "Se déconnecter"
+    },
+    "ranks": {
+      "initiate": "Initier",
+      "trainee": "Stagiaire",
+      "delegate": "Délégué",
+      "official": "Officiel",
+      "high_delegate": "Haut Délégué",
+      "consul": "Consul",
+      "assembly_master": "Maître d'Assemblée",
+      "overseer": "Surveillant"
+    },
+    "matchmaking": {
+      "title": "Assembler un match",
+      "subtitle": "Rejoignez une file d'attente compétitive ou trouvez une salle occasionnelle.",
+      "searching": "Recherche…",
+      "joining": "Rejoindre !",
+      "no_rooms": "Aucune salle",
+      "quick_join": "Rejoindre rapidement",
+      "quick_join_desc": "Meilleure salle disponible",
+      "create": "Créer une assemblée",
+      "create_desc": "Convoquer votre propre",
+      "practice": "Entraînement en solo",
+      "practice_desc": "Entraînement contre des robots IA",
+      "practice_short": "Entraînement",
+      "global_war": "Guerre mondiale",
+      "stats_running": "Assemblées en cours",
+      "stats_members": "Membres actifs"
+    },
+    "browser": {
+      "rejoin_title": "Assemblée active trouvée",
+      "rejoin_subtitle": "Vous vous êtes déconnecté de : {{name}}",
+      "rejoin_btn": "Rejoindre le jeu",
+      "status_recruiting": "Recrutement",
+      "status_in_progress": "En cours",
+      "privacy_public": "Public",
+      "privacy_private": "Privé",
+      "privacy_friends": "Amis",
+      "status_locked": "Verrouillé",
+      "players_count": "{{count}}/{{max}}",
+      "btn_join": "Rejoindre",
+      "btn_watch": "Regarder",
+      "filter_joinable": "Rejoignable",
+      "filter_active": "Actif",
+      "sort_label": "Trier",
+      "sort_new": "Nouveau",
+      "sort_full": "Complet",
+      "empty_no_rooms": "Aucune salle active trouvée.",
+      "empty_no_match": "Aucune pièce ne correspond à vos filtres.",
+      "empty_create_prompt": "Soyez le premier à en créer un",
+      "empty_clear_filters": "Effacer les filtres",
+      "private_modal_title": "Salle privée",
+      "private_modal_subtitle": "Saisissez le code d'invitation à 4 caractères.",
+      "private_modal_cancel": "Annuler"
+    },
+    "sidebar": {
+      "actions": "Actions"
+    },
+    "footer": {
+      "published_by": "Publié par",
+      "credits": "Crédits",
+      "legal": "Informations légales"
+    }
+  },
+  "game": {
+    "round": "Tour {{round}}",
+    "phase": "Phase : {{phase}}",
+    "civil_directives": "Directives civiles",
+    "state_directives": "Directives étatiques",
+    "winner": "{{faction}} Victoire !",
+    "gameOver": "G A M E O V E R",
+    "phases": {
+      "lobby": "En attente des joueurs ({{current}}/{{max}})...",
+      "nominate_chancellor": "{{name}} nomme un chancelier.",
+      "nomination_review": "L'Assemblée examine la candidature.",
+      "interdictor_review": "Interdictor choisit une cible.",
+      "broker_review": "Le courtier examine la candidature.",
+      "voting": "L'Assemblée vote.",
+      "legislative_president": "Le président révise les directives.",
+      "strategist_deck": "Le stratège regarde le deck.",
+      "legislative_chancellor": "Le Chancelier promulgue une directive.",
+      "auditor_inspect": "L'auditeur inspecte la pile de défausse.",
+      "defector_align": "Le transfuge envisage un réalignement secret.",
+      "quorum_revote": "Le quorum décide d'un nouveau vote d'urgence.",
+      "assassin_target": "Assassin choisit une cible."
+    },
+    "dossier": {
+      "title": "Votre dossier secret",
+      "identity": "Identité secrète",
+      "identity_civil": "Identité politique : Civile",
+      "identity_overseer": "Identité politique : Surveillant",
+      "identity_state": "Identité politique : État",
+      "agenda": "Agenda personnel",
+      "agenda_none": "Aucun agenda assigné.",
+      "agenda_bonus": "Terminer cette opération permet d'obtenir un bonus d'XP et d'IP égal à une victoire de faction.",
+      "title_role": "Rôle titre",
+      "title_none": "Aucun rôle titre attribué.",
+      "faction_state": "Faction d'État",
+      "awaiting": "En attente d'attribution de rôle...",
+      "close": "Fermer le dossier"
+    },
+    "powers": {
+      "peek": {
+        "name": "Aperçu de la politique",
+        "desc": "Le président présente un aperçu des 3 principales directives"
+      },
+      "kill": {
+        "name": "Exécution",
+        "desc": "Le président exécute un joueur"
+      },
+      "inv": {
+        "name": "Enquête",
+        "desc": "Le président enquête sur le parti d'un joueur"
+      },
+      "spec": {
+        "name": "Élection spéciale",
+        "desc": "Le président choisit le prochain candidat"
+      },
+      "win": {
+        "name": "Victoire de l'État",
+        "desc": "L'État gagne immédiatement"
+      },
+      "investigate": "Enquête",
+      "special_election": "Élection spéciale",
+      "execution": "Exécution",
+      "policy_peek": "Aperçu de la politique"
+    },
+    "titles": {
+      "interdictor": {
+        "name": "Interdicteur",
+        "action": "Détention"
+      },
+      "broker": {
+        "name": "Courtier",
+        "action": "Veto"
+      },
+      "strategist": {
+        "name": "Stratège",
+        "action": "Tirage au sort 4"
+      },
+      "auditor": {
+        "name": "Auditeur",
+        "action": "Inspecter"
+      },
+      "assassin": {
+        "name": "Assassin",
+        "action": "Exécuter"
+      },
+      "handler": {
+        "name": "Gestionnaire",
+        "action": "Échange"
+      },
+      "defector": {
+        "name": "Transfuge",
+        "action": "Vote inversé"
+      },
+      "archivist": {
+        "name": "Archiviste",
+        "action": "Inspecter en profondeur"
+      },
+      "quorum": {
+        "name": "Quorum",
+        "action": "Re-vote d'urgence"
+      },
+      "cipher": {
+        "name": "Chiffre",
+        "action": "Envoi"
+      }
+    },
+    "tracks": {
+      "civil_label": "Civil",
+      "state_label": "État",
+      "deck": "Deck",
+      "discard": "Rejeter",
+      "spectators": "Spectateurs ({{count}})",
+      "election_tracker": "Suivi des élections",
+      "win_civil": "Charte restaurée",
+      "win_civil_desc": "Civil gagne immédiatement",
+      "win_state": "Suprématie de l'État",
+      "win_state_desc": "État gagne immédiatement",
+      "quorum_revote": "RÉVOQUER"
+    },
+    "player_card": {
+      "candidate": "Candidat",
+      "nominated": "Nominé",
+      "eliminated": "Éliminé",
+      "president": "Président",
+      "chancellor": "Chancelier",
+      "detained": "Détenu",
+      "censured": "Censuré",
+      "reconnecting": "Reconnexion",
+      "nominate": "Nommer",
+      "execute": "Exécuter",
+      "detain": "Détenir",
+      "censure": "Censure",
+      "selected": "Sélectionné",
+      "exclude_hint": "Exclure des nominations",
+      "proven_not_overseer": "Prouvé non superviseur",
+      "aria_label": "Joueur {{name}}{{you}}"
+    },
+    "action_bar": {
+      "current_phase": "Phase actuelle",
+      "crisis_active": "Crise active",
+      "anonymous_dispatch": "Envoi anonyme intercepté",
+      "encrypted_dispatch": "Canal de répartition crypté",
+      "cipher_placeholder": "Saisir un message (max 80 caractères)...",
+      "quick_reactions": "Réactions rapides",
+      "toggle_reactions": "Basculer les réactions",
+      "mute": "Couper le micro",
+      "unmute": "Réactiver le micro",
+      "stop_video": "Arrêter la vidéo",
+      "start_video": "Démarrer la vidéo",
+      "declaring": "Les joueurs déclarent des directives.",
+      "handler_active": "Le gestionnaire utilise son pouvoir.",
+      "censure_debate": "L'Assemblée débat d'une motion de censure.",
+      "snap_volunteers": "Les bénévoles se mobilisent pour les élections anticipées.",
+      "crisis_incoming": "Événement de crise entrant...",
+      "investigating": "Le président enquête sur la loyauté d'un joueur.",
+      "calling_special": "Le président convoque une élection spéciale.",
+      "executing": "Le président exécute un joueur.",
+      "peeking": "Le président examine les trois principales politiques.",
+      "deciding": "Le président décide d'une action exécutive.",
+      "victorious": "{{faction}} faction victorieuse !",
+      "in_session": "L'Assemblée est en session.",
+      "nominate_prompt": "Appuyez sur un joueur sur le plateau pour le nommer chancelier.",
+      "nominate_watch": "Regardez la nomination : elle révèle à qui le président fait confiance.",
+      "detained_cant_vote": "Vous êtes détenu et ne pouvez pas voter pour ce tour.",
+      "voting_prompt": "Votez OUI pour soutenir ce gouvernement ou NON pour le bloquer.",
+      "discard_prompt": "Défaussez une carte de politique. Les deux autres vont au Chancelier.",
+      "pass_watch": "Le président choisit la politique à transmettre au chancelier.",
+      "declaration_hint": "Les déclarations indiquent à la table ce qui a été dessiné et adopté. Ce sont peut-être des mensonges.",
+      "enact_prompt": "Adoptez une stratégie. Vous pouvez proposer un veto si plus de 5 directives d'État sont adoptées.",
+      "enact_watch": "Le Chancelier choisit la politique à mettre en œuvre.",
+      "investigate_prompt": "Sélectionnez un joueur pour enquêter sur sa loyauté envers le parti.",
+      "special_prompt": "Sélectionnez un joueur pour être le prochain président.",
+      "execute_prompt": "Sélectionnez un joueur à exécuter.",
+      "peek_prompt": "Passez en revue les 3 premières cartes du jeu.",
+      "must_use_power": "Vous devez utiliser votre pouvoir exécutif.",
+      "pres_must_use": "Le Président doit utiliser son pouvoir exécutif.",
+      "lobby_ready_prompt": "Appuyez sur Prêt lorsque vous êtes prêt à commencer. Le jeu commence lorsque tous les joueurs sont prêts."
+    },
+    "chat": {
+      "title": "Chat d'Assemblée",
+      "round_separator": "Manche {{count}}",
+      "dead_cant_speak": "Les joueurs morts ne peuvent pas parler...",
+      "placeholder": "Tapez un message..."
+    },
+    "game_header": {
+      "prediction_civil": "Civil {{percent}}%",
+      "prediction_state": "État {{percent}}%",
+      "spectator_vote": "{{count}} Vote des spectateurs",
+      "spectator_votes": "{{count}} Votes des spectateurs",
+      "open_chat": "Chat ouvert",
+      "round_history": "Historique de la manche",
+      "phase_reference": "Référence de phase",
+      "your_dossier": "Votre dossier",
+      "my_profile": "Mon profil",
+      "leave_assembly": "Quitter l'Assemblée"
+    },
+    "modals": {
+      "friend_request": {
+        "title": "Demande d'ami",
+        "description": "<1>{{username}}</1> veut devenir amis.",
+        "deny": "Refuser",
+        "accept": "Accepter"
+      },
+      "investigation": {
+        "title": "Résultat de l'enquête",
+        "is_a": "{{name}} est un :",
+        "civil": "CIVIL",
+        "state": "ÉTAT",
+        "understood": "Compris"
+      },
+      "policy_peek": {
+        "title": "Aperçu des directives",
+        "subtitle": "Les 3 premières directives du jeu :",
+        "empty": "La pile est actuellement vide.",
+        "end": "Fin du Peek"
+      },
+      "declaration": {
+        "title": "Déclaration de directive",
+        "subtitle": "Que déclarerez-vous ?",
+        "hint": "Vous pouvez rapporter la vérité ou induire l'Assemblée en erreur.",
+        "drew_label": "Ce que vous avez pioché <1>(3 cartes)</1>",
+        "passed_label": "Ce que vous avez réussi <1>(2 cartes)</1>",
+        "received_label": "Ce que vous avez reçu <1>(2 cartes)</1>",
+        "result_drew": "Tiré : <1>{{civ}} Civil</1> / <3>{{sta}} État</3>",
+        "result_passed": "Réussi : <1>{{civ}} Civil</1> / <3>{{sta}} État</3>",
+        "result_received": "Reçu : <1>{{civ}} Civil</1> / <3>{{sta}} État</3>",
+        "submit": "Soumettre la déclaration"
+      },
+      "player_profile": {
+        "loading": "Chargement du profil...",
+        "failed": "Échec du chargement du profil.",
+        "close": "Fermer",
+        "wins": "Victoires",
+        "played": "Joué",
+        "win_rate": "Taux de victoire",
+        "kills": "Tués",
+        "pinned_achievements": "Médailles épinglées",
+        "empty_slot": "— emplacement vide —",
+        "add_friend": "Ajouter un allié",
+        "remove_friend": "Supprimer un allié",
+        "request_sent": "Demande envoyée"
+      }
+    },
+    "assembly_log": {
+      "title": "Journal de l'Assemblée",
+      "event_num": "Événement n°{{count}}"
+    },
+    "debrief": {
+      "intro_title": "L'Assemblée est terminée",
+      "charter_defended": "La Charte a été défendue.",
+      "secretariat_fallen": "Le Secrétariat est tombé aux mains de l'État.",
+      "key_moments": "Moments clés",
+      "identities_confirmed": "Toutes les identités confirmées",
+      "tap_to_advance": "Appuyez pour avancer",
+      "roles": {
+        "civil": "Civil",
+        "state": "Agent d'État",
+        "overseer": "Le surveillant"
+      },
+      "plays": {
+        "assassin": "{{assassin}} éliminé {{killed}} car l'assassin",
+        "execution_one": "{{name}} a été exécuté par décret présidentiel",
+        "execution_many": "{{names}} ont été exécutés par décret présidentiel",
+        "chaos_one": "Une directive du chaos a été imposée à l'Assemblée",
+        "chaos_many": "{{count}} les directives du chaos ont déstabilisé l'Assemblée",
+        "veto_one": "Le gouvernement a invoqué son droit de veto",
+        "veto_many": "Le veto a été exercé {{count}} fois",
+        "marathon": "Une épopée {{count}}-bataille de volontés",
+        "deadlock": "Les deux factions ont tenu l'Assemblée dans une impasse"
+      }
+    },
+    "tutorial": {
+      "back": "Précédent",
+      "next": "Suivant",
+      "enter": "Entrez dans l'Assemblée",
+      "skip": "Passer le didacticiel",
+      "error_general": "Une erreur s'est produite",
+      "error_invalid_email": "Adresse e-mail invalide",
+      "premise": {
+        "title": "L'Assemblée",
+        "subtitle": "Un jeu de loyauté cachée",
+        "p1": "Le monde s'est terminé avec {{crisis}}. Ce qui reste, c'est l'Assemblée – un conseil de délégués essayant de gouverner les ruines.",
+        "p2": "Mais tout le monde ne souhaite pas rétablir l’ordre. Certains veulent construire un nouvel État – et l’un d’entre eux, le {{overseer}}, attend de s’emparer du pouvoir total.",
+        "label": "L'Assemblée est",
+        "desc": "Un jeu de déduction sociale pour 5 à 10 joueurs. On vous confie un rôle secret. Utilisez-le, couchez-vous avec ou mourez-en."
+      },
+      "roles": {
+        "civil": {
+          "name": "Civil",
+          "flavor": "Défendre la Charte. La crise ne doit pas consumer le Secrétariat."
+        },
+        "state": {
+          "name": "État",
+          "flavor": "Adopter les directives de l'État. Élevez le surveillant au pouvoir."
+        },
+        "overseer": {
+          "name": "Le surveillant",
+          "flavor": "Accédez à la chancellerie. La suprématie de l’État vous attend."
+        }
+      },
+      "loop": {
+        "title": "La boucle du jeu",
+        "subtitle": "Chaque tour suit la même séquence",
+        "step_1": {
+          "label": "Nomination présidentielle",
+          "desc": "Le président actuel nomme un candidat chancelier. Le rôle présidentiel change à chaque tour."
+        },
+        "step_2": {
+          "label": "Vote de l'Assemblée",
+          "desc": "Tous les joueurs vivants votent AYE ou NAY sur le gouvernement proposé. La majorité AYE l'adopte."
+        },
+        "step_3": {
+          "label": "Session législative",
+          "desc": "Le président pioche 3 cartes politiques, en défausse 1 et en passe 2 au chancelier. Le Chancelier en promulgue un."
+        },
+        "step_4": {
+          "label": "Déclarations",
+          "desc": "Le président et le chancelier déclarent publiquement quelles cartes ils ont vues et transmises. C’est ainsi que la confiance se construit – ou se brise."
+        },
+        "chaos_desc": "Si 3 élections consécutives échouent, un {{chaos}} est automatiquement tiré au sort et adopté sans vote."
+      },
+      "voting": {
+        "title": "Votes et déclarations",
+        "subtitle": "Le cœur de la déduction sociale",
+        "p1": "Les votes sont {{simultaneous}} jusqu'à ce qu'ils soient révélés. Vous ne pouvez pas voir comment les autres ont voté avant de voter.",
+        "aye": "OUI",
+        "aye_desc": "Soutenez ce gouvernement",
+        "nay": "NON",
+        "nay_desc": "Bloquez ce gouvernement",
+        "decl_label": "Déclarations",
+        "decl_p1": "Une fois qu'une politique est adoptée, le président et le chancelier déclarent publiquement quelles cartes ils ont tirées et adoptées. Ces affirmations peuvent être {{true_or_false}} — la table doit décider qui croire.",
+        "decl_hint": "Les contradictions entre les déclarations du président et du chancelier constituent votre indice le plus important."
+      },
+      "executive": {
+        "title": "Actions exécutives",
+        "subtitle": "Le pouvoir augmente à mesure que l'État progresse",
+        "p1": "Chaque fois qu'une directive de l'État est promulguée, le président peut débloquer un pouvoir exécutif spécial. Celles-ci deviennent de plus en plus dangereuses à mesure que l’État progresse.",
+        "actions": {
+          "peek": {
+            "name": "Aperçu de la politique",
+            "desc": "Consultez les 3 premières cartes de la pioche."
+          },
+          "investigate": {
+            "name": "Enquêter",
+            "desc": "Découvrez si un joueur est civil ou étatique (pas qui en particulier)."
+          },
+          "special": {
+            "name": "Élection spéciale",
+            "desc": "Choisissez qui sera le prochain président, en sautant la rotation normale."
+          },
+          "execution": {
+            "name": "Exécution",
+            "desc": "Éliminer définitivement un joueur. Si c'est le surveillant, Civil gagne instantanément."
+          }
+        },
+        "footer": "Les actions exécutives sont confiées au président actuel et doivent être utilisées avant le début du prochain tour."
+      },
+      "titles": {
+        "assassin": {
+          "name": "Assassin",
+          "desc": "Éliminez un joueur de la partie."
+        },
+        "strategist": {
+          "name": "Stratège",
+          "desc": "Dessinez une politique supplémentaire (4 au total) lorsque vous êtes président."
+        },
+        "broker": {
+          "name": "Courtier",
+          "desc": "Forcer une re-nomination si celle en cours est défavorable."
+        },
+        "handler": {
+          "name": "Gestionnaire",
+          "desc": "Échangez les deux joueurs suivants dans l'ordre présidentiel."
+        },
+        "auditor": {
+          "name": "Auditeur",
+          "desc": "Jetez un œil aux 3 dernières politiques rejetées après une session législative."
+        },
+        "interdictor": {
+          "name": "Interdicteur",
+          "desc": "Détenir un joueur pendant un tour."
+        },
+        "archivist": {
+          "name": "Archiviste",
+          "desc": "Inspectez toute la pile de défausse une fois par partie."
+        },
+        "defector": {
+          "name": "Transfuge",
+          "desc": "Inversez secrètement votre vote après la révélation initiale pour changer le résultat."
+        },
+        "quorum": {
+          "name": "Quorum",
+          "desc": "Appel à un nouveau vote d'urgence lors d'élections ratées sous haute tension."
+        },
+        "cipher": {
+          "name": "Chiffre",
+          "desc": "Envoyez une dépêche anonyme à la salle pendant la phase législative."
+        }
+      },
+      "agendas": {
+        "title": "Agendas personnels",
+        "subtitle": "Votre objectif individuel caché",
+        "p1": "Chaque joueur se voit secrètement attribuer un {{agenda}} — un objectif caché qui rapporte des bonus d'XP et d'IP s'il est atteint, que votre faction gagne ou perde.",
+        "examples_label": "Exemples d'agenda",
+        "examples": [
+          "Votez Non dans au moins 3 tours",
+          "Soyez nommé chancelier au moins deux fois",
+          "Le jeu doit se terminer avant le tour (nombre de joueurs + 3)",
+          "Aucune politique de chaos n'est adoptée pendant le jeu"
+        ],
+        "footer": "Compléter votre agenda vous récompense {{bonus}} et des IP bonus — la même chose que gagner avec votre faction. Gagnez {{and}} et complétez votre agenda pour des récompenses doubles.",
+        "footer_sub": "Votre agenda est visible dans votre Dossier à tout moment. Les autres ne peuvent pas le voir."
+      },
+      "tips": {
+        "title": "Survivre à l'Assemblée",
+        "subtitle": "Points clés à retenir",
+        "civil": {
+          "heading": "Joueurs civils : ne faites confiance à personne",
+          "body": "Vous êtes plus nombreux que l'État mais vous ne savez pas qui ils sont. Les déclarations contradictoires, les nominations suspectes et les schémas de vote sont vos seuls indices."
+        },
+        "state": {
+          "heading": "Joueurs étatiques : coordonnez-vous soigneusement.",
+          "body": "Vous connaissez vos alliés mais vous ne pouvez pas communiquer ouvertement. Coordonnez-vous à travers les nominations, les déclarations et les schémas de vote subtils – sans être évident."
+        },
+        "decl": {
+          "heading": "Les déclarations sont essentielles.",
+          "body": "Après chaque session législative, le président et le chancelier déclarent ce qu'ils ont vu. C’est en recoupant ces affirmations que vous détectez les mensonges."
+        },
+        "dossier": {
+          "heading": "Regardez votre dossier",
+          "body": "Votre rôle, votre titre et votre agenda personnel sont toujours visibles dans votre dossier : appuyez sur l'icône dans l'en-tête pendant une partie."
+        }
+      },
+      "dossier": {
+        "title": "Dossier confidentiel",
+        "identity": "Identité politique",
+        "identity_civil": "Civil",
+        "identity_state": "Agent d'État",
+        "identity_overseer": "Le surveillant",
+        "agenda": "Agenda personnel",
+        "agenda_bonus": "Terminer ce processus confère des bonus d'XP et d'IP.",
+        "agenda_none": "Aucun agenda personnel attribué.",
+        "title_role": "Rôle titre",
+        "title_none": "Aucun rôle titre attribué.",
+        "faction_state": "Faction d'État",
+        "awaiting": "En attente d'affectation...",
+        "close": "Fermer le dossier",
+        "active": "Actif"
+      },
+      "game_over": {
+        "title": "Résultats des matchs",
+        "banners": {
+          "civil_win_default": "Charte restaurée",
+          "state_win_default": "Suprématie de l'État",
+          "inconclusive": "Non concluant",
+          "civil_desc": "La Charte a été défendue.",
+          "state_desc": "Le Secrétariat est tombé aux mains de l'État.",
+          "abort_desc": "L'assemblage s'est effondré en raison d'une déconnexion."
+        },
+        "performance_header": "Performance du match",
+        "victory": "Victoire obtenue",
+        "defeat": "Mission échouée",
+        "elo": "ELO",
+        "xp": "XP",
+        "ip": "IP",
+        "clan_xp": "XP de clan",
+        "casual": "Casual",
+        "achievements_header": "Succès débloqués",
+        "revelations_header": "Révélations d'identité",
+        "agenda": "Agenda",
+        "title_role": "Titre",
+        "you": "Vous",
+        "action_log": "Afficher le journal d'assemblage",
+        "action_replay": "Reconstruire le match",
+        "action_share": "Copier le lien de partage",
+        "action_shared": "Lien copié",
+        "action_play_again": "Rejouer",
+        "action_lobby": "Lobby",
+        "completed": "Terminé",
+        "failed": "Échec"
+      },
+      "match_replay": {
+        "title": "Relecture du match",
+        "subtitle": "Reconstruction d'après-match",
+        "hide_deceptions": "Masquer les tromperies",
+        "reveal_truth": "Révéler la vérité",
+        "no_history": "Aucun historique enregistré pour ce match",
+        "government_header": "Tour {{round}} Gouvernement",
+        "president": "Président",
+        "chancellor": "Chancelier",
+        "session_summary": "Résumé de la session",
+        "chaos_forced": "Chaos forcé",
+        "rejected": "Gouvernement rejeté",
+        "fail_veto": "Les deux parties ont convenu d'exercer leur droit de veto.",
+        "fail_default": "L'Assemblée n'a pas réussi à confirmer cette coalition.",
+        "enacted": "Directive adoptée",
+        "power_triggered": "Pouvoir déclenché : {{action}}",
+        "legislative_hand": "Main législative",
+        "pres_deck": "Deck du président",
+        "chan_hand": "Main du chancelier",
+        "deception_detected": "Tromperie détectée",
+        "conflicting_stories": "Histoires contradictoires",
+        "actual_draw": "Tirage réel",
+        "actual_received": "Réel reçu",
+        "public_claim": "Réclamation publique",
+        "hidden": "CACHÉ",
+        "voting_records": "Dossiers de vote",
+        "aye": "Oui",
+        "nay": "Non",
+        "no_vote": "Aucun vote n'a eu lieu ce tour",
+        "footer_info": "La relecture utilise des données d'archives décryptées. Utilisez la chronologie ci-dessus pour parcourir les étapes du match.",
+        "close": "Fermer la reconstruction"
+      },
+      "modals": {
+        "friend_request": {
+          "title": "Demande d'allié",
+          "description": "<1>{{username}}</1> veut être allié.",
+          "deny": "Refuser",
+          "accept": "Accepter"
+        },
+        "declaration": {
+          "drew_label": "<1>Réclamation :</1> J'ai dessiné...",
+          "result_drew": "J'ai dessiné <1>{{civ}}C</1> & <3>{{sta}}S</3>",
+          "passed_label": "<1>Réclamation :</1> J'ai réussi...",
+          "received_label": "<1>Réclamation :</1> J'ai reçu...",
+          "result_passed": "J'ai réussi <1>{{civ}}C</1> & <3>{{sta}}S</3>",
+          "result_received": "J'ai reçu <1>{{civ}}C</1> & <3>{{sta}}S</3>",
+          "submit": "Soumettre la déclaration"
+        }
+      },
+      "how_to_play": {
+        "title": "Comment jouer",
+        "subtitle": "Référence aux règles",
+        "tabs": {
+          "overview": "Présentation",
+          "roles": "Rôles",
+          "loop": "Boucle de jeu",
+          "titles": "Titres",
+          "agendas": "Ordres du jour",
+          "tips": "Conseils"
+        },
+        "overview": {
+          "p1": "L'Assemblée est un {{social_deduction_game}} pour 5 à 10 joueurs. Chaque joueur se voit secrètement attribuer une faction – civile ou étatique – et doit travailler avec ou contre les autres pour atteindre la condition de victoire de sa faction.",
+          "civil_wins_label": "Le civil gagne en",
+          "civil_wins": [
+            "Adoptant 5 directives civiles",
+            "Exécutant le surveillant"
+          ],
+          "state_wins_label": "L'État gagne en",
+          "state_wins": [
+            "Adoptant 6 directives d'État",
+            "Élevant le chancelier surveillant (après 3 États)"
+          ],
+          "crisis_label": "Mode crise (haute intensité)",
+          "crisis_desc": "Une variante chaotique avec {{event_cards}}. À chaque tour, un événement aléatoire est tiré et peut geler le suivi des élections, interrompre le chat ou forcer des élections anticipées immédiates.",
+          "deck_label": "Deck de stratégie",
+          "deck_desc": "Le deck contient {{civil_count}} et {{state_count}} cartes de stratégie. Le jeu est contre le Civil – la déduction et la coordination sont essentielles.",
+          "tracker_label": "Suivi des élections",
+          "tracker_desc": "Si trois élections échouent d'affilée, un {{chaos_policy}} est tiré du haut du paquet et adopté automatiquement sans vote."
+        },
+        "roles_tab": {
+          "civil": {
+            "label": "Civil",
+            "desc": "La majorité. Vous ne savez pas qui sont vos alliés. Utilisez des déclarations, des schémas de vote et des nominations pour trouver les agents de l'État et les arrêter."
+          },
+          "state": {
+            "label": "État",
+            "desc": "La minorité. Vous savez qui sont vos alliés. Coordonnez-vous secrètement pour promulguer les directives de l'État ou faire élire le surveillant au poste de chancelier."
+          },
+          "overseer": {
+            "label": "Le Surveillant",
+            "desc": "Un agent de l'État qui ne connaît pas les autres acteurs de l'État. Gagne avec l'État. S'il est élu chancelier après l'adoption de 3 directives de l'État, l'État gagne immédiatement.",
+            "distribution_hint": "À 5 ou 6 joueurs, le Surveillant connaît les autres agents de l'État."
+          },
+          "distribution_label": "Répartition des rôles"
+        },
+        "loop_tab": {
+          "step_1": {
+            "label": "Nomination",
+            "desc": "Le président actuel nomme un chancelier. Le même joueur ne peut pas servir de chancelier lors de tours consécutifs (ou de président lors de parties plus importantes)."
+          },
+          "step_2": {
+            "label": "Votez",
+            "desc": "Tous les joueurs vivants votent simultanément AYE ou NAY. Une stricte majorité d’AYE passe au gouvernement. Les égalités et les partages égaux échouent."
+          },
+          "step_3": {
+            "label": "Session législative",
+            "desc": "Le président pioche 3 cartes, en défausse 1 face cachée et en passe 2 au chancelier. Le Chancelier promulgue la première, rejette l’autre. Aucun des deux ne peut voir ce que l’autre a rejeté."
+          },
+          "step_4": {
+            "label": "Déclarations",
+            "desc": "Le président déclare combien de civils/états ils ont tirés et adoptés. Le chancelier déclare combien ils en ont reçu et adopté. Ces affirmations peuvent être des mensonges."
+          },
+          "step_5": {
+            "label": "Action exécutive",
+            "desc": "Si une directive de l'État a été adoptée et que le nombre de joueurs/le nombre de directives déclenche un pouvoir, le président doit l'utiliser avant la fin du tour."
+          }
+        },
+        "titles_tab": {
+          "intro": "Les rôles de titre sont attribués aléatoirement au début du jeu. Chacun est à usage unique et tire à un moment précis du tour. Vérifiez votre dossier pour voir si vous en avez un.",
+          "roles": {
+            "interdictor": {
+              "name": "Interdicteur",
+              "when": "Début de chaque tour",
+              "desc": "Avant nomination : retenir un joueur pour ce tour. Ils ne peuvent ni voter ni être nommés chancelier. Une fois utilisé."
+            },
+            "broker": {
+              "name": "Courtier",
+              "when": "Après la nomination",
+              "desc": "Examinez la nomination du chancelier et mettez votre veto, forçant le président à nommer à nouveau. Une fois utilisé."
+            },
+            "strategist": {
+              "name": "Stratège",
+              "when": "En tant que Président",
+              "desc": "Lorsque vous êtes Président, piochez 4 cartes politiques au lieu de 3, puis défaussez-en 2. Une fois utilisées."
+            },
+            "auditor": {
+              "name": "Auditeur",
+              "when": "Après la promulgation",
+              "desc": "Jetez un œil aux 3 dernières cartes de la pile de défausse. Utile pour suivre les politiques qui ont disparu. Une fois utilisé."
+            },
+            "assassin": {
+              "name": "Assassin",
+              "when": "Après la promulgation (en tant que président)",
+              "desc": "Lorsque vous êtes président, exécutez secrètement tout joueur vivant après la fin du tour. Une fois utilisé."
+            },
+            "handler": {
+              "name": "Gestionnaire",
+              "when": "Après la promulgation",
+              "desc": "Échangez les deux joueurs suivants dans la rotation présidentielle. Le second devient Président avant le premier. Une fois utilisé."
+            },
+            "defector": {
+              "name": "Transfuge",
+              "when": "Vote (Révélation)",
+              "desc": "Modifiez secrètement votre vote après la révélation initiale mais avant que le résultat ne soit finalisé. Cela peut transformer une égalité 5-5 en une passe 6-4. Une fois utilisé."
+            },
+            "archivist": {
+              "name": "Archiviste",
+              "when": "Après la promulgation",
+              "desc": "Inspection approfondie : jetez un œil aux 3 premières cartes de la pioche avant le début du tour suivant. Une fois utilisé."
+            },
+            "quorum": {
+              "name": "Quorum",
+              "when": "Après l'échec des élections",
+              "desc": "Session d'urgence : forcer un nouveau vote immédiat sur le dernier gouvernement défaillant, en contournant le prochain président. Une fois utilisé."
+            },
+            "cipher": {
+              "name": "Chiffrement",
+              "when": "N'importe quelle phase",
+              "desc": "Envoie un message crypté unidirectionnel à n'importe quel joueur. Eux seuls peuvent voir le texte que vous envoyez. Une fois utilisé."
+            }
+          }
+        },
+        "agendas_tab": {
+          "p1": "Chaque joueur reçoit un {{personal_agenda}} caché au début de chaque partie. Le terminer rapporte {{xp_bonus}} – ce qui équivaut à gagner avec votre faction – quel que soit le résultat du jeu.",
+          "list_label": "Les 20 agendas",
+          "agendas": {
+            "chaos_agent": {
+              "name": "Agent du chaos",
+              "desc": "Déclenchez une politique du chaos au moins une fois"
+            },
+            "purist": {
+              "name": "Le puriste",
+              "desc": "Au moins 3 directives civiles adoptées"
+            },
+            "dissenter": {
+              "name": "Le dissident",
+              "desc": "Votez contre la majorité plus de 3 fois"
+            },
+            "dove": {
+              "name": "La Colombe",
+              "desc": "Votez oui à chaque tour éligible"
+            },
+            "hawk": {
+              "name": "Le faucon",
+              "desc": "Votez non dans au moins 3 tours"
+            },
+            "stonewalled": {
+              "name": "Stonewalled",
+              "desc": "Votez non sur 2 gouvernements qui échouent"
+            },
+            "short_session": {
+              "name": "Session courte",
+              "desc": "Le jeu se termine avant le tour (joueurs + 3)"
+            },
+            "long_game": {
+              "name": "Le jeu long",
+              "desc": "Le jeu dure au moins (joueurs + 6) tours"
+            },
+            "loyalist": {
+              "name": "Le loyaliste",
+              "desc": "Votez oui pour 3 gouvernements civils"
+            },
+            "nominated": {
+              "name": "Nominé",
+              "desc": "Être nommé chancelier deux fois"
+            },
+            "deadlock": {
+              "name": "Impasse",
+              "desc": "Être dans au moins 1 gouvernement défaillant"
+            },
+            "prolific": {
+              "name": "Prolifique",
+              "desc": "Adopter 2 politiques en tant que chancelier"
+            },
+            "veteran": {
+              "name": "Le vétéran",
+              "desc": "Servir comme chancelier au moins une fois"
+            },
+            "unity": {
+              "name": "Unité",
+              "desc": "Pas de politique de chaos pendant le jeu"
+            },
+            "mandate": {
+              "name": "Le mandat",
+              "desc": "Au moins 4 directives d'État promulguées"
+            },
+            "clean_sweep": {
+              "name": "Nettoyage",
+              "desc": "Adopter une directive civile en tant que chancelier"
+            },
+            "weathervane": {
+              "name": "La girouette",
+              "desc": "Changez votre vote Plus de 4 fois"
+            },
+            "productive": {
+              "name": "Session productive",
+              "desc": "Plus de la moitié des tours adoptent une politique"
+            },
+            "close_race": {
+              "name": "Course serrée",
+              "desc": "Pistes dans les 2 directives à la fin du jeu"
+            },
+            "swing_vote": {
+              "name": "Le vote swing",
+              "desc": "Faites partie d'un gouvernement qui passe par 1 voix"
+            }
+          }
+        },
+        "tips_tab": {
+          "civil": {
+            "label": "Pour les joueurs civils",
+            "tips": [
+              "Déclarations de références croisées : si le président dit qu'il a réussi le 1C/1S mais que le chancelier dit qu'il a reçu le 2S, quelqu'un ment.",
+              "Suivez l'historique des votes. Un vote non cohérent sans explication est suspect.",
+              "Soyez prudent avec les actions des dirigeants : enquêtez sur la base de preuves et non d'instincts.",
+              "The deck is State-heavy. Some State policies being enacted doesn't prove anyone is guilty."
+            ]
+          },
+          "state": {
+            "label": "For State Players",
+            "tips": [
+              "Coordinate declarations carefully. Contradicting your State ally's claim is a giveaway.",
+              "Nominate your State allies as Chancellor when possible — but not so obviously it looks suspicious.",
+              "Blame bad hands. \"I only had State cards\" is plausible because the deck is State-heavy.",
+              "The Overseer should stay quiet and unremarkable until the moment is right."
+            ]
+          },
+          "general": {
+            "label": "General",
+            "tips": [
+              "Use the chat and declarations together. What players say matters.",
+              "Your personal agenda might conflict with your faction's best play. That tension is intentional.",
+              "The round history button shows every government, every vote, and every declaration."
+            ]
+          }
+        }
+      }
+    }
+  },
+  "profile": {
+    "settings": {
+      "general": {
+        "language": "Language",
+        "language_desc": "Select your preferred language",
+        "light_mode": "Light Mode",
+        "light_mode_desc": "Toggle light mode for the interface",
+        "ui_scale": "UI Scale",
+        "ui_scale_desc": "Adjust the scale of interface elements",
+        "recovery_email": "Recovery Email",
+        "recovery_email_desc": "Used to recover your account if you lose your token",
+        "recovery_email_placeholder": "Enter recovery email...",
+        "no_recovery_email": "Not set"
+      },
+      "tabs": {
+        "general": "General",
+        "audio": "Audio",
+        "voice": "Voice"
+      }
+    }
+  },
+  "social": {
+    "clan": {
+      "profile_label": "Clan Profile",
+      "level": "Level",
+      "members": "Members",
+      "no_desc": "No description provided.",
+      "share_clan": "Share Clan",
+      "roster": "Clan Roster",
+      "contribution": "Contrib.",
+      "founded_on": "Clan founded on {{date}}",
+      "not_found": "Clan not found",
+      "load_failed": "Failed to load clan",
+      "check_tag": "Check the clan tag and try again.",
+      "return_home": "Return Home"
+    },
+    "friends": {
+      "search_placeholder": "Search players by username…",
+      "search_btn": "Allies",
+      "search_min_chars": "Type at least 2 characters to search",
+      "searching": "Searching…",
+      "search_no_results": "No players found for \"{{query}}\"",
+      "status_sent": "Sent",
+      "friends_label": "Allies",
+      "pending_requests": "Pending Requests ({{count}})",
+      "wants_to_be_friends": "Wants to be allies",
+      "no_friends": "No allies yet.",
+      "no_friends_hint": "Search for players above or add someone from a game.",
+      "online": "Online ({{count}})",
+      "offline": "Offline ({{count}})",
+      "in_game": "In assembly · {{roomId}}",
+      "in_lobby": "In lobby",
+      "recently_played": "Recently Played With",
+      "time_m_ago": "{{count}}m ago",
+      "time_h_ago": "{{count}}h ago",
+      "time_d_ago": "{{count}}d ago",
+      "add_friend": "Add Ally",
+      "invite_title": "Invite to assembly",
+      "join_title": "Join their assembly",
+      "remove_title": "Remove ally"
+    }
+  }
+}

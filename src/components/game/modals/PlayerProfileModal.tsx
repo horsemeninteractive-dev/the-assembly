@@ -19,6 +19,7 @@ import { socket } from '../../../socket';
 import { getLevelFromXp } from '../../../utils/xp';
 import { getRankTier, getRankLabel } from '../../../utils/ranks';
 import { ACHIEVEMENT_MAP } from '../../../utils/achievements';
+import { useTranslation } from '../../../contexts/I18nContext';
 
 interface PlayerProfileModalProps {
   userId: string;
@@ -35,6 +36,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
   playSound,
   onSendFriendRequest,
 }) => {
+  const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
   const [isFriend, setIsFriend] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -94,7 +96,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
   if (loading) {
     return (
       <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-backdrop-sm backdrop-blur-sm">
-        <div className="text-primary font-mono">Loading profile...</div>
+        <div className="text-primary font-mono">{t('game.modals.player_profile.loading')}</div>
       </div>
     );
   }
@@ -102,9 +104,9 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
   if (!user) {
     return (
       <div className="fixed inset-0 z-[120] flex items-center justify-center p-4 bg-backdrop-sm backdrop-blur-sm">
-        <div className="text-primary font-mono">Failed to load profile.</div>
+        <div className="text-primary font-mono">{t('game.modals.player_profile.failed')}</div>
         <button onClick={onClose} className="ml-4 text-primary underline">
-          Close
+          {t('game.modals.player_profile.close')}
         </button>
       </div>
     );
@@ -159,7 +161,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
               )}
             </div>
             <div className="absolute -bottom-2 -right-2 bg-red-900 border border-red-500 text-white text-[8px] font-mono px-2 py-0.5 rounded-xl shadow-lg">
-              LVL {getLevelFromXp(user.stats.xp)}
+              {t('profile.lvl_label')} {getLevelFromXp(user.stats.xp)}
             </div>
           </div>
 
@@ -193,22 +195,22 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
         <div className="p-[3vh] space-y-[3vh]">
           <div className="grid grid-cols-2 gap-3">
             <StatCard
-              label="Wins"
+              label={t('game.modals.player_profile.wins')}
               value={user.stats.wins}
               icon={<Trophy className="w-[1.5vh] h-[1.5vh]" />}
             />
             <StatCard
-              label="Played"
+              label={t('game.modals.player_profile.played')}
               value={user.stats.gamesPlayed}
               icon={<Shield className="w-[1.5vh] h-[1.5vh]" />}
             />
             <StatCard
-              label="Win Rate"
+              label={t('game.modals.player_profile.win_rate')}
               value={`${winRate}%`}
               icon={<Check className="w-[1.5vh] h-[1.5vh]" />}
             />
             <StatCard
-              label="Kills"
+              label={t('game.modals.player_profile.kills')}
               icon={<Zap className="w-[1.5vh] h-[1.5vh] text-yellow-500" />}
               value={user.stats.kills}
             />
@@ -228,7 +230,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
                 <div className="flex items-center gap-1.5 mb-2">
                   <Medal className="w-[1.5vh] h-[1.5vh] text-yellow-400" />
                   <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-muted">
-                    Pinned Achievements
+                    {t('game.modals.player_profile.pinned_achievements')}
                   </span>
                 </div>
                 <div className="space-y-1.5">
@@ -241,7 +243,7 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
                           key={i}
                           className="flex items-center gap-2 px-2.5 py-2 rounded-lg border border-dashed border-subtle text-faint text-[10px] font-mono"
                         >
-                          — empty slot —
+                          {t('game.modals.player_profile.empty_slot')}
                         </div>
                       );
                     }
@@ -277,13 +279,13 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
           >
             {isFriend ? (
               <>
-                <UserMinus size={14} /> Remove Friend
+                <UserMinus size={14} /> {t('game.modals.player_profile.remove_friend')}
               </>
             ) : isPending ? (
-              'Request Sent'
+              t('game.modals.player_profile.request_sent')
             ) : (
               <>
-                <UserPlus size={14} /> Add Friend
+                <UserPlus size={14} /> {t('game.modals.player_profile.add_friend')}
               </>
             )}
           </button>

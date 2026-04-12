@@ -1,7 +1,7 @@
 import { Policy } from '../shared/types';
 import { Request } from 'express';
 
-export const CLOUD_RUN_PATTERN = /^https:\/\/[a-z0-9-]+-[a-z0-9]+-[a-z]{2,4}\.a\.run\.app$/;
+export const CLOUD_RUN_PATTERN = /^https:\/\/[a-z0-9-]+\.[a-z0-9-]+\.run\.app$/;
 
 export function isAllowedOrigin(origin: string | undefined): boolean {
   if (!origin) return false;

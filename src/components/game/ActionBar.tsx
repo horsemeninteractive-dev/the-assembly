@@ -90,8 +90,7 @@ export const ActionBar = ({
         if (gameState.titlePrompt?.role === 'Strategist')
           return t('game.phases.strategist_deck');
         return t('game.phases.legislative_president');
-      case 'Legislative_Chancellor':
-        if (gameState.lastEnactedPolicy) return 'Players are declaring directives.';
+        if (gameState.lastEnactedPolicy) return t('game.action_bar.declaring');
         return t('game.phases.legislative_chancellor');
       case 'Auditor_Action':
         return t('game.phases.auditor_inspect');
@@ -102,30 +101,30 @@ export const ActionBar = ({
       case 'Assassin_Action':
         return t('game.phases.assassin_target');
       case 'Handler_Action':
-        return 'Handler is using their power.';
+        return t('game.action_bar.handler_active');
       case 'Censure_Action':
-        return 'The Assembly is debating a Censure Motion.';
+        return t('game.action_bar.censure_debate');
       case 'Snap_Election':
-        return 'Volunteers are stepping forward for the Snap Election.';
+        return t('game.action_bar.snap_volunteers');
       case 'Event_Reveal':
-        return 'Crisis Event Incoming...';
+        return t('game.action_bar.crisis_incoming');
       case 'Executive_Action':
         switch (gameState.currentExecutiveAction) {
           case 'Investigate':
-            return "President is investigating a player's loyalty.";
+            return t('game.action_bar.investigating');
           case 'SpecialElection':
-            return 'President is calling a Special Election.';
+            return t('game.action_bar.calling_special');
           case 'Execution':
-            return 'President is executing a player.';
+            return t('game.action_bar.executing');
           case 'PolicyPeek':
-            return 'President is reviewing the top three policies.';
+            return t('game.action_bar.peeking');
           default:
-            return 'President is deciding on an executive action.';
+            return t('game.action_bar.deciding');
         }
       case 'GameOver':
-        return `${gameState.winner === 'Civil' ? 'Civil' : 'State'} faction victorious!`;
+        return t('game.action_bar.victorious', { faction: gameState.winner === 'Civil' ? t('game.tracks.civil_label') : t('game.tracks.state_label') });
       default:
-        return 'The Assembly is in session.';
+        return t('game.action_bar.in_session');
     }
   };
 
@@ -135,41 +134,41 @@ export const ActionBar = ({
     switch (gameState.phase) {
       case 'Nominate_Chancellor':
         return isPresident
-          ? 'Tap a player on the board to nominate them as Chancellor.'
-          : 'Watch the nomination — it reveals who the President trusts.';
+          ? t('game.action_bar.nominate_prompt')
+          : t('game.action_bar.nominate_watch');
       case 'Voting':
         return me?.id === gameState.detainedPlayerId
-          ? 'You are detained and cannot vote this round.'
-          : 'Vote AYE to support this government or NAY to block it.';
+          ? t('game.action_bar.detained_cant_vote')
+          : t('game.action_bar.voting_prompt');
       case 'Legislative_President':
         return isPresident
-          ? 'Discard one policy card. The other two go to the Chancellor.'
-          : 'The President is choosing which policy to pass to the Chancellor.';
+          ? t('game.action_bar.discard_prompt')
+          : t('game.action_bar.pass_watch');
       case 'Legislative_Chancellor':
         if (gameState.lastEnactedPolicy) {
-          return 'Declarations tell the table what was drawn and passed. They may be lies.';
+          return t('game.action_bar.declaration_hint');
         }
         return isChancellor
-          ? 'Enact one policy. You may propose a Veto if 5+ State directives are enacted.'
-          : 'The Chancellor is choosing which policy to enact.';
+          ? t('game.action_bar.enact_prompt')
+          : t('game.action_bar.enact_watch');
       case 'Executive_Action':
         if (isPresident) {
           switch (gameState.currentExecutiveAction) {
             case 'Investigate':
-              return 'Select a player to investigate their party loyalty.';
+              return t('game.action_bar.investigate_prompt');
             case 'SpecialElection':
-              return 'Select a player to be the next President.';
+              return t('game.action_bar.special_prompt');
             case 'Execution':
-              return 'Select a player to execute.';
+              return t('game.action_bar.execute_prompt');
             case 'PolicyPeek':
-              return 'Review the top 3 cards of the deck.';
+              return t('game.action_bar.peek_prompt');
             default:
-              return 'You must use your executive power.';
+              return t('game.action_bar.must_use_power');
           }
         }
-        return 'The President must use their executive power.';
+        return t('game.action_bar.pres_must_use');
       case 'Lobby':
-        return "Press Ready Up when you're ready to start. The game begins when all players are ready.";
+        return t('game.action_bar.lobby_ready_prompt');
       default:
         return '\u00A0';
     }
@@ -194,7 +193,7 @@ export const ActionBar = ({
               <div className="flex items-center gap-2 mb-2">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[10px] sm:text-xs font-mono text-emerald-400 uppercase tracking-[0.3em] font-bold">
-                  Intercepted Anonymous Dispatch
+                  {t('game.action_bar.anonymous_dispatch')}
                 </span>
               </div>
               <div className="text-responsive-sm sm:text-responsive-md text-emerald-100 font-serif italic leading-relaxed">
@@ -217,7 +216,7 @@ export const ActionBar = ({
       <div className="px-[2vw] py-[1.5vh] bg-surface-glass border-b border-subtle flex justify-between items-center">
         <div className="min-w-0 flex-1 mr-2 flex flex-col justify-center">
           <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-light mb-1">
-            Current Phase
+            {t('game.action_bar.current_phase')}
           </div>
           <div className="min-h-[1.5em] overflow-hidden">
             <AnimatePresence mode="wait">
@@ -279,7 +278,7 @@ export const ActionBar = ({
               </div>
               <div className="min-w-0 max-w-[80px] sm:max-w-[120px]">
                 <div className="text-[8px] font-light uppercase tracking-[0.15em] text-faint leading-none mb-0.5">
-                  Crisis Active
+                  {t('game.action_bar.crisis_active')}
                 </div>
                 <div className="text-[11px] font-serif italic text-primary truncate leading-none">
                   {gameState.activeEventCard.name}
@@ -291,9 +290,9 @@ export const ActionBar = ({
 
         <div className="flex gap-2 items-center">
           <div className="relative">
-            <Tooltip position="top" content="Quick Reactions">
+            <Tooltip position="top" content={t('game.action_bar.quick_reactions')}>
               <button
-                aria-label="Toggle Reactions"
+                aria-label={t('game.action_bar.toggle_reactions')}
                 onMouseEnter={() => playSound('hover')}
                 onClick={() => {
                   playSound('click');
@@ -334,9 +333,9 @@ export const ActionBar = ({
             </AnimatePresence>
           </div>
 
-          <Tooltip position="top" content={isVoiceActive ? 'Mute Mic' : 'Unmute Mic'}>
+          <Tooltip position="top" content={isVoiceActive ? t('game.action_bar.mute') : t('game.action_bar.unmute')}>
             <button
-              aria-label={isVoiceActive ? 'Mute Mic' : 'Unmute Mic'}
+              aria-label={isVoiceActive ? t('game.action_bar.mute') : t('game.action_bar.unmute')}
               onMouseEnter={() => playSound('hover')}
               onClick={() => {
                 playSound('click');
@@ -354,9 +353,9 @@ export const ActionBar = ({
               )}
             </button>
           </Tooltip>
-          <Tooltip position="top" content={isVideoActive ? 'Stop Video' : 'Start Video'}>
+          <Tooltip position="top" content={isVideoActive ? t('game.action_bar.stop_video') : t('game.action_bar.start_video')}>
             <button
-              aria-label={isVideoActive ? 'Stop Video' : 'Start Video'}
+              aria-label={isVideoActive ? t('game.action_bar.stop_video') : t('game.action_bar.start_video')}
               onMouseEnter={() => playSound('hover')}
               onClick={() => {
                 playSound('click');
@@ -386,13 +385,13 @@ export const ActionBar = ({
               <div className="flex items-center gap-2 mb-1">
                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span className="text-[10px] font-mono text-emerald-500 uppercase tracking-widest">
-                  Encrypted Dispatch Channel
+                  {t('game.action_bar.encrypted_dispatch')}
                 </span>
               </div>
               <div className="flex gap-2">
                 <input
                   autoFocus
-                  placeholder="Enter message (max 80 chars)..."
+                  placeholder={t('game.action_bar.cipher_placeholder')}
                   maxLength={80}
                   value={cipherMessage}
                   onChange={(e) => setCipherMessage(e.target.value)}

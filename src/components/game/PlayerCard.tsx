@@ -1,4 +1,5 @@
 import React, { useRef } from 'react';
+import { useTranslation } from '../../contexts/I18nContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { Users, Eye, Check, ShieldOff, WifiOff, AlertCircle, Skull } from 'lucide-react';
 import { socket } from '../../socket';
@@ -87,6 +88,7 @@ export const PlayerCard = React.memo(
     setSelectedPlayerId,
     me,
   }: PlayerCardProps) => {
+    const { t } = useTranslation();
     const effectiveVote = p.vote || gameState.previousVotes?.[p.id];
     // Don't show revealed vote flip for other players during normal voting 
     const showVoteBack = (gameState.openSession && p.vote) || (gameState.phase === 'Voting_Reveal' && effectiveVote);
@@ -121,7 +123,7 @@ export const PlayerCard = React.memo(
     return (
       <motion.div
         role="button"
-        aria-label={`Player ${p.name.replace(' (AI)', '')}${isMe ? ' (You)' : ''}`}
+        aria-label={t('game.player_card.aria_label', { name: p.name.replace(' (AI)', ''), you: isMe ? ` (${t('game.modals.game_over.you')})` : '' })}
         tabIndex={0}
         animate={{ scale: speakingPlayers[p.id] ? 1.05 : 1 }}
         transition={{ duration: 0.2 }}
@@ -192,20 +194,18 @@ export const PlayerCard = React.memo(
 
         {/* Not-Overseer marker */}
         {p.isProvenNotOverseer && (
-          <div className="absolute top-0.5 left-0.5 z-20 pointer-events-none" title="Proven Not Overseer">
+          <div className="absolute top-0.5 left-0.5 z-20 pointer-events-none" title={t('game.player_card.proven_not_overseer')}>
             <div className="p-0.5 rounded border border-white/20 bg-emerald-900/80 text-emerald-300">
               <ShieldOff className="w-2.5 h-2.5" />
             </div>
           </div>
         )}
 
-
-
         {/* Quorum Revote Badge */}
         {gameState.isRevote && p.isPresident && (
           <div className="absolute -right-1 top-1/2 -translate-y-1/2 z-20 pointer-events-none">
             <div className="px-1 py-0.5 rounded-l text-[8px] font-mono leading-none bg-orange-900/90 text-orange-400 border border-orange-700/40 shadow-[0_0_10px_rgba(251,146,60,0.2)]">
-              REVOTE
+              {t('game.tracks.quorum_revote')}
             </div>
           </div>
         )}
@@ -492,7 +492,7 @@ export const PlayerCard = React.memo(
                     p.isAlive ? 'text-primary/90' : 'text-ghost'
                   )}
                 >
-                  {p.name.replace(' (AI)', '')} {isMe && '(You)'}
+                  {p.name.replace(' (AI)', '')} {isMe && `(${t('game.modals.game_over.you')})`}
                   {p.isLagging && !p.isDisconnected && (
                     <AlertCircle className="w-2 h-2 sm:w-3 sm:h-3 text-yellow-500 animate-pulse shrink-0" />
                   )}
@@ -519,27 +519,27 @@ export const PlayerCard = React.memo(
               >
                 {gameState.detainedPlayerId === p.id && (
                   <span className="px-1 sm:px-2 py-0.5 bg-purple-900/40 text-purple-500 font-mono uppercase rounded border border-purple-900/50 text-[7px] sm:text-[9px]">
-                    Detained
-                  </span>
+                      {t('game.player_card.detained')}
+                    </span>
                 )}
                 {(p.isPresident || p.isPresidentialCandidate) && (
                   <span className="px-1 sm:px-2 py-0.5 bg-yellow-900/40 text-yellow-500 font-mono uppercase rounded border border-yellow-900/50 text-[7px] sm:text-[9px]">
-                    {p.isPresident ? 'President' : 'Candidate'}
+                    {p.isPresident ? t('game.player_card.president') : t('game.player_card.candidate')}
                   </span>
                 )}
                 {(p.isChancellor || p.isChancellorCandidate) && (
                   <span className="px-1 sm:px-2 py-0.5 bg-blue-900/40 text-blue-500 font-mono uppercase rounded border border-blue-900/50 text-[7px] sm:text-[9px]">
-                    {p.isChancellor ? 'Chancellor' : 'Nominated'}
+                    {p.isChancellor ? t('game.player_card.chancellor') : t('game.player_card.nominated')}
                   </span>
                 )}
                 {!p.isAlive && (
                   <span className="px-1 sm:px-2 py-0.5 bg-red-900/20 text-red-500 font-mono uppercase rounded border border-red-900/50 text-[7px] sm:text-[9px]">
-                    Eliminated
+                    {t('game.player_card.eliminated')}
                   </span>
                 )}
                 {gameState.censuredPlayerId === p.id && (
                   <span className="px-1 sm:px-2 py-0.5 bg-red-900/40 text-red-400 font-mono uppercase rounded border border-red-500/50 text-[7px] sm:text-[9px] animate-pulse">
-                    Censured
+                    {t('game.player_card.censured')}
                   </span>
                 )}
 
@@ -592,8 +592,8 @@ export const PlayerCard = React.memo(
                 aria-label={`Nominate ${p.name.replace(' (AI)', '')} for Chancellor`}
                 className="absolute inset-0 bg-blue-900/80 rounded-xl flex items-center justify-center font-thematic tracking-wide text-white text-[12px] uppercase"
               >
-                Nominate
-              </button>
+                  {t('game.player_card.nominate')}
+                </button>
             );
           })()}
 
@@ -615,8 +615,8 @@ export const PlayerCard = React.memo(
                   aria-label={`Execute ${p.name.replace(' (AI)', '')}`}
                   className="absolute inset-0 z-30 bg-red-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
                 >
-                  Execute
-                </button>
+                    {t('game.player_card.execute')}
+                  </button>
               );
             } else if (gameState.titlePrompt.role === 'Interdictor') {
               const currentPresidentId = gameState.players[gameState.presidentIdx]?.id;
@@ -635,7 +635,7 @@ export const PlayerCard = React.memo(
                     aria-label={`Detain ${p.name.replace(' (AI)', '')}`}
                     className="absolute inset-0 z-30 bg-purple-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
                   >
-                    Detain
+                      {t('game.player_card.detain')}
                   </button>
                 );
               }
@@ -658,7 +658,7 @@ export const PlayerCard = React.memo(
               aria-label={`${gameState.currentExecutiveAction} ${p.name.replace(' (AI)', '')}`}
               className="absolute inset-0 bg-red-900/80 rounded-xl flex items-center justify-center font-serif italic text-white text-[9px] text-center px-1"
             >
-              {gameState.currentExecutiveAction}
+              {t(`game.powers.${gameState.currentExecutiveAction === 'SpecialElection' ? 'special_election' : gameState.currentExecutiveAction === 'PolicyPeek' ? 'policy_peek' : gameState.currentExecutiveAction.toLowerCase()}`)}
             </button>
           )}
 
@@ -682,10 +682,10 @@ export const PlayerCard = React.memo(
               )}
             >
               <span className="text-[10px] sm:text-[12px] uppercase tracking-wider not-italic font-bold mb-1">
-                {me.censureVoteId === p.id ? 'Selected' : 'Censure'}
+                {me.censureVoteId === p.id ? t('game.player_card.selected') : t('game.player_card.censure')}
               </span>
               <span className="text-[8px] sm:text-[9px] opacity-80 leading-tight">
-                {me.censureVoteId === p.id ? 'Tap another to change' : 'Exclude from nominations'}
+                {me.censureVoteId === p.id ? t('game.modals.game_over.action_shared') : t('game.player_card.exclude_hint')}
               </span>
             </button>
           )}
@@ -717,8 +717,8 @@ export const PlayerCard = React.memo(
             <div className="flex flex-col items-center gap-1">
               <WifiOff className="w-8 h-8 text-red-500 animate-pulse drop-shadow-[0_0_8px_rgba(239,68,68,0.6)]" />
               <span className="text-[10px] font-mono font-bold text-red-400 uppercase tracking-widest bg-black/80 px-2 py-0.5 rounded border border-red-500/30">
-                Reconnecting
-              </span>
+                  {t('game.player_card.reconnecting')}
+                </span>
             </div>
           </div>
         )}

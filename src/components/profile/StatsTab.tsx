@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../../contexts/I18nContext';
 import { Shield, Trophy, Check, Star, Flame, Zap, Heart, Scroll, Calendar } from 'lucide-react';
 import { User } from '../../../shared/types';
 import { getRankTier, getRankLabel } from '../../utils/ranks';
@@ -28,6 +29,7 @@ interface StatsTabProps {
 }
 
 export function StatsTab({ user }: StatsTabProps) {
+  const { t } = useTranslation();
   const winRate =
     user.stats.gamesPlayed > 0 ? Math.round((user.stats.wins / user.stats.gamesPlayed) * 100) : 0;
 
@@ -45,7 +47,7 @@ export function StatsTab({ user }: StatsTabProps) {
             <RankIcon tier={getRankTier(user.stats.elo).name} className="w-10 h-10" />
             <div>
               <div className="text-[10px] font-mono text-muted uppercase tracking-widest mb-0.5">
-                Ranked Rating
+                {t('profile.stats.rank_rating')}
               </div>
               <div
                 className={cn(
@@ -62,7 +64,7 @@ export function StatsTab({ user }: StatsTabProps) {
               {user.stats.elo}
             </div>
             <div className="text-[10px] font-mono text-faint uppercase tracking-widest">
-              ELO
+              {t('profile.stats.elo')}
             </div>
           </div>
         </div>
@@ -91,7 +93,7 @@ export function StatsTab({ user }: StatsTabProps) {
               </div>
               {nextTier && (
                 <div className="text-[9px] font-mono text-faint text-right">
-                  {tier.maxElo - user.stats.elo} ELO to {nextTier}
+                  {t('profile.stats.elo_to_next', { amount: tier.maxElo - user.stats.elo, tier: nextTier })}
                 </div>
               )}
             </div>
@@ -99,53 +101,53 @@ export function StatsTab({ user }: StatsTabProps) {
         })()}
       </div>
       <StatCard
-        label="Games Played"
+        label={t('profile.stats.games_played')}
         value={user.stats.gamesPlayed}
         icon={<Shield className="w-4 h-4" />}
       />
       <StatCard
-        label="Win Rate"
+        label={t('profile.stats.win_rate')}
         value={`${winRate}%`}
         icon={<Trophy className="w-4 h-4" />}
       />
       <StatCard
-        label="Total Wins"
+        label={t('profile.stats.total_wins')}
         value={user.stats.wins}
         icon={<Check className="w-4 h-4" />}
       />
       <StatCard
-        label="Civil Games"
+        label={t('profile.stats.civil_games')}
         value={user.stats.civilGames}
         icon={<Star className="w-4 h-4" />}
       />
       <StatCard
-        label="State Games"
+        label={t('profile.stats.state_games')}
         value={user.stats.stateGames}
         icon={<Flame className="w-4 h-4" />}
       />
       <StatCard
-        label="Overseer Games"
+        label={t('profile.stats.overseer_games')}
         value={user.stats.overseerGames}
         icon={<Shield className="w-4 h-4" />}
       />
       <StatCard
-        label="Kills"
+        label={t('profile.stats.kills')}
         value={user.stats.kills}
         icon={<Zap className="w-4 h-4 text-yellow-500" />}
       />
       <StatCard
-        label="Deaths"
+        label={t('profile.stats.deaths')}
         value={user.stats.deaths}
         icon={<Heart className="w-4 h-4 text-red-500" />}
       />
       <StatCard
-        label="Agendas Completed"
+        label={t('profile.stats.agendas_completed')}
         value={user.stats.agendasCompleted || 0}
         icon={<Scroll className="w-4 h-4 text-emerald-500" />}
       />
       {user.createdAt && (
         <StatCard
-          label="Account Created"
+          label={t('profile.stats.account_created')}
           value={new Date(user.createdAt).toLocaleDateString()}
           icon={<Calendar className="w-4 h-4 text-blue-500" />}
         />

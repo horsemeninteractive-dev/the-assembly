@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from '../../contexts/I18nContext';
 import { User, CosmeticItem } from '../../../shared/types';
 import { DEFAULT_ITEMS } from '../../sharedConstants';
 import { getLevelFromXp, getXpInCurrentLevel, getXpForNextLevel, getTotalXpForLevel } from '../../utils/xp';
@@ -16,6 +17,7 @@ interface PassTabProps {
 }
 
 export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId, setError }: PassTabProps) {
+  const { t } = useTranslation();
   const [claimingReward, setClaimingReward] = useState<string | null>(null);
   const [justClaimed, setJustClaimed] = useState<string | null>(null);
 
@@ -49,26 +51,26 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
     {
       level: 10,
       rewardId: 'pass-0-lvl10',
-      label: 'Geometric Grid',
+      label: t('profile.pass.rewards.geometric_grid'),
       item: DEFAULT_ITEMS.find((i) => i.id === 'bg-pass-0'),
     },
     {
       level: 20,
       rewardId: 'pass-0-lvl20',
-      label: 'Purple Rain',
+      label: t('profile.pass.rewards.purple_rain'),
       item: DEFAULT_ITEMS.find((i) => i.id === 'vote-pass-0'),
     },
-    { level: 30, rewardId: 'pass-0-lvl30', label: '500 Cabinet Points', cp: 500 },
+    { level: 30, rewardId: 'pass-0-lvl30', label: t('profile.pass.reward_types.cp_count', { count: 500 }), cp: 500 },
     {
       level: 40,
       rewardId: 'pass-0-lvl40',
-      label: 'Static Noise',
+      label: t('profile.pass.rewards.static_noise'),
       item: DEFAULT_ITEMS.find((i) => i.id === 'music-pass-0'),
     },
     {
       level: 50,
       rewardId: 'pass-0-lvl50',
-      label: 'Purple Pill Frame',
+      label: t('profile.pass.rewards.purple_pill'),
       item: DEFAULT_ITEMS.find((i) => i.id === 'frame-pass-0'),
     },
   ];
@@ -92,28 +94,28 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
           <div className="flex items-start justify-between gap-4">
             <div>
               <div className="text-[10px] font-mono text-muted uppercase tracking-[0.2em] mb-1">
-                Assembly Pass
+                {t('profile.pass.title')}
               </div>
               <h3 className="text-2xl font-thematic text-primary tracking-wide uppercase leading-none">
-                Season 0
+                {t('profile.pass.season', { number: 0 })}
               </h3>
-              <p className="text-xs text-faint font-mono mt-1">Calibration Season · Free Tier</p>
+              <p className="text-xs text-faint font-mono mt-1">{t('profile.pass.season_desc')}</p>
             </div>
             <div className="text-right shrink-0">
               <div className="text-3xl font-thematic text-yellow-500 leading-none">
                 {currentLevel}
               </div>
               <div className="text-[10px] font-mono text-muted uppercase tracking-widest">
-                Level
+                {t('profile.pass.level')}
               </div>
             </div>
           </div>
           {/* XP progress bar */}
           <div className="mt-4 space-y-1">
             <div className="flex justify-between text-[10px] font-mono text-faint">
-              <span>{xpInLevel.toLocaleString()} XP</span>
+              <span>{t('profile.pass.xp_summary', { amount: xpInLevel.toLocaleString() })}</span>
               <span>
-                {xpNeeded.toLocaleString()} XP to level {currentLevel + 1}
+                {t('profile.pass.xp_to_next', { amount: xpNeeded.toLocaleString(), level: currentLevel + 1 })}
               </span>
             </div>
             <div className="h-2 bg-card rounded-full overflow-hidden border border-subtle">
@@ -181,7 +183,7 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                           canClaim ? 'text-yellow-500/70' : 'text-faint'
                         )}
                       >
-                        LVL
+                        {t('common.lvl')}
                       </span>
                     </>
                   )}
@@ -199,16 +201,16 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                   </div>
                   <div className="text-[10px] font-mono text-faint uppercase tracking-widest">
                     {reward.cp
-                      ? 'Cabinet Points'
+                      ? t('profile.pass.reward_types.cp')
                       : reward.item?.type === 'background'
-                        ? 'Background'
+                        ? t('profile.pass.reward_types.background')
                         : reward.item?.type === 'vote'
-                          ? 'Vote Style'
+                          ? t('profile.pass.reward_types.vote')
                           : reward.item?.type === 'music'
-                            ? 'Music Track'
+                            ? t('profile.pass.reward_types.music')
                             : reward.item?.type === 'frame'
-                              ? 'Avatar Frame'
-                              : 'Reward'}
+                              ? t('profile.pass.reward_types.frame')
+                              : t('profile.pass.reward_types.reward')}
                   </div>
                   {/* Progress bar for locked rewards */}
                   {!isUnlocked && (
@@ -275,7 +277,7 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                             <div className="absolute inset-0 animate-purple-rain bg-purple-500/50 pointer-events-none" />
                           )}
                           <span className="text-[9px] font-thematic uppercase relative z-10">
-                            AYE!
+                            {t('common.aye') || 'AYE!'}
                           </span>
                         </div>
                       ) : reward.item.type === 'background' ? (
@@ -311,7 +313,7 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                 <div className="shrink-0 ml-2">
                   {isClaimed ? (
                     <span className="text-[10px] font-mono text-emerald-400 uppercase tracking-widest">
-                      Claimed
+                      {t('profile.pass.btn_claimed')}
                     </span>
                   ) : canClaim ? (
                     <button
@@ -324,11 +326,11 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                           : 'bg-yellow-500 border-yellow-400 text-black hover:bg-yellow-400 font-bold shadow-md shadow-yellow-900/20'
                       )}
                     >
-                      {isClaiming ? '...' : wasJustClaimed ? '✓' : 'Claim'}
+                      {isClaiming ? '...' : wasJustClaimed ? '✓' : t('profile.pass.btn_claim')}
                     </button>
                   ) : (
                     <span className="text-[10px] font-mono text-faint uppercase tracking-widest">
-                      Locked
+                      {t('profile.pass.btn_locked')}
                     </span>
                   )}
                 </div>
@@ -341,10 +343,10 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
       {/* Season footer */}
       <div className="text-center space-y-1 pt-2">
         <p className="text-[10px] font-mono text-faint uppercase tracking-widest">
-          Season 0 · Free Tier Only
+          {t('profile.pass.footer_season', { number: 0 })}
         </p>
         <p className="text-[9px] font-mono text-whisper">
-          Premium Cabinet Points will be available in future seasons
+          {t('profile.pass.footer_premium_hint')}
         </p>
       </div>
     </div>

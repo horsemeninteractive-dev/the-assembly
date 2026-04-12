@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Scale, Eye, Crown, Vote, Zap, Target, FileText } from 'lucide-react';
 import { OverseerIcon } from './icons';
+import { useTranslation } from '../contexts/I18nContext';
 import { cn } from '../utils/utils';
 
 interface HowToPlayModalProps {
@@ -11,69 +12,67 @@ interface HowToPlayModalProps {
 
 type TabId = 'overview' | 'roles' | 'loop' | 'titles' | 'agendas' | 'tips';
 
-const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
-  { id: 'overview', label: 'Overview', icon: <FileText className="w-3.5 h-3.5" /> },
-  { id: 'roles', label: 'Roles', icon: <Eye className="w-3.5 h-3.5" /> },
-  { id: 'loop', label: 'Game Loop', icon: <Crown className="w-3.5 h-3.5" /> },
-  { id: 'titles', label: 'Titles', icon: <Zap className="w-3.5 h-3.5" /> },
-  { id: 'agendas', label: 'Agendas', icon: <Target className="w-3.5 h-3.5" /> },
-  { id: 'tips', label: 'Tips', icon: <Vote className="w-3.5 h-3.5" /> },
-];
-
 const TabContent: React.FC<{ tab: TabId }> = ({ tab }) => {
+  const { t } = useTranslation();
   if (tab === 'overview')
     return (
       <div className="space-y-4">
         <p className="text-secondary leading-relaxed text-sm">
-          The Assembly is a <strong className="text-primary">social deduction game</strong> for 5–10
-          players. Each player is secretly assigned a faction — Civil or State — and must work with
-          or against the others to achieve their faction's win condition.
+          {t('game.how_to_play.overview.p1', {
+            social_deduction_game: <strong className="text-primary">social deduction game</strong>,
+          })}
         </p>
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-blue-900/15 border border-blue-500/20 rounded-xl p-3">
             <div className="text-blue-400 font-bold text-xs uppercase tracking-widest mb-1">
-              Civil wins by
+              {t('game.how_to_play.overview.civil_wins_label')}
             </div>
             <ul className="text-tertiary text-xs space-y-1">
-              <li>Enacting 5 Civil directives</li>
-              <li>Executing the Overseer</li>
+              {t('game.how_to_play.overview.civil_wins', { returnObjects: true }).map((w: string) => (
+                <li key={w}>{w}</li>
+              ))}
             </ul>
           </div>
           <div className="bg-red-900/15 border border-red-500/20 rounded-xl p-3">
             <div className="text-red-400 font-bold text-xs uppercase tracking-widest mb-1">
-              State wins by
+              {t('game.how_to_play.overview.state_wins_label')}
             </div>
             <ul className="text-tertiary text-xs space-y-1">
-              <li>Enacting 6 State directives</li>
-              <li>Electing Overseer Chancellor (after 3 State)</li>
+              {t('game.how_to_play.overview.state_wins', { returnObjects: true }).map((w: string) => (
+                <li key={w}>{w}</li>
+              ))}
             </ul>
           </div>
         </div>
         <div className="bg-surface-glass border border-default rounded-xl p-4 space-y-3 backdrop-blur-md">
           <div className="text-orange-400 text-xs font-mono uppercase tracking-widest border-b border-orange-500/20 pb-1.5 mb-2">
-            Crisis Mode (High Intensity)
+            {t('game.how_to_play.overview.crisis_label')}
           </div>
           <p className="text-tertiary text-xs leading-relaxed">
-            A chaotic variant featuring <span className="text-primary font-bold">Event Cards</span>. 
-            Every round, a random event is drawn that can freeze the election tracker, blackout the chat, or force immediate snap elections.
+            {t('game.how_to_play.overview.crisis_desc', {
+              event_cards: <span className="text-primary font-bold">Event Cards</span>,
+            })}
           </p>
         </div>
         <div className="bg-surface border border-default rounded-xl p-4 space-y-3">
-          <div className="text-muted text-xs font-mono uppercase tracking-widest">Policy Deck</div>
+          <div className="text-muted text-xs font-mono uppercase tracking-widest">
+            {t('game.how_to_play.overview.deck_label')}
+          </div>
           <p className="text-tertiary text-sm">
-            The deck contains <span className="text-blue-400">6 Civil</span> and{' '}
-            <span className="text-red-400">11 State</span> policy cards. The deck is stacked against
-            Civil — deduction and coordination are essential.
+            {t('game.how_to_play.overview.deck_desc', {
+              civil_count: <span className="text-blue-400">6 Civil</span>,
+              state_count: <span className="text-red-400">11 State</span>,
+            })}
           </p>
         </div>
         <div className="bg-surface border border-default rounded-xl p-4 space-y-2">
           <div className="text-muted text-xs font-mono uppercase tracking-widest">
-            Election Tracker
+            {t('game.how_to_play.overview.tracker_label')}
           </div>
           <p className="text-tertiary text-sm">
-            If three elections fail in a row, a{' '}
-            <span className="text-orange-400">chaos policy</span> is drawn from the top of the deck
-            and enacted automatically without a vote.
+            {t('game.how_to_play.overview.tracker_desc', {
+              chaos_policy: <span className="text-orange-400">chaos policy</span>,
+            })}
           </p>
         </div>
       </div>
@@ -85,41 +84,42 @@ const TabContent: React.FC<{ tab: TabId }> = ({ tab }) => {
         <div className="bg-blue-900/15 border border-blue-500/25 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <Scale className="w-5 h-5 text-blue-400" />
-            <div className="text-blue-400 font-bold uppercase tracking-wider text-sm">Civil</div>
+            <div className="text-blue-400 font-bold uppercase tracking-wider text-sm">
+              {t('game.how_to_play.roles_tab.civil.label')}
+            </div>
           </div>
           <p className="text-tertiary text-sm leading-relaxed">
-            The majority. You don't know who your allies are. Use declarations, voting patterns, and
-            nominations to find the State agents and stop them.
+            {t('game.how_to_play.roles_tab.civil.desc')}
           </p>
         </div>
         <div className="bg-red-900/15 border border-red-500/25 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <Eye className="w-5 h-5 text-red-400" />
-            <div className="text-red-400 font-bold uppercase tracking-wider text-sm">State</div>
+            <div className="text-red-400 font-bold uppercase tracking-wider text-sm">
+              {t('game.how_to_play.roles_tab.state.label')}
+            </div>
           </div>
           <p className="text-tertiary text-sm leading-relaxed">
-            The minority. You know who your State allies are. Secretly coordinate to enact State
-            directives or get the Overseer elected as Chancellor.
+            {t('game.how_to_play.roles_tab.state.desc')}
           </p>
         </div>
         <div className="bg-red-900/25 border border-red-600/40 rounded-xl p-4">
           <div className="flex items-center gap-2 mb-2">
             <OverseerIcon className="w-5 h-5 text-red-500" />
             <div className="text-red-500 font-bold uppercase tracking-wider text-sm">
-              The Overseer
+              {t('game.how_to_play.roles_tab.overseer.label')}
             </div>
           </div>
           <p className="text-tertiary text-sm leading-relaxed">
-            A State agent who doesn't know the other State players. Wins with State. If elected
-            Chancellor after 3 State directives are enacted, State wins immediately.
+            {t('game.how_to_play.roles_tab.overseer.desc')}
           </p>
           <p className="text-faint text-xs italic mt-2">
-            At 5–6 players, the Overseer knows the other State agents.
+            {t('game.how_to_play.roles_tab.overseer.distribution_hint')}
           </p>
         </div>
         <div className="bg-surface border border-default rounded-xl p-3">
           <div className="text-muted text-xs font-mono uppercase tracking-widest mb-2">
-            Role Distribution
+            {t('game.how_to_play.roles_tab.distribution_label')}
           </div>
           <div className="grid grid-cols-3 gap-2 text-xs text-center">
             {[
@@ -147,33 +147,33 @@ const TabContent: React.FC<{ tab: TabId }> = ({ tab }) => {
         {[
           {
             num: '1',
-            label: 'Nomination',
+            label: t('game.how_to_play.loop_tab.step_1.label'),
             color: 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20',
-            desc: 'The current President nominates a Chancellor. The same player cannot serve as Chancellor in consecutive rounds (or as President in larger games).',
+            desc: t('game.how_to_play.loop_tab.step_1.desc'),
           },
           {
             num: '2',
-            label: 'Vote',
+            label: t('game.how_to_play.loop_tab.step_2.label'),
             color: 'text-purple-400 bg-purple-500/10 border-purple-500/20',
-            desc: 'All living players simultaneously vote AYE or NAY. A strict majority of AYE passes the government. Ties and equal splits fail.',
+            desc: t('game.how_to_play.loop_tab.step_2.desc'),
           },
           {
             num: '3',
-            label: 'Legislative Session',
+            label: t('game.how_to_play.loop_tab.step_3.label'),
             color: 'text-blue-400 bg-blue-500/10 border-blue-500/20',
-            desc: 'President draws 3 cards, discards 1 face-down, passes 2 to Chancellor. Chancellor enacts 1, discards the other. Neither can see what the other discarded.',
+            desc: t('game.how_to_play.loop_tab.step_3.desc'),
           },
           {
             num: '4',
-            label: 'Declarations',
+            label: t('game.how_to_play.loop_tab.step_4.label'),
             color: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20',
-            desc: 'President declares how many Civil/State they drew and passed. Chancellor declares how many they received and enacted. These claims can be lies.',
+            desc: t('game.how_to_play.loop_tab.step_4.desc'),
           },
           {
             num: '5',
-            label: 'Executive Action',
+            label: t('game.how_to_play.loop_tab.step_5.label'),
             color: 'text-orange-400 bg-orange-500/10 border-orange-500/20',
-            desc: 'If a State directive was enacted and the player count/directive count triggers a power, the President must use it before the round ends.',
+            desc: t('game.how_to_play.loop_tab.step_5.desc'),
           },
         ].map((step) => (
           <div key={step.num} className={cn('rounded-xl p-3 border', step.color)}>
@@ -193,71 +193,21 @@ const TabContent: React.FC<{ tab: TabId }> = ({ tab }) => {
     return (
       <div className="space-y-3">
         <p className="text-tertiary text-sm leading-relaxed">
-          Title Roles are assigned randomly at game start. Each is single-use and fires at a
-          specific point in the round. Check your Dossier to see if you have one.
+          {t('game.how_to_play.titles_tab.intro')}
         </p>
-        {[
-          {
-            name: 'Interdictor',
-            when: 'Start of each round',
-            desc: 'Before nomination: detain a player for this round. They cannot vote or be nominated as Chancellor. Once used.',
-          },
-          {
-            name: 'Broker',
-            when: 'After nomination',
-            desc: 'Review the Chancellor nomination and veto it, forcing the President to nominate again. Once used.',
-          },
-          {
-            name: 'Strategist',
-            when: 'As President',
-            desc: "When you're President, draw 4 policy cards instead of 3, then discard 2. Once used.",
-          },
-          {
-            name: 'Auditor',
-            when: 'After enactment',
-            desc: 'Peek at the last 3 cards in the discard pile. Useful for tracking what policies are gone. Once used.',
-          },
-          {
-            name: 'Assassin',
-            when: 'After enactment (as President)',
-            desc: "When you're President, secretly execute any living player after the round ends. Once used.",
-          },
-          {
-            name: 'Handler',
-            when: 'After enactment',
-            desc: 'Swap the next two players in the presidential rotation. The second becomes President before the first. Once used.',
-          },
-          {
-            name: 'Defector',
-            when: 'Voting (Reveal)',
-            desc: 'Secretly change your vote after the initial reveal but before the result is finalized. This can flip a 5-5 tie into a 6-4 pass. Once used.',
-          },
-          {
-            name: 'Archivist',
-            when: 'After enactment',
-            desc: 'Deep inspection: peek at the top 3 cards of the Draw Pile before the next round begins. Once used.',
-          },
-          {
-            name: 'Quorum',
-            when: 'After election fail',
-            desc: 'Emergency session: force an immediate re-vote on the last failed government, bypassing the next President. Once used.',
-          },
-          {
-            name: 'Cipher',
-            when: 'Any phase',
-            desc: 'Send a one-way encrypted message to any player. Only they can see the text you send. Once used.',
-          },
-        ].map((role) => (
-          <div key={role.name} className="bg-surface border border-default rounded-xl p-3">
-            <div className="flex items-start justify-between gap-2 mb-1">
-              <div className="text-yellow-400 font-bold text-sm">{role.name}</div>
-              <div className="text-faint text-[10px] font-mono uppercase tracking-widest shrink-0">
-                {role.when}
+        {Object.entries(t('game.how_to_play.titles_tab.roles', { returnObjects: true })).map(
+          ([key, role]: [string, any]) => (
+            <div key={key} className="bg-surface border border-default rounded-xl p-3">
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <div className="text-yellow-400 font-bold text-sm">{role.name}</div>
+                <div className="text-faint text-[10px] font-mono uppercase tracking-widest shrink-0">
+                  {role.when}
+                </div>
               </div>
+              <p className="text-tertiary text-xs leading-relaxed">{role.desc}</p>
             </div>
-            <p className="text-tertiary text-xs leading-relaxed">{role.desc}</p>
-          </div>
-        ))}
+          )
+        )}
       </div>
     );
 
@@ -265,46 +215,27 @@ const TabContent: React.FC<{ tab: TabId }> = ({ tab }) => {
     return (
       <div className="space-y-4">
         <p className="text-secondary text-sm leading-relaxed">
-          Every player receives a hidden{' '}
-          <span className="text-emerald-400 font-medium">Personal Agenda</span> at the start of each
-          game. Completing it earns <strong className="text-primary">+100 XP and bonus IP</strong> —
-          equal to winning with your faction — regardless of the game result.
+          {t('game.how_to_play.agendas_tab.p1', {
+            personal_agenda: <span className="text-emerald-400 font-medium">Personal Agenda</span>,
+            xp_bonus: <strong className="text-primary">+100 XP and bonus IP</strong>,
+          })}
         </p>
         <div className="bg-emerald-900/10 border border-emerald-500/20 rounded-xl p-4 space-y-3">
           <div className="text-emerald-400 text-xs font-mono uppercase tracking-widest">
-            All 20 Agendas
+            {t('game.how_to_play.agendas_tab.list_label')}
           </div>
           <div className="grid grid-cols-1 gap-1.5">
-            {[
-              ['Chaos Agent', 'Trigger a chaos policy at least once'],
-              ['The Purist', 'At least 3 Civil directives enacted'],
-              ['The Dissenter', 'Vote against the majority 3+ times'],
-              ['The Dove', 'Vote Aye in every eligible round'],
-              ['The Hawk', 'Vote Nay in at least 3 rounds'],
-              ['Stonewalled', 'Vote Nay on 2 governments that fail'],
-              ['Short Session', 'Game ends before round (players + 3)'],
-              ['The Long Game', 'Game lasts at least (players + 6) rounds'],
-              ['The Loyalist', 'Vote Aye on 3 civil-enacting governments'],
-              ['Nominated', 'Be nominated Chancellor twice'],
-              ['Deadlock', 'Be in at least 1 failed government'],
-              ['Prolific', 'Enact 2 policies as Chancellor'],
-              ['The Veteran', 'Serve as Chancellor at least once'],
-              ['Unity', 'No chaos policy during the game'],
-              ['The Mandate', 'At least 4 State directives enacted'],
-              ['Clean Sweep', 'Enact a Civil directive as Chancellor'],
-              ['The Weathervane', 'Switch your vote 4+ times'],
-              ['Productive Session', 'More than half of rounds enact a policy'],
-              ['Close Race', 'Tracks within 2 directives at game end'],
-              ['The Swing Vote', 'Be in a government that passes by 1 vote'],
-            ].map(([name, desc]) => (
-              <div key={name} className="flex gap-2 items-start">
-                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/30 shrink-0 mt-1.5" />
-                <div>
-                  <span className="text-primary text-xs font-medium">{name}</span>
-                  <span className="text-faint text-xs"> — {desc}</span>
+            {Object.entries(t('game.how_to_play.agendas_tab.agendas', { returnObjects: true })).map(
+              ([key, agenda]: [string, any]) => (
+                <div key={key} className="flex gap-2 items-start">
+                  <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/30 shrink-0 mt-1.5" />
+                  <div>
+                    <span className="text-primary text-xs font-medium">{agenda.name}</span>
+                    <span className="text-faint text-xs"> — {agenda.desc}</span>
+                  </div>
                 </div>
-              </div>
-            ))}
+              )
+            )}
           </div>
         </div>
       </div>
@@ -315,36 +246,22 @@ const TabContent: React.FC<{ tab: TabId }> = ({ tab }) => {
       <div className="space-y-3">
         {[
           {
-            faction: 'For Civil Players',
+            faction: t('game.how_to_play.tips_tab.civil.label'),
             color: 'text-blue-400',
             bg: 'bg-blue-900/10 border-blue-500/20',
-            tips: [
-              'Cross-reference declarations: if President says they passed 1C/1S but Chancellor says they received 2S, someone is lying.',
-              'Track the voting record. Consistent Nay voting without explanation is suspicious.',
-              'Be careful with executive actions — investigate based on evidence, not gut feeling.',
-              "The deck is State-heavy. Some State policies being enacted doesn't prove anyone is guilty.",
-            ],
+            tips: t('game.how_to_play.tips_tab.civil.tips', { returnObjects: true }),
           },
           {
-            faction: 'For State Players',
+            faction: t('game.how_to_play.tips_tab.state.label'),
             color: 'text-red-400',
             bg: 'bg-red-900/10 border-red-500/20',
-            tips: [
-              "Coordinate declarations carefully. Contradicting your State ally's claim is a giveaway.",
-              'Nominate your State allies as Chancellor when possible — but not so obviously it looks suspicious.',
-              'Blame bad hands. "I only had State cards" is plausible because the deck is State-heavy.',
-              'The Overseer should stay quiet and unremarkable until the moment is right.',
-            ],
+            tips: t('game.how_to_play.tips_tab.state.tips', { returnObjects: true }),
           },
           {
-            faction: 'General',
+            faction: t('game.how_to_play.tips_tab.general.label'),
             color: 'text-secondary',
             bg: 'bg-surface border-default',
-            tips: [
-              'Use the chat and declarations together. What players say matters.',
-              "Your personal agenda might conflict with your faction's best play. That tension is intentional.",
-              'The round history button shows every government, every vote, and every declaration.',
-            ],
+            tips: t('game.how_to_play.tips_tab.general.tips', { returnObjects: true }),
           },
         ].map((section) => (
           <div key={section.faction} className={cn('rounded-xl p-4 border', section.bg)}>
@@ -352,11 +269,8 @@ const TabContent: React.FC<{ tab: TabId }> = ({ tab }) => {
               {section.faction}
             </div>
             <ul className="space-y-1.5">
-              {section.tips.map((tip, i) => (
-                <li
-                  key={i}
-                  className="flex gap-2 items-start text-tertiary text-xs leading-relaxed"
-                >
+              {section.tips.map((tip: string, i: number) => (
+                <li key={i} className="flex gap-2 items-start text-tertiary text-xs leading-relaxed">
                   <span className="text-faint shrink-0 mt-0.5">—</span>
                   <span>{tip}</span>
                 </li>
@@ -371,7 +285,29 @@ const TabContent: React.FC<{ tab: TabId }> = ({ tab }) => {
 };
 
 export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ isOpen, onClose }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<TabId>('overview');
+
+  const TABS: { id: TabId; label: string; icon: React.ReactNode }[] = [
+    {
+      id: 'overview',
+      label: t('game.how_to_play.tabs.overview'),
+      icon: <FileText className="w-3.5 h-3.5" />,
+    },
+    { id: 'roles', label: t('game.how_to_play.tabs.roles'), icon: <Eye className="w-3.5 h-3.5" /> },
+    { id: 'loop', label: t('game.how_to_play.tabs.loop'), icon: <Crown className="w-3.5 h-3.5" /> },
+    {
+      id: 'titles',
+      label: t('game.how_to_play.tabs.titles'),
+      icon: <Zap className="w-3.5 h-3.5" />,
+    },
+    {
+      id: 'agendas',
+      label: t('game.how_to_play.tabs.agendas'),
+      icon: <Target className="w-3.5 h-3.5" />,
+    },
+    { id: 'tips', label: t('game.how_to_play.tabs.tips'), icon: <Vote className="w-3.5 h-3.5" /> },
+  ];
 
   return (
     <AnimatePresence>
@@ -395,9 +331,11 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ isOpen, onClose 
             <div className="flex items-center justify-between px-6 pt-5 pb-4 border-b border-subtle shrink-0">
               <div>
                 <h2 className="text-lg font-thematic text-primary tracking-wide uppercase">
-                  How to Play
+                  {t('game.how_to_play.title')}
                 </h2>
-                <p className="text-faint text-xs font-mono">The Assembly — Rules Reference</p>
+                <p className="text-faint text-xs font-mono">
+                  The Assembly — {t('game.how_to_play.subtitle')}
+                </p>
               </div>
               <button
                 onClick={onClose}
@@ -448,7 +386,7 @@ export const HowToPlayModal: React.FC<HowToPlayModalProps> = ({ isOpen, onClose 
                 onClick={onClose}
                 className="w-full py-2.5 bg-card text-primary rounded-xl hover:bg-hover transition-all font-thematic text-sm uppercase tracking-widest border border-default"
               >
-                Back to Lobby
+                {t('game.how_to_play.back_to_lobby')}
               </button>
             </div>
           </motion.div>

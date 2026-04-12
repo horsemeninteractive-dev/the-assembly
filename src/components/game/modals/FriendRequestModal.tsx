@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { motion } from 'motion/react';
 import { UserPlus, X, Check } from 'lucide-react';
+import { useTranslation, Trans } from '../../../contexts/I18nContext';
 
 interface FriendRequestModalProps {
   fromUsername: string;
@@ -14,6 +15,8 @@ export const FriendRequestModal: React.FC<FriendRequestModalProps> = ({
   onAccept,
   onDeny,
 }) => {
+  const { t } = useTranslation();
+
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
       <motion.div
@@ -32,23 +35,27 @@ export const FriendRequestModal: React.FC<FriendRequestModalProps> = ({
             <UserPlus className="w-6 h-6 text-red-500" />
           </div>
           <div>
-            <h3 className="text-lg font-thematic">Friend Request</h3>
-            <p className="text-sm text-muted mt-1">
-              <span className="text-primary font-bold">{fromUsername}</span> wants to be friends.
-            </p>
+            <h3 className="text-lg font-thematic">{t('game.modals.friend_request.title')}</h3>
+            <div className="text-sm text-muted mt-1">
+              <Trans
+                i18nKey="game.modals.friend_request.description"
+                values={{ username: fromUsername }}
+                components={{ 1: <span className="text-primary font-bold" /> }}
+              />
+            </div>
           </div>
           <div className="flex gap-3 w-full mt-2">
             <button
               onClick={onDeny}
               className="flex-1 py-2 rounded-lg bg-card hover:bg-subtle text-xs font-mono uppercase tracking-widest transition-colors"
             >
-              Deny
+              {t('game.modals.friend_request.deny')}
             </button>
             <button
               onClick={onAccept}
               className="flex-1 py-2 rounded-lg bg-red-900 hover:bg-red-800 text-xs font-mono uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
             >
-              <Check className="w-3 h-3" /> Accept
+              <Check className="w-3 h-3" /> {t('game.modals.friend_request.accept')}
             </button>
           </div>
         </div>

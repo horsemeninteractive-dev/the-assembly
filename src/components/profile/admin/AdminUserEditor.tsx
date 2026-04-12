@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../../../contexts/I18nContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { X, Ban, UserCheck } from 'lucide-react';
 import { User } from '../../../../shared/types';
@@ -12,6 +13,7 @@ interface AdminUserEditorProps {
 }
 
 export const AdminUserEditor: React.FC<AdminUserEditorProps> = ({ user, onClose, onUpdate }) => {
+  const { t } = useTranslation();
   const handleToggleBan = () => {
     onUpdate(user.id, { isBanned: !user.isBanned });
     socket.emit('adminUpdateUser', { userId: user.id, updates: { isBanned: !user.isBanned } });
@@ -32,7 +34,7 @@ export const AdminUserEditor: React.FC<AdminUserEditorProps> = ({ user, onClose,
     >
       <div className="flex items-center justify-between">
         <span className="text-[10px] font-mono text-yellow-500 uppercase font-bold tracking-[0.2em]">
-          Account Inspector
+          {t('profile.admin.users.editor_title')}
         </span>
         <button
           onClick={onClose}
@@ -68,7 +70,7 @@ export const AdminUserEditor: React.FC<AdminUserEditorProps> = ({ user, onClose,
           <div>
             <div className="text-xs font-bold text-primary flex items-center gap-2">
               {user.isBanned ? <Ban className="w-3.5 h-3.5 text-red-500" /> : <UserCheck className="w-3.5 h-3.5 text-emerald-500" />}
-              STATUS: {user.isBanned ? 'RESTRICTED' : 'ACTIVE'}
+              {t('common.status')}: {user.isBanned ? t('profile.admin.users.status_banned') : t('common.active')}
             </div>
             <div className="text-[9px] text-ghost font-mono uppercase mt-0.5">Toggle account access</div>
           </div>
@@ -79,14 +81,14 @@ export const AdminUserEditor: React.FC<AdminUserEditorProps> = ({ user, onClose,
               user.isBanned ? 'bg-emerald-600 text-black hover:bg-emerald-500' : 'bg-red-600 text-white hover:bg-red-500'
             )}
           >
-            {user.isBanned ? 'Pardon' : 'Ban'}
+            {user.isBanned ? t('profile.admin.users.btn_pardon') : t('profile.admin.users.btn_ban')}
           </button>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div className="bg-elevated/40 p-4 rounded-2xl border border-subtle">
             <div className="text-[9px] font-mono text-faint uppercase mb-1.5 font-bold tracking-widest">
-              Cabinet Points
+              {t('profile.shop.currency')}
             </div>
             <input
               type="number"
@@ -97,7 +99,7 @@ export const AdminUserEditor: React.FC<AdminUserEditorProps> = ({ user, onClose,
           </div>
           <div className="bg-elevated/40 p-4 rounded-2xl border border-subtle">
             <div className="text-[9px] font-mono text-faint uppercase mb-1.5 font-bold tracking-widest">
-              ELO Rating
+              {t('profile.stats.elo')}
             </div>
             <input
               type="number"

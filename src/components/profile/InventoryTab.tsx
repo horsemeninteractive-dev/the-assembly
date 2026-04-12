@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from '../../contexts/I18nContext';
 import { cn, getProxiedUrl, apiUrl } from '../../utils/utils';
 import { CosmeticItem, User } from '../../../shared/types';
 import { Play, Pause, User as UserIcon, Scroll } from 'lucide-react';
@@ -23,6 +24,7 @@ export const InventoryTab: React.FC<InventoryProps> = ({
   playPreview,
   playingItemId,
 }) => {
+  const { t } = useTranslation();
   const [category, setCategory] = useState<
     'frame' | 'badge' | 'policy' | 'vote' | 'music' | 'sound' | 'background'
   >('frame');
@@ -74,12 +76,12 @@ export const InventoryTab: React.FC<InventoryProps> = ({
     id: 'frame' | 'badge' | 'policy' | 'vote' | 'music' | 'sound' | 'background';
     label: string;
   }[] = [
-    { id: 'frame', label: 'Frames' },
-    { id: 'policy', label: 'Directives' },
-    { id: 'vote', label: 'Votes' },
-    { id: 'music', label: 'Music' },
-    { id: 'sound', label: 'Sounds' },
-    { id: 'background', label: 'Backgrounds' },
+    { id: 'frame', label: t('profile.inventory.categories.frame') },
+    { id: 'policy', label: t('profile.inventory.categories.policy') },
+    { id: 'vote', label: t('profile.inventory.categories.vote') },
+    { id: 'music', label: t('profile.inventory.categories.music') },
+    { id: 'sound', label: t('profile.inventory.categories.sound') },
+    { id: 'background', label: t('profile.inventory.categories.background') },
   ];
 
   return (
@@ -197,8 +199,8 @@ export const InventoryTab: React.FC<InventoryProps> = ({
                       getVoteStyles(item.id, 'Aye')
                     )}
                   >
-                    <span className="text-lg font-thematic uppercase">AYE!</span>
-                    <span className="text-[8px] font-mono uppercase">YES</span>
+                    <span className="text-lg font-thematic uppercase">{t('profile.inventory.vote_aye')}</span>
+                    <span className="text-[8px] font-mono uppercase">{t('profile.inventory.vote_yes')}</span>
                   </div>
                 ) : item.id === 'bg-nebula-void' ? (
                   <div className="w-full h-full rounded-2xl bg-nebula-void overflow-hidden scale-[0.25] origin-center" />
@@ -215,10 +217,10 @@ export const InventoryTab: React.FC<InventoryProps> = ({
               </div>
               <h4 className="font-serif italic text-lg mb-1 text-primary">{item.name}</h4>
               <p className="text-[10px] text-muted font-mono uppercase mb-1">
-                {item.type === 'policy' ? 'Directive Style' : item.type}
+                {item.type === 'policy' ? t('profile.inventory.item_type_policy') : t(`profile.inventory.categories.${item.type}`)}
               </p>
               <p className={cn('text-[9px] font-mono uppercase mb-4', getRarity(item.price).color)}>
-                {getRarity(item.price).name}
+                {t(`profile.inventory.rarities.${getRarity(item.price).name.toLowerCase()}`)}
               </p>
               <button
                 onClick={() => {
@@ -233,7 +235,7 @@ export const InventoryTab: React.FC<InventoryProps> = ({
                     : 'bg-card text-white hover:bg-subtle'
                 )}
               >
-                {isEquipped ? 'Equipped' : 'Equip'}
+                {isEquipped ? t('profile.inventory.btn_equipped') : t('profile.inventory.btn_equip')}
               </button>
             </div>
           );

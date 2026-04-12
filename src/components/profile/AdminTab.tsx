@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useTranslation } from '../../contexts/I18nContext';
 import {
   Trash2,
   Users,
@@ -27,13 +28,14 @@ const TAB_CONFIG: {
   activeBg: string;
   activeColor: string;
 }[] = [
-  { id: 'rooms', label: 'Rooms', icon: Shield, activeBg: 'bg-zinc-700 border-zinc-500', activeColor: 'text-white' },
-  { id: 'users', label: 'Users', icon: Users, activeBg: 'bg-yellow-900/40 border-yellow-600/60', activeColor: 'text-yellow-400' },
-  { id: 'system', label: 'System', icon: Settings, activeBg: 'bg-blue-900/40 border-blue-600/60', activeColor: 'text-blue-400' },
-  { id: 'logs', label: 'Chat Logs', icon: MessageSquare, activeBg: 'bg-emerald-900/40 border-emerald-600/60', activeColor: 'text-emerald-400' },
+  { id: 'rooms', label: 'profile.admin.tabs.rooms', icon: Shield, activeBg: 'bg-zinc-700 border-zinc-500', activeColor: 'text-white' },
+  { id: 'users', label: 'profile.admin.tabs.users', icon: Users, activeBg: 'bg-yellow-900/40 border-yellow-600/60', activeColor: 'text-yellow-400' },
+  { id: 'system', label: 'profile.admin.tabs.system', icon: Settings, activeBg: 'bg-blue-900/40 border-blue-600/60', activeColor: 'text-blue-400' },
+  { id: 'logs', label: 'profile.admin.tabs.logs', icon: MessageSquare, activeBg: 'bg-emerald-900/40 border-emerald-600/60', activeColor: 'text-emerald-400' },
 ];
 
 export const AdminTools: React.FC<{ adminId: string; token: string }> = ({ adminId, token }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<AdminTab>('rooms');
   const [rooms, setRooms] = useState<RoomInfo[]>([]);
   const [loading, setLoading] = useState(false);
@@ -122,7 +124,7 @@ export const AdminTools: React.FC<{ adminId: string; token: string }> = ({ admin
             )}
           >
             <tab.icon className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">{tab.label}</span>
+            <span className="hidden sm:inline">{t(tab.label)}</span>
           </button>
         ))}
       </div>
@@ -136,30 +138,30 @@ export const AdminTools: React.FC<{ adminId: string; token: string }> = ({ admin
                 <div className="flex items-center gap-2 flex-1">
                   <div className="relative flex-1 max-w-md">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-ghost" />
-                    <input type="text" placeholder="Filter active rooms..." className="w-full bg-white border border-subtle rounded-xl py-2.5 pl-9 pr-4 text-sm text-black placeholder:text-zinc-400 font-mono focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all" />
+                    <input type="text" placeholder={t('profile.admin.rooms.filter_placeholder')} className="w-full bg-white border border-subtle rounded-xl py-2.5 pl-9 pr-4 text-sm text-black placeholder:text-zinc-400 font-mono focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all" />
                   </div>
-                  <button onClick={fetchRooms} className={cn('p-2.5 rounded-xl border border-subtle bg-white text-ghost hover:text-primary transition-all shadow-sm group', loading && 'animate-spin')} title="Refresh Rooms">
+                  <button onClick={fetchRooms} className={cn('p-2.5 rounded-xl border border-subtle bg-white text-ghost hover:text-primary transition-all shadow-sm group', loading && 'animate-spin')} title={t('profile.admin.rooms.btn_refresh')}>
                     <RefreshCw className="w-4 h-4 group-hover:rotate-180 transition-transform duration-500" />
                   </button>
-                  <button onClick={() => confirm('Clear stale Redis rooms?') && socket.emit('adminClearRedis')} className="p-2.5 rounded-xl border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 hover:border-red-500/40 transition-all shadow-sm" title="Purge Redis Stale Games">
+                  <button onClick={() => confirm(t('profile.admin.rooms.purge_confirm')) && socket.emit('adminClearRedis')} className="p-2.5 rounded-xl border border-red-500/20 bg-red-500/5 text-red-400 hover:bg-red-500/10 hover:border-red-500/40 transition-all shadow-sm" title={t('profile.admin.rooms.btn_purge')}>
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-                <span className="text-[10px] font-mono text-faint uppercase font-bold tracking-widest bg-elevated/50 px-3 py-1.5 rounded-lg border border-subtle/30">{rooms.length} Active Sessions</span>
+                <span className="text-[10px] font-mono text-faint uppercase font-bold tracking-widest bg-elevated/50 px-3 py-1.5 rounded-lg border border-subtle/30">{t('profile.admin.rooms.active_sessions', { count: rooms.length })}</span>
               </div>
               <div className="grid grid-cols-1 gap-3">
                 {rooms.map(room => (
                   <div key={room.id} className="bg-card/40 border border-subtle rounded-2xl p-4 flex items-center justify-between group hover:border-ghost/30 transition-all">
                     <div className="flex items-center gap-4">
                       <div className="px-2.5 py-1 rounded bg-elevated border border-subtle font-mono text-[10px] font-bold text-primary tracking-wider">{room.id}</div>
-                      <div className="flex flex-col"><span className="text-[10px] font-mono text-faint uppercase mb-0.5">Host: {room.hostName}</span><div className="flex items-center gap-2"><span className={cn('text-[10px] uppercase font-bold tracking-widest', room.phase === 'Lobby' ? 'text-emerald-400' : 'text-blue-400')}>{room.phase}</span><span className="text-[10px] text-ghost opacity-30">•</span><span className="text-[10px] text-ghost font-mono">{room.playerCount}/{room.maxPlayers} USERS</span></div></div>
+                      <div className="flex flex-col"><span className="text-[10px] font-mono text-faint uppercase mb-0.5">{t('profile.admin.rooms.host_label', { name: room.hostName })}</span><div className="flex items-center gap-2"><span className={cn('text-[10px] uppercase font-bold tracking-widest', room.phase === 'Lobby' ? 'text-emerald-400' : 'text-blue-400')}>{room.phase}</span><span className="text-[10px] text-ghost opacity-30">•</span><span className="text-[10px] text-ghost font-mono">{t('profile.admin.rooms.users_summary', { current: room.playerCount, max: room.maxPlayers })}</span></div></div>
                     </div>
                     <div className="flex items-center gap-2">
                       <button onClick={() => { setSelectedRoomId(room.id); setChatLogs([]); socket.emit('adminGetChatLogs', room.id); }} className="p-2.5 rounded-xl hover:bg-primary/10 text-ghost hover:text-primary transition-all"><MessageSquare className="w-4 h-4" /></button>
                       {confirmDelete === room.id ? (
                         <div className="flex gap-2">
-                          <button onClick={() => handleDeleteRoom(room.id)} className="px-3 py-1.5 bg-red-600 text-white text-[10px] rounded-lg uppercase font-bold shadow-lg shadow-red-900/40">Confirm</button>
-                          <button onClick={() => setConfirmDelete(null)} className="px-3 py-1.5 bg-elevated text-ghost text-[10px] rounded-lg border border-subtle uppercase">Cancel</button>
+                          <button onClick={() => handleDeleteRoom(room.id)} className="px-3 py-1.5 bg-red-600 text-white text-[10px] rounded-lg uppercase font-bold shadow-lg shadow-red-900/40">{t('common.confirm')}</button>
+                          <button onClick={() => setConfirmDelete(null)} className="px-3 py-1.5 bg-elevated text-ghost text-[10px] rounded-lg border border-subtle uppercase">{t('common.cancel')}</button>
                         </div>
                       ) : (
                         <button onClick={() => setConfirmDelete(room.id)} className="p-2.5 text-red-500/50 hover:text-red-500 hover:bg-red-500/10 rounded-xl transition-all"><Trash2 className="w-4 h-4" /></button>
@@ -185,7 +187,7 @@ export const AdminTools: React.FC<{ adminId: string; token: string }> = ({ admin
           {activeTab === 'logs' && (
             <motion.div key="logs" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[65vh]">
               <div className="bg-card/40 border border-subtle rounded-3xl flex flex-col overflow-hidden shadow-xl">
-                <div className="p-4 border-b border-subtle bg-elevated/30 flex items-center justify-between"><span className="text-[10px] font-mono text-faint uppercase font-bold tracking-widest">Sessions</span><button onClick={fetchRooms} className={cn('text-ghost hover:text-primary transition-colors', loading && 'animate-spin')}><RefreshCw className="w-3 h-3" /></button></div>
+                <div className="p-4 border-b border-subtle bg-elevated/30 flex items-center justify-between"><span className="text-[10px] font-mono text-faint uppercase font-bold tracking-widest">{t('profile.admin.logs.sessions')}</span><button onClick={fetchRooms} className={cn('text-ghost hover:text-primary transition-colors', loading && 'animate-spin')}><RefreshCw className="w-3 h-3" /></button></div>
                 <div className="flex-1 overflow-y-auto p-2 space-y-1 scrollbar-hide">
                   {rooms.map(room => (
                     <button key={room.id} onClick={() => { setSelectedRoomId(room.id); setChatLogs([]); socket.emit('adminGetChatLogs', room.id); }} className={cn('w-full text-left p-3.5 rounded-xl transition-all border flex items-center justify-between group', selectedRoomId === room.id ? 'bg-emerald-900/20 border-emerald-500/40 text-emerald-400 shadow-inner' : 'border-transparent text-ghost hover:bg-elevated hover:text-primary')}>
@@ -197,7 +199,7 @@ export const AdminTools: React.FC<{ adminId: string; token: string }> = ({ admin
               </div>
               <div className="md:col-span-2 bg-black/60 border border-subtle rounded-3xl flex flex-col overflow-hidden shadow-2xl">
                 <div className="p-4 border-b border-subtle bg-elevated/30 flex items-center justify-between">
-                  <div className="flex items-center gap-3"><MessageSquare className="w-4 h-4 text-emerald-500" /><span className="text-[10px] font-mono text-ghost uppercase font-bold tracking-widest">{selectedRoomId ? `PERSISTED_LOG: ${selectedRoomId}` : 'WAITING_FOR_SELECTION'}</span></div>
+                  <div className="flex items-center gap-3"><MessageSquare className="w-4 h-4 text-emerald-500" /><span className="text-[10px] font-mono text-ghost uppercase font-bold tracking-widest">{selectedRoomId ? t('profile.admin.logs.persisted_log', { id: selectedRoomId }) : t('profile.admin.logs.waiting')}</span></div>
                   {selectedRoomId && <button onClick={() => socket.emit('adminGetChatLogs', selectedRoomId)} className="text-ghost hover:text-emerald-400 transition-colors"><RefreshCw className="w-3.5 h-3.5" /></button>}
                 </div>
                 <div className="flex-1 overflow-y-auto p-5 space-y-2.5 font-mono text-[11px] scrollbar-hide">
@@ -208,7 +210,7 @@ export const AdminTools: React.FC<{ adminId: string; token: string }> = ({ admin
                       <span className="text-ghost break-words">{log.text}</span>
                     </div>
                   ))}
-                  {selectedRoomId && chatLogs.length === 0 && <div className="text-center py-12 opacity-20 italic">No communication logs recorded for this session</div>}
+                  {selectedRoomId && chatLogs.length === 0 && <div className="text-center py-12 opacity-20 italic">{t('profile.admin.logs.empty')}</div>}
                 </div>
               </div>
             </motion.div>

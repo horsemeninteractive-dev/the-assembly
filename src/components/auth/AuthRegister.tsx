@@ -2,8 +2,10 @@ import React from 'react';
 import { Loader2 } from 'lucide-react';
 import { apiUrl, getProxiedUrl, cn } from '../../utils/utils';
 import { useAuthContext } from '../../contexts/AuthContext';
+import { useTranslation } from '../../contexts/I18nContext';
 
 export const AuthRegister: React.FC<any> = ({ form }) => {
+  const { t } = useTranslation();
   const { handleAuthSuccess } = useAuthContext();
   const {
     username, setUsername, email, setEmail,
@@ -40,19 +42,19 @@ export const AuthRegister: React.FC<any> = ({ form }) => {
     <div className="space-y-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <label className="text-[10px] uppercase tracking-widest text-ghost font-mono ml-1">Username</label>
+          <label className="text-[10px] uppercase tracking-widest text-ghost font-mono ml-1">{t('auth.form.username')}</label>
           <input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="w-full bg-white border border-subtle rounded-xl px-4 py-3 text-sm text-black focus:border-strong focus:outline-none transition-all placeholder:text-gray-400"
-            placeholder="Agent Handle"
+            placeholder={t('auth.form.username_placeholder')}
             required
           />
         </div>
 
         <div className="space-y-2">
-          <label className="text-[10px] uppercase tracking-widest text-ghost font-mono ml-1">Email</label>
+          <label className="text-[10px] uppercase tracking-widest text-ghost font-mono ml-1">{t('auth.form.email')}</label>
           <input
             type="email"
             value={email}
@@ -64,7 +66,7 @@ export const AuthRegister: React.FC<any> = ({ form }) => {
         </div>
 
         <div className="space-y-2">
-          <label className="text-[10px] font-mono text-ghost uppercase tracking-widest ml-1">Secure Key</label>
+          <label className="text-[10px] font-mono text-ghost uppercase tracking-widest ml-1">{t('auth.form.password')}</label>
           <input
             type="password"
             value={password}
@@ -77,7 +79,7 @@ export const AuthRegister: React.FC<any> = ({ form }) => {
         </div>
 
         <div className="space-y-3">
-          <label className="text-[10px] uppercase tracking-widest text-ghost font-mono ml-1">Choose Avatar</label>
+          <label className="text-[10px] uppercase tracking-widest text-ghost font-mono ml-1">{t('auth.form.choose_avatar')}</label>
           <div className="grid grid-cols-6 gap-2">
             {avatarChoices.map((choice: string) => (
               <button
@@ -106,7 +108,7 @@ export const AuthRegister: React.FC<any> = ({ form }) => {
           disabled={isLoading}
           className="w-full btn-primary font-thematic text-xl py-3 rounded-xl hover:bg-subtle transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Create Account'}
+          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : t('auth.form.create_account')}
         </button>
       </form>
 
@@ -115,7 +117,7 @@ export const AuthRegister: React.FC<any> = ({ form }) => {
           onClick={() => setIsLogin(true)}
           className="text-[11px] text-muted hover:text-white transition-colors font-mono uppercase tracking-widest"
         >
-          Already have an account? Login
+          {t('auth.form.login_prompt')}
         </button>
       </div>
     </div>

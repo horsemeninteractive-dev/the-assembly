@@ -205,6 +205,7 @@ export interface MatchSummary {
   xpEarned: number;
   ipEarned: number;
   cpEarned: number;
+  matchId?: string;
 }
 
 // Sent via socket immediately after a game ends — ephemeral, not persisted

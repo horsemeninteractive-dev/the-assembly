@@ -106,8 +106,8 @@ const MemberRow: React.FC<{
   onKick: (userId: string) => void;
   onRoleChange: (userId: string, role: 'officer' | 'member') => void;
   onTransfer: (userId: string) => void;
-}> = ({ member, isSelf, isOwner, isOfficer, clan, onKick, onRoleChange, onTransfer }) => {
-  const { t } = useTranslation();
+  t: any;
+}> = ({ member, isSelf, isOwner, isOfficer, clan, onKick, onRoleChange, onTransfer, t }) => {
   const level = 0; // members don't expose xp to us here; show contribution instead
   const canAct = (isOwner || isOfficer) && !isSelf;
   const canKick = canAct && !(isOfficer && (member.role === 'officer' || member.role === 'owner'));
@@ -191,9 +191,8 @@ const MemberRow: React.FC<{
   );
 };
 
-const ClanCard: React.FC<{ clan: ClanSummary; onSelect: () => void }> = ({ clan, onSelect }) => {
-  const { t } = useTranslation();
-  return (
+const ClanCard: React.FC<{ clan: ClanSummary; onSelect: () => void; t: any }> = ({
+  const { t } = useTranslation(); clan, onSelect, t }) => (
   <button
     onClick={onSelect}
     className="w-full flex items-center gap-3 p-3 bg-elevated rounded-2xl border border-subtle hover:border-default transition-colors text-left"
@@ -209,7 +208,6 @@ const ClanCard: React.FC<{ clan: ClanSummary; onSelect: () => void }> = ({ clan,
     <ChevronRight className="w-4 h-4 text-ghost shrink-0" />
   </button>
 );
-};
 
 // ---------------------------------------------------------------------------
 // API helpers
@@ -220,7 +218,8 @@ async function apiFetch(path: string, token: string, options?: RequestInit) {
     ...options,
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...(options?.headers ?? {}) },
   });
-  const json = await res.json().catch(() => ({}));
+  const json = await res.json().catch(() => ({
+  const { t } = useTranslation();}));
   if (!res.ok) throw new Error(json.error ?? `HTTP ${res.status}`);
   return json;
 }
@@ -230,6 +229,7 @@ async function apiFetch(path: string, token: string, options?: RequestInit) {
 // ---------------------------------------------------------------------------
 
 export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, playSound }) => {
+  const { t } = useTranslation();
   const { t } = useTranslation();
   const [clanData, setClanData] = useState<ClanData | null>(null);
   const [invites, setInvites] = useState<ClanInvite[]>([]);
@@ -270,6 +270,7 @@ export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, pla
 
   // ── Load initial data ─────────────────────────────────────────────────────
   const loadData = useCallback(async () => {
+  const { t } = useTranslation();
     setLoading(true);
     setError('');
     try {
@@ -332,6 +333,7 @@ export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, pla
 
   // ── Actions ───────────────────────────────────────────────────────────────
   const handleCreate = async () => {
+  const { t } = useTranslation();
     setCreateError('');
     if (!createForm.tag || !createForm.name) { setCreateError('Tag and name are required'); return; }
     setCreating(true);
@@ -351,6 +353,7 @@ export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, pla
   };
 
   const handleRespondInvite = async (invite: ClanInvite, accept: boolean) => {
+  const { t } = useTranslation();
     try {
       await apiFetch('/api/clans/invites/respond', token, {
         method: 'POST',
@@ -368,6 +371,7 @@ export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, pla
   };
 
   const handleLeave = async () => {
+  const { t } = useTranslation();
     if (!clanData) return;
     if (!confirm(t('profile.clans.alerts.leave_confirm'))) return;
     try {
@@ -381,6 +385,7 @@ export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, pla
   };
 
   const handleDisband = async () => {
+  const { t } = useTranslation();
     if (!clanData) return;
     if (!confirm(t('profile.clans.alerts.disband_confirm'))) return;
     try {
@@ -394,6 +399,7 @@ export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, pla
   };
 
   const handleKick = async (userId: string) => {
+  const { t } = useTranslation();
     if (!clanData || !confirm(t('profile.clans.alerts.kick_confirm'))) return;
     try {
       await apiFetch(`/api/clans/${clanData.clan.id}/members/${userId}`, token, { method: 'DELETE' });
@@ -404,6 +410,7 @@ export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, pla
   };
 
   const handleRoleChange = async (userId: string, role: 'officer' | 'member') => {
+  const { t } = useTranslation();
     if (!clanData) return;
     try {
       await apiFetch(`/api/clans/${clanData.clan.id}/members/${userId}/role`, token, {
@@ -417,6 +424,7 @@ export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, pla
   };
 
   const handleTransfer = async (userId: string) => {
+  const { t } = useTranslation();
     if (!clanData || !confirm(t('profile.clans.alerts.transfer_confirm'))) return;
     try {
       await apiFetch(`/api/clans/${clanData.clan.id}/transfer`, token, {
@@ -430,6 +438,7 @@ export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, pla
   };
 
   const handleSaveEdit = async () => {
+  const { t } = useTranslation();
     if (!clanData) return;
     setSaving(true);
     try {
@@ -447,6 +456,7 @@ export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, pla
   };
 
   const handleInvitePlayer = async (targetUserId: string) => {
+  const { t } = useTranslation();
     if (!clanData) return;
     try {
       await apiFetch(`/api/clans/${clanData.clan.id}/invite`, token, {
@@ -462,6 +472,7 @@ export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, pla
   };
 
   const handleShareClan = (tag: string) => {
+  const { t } = useTranslation();
     const url = `${window.location.origin}/clan/${tag}`;
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true);
@@ -585,6 +596,7 @@ export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, pla
             <ClanCard
               key={clan.id}
               clan={clan}
+              t={t}
               onSelect={async () => {
                 // Show public clan profile — navigate to leaderboard for now
                 setView('leaderboard');
@@ -960,6 +972,7 @@ export const ClanTab: React.FC<ClanTabProps> = ({ user, token, onUpdateUser, pla
               onKick={handleKick}
               onRoleChange={handleRoleChange}
               onTransfer={handleTransfer}
+              t={t}
             />
           ))}
         </div>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from '../../contexts/I18nContext';
 import { motion } from 'motion/react';
 import {
   Trophy, Shield, Eye, Gamepad2, Target, Crown, Gavel,
@@ -35,6 +36,7 @@ const ICONS: Record<string, React.ReactNode> = {
 // ---------------------------------------------------------------------------
 
 function useCountdown(targetIso: string | undefined) {
+  const { t } = useTranslation();
   const [label, setLabel] = useState('');
 
   useEffect(() => {
@@ -42,7 +44,7 @@ function useCountdown(targetIso: string | undefined) {
 
     const tick = () => {
       const diff = new Date(targetIso).getTime() - Date.now();
-      if (diff <= 0) { setLabel('Now'); return; }
+      if (diff <= 0) { setLabel(t('profile.challenges.countdown.now')); return; }
 
       const h = Math.floor(diff / 3_600_000);
       const m = Math.floor((diff % 3_600_000) / 60_000);
@@ -50,18 +52,18 @@ function useCountdown(targetIso: string | undefined) {
 
       if (h > 23) {
         const d = Math.floor(h / 24);
-        setLabel(`${d}d ${h % 24}h`);
+        setLabel(t('profile.challenges.countdown.days', { d, h: h % 24 }));
       } else if (h > 0) {
-        setLabel(`${h}h ${m}m`);
+        setLabel(t('profile.challenges.countdown.hours', { h, m }));
       } else {
-        setLabel(`${m}m ${s}s`);
+        setLabel(t('profile.challenges.countdown.minutes', { m, s }));
       }
     };
 
     tick();
     const id = setInterval(tick, 1000);
     return () => clearInterval(id);
-  }, [targetIso]);
+  }, [targetIso, t]);
 
   return label;
 }
@@ -71,6 +73,7 @@ function useCountdown(targetIso: string | undefined) {
 // ---------------------------------------------------------------------------
 
 function ChallengeCard({ challenge }: { challenge: EnrichedChallenge }) {
+  const { t } = useTranslation();
   const pct = Math.min(100, Math.round((challenge.progress / challenge.target) * 100));
   const done = challenge.completed;
 
@@ -155,15 +158,15 @@ function ChallengeCard({ challenge }: { challenge: EnrichedChallenge }) {
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1 text-[10px] font-mono text-yellow-400/80">
               <Flame className="w-2.5 h-2.5" />
-              +{challenge.xpReward} XP
+              {t('profile.challenges.xp_reward', { amount: challenge.xpReward })}
             </span>
             <span className="flex items-center gap-1 text-[10px] font-mono text-emerald-400/80">
               <Coins className="w-2.5 h-2.5" />
-              +{challenge.ipReward} IP
+              {t('profile.challenges.ip_reward', { amount: challenge.ipReward })}
             </span>
             {done && (
               <span className="ml-auto text-[9px] font-mono text-muted uppercase tracking-widest">
-                Claimed
+                {t('profile.challenges.claimed')}
               </span>
             )}
           </div>
@@ -190,6 +193,7 @@ function SectionHeader({
   count: number;
   total: number;
 }) {
+  const { t } = useTranslation();
   const countdown = useCountdown(resetsAt);
 
   return (
@@ -199,7 +203,7 @@ function SectionHeader({
           {label}
         </span>
         <span className="text-[9px] font-mono text-faint">
-          {count}/{total} complete
+          {t('profile.challenges.section_complete', { count, total })}
         </span>
       </div>
       <div className="flex items-center gap-1 text-[9px] font-mono text-faint">
@@ -220,6 +224,7 @@ interface ChallengesTabProps {
 }
 
 export function ChallengesTab({ user, token }: ChallengesTabProps) {
+  const { t } = useTranslation();
   const [data, setData] = useState<ChallengesResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -234,11 +239,11 @@ export function ChallengesTab({ user, token }: ChallengesTabProps) {
       if (!res.ok) throw new Error('Failed to load challenges');
       setData(await res.json());
     } catch {
-      setError('Could not load challenges. Please try again.');
+      setError(t('profile.challenges.error_load'));
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, t]);
 
   useEffect(() => { load(); }, [load]);
 
@@ -246,7 +251,7 @@ export function ChallengesTab({ user, token }: ChallengesTabProps) {
     return (
       <div className="flex items-center justify-center py-16 text-muted">
         <RefreshCw className="w-5 h-5 animate-spin mr-2" />
-        <span className="text-sm font-mono">Loading challenges…</span>
+        <span className="text-sm font-mono">{t('profile.challenges.loading')}</span>
       </div>
     );
   }
@@ -254,12 +259,12 @@ export function ChallengesTab({ user, token }: ChallengesTabProps) {
   if (error || !data) {
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted">
-        <p className="text-sm">{error || 'No challenge data available.'}</p>
+        <p className="text-sm">{error || t('profile.challenges.error_no_data')}</p>
         <button
           onClick={load}
           className="text-xs font-mono uppercase tracking-widest px-4 py-2 rounded-xl border border-default hover:bg-hover transition-all"
         >
-          Retry
+          {t('profile.challenges.retry')}
         </button>
       </div>
     );
@@ -275,7 +280,7 @@ export function ChallengesTab({ user, token }: ChallengesTabProps) {
       {/* Daily */}
       <section>
         <SectionHeader
-          label="Daily"
+          label={t('profile.challenges.tiers.daily')}
           resetsAt={data.dailyResetsAt}
           color="text-emerald-400"
           count={dailyDone}
@@ -291,7 +296,7 @@ export function ChallengesTab({ user, token }: ChallengesTabProps) {
       {/* Weekly */}
       <section>
         <SectionHeader
-          label="Weekly"
+          label={t('profile.challenges.tiers.weekly')}
           resetsAt={data.weeklyResetsAt}
           color="text-blue-400"
           count={weeklyDone}
@@ -308,7 +313,7 @@ export function ChallengesTab({ user, token }: ChallengesTabProps) {
       {data.seasonal.length > 0 && (
         <section>
           <SectionHeader
-            label="Seasonal"
+            label={t('profile.challenges.tiers.seasonal')}
             resetsAt={data.seasonEndsAt}
             color="text-purple-400"
             count={seasonalDone}

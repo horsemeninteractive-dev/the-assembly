@@ -7,6 +7,7 @@ import { useAuthForm } from './auth/useAuthForm';
 import { AuthLogin } from './auth/AuthLogin';
 import { AuthRegister } from './auth/AuthRegister';
 import { AuthPasswordReset } from './auth/AuthPasswordReset';
+import { useTranslation } from '../contexts/I18nContext';
 
 interface AuthProps {
   onAuthSuccess: (user: User, token: string) => void;
@@ -15,6 +16,7 @@ interface AuthProps {
 }
 
 export const Auth: React.FC<AuthProps> = ({ onAuthSuccess, defaultMode, onBackToLanding }) => {
+  const { t } = useTranslation();
   const form = useAuthForm({ onAuthSuccess, defaultMode });
   const { isLogin, view, setView, setResetToken, message } = form;
 
@@ -69,7 +71,7 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess, defaultMode, onBackTo
           className="absolute top-6 left-6 z-50 flex items-center gap-2 p-2 rounded-xl text-white/50 hover:text-white hover:bg-white/5 transition-all"
         >
           <ArrowLeft className="w-5 h-5" />
-          <span className="text-xs font-mono tracking-widest uppercase font-bold hidden sm:inline">Back</span>
+          <span className="text-xs font-mono tracking-widest uppercase font-bold hidden sm:inline">{t('auth.back')}</span>
         </button>
       )}
 
@@ -89,10 +91,10 @@ export const Auth: React.FC<AuthProps> = ({ onAuthSuccess, defaultMode, onBackTo
             />
           </div>
           <h1 className="text-3xl font-thematic text-white tracking-wide uppercase">
-            The Assembly
+            {t('common.title')}
           </h1>
           <p className="text-white/45 text-sm mt-1">
-            {view !== 'auth' ? 'Account Recovery' : isLogin ? 'Welcome back, Delegate' : 'Register for the Assembly'}
+            {view !== 'auth' ? t('auth.recovery_title') : isLogin ? t('auth.welcome_back') : t('auth.register_assembly')}
           </p>
         </div>
 

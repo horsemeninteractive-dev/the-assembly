@@ -2,8 +2,10 @@ import React from 'react';
 import { Chrome, MessageSquare, Loader2 } from 'lucide-react';
 import { apiUrl } from '../../utils/utils';
 import { useAuthContext } from '../../contexts/AuthContext';
+import { useTranslation } from '../../contexts/I18nContext';
 
 export const AuthLogin: React.FC<any> = ({ form }) => {
+  const { t } = useTranslation();
   const { handleAuthSuccess } = useAuthContext();
   const {
     username, setUsername,
@@ -41,26 +43,26 @@ export const AuthLogin: React.FC<any> = ({ form }) => {
     <div className="space-y-4">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="space-y-2">
-          <label className="text-[10px] uppercase tracking-widest text-ghost font-mono ml-1">Username</label>
+          <label className="text-[10px] uppercase tracking-widest text-ghost font-mono ml-1">{t('auth.form.username')}</label>
           <input
             type="text"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
             className="w-full bg-white border border-subtle rounded-xl px-4 py-3 text-sm text-black focus:border-strong focus:outline-none transition-all placeholder:text-gray-400"
-            placeholder="Agent Handle"
+            placeholder={t('auth.form.username_placeholder')}
             required
           />
         </div>
 
         <div className="space-y-2">
           <div className="flex justify-between items-center">
-            <label className="text-[10px] font-mono text-ghost uppercase tracking-widest ml-1">Secure Key</label>
+            <label className="text-[10px] font-mono text-ghost uppercase tracking-widest ml-1">{t('auth.form.password')}</label>
             <button
               type="button"
               onClick={() => setView('forgot')}
               className="text-[9px] text-muted hover:text-primary transition-colors uppercase font-mono"
             >
-              Forgot Key?
+              {t('auth.form.forgot_password')}
             </button>
           </div>
           <input
@@ -84,7 +86,7 @@ export const AuthLogin: React.FC<any> = ({ form }) => {
           disabled={isLoading}
           className="w-full btn-primary font-thematic text-xl py-3 rounded-xl hover:bg-subtle transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
         >
-          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Sign In'}
+          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : t('auth.form.sign_in')}
         </button>
       </form>
 
@@ -93,7 +95,7 @@ export const AuthLogin: React.FC<any> = ({ form }) => {
           <div className="absolute inset-0 flex items-center">
             <div className="w-full border-t border-subtle"></div>
           </div>
-          <span className="relative px-4 bg-surface text-[10px] uppercase tracking-widest text-ghost font-mono">Or continue with</span>
+          <span className="relative px-4 bg-surface text-[10px] uppercase tracking-widest text-ghost font-mono">{t('auth.form.or_continue')}</span>
         </div>
 
         <div className="grid grid-cols-2 gap-3">
@@ -119,7 +121,7 @@ export const AuthLogin: React.FC<any> = ({ form }) => {
           onClick={() => setIsLogin(false)}
           className="text-[11px] text-muted hover:text-white transition-colors font-mono uppercase tracking-widest"
         >
-          Don't have an account? Register
+          {t('auth.form.register_prompt')}
         </button>
       </div>
     </div>

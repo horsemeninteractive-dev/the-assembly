@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from 'react';
+import { useTranslation } from '../../contexts/I18nContext';
 import { motion } from 'motion/react';
 import {
   Trophy, Shield, Eye, Gamepad2, Target, Crown, Gavel,
@@ -65,6 +66,7 @@ function ChallengeCountdown({ targetIso }: { targetIso: string | undefined }) {
 }
 
 function ClanChallengeCard({ challenge }: { challenge: EnrichedChallenge }) {
+  const { t } = useTranslation();
   const pct = Math.min(100, Math.round((challenge.progress / challenge.target) * 100));
   const done = challenge.completed;
 
@@ -90,7 +92,7 @@ function ClanChallengeCard({ challenge }: { challenge: EnrichedChallenge }) {
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1 text-[10px] font-mono text-yellow-400/80">
               <Shield className="w-2.5 h-2.5" />
-              +{challenge.xpReward} Clan XP
+              {t('profile.clans.challenges.xp_reward', { count: challenge.xpReward })}
             </span>
           </div>
         </div>
@@ -104,6 +106,7 @@ export function ClanChallenges({ token }: { token: string }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
+  const { t } = useTranslation();
   const load = useCallback(async () => {
     setLoading(true);
     setError('');
@@ -111,32 +114,32 @@ export function ClanChallenges({ token }: { token: string }) {
       const res = await fetch(apiUrl('/api/clans/mine/challenges'), {
         headers: { Authorization: `Bearer ${token}` },
       });
-      if (!res.ok) throw new Error('Failed to load clan challenges');
+      if (!res.ok) throw new Error(t('profile.clans.challenges.loading_error'));
       setData(await res.json());
     } catch {
-      setError('Could not load clan challenges.');
+      setError(t('profile.clans.challenges.loading_error'));
     } finally {
       setLoading(false);
     }
-  }, [token]);
+  }, [token, t]);
 
   useEffect(() => { load(); }, [load]);
 
-  if (loading) return <div className="flex items-center justify-center py-16 text-muted"><RefreshCw className="w-5 h-5 animate-spin mr-2" /><span className="text-sm font-mono">Loading...</span></div>;
-  if (error || !data) return <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted"><p className="text-sm">{error}</p><button onClick={load} className="text-xs font-mono uppercase tracking-widest px-4 py-2 rounded-xl border border-default">Retry</button></div>;
+  if (loading) return <div className="flex items-center justify-center py-16 text-muted"><RefreshCw className="w-5 h-5 animate-spin mr-2" /><span className="text-sm font-mono">{t('profile.clans.challenges.loading')}</span></div>;
+  if (error || !data) return <div className="flex flex-col items-center justify-center py-16 gap-3 text-muted"><p className="text-sm">{error}</p><button onClick={load} className="text-xs font-mono uppercase tracking-widest px-4 py-2 rounded-xl border border-default">{t('profile.clans.challenges.retry')}</button></div>;
 
   return (
     <div className="space-y-6">
       <section>
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[10px] font-mono uppercase tracking-[0.2em] font-bold text-emerald-400">Daily Clan Challenges</span>
+          <span className="text-[10px] font-mono uppercase tracking-[0.2em] font-bold text-emerald-400">{t('profile.clans.challenges.daily')}</span>
           <ChallengeCountdown targetIso={data.dailyResetsAt} />
         </div>
         <div className="space-y-3">{data.daily.map(c => <ClanChallengeCard key={c.id} challenge={c} />)}</div>
       </section>
       <section>
         <div className="flex items-center justify-between mb-3">
-          <span className="text-[10px] font-mono uppercase tracking-[0.2em] font-bold text-blue-400">Weekly Clan Challenges</span>
+          <span className="text-[10px] font-mono uppercase tracking-[0.2em] font-bold text-blue-400">{t('profile.clans.challenges.weekly')}</span>
           <ChallengeCountdown targetIso={data.weeklyResetsAt} />
         </div>
         <div className="space-y-3">{data.weekly.map(c => <ClanChallengeCard key={c.id} challenge={c} />)}</div>
@@ -144,7 +147,7 @@ export function ClanChallenges({ token }: { token: string }) {
       {data.seasonal.length > 0 && (
         <section>
           <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] font-mono uppercase tracking-[0.2em] font-bold text-purple-400">Seasonal Clan Challenges</span>
+            <span className="text-[10px] font-mono uppercase tracking-[0.2em] font-bold text-purple-400">{t('profile.clans.challenges.seasonal')}</span>
             <ChallengeCountdown targetIso={data.seasonEndsAt} />
           </div>
           <div className="space-y-3">{data.seasonal.map(c => <ClanChallengeCard key={c.id} challenge={c} />)}</div>

@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Scroll, X } from 'lucide-react';
 import { cn } from '../../../utils/utils';
+import { useTranslation } from '../../../contexts/I18nContext';
 
 interface AssemblyLogProps {
   log: string[];
@@ -31,6 +32,7 @@ const getLogColor = (entry: string) => {
 };
 
 export const AssemblyLog = ({ log, isOpen, onClose, showDebug }: AssemblyLogProps) => {
+  const { t } = useTranslation();
   const logEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -57,7 +59,7 @@ export const AssemblyLog = ({ log, isOpen, onClose, showDebug }: AssemblyLogProp
             <div className="flex items-center gap-3">
               <Scroll className="w-4 h-4 text-primary" />
               <h3 className="font-thematic text-lg uppercase tracking-wider text-primary">
-                Assembly Log
+                {t('game.assembly_log.title')}
               </h3>
             </div>
             <button
@@ -102,7 +104,7 @@ export const AssemblyLog = ({ log, isOpen, onClose, showDebug }: AssemblyLogProp
                   >
                     <div className="flex items-center gap-2 mb-0.5">
                       <div className="text-[8px] font-mono opacity-30 uppercase tracking-widest">
-                        Event #{i + 1}
+                        {t('game.assembly_log.event_num', { count: i + 1 })}
                       </div>
                       <div className="h-[1px] flex-1 bg-white/5" />
                     </div>

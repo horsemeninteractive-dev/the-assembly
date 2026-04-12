@@ -10,6 +10,7 @@ import { ClanEmblem } from './clans/ClanEmblem';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
+import { useTranslation, Trans } from '../contexts/I18nContext';
 interface PublicClanMember {
   username: string;
   avatarUrl: string | null;
@@ -74,6 +75,7 @@ function Skeleton({ className }: { className?: string }) {
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export function ClanProfile({ tag }: { tag: string }) {
+  const { t } = useTranslation();
   const [clan, setClan] = useState<PublicClan | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -99,15 +101,15 @@ export function ClanProfile({ tag }: { tag: string }) {
     fetch(apiUrl(`/api/public/clan/${encodeURIComponent(tag)}`))
       .then((r) => {
         if (!r.ok) {
-          if (r.status === 404) throw new Error('Clan not found');
-          throw new Error('Failed to load clan');
+          if (r.status === 404) throw new Error(t('social.clan.not_found'));
+          throw new Error(t('social.clan.load_failed'));
         }
         return r.json();
       })
       .then((data) => setClan(data.clan))
       .catch((err) => setError(err.message))
       .finally(() => setLoading(false));
-  }, [tag]);
+  }, [tag, t]);
 
   const handleShare = () => {
     const url = window.location.href;
@@ -148,13 +150,13 @@ export function ClanProfile({ tag }: { tag: string }) {
           <div className="w-5 h-5 rounded bg-white/10 border border-subtle flex items-center justify-center">
             <span className="text-[8px] font-bold text-primary">A</span>
           </div>
-          The Assembly
+          {t('common.title')}
         </a>
         <a
           href="/"
           className="flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-muted hover:text-primary transition-colors px-3 py-1.5 rounded-lg border border-subtle hover:border-default"
         >
-          Play Now
+          {t('landing.nav.play')}
           <ChevronRight className="w-3 h-3" />
         </a>
       </header>
@@ -189,13 +191,13 @@ export function ClanProfile({ tag }: { tag: string }) {
               </div>
               <div>
                 <div className="text-lg font-thematic tracking-wide text-primary">{error}</div>
-                <div className="text-xs font-mono text-muted mt-1">Check the clan tag and try again.</div>
+                <div className="text-xs font-mono text-muted mt-1">{t('social.clan.check_tag')}</div>
               </div>
               <a
                 href="/"
                 className="mt-2 px-5 py-2.5 bg-white text-black rounded-xl text-sm font-mono font-bold hover:bg-gray-200 transition-colors"
               >
-                Return Home
+                {t('social.clan.return_home')}
               </a>
             </motion.div>
           )}
@@ -217,7 +219,7 @@ export function ClanProfile({ tag }: { tag: string }) {
                   {/* Identity */}
                   <div className="flex-1 min-w-0">
                     <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-muted mb-0.5">
-                      Clan Profile
+                      {t('social.clan.profile_label')}
                     </div>
                     <div className="text-2xl font-thematic tracking-wide text-primary leading-tight break-all">
                       {clan.name}
@@ -228,18 +230,18 @@ export function ClanProfile({ tag }: { tag: string }) {
 
                     <div className="flex items-center gap-3 mt-3">
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-mono uppercase tracking-widest text-faint">Level</span>
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-faint">{t('social.clan.level')}</span>
                         <span className="text-lg font-thematic text-yellow-500 leading-none">{clan.level}</span>
                       </div>
                       <div className="w-px h-6 bg-subtle" />
                       <div className="flex flex-col">
-                        <span className="text-[10px] font-mono uppercase tracking-widest text-faint">Members</span>
+                        <span className="text-[10px] font-mono uppercase tracking-widest text-faint">{t('social.clan.members')}</span>
                         <span className="text-lg font-thematic text-primary leading-none">{clan.memberCount}</span>
                       </div>
                     </div>
 
                     <div className="mt-4 text-sm text-muted italic leading-relaxed">
-                      "{clan.description || 'No description provided.'}"
+                      "{clan.description || t('social.clan.no_desc')}"
                     </div>
                   </div>
                 </div>
@@ -256,14 +258,14 @@ export function ClanProfile({ tag }: { tag: string }) {
                     )}
                   >
                     {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    {copied ? 'Copied Link' : 'Share Clan'}
+                    {copied ? t('profile.share.copied') : t('social.clan.share_clan')}
                   </button>
                   <a
                     href="/"
                     className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-white text-black text-xs font-mono uppercase tracking-widest hover:bg-gray-200 transition-colors font-bold"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
-                    Play Now
+                    {t('landing.nav.play')}
                   </a>
                 </div>
               </motion.div>
@@ -273,7 +275,7 @@ export function ClanProfile({ tag }: { tag: string }) {
                 <div className="flex items-center gap-2">
                   <Users className="w-3.5 h-3.5 text-muted" />
                   <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-muted">
-                    Clan Roster
+                    {t('social.clan.roster')}
                   </span>
                   <div className="flex-1 h-px bg-subtle" />
                 </div>
@@ -305,10 +307,10 @@ export function ClanProfile({ tag }: { tag: string }) {
                       </div>
                       <div className="text-right">
                         <div className="text-xs font-mono font-bold text-yellow-500/80">
-                          {m.xpContributed.toLocaleString()} XP
+                          {m.xpContributed.toLocaleString()} {t('profile.xp_label')}
                         </div>
                         <div className="text-[9px] font-mono text-faint">
-                          Contrib.
+                          {t('social.clan.contribution')}
                         </div>
                       </div>
                     </motion.a>
@@ -319,7 +321,7 @@ export function ClanProfile({ tag }: { tag: string }) {
               {/* ── Footer ────────────────────────────────────────────── */}
               <div className="text-center py-6">
                 <div className="text-[10px] font-mono text-faint">
-                  Clan founded on {new Date(clan.createdAt).toLocaleDateString()}
+                  {t('social.clan.founded_on', { date: new Date(clan.createdAt).toLocaleDateString() })}
                 </div>
               </div>
             </motion.div>

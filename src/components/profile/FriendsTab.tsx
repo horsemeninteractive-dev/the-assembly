@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useTranslation } from '../../contexts/I18nContext';
 import { socket } from '../../socket';
 import { User, RecentlyPlayedEntry, GameMode } from '../../../shared/types';
 import { cn, getProxiedUrl, apiUrl, debugError } from '../../utils/utils';
@@ -42,6 +43,7 @@ const PlayerCard: React.FC<{
   statusLine?: React.ReactNode;
   actions: React.ReactNode;
 }> = ({ player, isOnline, statusLine, actions }) => {
+  const { t } = useTranslation();
   const level = getLevelFromXp(player.stats?.xp ?? 0);
   return (
     <div className="flex items-center gap-3 p-3 bg-elevated rounded-2xl border border-subtle hover:border-default transition-colors">
@@ -110,6 +112,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
   onJoinRoom,
   mode,
 }) => {
+  const { t } = useTranslation();
   const [friends, setFriends] = useState<FriendWithStatus[]>([]);
   const [pending, setPending] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
@@ -289,7 +292,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
             onFocus={() => {
               if (searchQuery.length >= 2) setActiveSection('search');
             }}
-            placeholder="Search players by username…"
+            placeholder={t('social.friends.search_placeholder')}
             className="w-full bg-elevated border border-subtle rounded-xl py-2.5 pl-9 pr-8 text-sm text-primary placeholder-ghost font-mono focus:outline-none focus:border-strong transition-colors"
           />
           {searchQuery && (
@@ -314,7 +317,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
             }}
             className="px-3 rounded-xl border border-subtle bg-elevated text-muted text-xs font-mono uppercase tracking-widest hover:text-white transition-colors"
           >
-            Friends
+            {t('social.friends.search_btn')}
           </button>
         )}
       </div>
@@ -324,13 +327,13 @@ export const FriendsList: React.FC<FriendsListProps> = ({
         <div className="space-y-2">
           {searchQuery.length < 2 ? (
             <p className="text-ghost text-xs font-mono text-center py-6">
-              Type at least 2 characters to search
+              {t('social.friends.search_min_chars')}
             </p>
           ) : searchLoading ? (
-            <p className="text-ghost text-xs font-mono text-center py-6">Searching…</p>
+            <p className="text-ghost text-xs font-mono text-center py-6">{t('social.friends.searching')}</p>
           ) : searchResults.length === 0 ? (
             <p className="text-ghost text-xs font-mono text-center py-6">
-              No players found for "{searchQuery}"
+              {t('social.friends.search_no_results', { query: searchQuery })}
             </p>
           ) : (
             searchResults.map((result) => {
@@ -342,17 +345,17 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                   actions={
                     result.isFriend ? (
                       <span className="text-[10px] text-emerald-400 font-mono uppercase tracking-widest px-2">
-                        Friends
+                        {t('social.friends.friends_label')}
                       </span>
                     ) : alreadySent ? (
                       <span className="text-[10px] text-faint font-mono uppercase tracking-widest px-2 flex items-center gap-1">
-                        <Clock className="w-3 h-3" /> Sent
+                        <Clock className="w-3 h-3" /> {t('social.friends.status_sent')}
                       </span>
                     ) : (
                       <button
                         onClick={() => sendRequest(result.id)}
                         className="p-2 rounded-lg bg-card hover:bg-red-900/30 text-muted hover:text-red-400 transition-colors border border-default hover:border-red-900/50"
-                        title="Send friend request"
+                        title={t('social.friends.add_friend')}
                       >
                         <UserPlus className="w-4 h-4" />
                       </button>
@@ -373,26 +376,26 @@ export const FriendsList: React.FC<FriendsListProps> = ({
             <div className="space-y-2">
               <div className="text-[10px] font-mono uppercase tracking-widest text-faint flex items-center gap-2">
                 <Clock className="w-3 h-3" />
-                Pending Requests ({pending.length})
+                {t('social.friends.pending_requests', { count: pending.length })}
               </div>
               {pending.map((requester) => (
                 <PlayerCard
                   key={requester.id}
                   player={requester}
-                  statusLine={<span className="text-yellow-400/80">Wants to be friends</span>}
+                  statusLine={<span className="text-yellow-400/80">{t('social.friends.wants_to_be_friends')}</span>}
                   actions={
                     <>
                       <button
                         onClick={() => declineRequest(requester.id)}
                         className="p-2 rounded-lg bg-card hover:bg-red-900/20 text-muted hover:text-red-400 transition-colors border border-default"
-                        title="Decline"
+                        title={t('common.cancel')}
                       >
                         <X className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => acceptRequest(requester.id)}
                         className="p-2 rounded-lg bg-emerald-900/20 hover:bg-emerald-900/40 text-emerald-400 transition-colors border border-emerald-900/40"
-                        title="Accept"
+                        title={t('common.confirm')}
                       >
                         <Check className="w-4 h-4" />
                       </button>
@@ -404,13 +407,13 @@ export const FriendsList: React.FC<FriendsListProps> = ({
           )}
 
           {loading ? (
-            <p className="text-ghost text-xs font-mono text-center py-8">Loading…</p>
+            <p className="text-ghost text-xs font-mono text-center py-8">{t('social.friends.searching')}</p>
           ) : friends.length === 0 && pending.length === 0 ? (
             <div className="text-center py-8 space-y-2">
               <Users className="w-8 h-8 text-whisper mx-auto" />
-              <p className="text-ghost text-xs font-mono">No friends yet.</p>
+              <p className="text-ghost text-xs font-mono">{t('social.friends.no_friends')}</p>
               <p className="text-whisper text-xs">
-                Search for players above or add someone from a game.
+                {t('social.friends.no_friends_hint')}
               </p>
             </div>
           ) : (
@@ -419,7 +422,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                 <div className="space-y-2">
                   <div className="text-[10px] font-mono uppercase tracking-widest text-faint flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                    Online ({onlineFriends.length})
+                    {t('social.friends.online', { count: onlineFriends.length })}
                   </div>
                   {onlineFriends.map((friend) => {
                     const canJoin = !!friend.currentRoomId && !!onJoinRoom;
@@ -432,10 +435,10 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                         statusLine={
                           friend.currentRoomId ? (
                             <span className="text-emerald-400">
-                              In game · {friend.currentRoomId}
+                              {t('social.friends.in_game', { roomId: friend.currentRoomId })}
                             </span>
                           ) : (
-                            <span className="text-emerald-400">In lobby</span>
+                            <span className="text-emerald-400">{t('social.friends.in_lobby')}</span>
                           )
                         }
                         actions={
@@ -447,7 +450,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                                   onJoinRoom!(friend.currentRoomId!);
                                 }}
                                 className="p-2 rounded-lg bg-emerald-900/20 hover:bg-emerald-900/40 text-emerald-400 transition-colors border border-emerald-900/40"
-                                title="Join their game"
+                                title={t('social.friends.join_title')}
                               >
                                 <Gamepad2 className="w-4 h-4" />
                               </button>
@@ -456,7 +459,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                               <button
                                 onClick={() => inviteFriend(friend.id)}
                                 className="p-2 rounded-lg bg-card hover:bg-hover text-muted hover:text-white transition-colors border border-default"
-                                title="Invite to your game"
+                                title={t('social.friends.invite_title')}
                               >
                                 <ChevronRight className="w-4 h-4" />
                               </button>
@@ -464,7 +467,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                             <button
                               onClick={() => removeFriend(friend.id)}
                               className="p-2 rounded-lg bg-card hover:bg-red-900/20 text-faint hover:text-red-400 transition-colors border border-default"
-                              title="Remove friend"
+                              title={t('social.friends.remove_title')}
                             >
                               <UserMinus className="w-4 h-4" />
                             </button>
@@ -480,7 +483,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                 <div className="space-y-2">
                   <div className="text-[10px] font-mono uppercase tracking-widest text-faint flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full bg-muted-bg" />
-                    Offline ({offlineFriends.length})
+                    {t('social.friends.offline', { count: offlineFriends.length })}
                   </div>
                   {offlineFriends.map((friend) => (
                     <PlayerCard
@@ -491,7 +494,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                         <button
                           onClick={() => removeFriend(friend.id)}
                           className="p-2 rounded-lg bg-card hover:bg-red-900/20 text-faint hover:text-red-400 transition-colors border border-default"
-                          title="Remove friend"
+                          title={t('social.friends.remove_title')}
                         >
                           <UserMinus className="w-4 h-4" />
                         </button>
@@ -508,7 +511,7 @@ export const FriendsList: React.FC<FriendsListProps> = ({
             <div className="space-y-2">
               <div className="text-[10px] font-mono uppercase tracking-widest text-faint flex items-center gap-2">
                 <History className="w-3 h-3" />
-                Recently Played With
+                {t('social.friends.recently_played')}
               </div>
               {recentlyPlayed.slice(0, 5).map((entry) => {
                 const isFriendAlready = friends.some((f) => f.id === entry.userId);
@@ -518,9 +521,9 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                   const mins = Math.floor(diff / 60000);
                   const hours = Math.floor(diff / 3600000);
                   const days = Math.floor(diff / 86400000);
-                  if (mins < 60) return `${mins}m ago`;
-                  if (hours < 24) return `${hours}h ago`;
-                  return `${days}d ago`;
+                  if (mins < 60) return t('social.friends.time_m_ago', { count: mins });
+                  if (hours < 24) return t('social.friends.time_h_ago', { count: hours });
+                  return t('social.friends.time_d_ago', { count: days });
                 })();
 
                 return (
@@ -570,17 +573,17 @@ export const FriendsList: React.FC<FriendsListProps> = ({
                     <div className="flex items-center gap-1 shrink-0">
                       {isFriendAlready ? (
                         <span className="text-[10px] text-emerald-400 font-mono uppercase tracking-widest px-2">
-                          Friends
+                          {t('social.friends.friends_label')}
                         </span>
                       ) : alreadySent ? (
                         <span className="text-[10px] text-faint font-mono uppercase tracking-widest px-2 flex items-center gap-1">
-                          <Clock className="w-3 h-3" /> Sent
+                          <Clock className="w-3 h-3" /> {t('social.friends.status_sent')}
                         </span>
                       ) : (
                         <button
                           onClick={() => sendRequest(entry.userId)}
                           className="p-2 rounded-lg bg-card hover:bg-red-900/30 text-muted hover:text-red-400 transition-colors border border-default hover:border-red-900/50"
-                          title="Send friend request"
+                          title={t('social.friends.add_friend')}
                         >
                           <UserPlus className="w-4 h-4" />
                         </button>

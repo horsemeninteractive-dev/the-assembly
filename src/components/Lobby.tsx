@@ -15,6 +15,7 @@ import { LobbyRoomBrowser } from './lobby/LobbyRoomBrowser';
 import { LobbyRoomCreator } from './lobby/LobbyRoomCreator';
 import { LobbyPracticeCreator } from './lobby/LobbyPracticeCreator';
 
+import { useTranslation, Trans } from '../contexts/I18nContext';
 interface LobbyProps {
   user: User;
   onJoinRoom: (
@@ -51,6 +52,7 @@ export const Lobby: React.FC<LobbyProps> = ({
   token,
   uiScaleSetting = 1,
 }) => {
+  const { t } = useTranslation();
   const [rooms, setRooms] = useState<RoomInfo[]>([]);
   const [rejoinInfo, setRejoinInfo] = useState<{
     canRejoin: boolean;
@@ -173,7 +175,7 @@ export const Lobby: React.FC<LobbyProps> = ({
         >
           <div className="flex flex-col gap-3 p-4 flex-1">
             <p className="text-[8px] font-mono text-ghost uppercase tracking-[0.22em] px-1 pt-1">
-              Actions
+              {t('lobby.sidebar.actions')}
             </p>
 
             <LobbyMatchmaking
@@ -242,7 +244,7 @@ export const Lobby: React.FC<LobbyProps> = ({
               />
             </div>
             <div>
-              <p className="text-[9px] font-mono text-muted uppercase tracking-[0.2em] leading-none">Published by</p>
+              <p className="text-[9px] font-mono text-muted uppercase tracking-[0.2em] leading-none">{t('lobby.footer.published_by')}</p>
               <p className="text-xs font-serif italic text-primary leading-tight">Horsemen Interactive</p>
             </div>
           </div>
@@ -253,7 +255,7 @@ export const Lobby: React.FC<LobbyProps> = ({
               onClick={() => { playSound('click'); setIsCreditsOpen(true); }}
               className="text-[9px] font-mono text-primary/80 hover:text-white uppercase tracking-widest transition-colors font-bold"
             >
-              Credits
+              {t('lobby.footer.credits')}
             </button>
             <div className="w-px h-3 bg-subtle" />
             <button
@@ -261,7 +263,7 @@ export const Lobby: React.FC<LobbyProps> = ({
               onClick={() => { playSound('click'); setIsLegalOpen(true); }}
               className="text-[9px] font-mono text-muted hover:text-primary uppercase tracking-widest transition-colors"
             >
-              Legal Info
+              {t('lobby.footer.legal')}
             </button>
             <div className="w-px h-3 bg-subtle hidden sm:block" />
             <p className="text-[9px] font-mono text-ghost uppercase tracking-tighter">

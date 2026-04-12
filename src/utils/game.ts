@@ -17,7 +17,7 @@ export const BIG_PLAY_ICON: Record<BigPlay['icon'], any> = {
   target: Target,
 };
 
-export function extractBigPlays(gameState: GameState): BigPlay[] {
+export function extractBigPlays(gameState: GameState, t: any): BigPlay[] {
   const plays: BigPlay[] = [];
   const rh = gameState.roundHistory ?? [];
 
@@ -28,7 +28,10 @@ export function extractBigPlays(gameState: GameState): BigPlay[] {
     if (killed) {
       plays.push({
         icon: 'swords',
-        text: `${assassin.name.replace(' (AI)', '')} eliminated ${killed.name.replace(' (AI)', '')} as the Assassin`,
+        text: t('debrief.plays.assassin', { 
+          assassin: assassin.name.replace(' (AI)', ''), 
+          killed: killed.name.replace(' (AI)', '') 
+        }),
       });
     }
   }
@@ -44,7 +47,9 @@ export function extractBigPlays(gameState: GameState): BigPlay[] {
     const names = executed.map((p) => p.name.replace(' (AI)', '')).join(' and ');
     plays.push({
       icon: 'zap',
-      text: `${names} ${executed.length === 1 ? 'was' : 'were'} executed by presidential decree`,
+      text: executed.length === 1 
+        ? t('debrief.plays.execution_one', { name: names }) 
+        : t('debrief.plays.execution_many', { names }),
     });
   }
 
@@ -55,8 +60,8 @@ export function extractBigPlays(gameState: GameState): BigPlay[] {
       icon: 'alert',
       text:
         chaosCount === 1
-          ? 'A chaos directive was forced upon the Assembly'
-          : `${chaosCount} chaos directives destabilised the Assembly`,
+          ? t('debrief.plays.chaos_one')
+          : t('debrief.plays.chaos_many', { count: chaosCount }),
     });
   }
 
@@ -67,21 +72,21 @@ export function extractBigPlays(gameState: GameState): BigPlay[] {
       icon: 'shield',
       text:
         vetoCount === 1
-          ? 'The government invoked their veto power'
-          : `The veto was exercised ${vetoCount} times`,
+          ? t('debrief.plays.veto_one')
+          : t('debrief.plays.veto_many', { count: vetoCount }),
     });
   }
 
   // Marathon game
   if (gameState.round > 9) {
-    plays.push({ icon: 'clock', text: `An epic ${gameState.round}-round battle of wills` });
+    plays.push({ icon: 'clock', text: t('debrief.plays.marathon', { count: gameState.round }) });
   }
 
   // Deadlocked race
   if (gameState.civilDirectives >= 4 && gameState.stateDirectives >= 4) {
     plays.push({
       icon: 'target',
-      text: 'Both factions held the Assembly in a knife-edge deadlock',
+      text: t('debrief.plays.deadlock'),
     });
   }
 

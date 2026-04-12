@@ -27,6 +27,7 @@ import { ACHIEVEMENT_MAP, AchievementDef } from '../../../utils/achievements';
 import { generateShareUrl, getTwitterShareUrl } from '../../../utils/share';
 import { ReplayModal } from './ReplayModal';
 
+import { useTranslation, Trans } from '../../../contexts/I18nContext';
 interface GameOverModalProps {
   gameState: GameState;
   privateInfo: PrivateInfo | null;
@@ -76,12 +77,12 @@ export const GameOverModal = ({
   onOpenLog,
   playSound,
 }: GameOverModalProps) => {
+  const { t } = useTranslation();
   const agenda = privateInfo?.personalAgenda;
   const agendaCompleted = agenda?.status === 'completed';
   const agendaFailed = agenda?.status === 'failed';
 
   const isRanked = postMatchResult?.mode === 'Ranked';
-  const xpAfter = postMatchResult ? undefined : undefined; // we don't have the full xp value here, use userUpdate
 
   const [copied, setCopied] = React.useState(false);
   const [isReplayOpen, setIsReplayOpen] = React.useState(false);
@@ -138,17 +139,17 @@ export const GameOverModal = ({
                 )}
               >
                 {gameState.winner === 'Civil'
-                  ? gameState.winReason || 'Charter Restored'
+                  ? gameState.winReason || t('game.game_over.banners.civil_win_default')
                   : gameState.winner === 'State'
-                    ? gameState.winReason || 'State Supremacy'
-                    : 'Inconclusive'}
+                    ? gameState.winReason || t('game.game_over.banners.state_win_default')
+                    : t('game.game_over.banners.inconclusive')}
               </div>
               <p className="text-responsive-xs text-muted font-mono uppercase tracking-[0.2em]">
                 {gameState.winner === 'Civil'
-                  ? 'The Charter has been defended.'
+                  ? t('game.game_over.banners.civil_desc')
                   : gameState.winner === 'State'
-                    ? 'The Secretariat has fallen to the State.'
-                    : 'The Assembly has collapsed due to a disconnection.'}
+                    ? t('game.game_over.banners.state_desc')
+                    : t('game.game_over.banners.abort_desc')}
               </p>
             </div>
 
@@ -157,7 +158,7 @@ export const GameOverModal = ({
               {/* Left Column: Match Summary & Progress */}
               <div className="lg:w-1/2 lg:basis-1/2 lg:overflow-y-auto custom-scrollbar p-[3vh] space-y-[2.5vh] shrink-0">
                 <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono border-b border-subtle/30 pb-2 flex justify-between items-center">
-                  <span>Match Performance</span>
+                  <span>{t('game.game_over.performance_header')}</span>
                 </div>
 
                 {/* ── Post-match ELO summary ────────────────── */}
@@ -177,18 +178,25 @@ export const GameOverModal = ({
                           postMatchResult.won ? 'text-emerald-400' : 'text-red-400'
                         )}
                       >
-                        {postMatchResult.won ? 'Victory Achieved' : 'Mission Failed'}
+                        {postMatchResult.won
+                          ? t('game.game_over.victory')
+                          : t('game.game_over.defeat')}
                       </span>
                       <span className="text-[10px] font-mono text-faint uppercase tracking-widest">
                         {postMatchResult.mode} · {postMatchResult.role}
                       </span>
                     </div>
 
-                    <div className={cn("grid gap-2", postMatchResult.clanXpEarned ? "grid-cols-2 lg:grid-cols-4" : "grid-cols-3")}>
+                    <div
+                      className={cn(
+                        'grid gap-2',
+                        postMatchResult.clanXpEarned ? 'grid-cols-2 lg:grid-cols-4' : 'grid-cols-3'
+                      )}
+                    >
                       {isRanked ? (
                         <div className="bg-surface-glass/40 rounded-xl p-2.5 text-center border border-subtle">
                           <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                            <Trophy className="w-3 h-3" /> ELO
+                            <Trophy className="w-3 h-3" /> {t('game.game_over.elo')}
                           </div>
                           <EloChange change={postMatchResult.eloChange} />
                           <div className="text-[9px] font-mono text-faint mt-0.5">
@@ -209,15 +217,17 @@ export const GameOverModal = ({
                       ) : (
                         <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                           <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                            <Trophy className="w-3 h-3" /> ELO
+                            <Trophy className="w-3 h-3" /> {t('game.game_over.elo')}
                           </div>
-                          <span className="text-muted text-xs font-mono">Casual</span>
+                          <span className="text-muted text-xs font-mono">
+                            {t('game.game_over.casual')}
+                          </span>
                         </div>
                       )}
 
                       <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                         <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                          <Flame className="w-3 h-3" /> XP
+                          <Flame className="w-3 h-3" /> {t('game.game_over.xp')}
                         </div>
                         <span className="text-yellow-400 font-mono text-sm font-bold">
                           +{postMatchResult.xpEarned}
@@ -226,23 +236,24 @@ export const GameOverModal = ({
 
                       <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                         <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                          <Coins className="w-3 h-3" /> IP
+                          <Coins className="w-3 h-3" /> {t('game.game_over.ip')}
                         </div>
                         <span className="text-emerald-400 font-mono text-sm font-bold">
                           +{postMatchResult.ipEarned}
                         </span>
                       </div>
 
-                      {postMatchResult.clanXpEarned !== undefined && postMatchResult.clanXpEarned > 0 && (
-                        <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
-                          <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                            <Shield className="w-3 h-3" /> Clan XP
+                      {postMatchResult.clanXpEarned !== undefined &&
+                        postMatchResult.clanXpEarned > 0 && (
+                          <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
+                            <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
+                              <Shield className="w-3 h-3" /> {t('game.game_over.clan_xp')}
+                            </div>
+                            <span className="text-blue-400 font-mono text-sm font-bold">
+                              +{postMatchResult.clanXpEarned}
+                            </span>
                           </div>
-                          <span className="text-blue-400 font-mono text-sm font-bold">
-                            +{postMatchResult.clanXpEarned}
-                          </span>
-                        </div>
-                      )}
+                        )}
                     </div>
                   </div>
                 )}
@@ -272,7 +283,7 @@ export const GameOverModal = ({
                         />
                         <div className="min-w-0">
                           <div className="text-responsive-xs uppercase tracking-widest text-muted font-mono mb-0.5">
-                            Personal Agenda
+                            {t('game.game_over.agenda')}
                           </div>
                           <div className="text-responsive-sm font-bold text-primary uppercase tracking-wide">
                             {agenda.name}
@@ -297,7 +308,7 @@ export const GameOverModal = ({
                         <div className="flex items-center gap-2 mb-2">
                           <Medal className="w-[2vh] h-[2vh] text-yellow-400 shrink-0" />
                           <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-yellow-400">
-                            Achievements Unlocked
+                            {t('game.game_over.achievements_header')}
                           </span>
                         </div>
                         <div className="space-y-1.5">
@@ -323,7 +334,7 @@ export const GameOverModal = ({
               <div className="lg:w-1/2 lg:basis-1/2 flex flex-col min-h-0 bg-black/5 lg:bg-transparent shrink-0">
                 <div className="flex-1 lg:overflow-y-auto custom-scrollbar p-[3vh] space-y-[2.5vh]">
                   <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono border-b border-subtle/30 pb-2 flex justify-between items-center">
-                    <span>Identity Revelations</span>
+                    <span>{t('game.game_over.revelations_header')}</span>
                     <OverseerIcon className="w-3 h-3 opacity-30" />
                   </div>
 
@@ -363,7 +374,7 @@ export const GameOverModal = ({
                                   {p.name.replace(' (AI)', '')}
                                   {p.id === myId && (
                                     <span className="ml-1.5 text-[9px] text-yellow-500 uppercase tracking-tighter">
-                                      You
+                                      {t('game.game_over.you')}
                                     </span>
                                   )}
                                 </span>
@@ -381,10 +392,10 @@ export const GameOverModal = ({
                               )}
                             >
                               {p.role === 'Civil'
-                                ? 'Civil'
+                                ? t('game.roles.civil.name')
                                 : p.role === 'State'
-                                  ? 'State'
-                                  : 'The Overseer'}
+                                  ? t('game.roles.state.name')
+                                  : t('game.roles.overseer.name')}
                             </div>
                           </div>
 
@@ -395,7 +406,8 @@ export const GameOverModal = ({
                                 <div className="flex items-center gap-1.5">
                                   <Target className="w-2.5 h-2.5 text-muted" />
                                   <span className="text-[10px] font-mono text-tertiary uppercase tracking-wider truncate">
-                                    Agenda: <span className="text-secondary">{agendaName}</span>
+                                    {t('game.game_over.agenda')}:{' '}
+                                    <span className="text-secondary">{agendaName}</span>
                                   </span>
                                 </div>
                               )}
@@ -403,7 +415,7 @@ export const GameOverModal = ({
                                 <div className="flex items-center gap-1.5">
                                   <Shield className="w-2.5 h-2.5 text-red-500/70" />
                                   <span className="text-[10px] font-mono text-red-500/80 uppercase tracking-widest font-bold">
-                                    {titleRole}
+                                    {t(`game.titles.${titleRole.toLowerCase()}.name`)}
                                   </span>
                                 </div>
                               )}
@@ -426,7 +438,7 @@ export const GameOverModal = ({
                   className="flex-1 py-[1.2vh] bg-card text-tertiary border border-default rounded-xl hover:bg-hover hover:text-primary transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2"
                 >
                   <Scroll className="w-[2vh] h-[2vh]" />
-                  View Assembly Log
+                  {t('game.game_over.action_log')}
                 </button>
                 <button
                   onMouseEnter={() => playSound('hover')}
@@ -434,7 +446,7 @@ export const GameOverModal = ({
                   className="flex-1 py-[1.2vh] bg-surface-glass text-primary border border-primary/30 rounded-xl hover:bg-primary/10 transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2 border-primary/20"
                 >
                   <History className="w-[2vh] h-[2vh]" />
-                  Reconstruct Match
+                  {t('game.game_over.action_replay')}
                 </button>
               </div>
 
@@ -443,14 +455,14 @@ export const GameOverModal = ({
                   onMouseEnter={() => playSound('hover')}
                   onClick={handleShare}
                   className={cn(
-                    "flex-1 py-[1.2vh] border rounded-xl transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2",
-                    copied 
-                      ? "bg-emerald-900/20 border-emerald-500/40 text-emerald-400" 
-                      : "bg-card text-tertiary border-default hover:bg-hover hover:text-primary"
+                    'flex-1 py-[1.2vh] border rounded-xl transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2',
+                    copied
+                      ? 'bg-emerald-900/20 border-emerald-500/40 text-emerald-400'
+                      : 'bg-card text-tertiary border-default hover:bg-hover hover:text-primary'
                   )}
                 >
                   <Share2 className="w-[2vh] h-[2vh]" />
-                  {copied ? 'Link Copied' : 'Copy Share Link'}
+                  {copied ? t('game.game_over.action_shared') : t('game.game_over.action_share')}
                 </button>
                 <button
                   onMouseEnter={() => playSound('hover')}
@@ -468,14 +480,14 @@ export const GameOverModal = ({
                   onClick={onPlayAgain}
                   className="flex-1 py-[1.5vh] btn-primary rounded-xl hover:bg-subtle transition-all font-thematic text-responsive-sm uppercase tracking-widest"
                 >
-                  Play Again
+                  {t('game.game_over.action_play_again')}
                 </button>
                 <button
                   onMouseEnter={() => playSound('hover')}
                   onClick={onLeave}
                   className="flex-1 py-[1.5vh] bg-card text-primary rounded-xl hover:bg-subtle transition-all font-thematic text-responsive-sm uppercase tracking-widest border border-default"
                 >
-                  Lobby
+                  {t('game.game_over.action_lobby')}
                 </button>
               </div>
             </div>

@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { cn, getProxiedUrl } from '../../utils/utils';
 import { RoomInfo, RoomPrivacy, GameMode } from '../../../shared/types';
+import { useTranslation } from '../../contexts/I18nContext';
 
 interface LobbyRoomBrowserProps {
   rooms: RoomInfo[];
@@ -52,6 +53,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
   playSound,
   onOpenCreate,
 }) => {
+  const { t } = useTranslation();
   const [filterCasual,  setFilterCasual]  = useState(true);
   const [filterRanked,  setFilterRanked]  = useState(true);
   const [filterClassic, setFilterClassic] = useState(true);
@@ -87,21 +89,21 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
   };
 
   const modeFilters = [
-    { label: 'Casual',  active: filterCasual,  toggle: () => setFilterCasual(v => !v)  },
-    { label: 'Ranked',  active: filterRanked,  toggle: () => setFilterRanked(v => !v)  },
-    { label: 'Classic', active: filterClassic, toggle: () => setFilterClassic(v => !v) },
-    { label: 'Crisis',  active: filterCrisis,  toggle: () => setFilterCrisis(v => !v)  },
+    { label: t('game.modes.casual'),  active: filterCasual,  toggle: () => setFilterCasual(v => !v), raw: 'Casual' },
+    { label: t('game.modes.ranked'),  active: filterRanked,  toggle: () => setFilterRanked(v => !v), raw: 'Ranked'  },
+    { label: t('game.modes.classic'), active: filterClassic, toggle: () => setFilterClassic(v => !v), raw: 'Classic' },
+    { label: t('game.modes.crisis'),  active: filterCrisis,  toggle: () => setFilterCrisis(v => !v), raw: 'Crisis'  },
   ];
 
   const phaseFilters = [
     {
-      label: 'Joinable',
+      label: t('lobby.browser.filter_joinable'),
       active: filterJoinable,
       toggle: () => { setFilterJoinable(v => !v); if (!filterJoinable) setFilterInProgress(false); },
       activeClass: 'bg-emerald-600 border-emerald-400 text-white shadow-[0_0_8px_rgba(5,150,105,0.4)]',
     },
     {
-      label: 'Active',
+      label: t('lobby.browser.filter_active'),
       active: filterInProgress,
       toggle: () => { setFilterInProgress(v => !v); if (!filterInProgress) setFilterJoinable(false); },
       activeClass: 'bg-red-600 border-red-400 text-white shadow-[0_0_8px_rgba(220,38,38,0.4)]',
@@ -123,9 +125,9 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
               <LogOut className="w-4 h-4 text-red-500 rotate-180" />
             </div>
             <div>
-              <h3 className="text-sm font-serif italic text-primary">Active Assembly Found</h3>
+              <h3 className="text-sm font-serif italic text-primary">{t('lobby.browser.rejoin_title')}</h3>
               <p className="text-[9px] text-red-500/70 font-mono uppercase tracking-widest">
-                You disconnected from: {rejoinInfo.roomName}
+                {t('lobby.browser.rejoin_subtitle', { name: rejoinInfo.roomName })}
               </p>
             </div>
           </div>
@@ -133,7 +135,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
             onClick={() => onJoinRoom(rejoinInfo.roomId!)}
             className="w-full sm:w-auto bg-red-600 text-white px-4 py-1.5 rounded-lg font-thematic text-sm hover:bg-red-500 transition-all shadow-lg shadow-red-900/20"
           >
-            Rejoin Game
+            {t('lobby.browser.rejoin_btn')}
           </button>
         </motion.div>
       )}
@@ -172,7 +174,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                 : 'bg-red-900/10 border-red-900/30 text-red-500'
             )}
           >
-            {room.phase === 'Lobby' ? 'Recruiting' : 'In Progress'}
+            {room.phase === 'Lobby' ? t('lobby.browser.status_recruiting') : t('lobby.browser.status_in_progress')}
           </div>
         </div>
         <div className="flex flex-col items-end gap-1">
@@ -188,18 +190,18 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                     : 'bg-blue-900/10 border-blue-900/30 text-blue-400'
             )}
           >
-            {room.mode}
+            {t(`game.modes.${room.mode.toLowerCase()}`)}
           </div>
           {room.privacy && room.privacy !== 'public' && (
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[7px] font-mono uppercase tracking-widest border bg-card border-subtle text-ghost">
               {room.privacy === 'private' ? <Lock className="w-2 h-2" /> : <Users2 className="w-2 h-2" />}
-              {room.privacy === 'private' ? 'Private' : 'Friends'}
+              {room.privacy === 'private' ? t('lobby.browser.privacy_private') : t('lobby.browser.privacy_friends')}
             </div>
           )}
           {room.isLocked && (
             <div className="flex items-center gap-1 px-2 py-0.5 rounded-full text-[7px] font-mono uppercase tracking-widest border bg-red-900/20 border-red-900/40 text-red-400">
               <Lock className="w-2 h-2" />
-              Locked
+              {t('lobby.browser.status_locked')}
             </div>
           )}
         </div>
@@ -223,7 +225,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
           </div>
         )}
         <span className="ml-2 flex items-center text-[9px] font-mono text-muted">
-          {room.playerCount}/{room.maxPlayers}
+          {t('lobby.browser.players_count', { count: room.playerCount, max: room.maxPlayers })}
         </span>
       </div>
 
@@ -248,7 +250,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
               : 'btn-primary hover:bg-subtle'
           )}
         >
-          {room.isLocked && room.phase === 'Lobby' ? 'Locked' : 'Join'}
+          {room.isLocked && room.phase === 'Lobby' ? t('lobby.browser.status_locked') : t('lobby.browser.btn_join')}
         </button>
         <button
           onMouseEnter={() => playSound('hover')}
@@ -259,7 +261,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
           }}
           className="flex-1 py-1.5 bg-card text-primary text-[9px] font-mono uppercase tracking-widest rounded-lg border border-default hover:bg-subtle transition-colors"
         >
-          Watch
+          {t('lobby.browser.btn_watch')}
         </button>
       </div>
     </motion.div>
@@ -271,22 +273,22 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
       <MessageSquare className="w-10 h-10 text-whisper mb-3" />
       <p className="text-sm text-muted font-serif italic">
         {(Array.isArray(rooms) ? rooms.length : 0) === 0
-          ? 'No active rooms found.'
-          : 'No rooms match your filters.'}
+          ? t('lobby.browser.empty_no_rooms')
+          : t('lobby.browser.empty_no_match')}
       </p>
       {(Array.isArray(rooms) ? rooms.length : 0) === 0 ? (
         <button
           onClick={onOpenCreate}
           className="mt-3 text-[9px] text-red-500 font-mono uppercase tracking-widest hover:underline"
         >
-          Be the first to create one
+          {t('lobby.browser.empty_create_prompt')}
         </button>
       ) : (
         <button
           onClick={clearFilters}
           className="mt-3 text-[9px] text-red-500 font-mono uppercase tracking-widest hover:underline"
         >
-          Clear filters
+          {t('lobby.browser.empty_clear_filters')}
         </button>
       )}
     </div>
@@ -312,13 +314,13 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
 
           {modeFilters.map((f) => (
             <button
-              key={f.label}
+              key={f.raw}
               onMouseEnter={() => playSound('hover')}
               onClick={() => { playSound('click'); f.toggle(); }}
               className={cn(
                 'px-2.5 py-1 rounded-full border text-[8px] font-mono uppercase tracking-widest transition-all shrink-0',
                 f.active
-                  ? MODE_STYLES[f.label]?.chip
+                  ? MODE_STYLES[f.raw]?.chip
                   : 'border-subtle text-ghost bg-elevated hover:bg-surface'
               )}
             >
@@ -344,7 +346,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
 
           <div className="flex-1" />
 
-          <span className="text-[8px] font-mono text-muted uppercase tracking-widest hidden sm:block">Sort</span>
+          <span className="text-[8px] font-mono text-muted uppercase tracking-widest hidden sm:block">{t('lobby.browser.sort_label')}</span>
           {(['newest', 'players'] as const).map((s) => (
             <button
               key={s}
@@ -357,7 +359,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                   : 'border-transparent text-ghost hover:text-muted'
               )}
             >
-              {s === 'newest' ? 'New' : 'Full'}
+              {s === 'newest' ? t('lobby.browser.sort_new') : t('lobby.browser.sort_full')}
             </button>
           ))}
           <span className="text-[8px] font-mono text-faint pl-1">
@@ -403,19 +405,19 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
 
           {modeFilters.map((f) => (
             <button
-              key={f.label}
+              key={f.raw}
               onClick={() => { playSound('click'); f.toggle(); }}
               className={cn(
                 'px-2.5 py-1.5 rounded-lg border text-[8px] font-mono uppercase tracking-widest transition-all shrink-0 flex items-center gap-1.5 font-bold',
                 f.active
-                  ? `${MODE_STYLES[f.label]?.chip} border-transparent`
+                  ? `${MODE_STYLES[f.raw]?.chip} border-transparent`
                   : 'bg-elevated/40 border-subtle text-ghost hover:text-muted'
               )}
             >
               <div className={cn("w-1.5 h-1.5 rounded-full", 
-                f.label === 'Casual' ? 'bg-blue-400' :
-                f.label === 'Ranked' ? 'bg-yellow-400' :
-                f.label === 'Classic' ? 'bg-emerald-400' :
+                f.raw === 'Casual' ? 'bg-blue-400' :
+                f.raw === 'Ranked' ? 'bg-yellow-400' :
+                f.raw === 'Classic' ? 'bg-emerald-400' :
                 'bg-purple-400'
               )} />
               {f.label}
@@ -451,7 +453,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                     : 'border-transparent text-ghost'
                 )}
               >
-                {s === 'newest' ? 'New' : 'Full'}
+                {s === 'newest' ? t('lobby.browser.sort_new') : t('lobby.browser.sort_full')}
               </button>
             ))}
             <span className="text-[9px] font-mono text-faint pl-1">
@@ -471,16 +473,16 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
               <MessageSquare className="w-8 h-8 text-whisper mb-3" />
               <p className="text-sm text-muted font-serif italic">
                 {(Array.isArray(rooms) ? rooms.length : 0) === 0
-                  ? 'No active rooms found.'
-                  : 'No rooms match your filters.'}
+                  ? t('lobby.browser.empty_no_rooms')
+                  : t('lobby.browser.empty_no_match')}
               </p>
               {(Array.isArray(rooms) ? rooms.length : 0) === 0 ? (
                 <button onClick={onOpenCreate} className="mt-3 text-[9px] text-red-500 font-mono uppercase tracking-widest hover:underline">
-                  Be the first to create one
+                  {t('lobby.browser.empty_create_prompt')}
                 </button>
               ) : (
                 <button onClick={clearFilters} className="mt-3 text-[9px] text-red-500 font-mono uppercase tracking-widest hover:underline">
-                  Clear filters
+                  {t('lobby.browser.empty_clear_filters')}
                 </button>
               )}
             </div>
@@ -512,9 +514,9 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                   <Lock className="w-6 h-6 text-muted" />
                 </div>
                 <div>
-                  <h3 className="text-lg font-thematic text-primary uppercase tracking-wide">Private Room</h3>
+                  <h3 className="text-lg font-thematic text-primary uppercase tracking-wide">{t('lobby.browser.private_modal_title')}</h3>
                   <p className="text-xs text-muted font-mono mt-1">{invitePrompt.roomName}</p>
-                  <p className="text-xs text-faint mt-1">Enter the 4-character invite code.</p>
+                  <p className="text-xs text-faint mt-1">{t('lobby.browser.private_modal_subtitle')}</p>
                 </div>
                 <input
                   autoFocus
@@ -537,7 +539,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                     onClick={() => { setInvitePrompt(null); setInviteCodeInput(''); }}
                     className="flex-1 py-2 border border-subtle text-muted text-xs font-mono uppercase tracking-widest rounded-xl hover:bg-card transition-colors"
                   >
-                    Cancel
+                    {t('lobby.browser.private_modal_cancel')}
                   </button>
                   <button
                     disabled={inviteCodeInput.length !== 4}
@@ -553,7 +555,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                         : 'bg-card text-ghost border border-subtle cursor-not-allowed'
                     )}
                   >
-                    Join
+                    {t('lobby.browser.btn_join')}
                   </button>
                 </div>
               </div>

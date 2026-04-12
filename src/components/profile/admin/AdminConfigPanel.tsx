@@ -1,4 +1,5 @@
 import React from 'react';
+import { useTranslation } from '../../../contexts/I18nContext';
 import { motion } from 'motion/react';
 import { Server, Activity, Clock } from 'lucide-react';
 import { SystemConfig } from '../../../../shared/types';
@@ -11,6 +12,7 @@ interface AdminConfigPanelProps {
 }
 
 export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setConfig }) => {
+  const { t } = useTranslation();
   const handleUpdateConfig = (updates: Partial<SystemConfig>) => {
     const newConfig = { ...config, ...updates };
     setConfig(newConfig);
@@ -32,7 +34,7 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
           </div>
           <div>
             <h2 className="text-xl font-thematic uppercase tracking-[0.15em] text-primary">
-              Live Controller
+              {t('profile.admin.tabs.system')}
             </h2>
             <p className="text-[10px] text-blue-400 font-mono uppercase tracking-widest">
               Environment Meta-Data
@@ -60,7 +62,7 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
               </div>
               <div>
                 <div className="text-sm font-bold text-primary uppercase tracking-widest">
-                  Maintenance Mode
+                  {t('profile.admin.config.maintenance')}
                 </div>
                 <div className="text-[10px] font-mono uppercase mt-0.5 opacity-60">
                   {config.maintenanceMode
@@ -91,7 +93,7 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
             <div className="bg-elevated/50 p-6 rounded-3xl border border-subtle space-y-4">
               <div className="flex justify-between items-center">
                 <div className="text-[10px] font-mono text-blue-400 uppercase font-bold tracking-widest">
-                  XP MULTIPLIER
+                  {t('profile.admin.config.xp_boost')}
                 </div>
                 <span className="text-2xl font-thematic text-primary">
                   {config.xpMultiplier}x
@@ -112,7 +114,7 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
             <div className="bg-elevated/50 p-6 rounded-3xl border border-subtle space-y-4">
               <div className="flex justify-between items-center">
                 <div className="text-[10px] font-mono text-emerald-400 uppercase font-bold tracking-widest">
-                  IP MULTIPLIER
+                  {t('profile.admin.config.ip_boost')}
                 </div>
                 <span className="text-2xl font-thematic text-primary">
                   {config.ipMultiplier}x

@@ -1,50 +1,50 @@
 import React from 'react';
 import { motion } from 'motion/react';
-import { Scale, Eye, Search, Zap, Target, Trophy, Layers, Trash2 } from 'lucide-react';
+import { Scale, Eye, Search, Zap, Target, Trophy, Layers, Trash2, User as UserIcon } from 'lucide-react';
 import { GameState } from '../../../shared/types';
-import { cn } from '../../utils/utils';
-import { User as UserIcon } from 'lucide-react';
-import { getProxiedUrl } from '../../utils/utils';
+import { cn, getProxiedUrl } from '../../utils/utils';
+import { useTranslation } from '../../contexts/I18nContext';
 
 interface PolicyTracksProps {
   gameState: GameState;
 }
 
 export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
+  const { t } = useTranslation();
   const numPlayers = gameState.players.length;
 
   // slotIndex here is the directive number (1-6), but visually the track is reversed (6 on left, 1 on right)
   const getStatePower = (slotIndex: number) => {
     if (numPlayers <= 6) {
       if (slotIndex === 3)
-        return { power: 'Peek', description: 'President previews top 3 directives', Icon: Eye };
+        return { power: t('game.powers.peek.name'), description: t('game.powers.peek.desc'), Icon: Eye };
       if (slotIndex === 4 || slotIndex === 5)
-        return { power: 'Kill', description: 'President executes a player', Icon: Target };
+        return { power: t('game.powers.kill.name'), description: t('game.powers.kill.desc'), Icon: Target };
     } else if (numPlayers <= 8) {
       if (slotIndex === 2)
         return {
-          power: 'Inv',
-          description: "President investigates a player's party",
+          power: t('game.powers.inv.name'),
+          description: t('game.powers.inv.desc'),
           Icon: Search,
         };
       if (slotIndex === 3)
-        return { power: 'Spec', description: 'President chooses next candidate', Icon: Zap };
+        return { power: t('game.powers.spec.name'), description: t('game.powers.spec.desc'), Icon: Zap };
       if (slotIndex === 4 || slotIndex === 5)
-        return { power: 'Kill', description: 'President executes a player', Icon: Target };
+        return { power: t('game.powers.kill.name'), description: t('game.powers.kill.desc'), Icon: Target };
     } else {
       if (slotIndex === 1 || slotIndex === 2)
         return {
-          power: 'Inv',
-          description: "President investigates a player's party",
+          power: t('game.powers.inv.name'),
+          description: t('game.powers.inv.desc'),
           Icon: Search,
         };
       if (slotIndex === 3)
-        return { power: 'Spec', description: 'President chooses next candidate', Icon: Zap };
+        return { power: t('game.powers.spec.name'), description: t('game.powers.spec.desc'), Icon: Zap };
       if (slotIndex === 4 || slotIndex === 5)
-        return { power: 'Kill', description: 'President executes a player', Icon: Target };
+        return { power: t('game.powers.kill.name'), description: t('game.powers.kill.desc'), Icon: Target };
     }
     if (slotIndex === 6)
-      return { power: 'Win', description: 'State wins immediately', Icon: Trophy };
+      return { power: t('game.powers.win.name'), description: t('game.powers.win.desc'), Icon: Trophy };
     return null;
   };
 
@@ -64,7 +64,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
         <div className="flex items-center justify-between uppercase tracking-widest font-light text-blue-400/70">
           <div className="flex items-center gap-1 text-responsive-xs">
             <Scale className="w-[1.4vh] h-[1.4vh]" />
-            <span>Civil</span>
+            <span>{t('game.tracks.civil_label')}</span>
           </div>
           <span className="text-[1.8vh] sm:text-[2vh] font-bold leading-none text-blue-400">{gameState.civilDirectives}</span>
         </div>
@@ -103,10 +103,10 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
                 {isCivilWin && (
                   <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 w-32 p-2 bg-surface border border-default rounded-xl opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity z-[200] shadow-2xl">
                     <div className="text-responsive-xs font-mono text-blue-400 uppercase mb-1">
-                      Win
+                      {t('game.tracks.win_civil')}
                     </div>
                     <div className="text-[7px] text-tertiary leading-tight">
-                      Civil wins immediately
+                      {t('game.tracks.win_civil_desc')}
                     </div>
                   </div>
                 )}
@@ -124,7 +124,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
             {gameState.deck.length}
           </span>
           <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 bg-black text-[8px] font-mono text-white rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 shadow-xl">
-            DECK
+            {t('game.tracks.deck')}
           </div>
         </div>
         <div className="w-[1.5vh] h-px bg-card" />
@@ -134,7 +134,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
             {gameState.discard.length}
           </span>
           <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 bg-black text-[8px] font-mono text-white rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50">
-            DISCARD
+            {t('game.tracks.discard')}
           </div>
         </div>
       </div>
@@ -144,7 +144,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
         <div className="flex items-center justify-between uppercase tracking-widest text-red-500/70 font-light">
           <span className="text-[1.8vh] sm:text-[2vh] font-bold leading-none text-red-500">{gameState.stateDirectives}</span>
           <div className="flex items-center gap-1 text-responsive-xs">
-            <span>State</span>
+            <span>{t('game.tracks.state_label')}</span>
             <Eye className="w-[1.4vh] h-[1.4vh]" />
           </div>
         </div>
@@ -216,7 +216,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
           <div className="flex items-center gap-1.5 shrink-0 font-light">
             <Eye className="w-[1.2vh] h-[1.2vh] text-ghost" />
             <span className="text-responsive-xs uppercase tracking-widest text-ghost">
-              Spectators ({gameState.spectators.length})
+              {t('game.tracks.spectators', { count: gameState.spectators.length })}
             </span>
           </div>
           <div className="flex items-center gap-2">
@@ -258,7 +258,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
             "text-ghost font-light"
           )}
         >
-          Election Tracker
+          {t('game.tracks.election_tracker')}
         </span>
         <div className="flex gap-2">
           {[0, 1, 2, 3].map((i) => {

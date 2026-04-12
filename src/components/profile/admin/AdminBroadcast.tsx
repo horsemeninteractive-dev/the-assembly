@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
+import { useTranslation } from '../../../contexts/I18nContext';
 import { Megaphone } from 'lucide-react';
 import { socket } from '../../../socket';
 
 export const AdminBroadcast: React.FC = () => {
+  const { t } = useTranslation();
   const [broadcastMessage, setBroadcastMessage] = useState('');
   const [isBroadcasting, setIsBroadcasting] = useState(false);
 
@@ -19,7 +21,7 @@ export const AdminBroadcast: React.FC = () => {
       <div className="flex items-center gap-3 mb-4">
         <Megaphone className="w-5 h-5 text-yellow-500" />
         <h3 className="text-xs font-mono text-primary uppercase tracking-widest font-bold">
-          Global Broadcast
+          {t('profile.admin.broadcast.title')}
         </h3>
       </div>
       <div className="flex gap-3">
@@ -27,7 +29,7 @@ export const AdminBroadcast: React.FC = () => {
           type="text"
           value={broadcastMessage}
           onChange={(e) => setBroadcastMessage(e.target.value)}
-          placeholder="Message all players..."
+          placeholder={t('profile.admin.broadcast.placeholder')}
           className="flex-1 bg-white border border-subtle rounded-2xl px-4 py-3 text-sm font-mono text-black placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-yellow-500/50"
         />
         <button
@@ -35,7 +37,7 @@ export const AdminBroadcast: React.FC = () => {
           disabled={isBroadcasting || !broadcastMessage.trim()}
           className="btn-primary bg-yellow-600 border-yellow-500 text-black px-8 rounded-2xl font-thematic uppercase tracking-widest text-xs"
         >
-          {isBroadcasting ? 'Sent!' : 'Broadcast'}
+          {isBroadcasting ? t('common.sent') : t('profile.admin.broadcast.btn_send')}
         </button>
       </div>
     </section>

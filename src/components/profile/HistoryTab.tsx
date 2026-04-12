@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from '../../contexts/I18nContext';
 import { motion, AnimatePresence } from 'motion/react';
 import { Clock, ChevronDown, ChevronUp, Target, History as HistoryIcon } from 'lucide-react';
 import { cn, apiUrl } from '../../utils/utils';
@@ -12,6 +13,7 @@ interface HistoryTabProps {
 }
 
 export function HistoryTab({ user, token, playSound }: HistoryTabProps) {
+  const { t } = useTranslation();
   const [matchHistory, setMatchHistory] = useState<MatchSummary[]>([]);
   const [historyLoading, setHistoryLoading] = useState(true);
   const [expandedMatch, setExpandedMatch] = useState<string | null>(null);
@@ -42,12 +44,12 @@ export function HistoryTab({ user, token, playSound }: HistoryTabProps) {
   };
 
   const handleWatchReplay = async (match: MatchSummary) => {
-    if (!match.matchId) return;
+    if (!match.id) return;
     
     try {
-      setFetchingReplayId(match.matchId);
+      setFetchingReplayId(match.id);
       playSound('click');
-      const res = await fetch(apiUrl(`/api/matches/${match.matchId}`), {
+      const res = await fetch(apiUrl(`/api/matches/${match.id}`), {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error();
@@ -76,7 +78,7 @@ export function HistoryTab({ user, token, playSound }: HistoryTabProps) {
   if (historyLoading) {
     return (
       <div className="flex items-center justify-center py-16 text-ghost font-mono text-xs uppercase tracking-widest">
-        Loading match history...
+        {t('profile.history.loading')}
       </div>
     );
   }
@@ -295,19 +297,19 @@ export function HistoryTab({ user, token, playSound }: HistoryTabProps) {
                     )}
 
                     {/* Replay Button */}
-                    {match.matchId && (
+                    {match.id && (
                       <button
                         onClick={(e) => { e.stopPropagation(); handleWatchReplay(match); }}
-                        disabled={fetchingReplayId === match.matchId}
+                        disabled={fetchingReplayId === match.id}
                         className={cn(
                           "w-full flex items-center justify-center gap-3 py-3 rounded-xl border transition-all font-thematic uppercase tracking-widest text-xs",
-                          fetchingReplayId === match.matchId
+                          fetchingReplayId === match.id
                             ? "bg-surface text-faint border-default"
                             : "bg-surface-glass text-primary border-primary/20 hover:bg-primary/10 hover:border-primary/40"
                         )}
                       >
-                        <HistoryIcon className={cn("w-4 h-4", fetchingReplayId === match.matchId && "animate-spin")} />
-                        {fetchingReplayId === match.matchId ? 'Decrypting Records...' : 'Watch Replay'}
+                        <HistoryIcon className={cn("w-4 h-4", fetchingReplayId === match.id && "animate-spin")} />
+                        {fetchingReplayId === match.id ? t('profile.history.btn_decrypting') : t('profile.history.btn_replay')}
                       </button>
                     )}
 

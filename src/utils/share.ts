@@ -15,9 +15,9 @@ export interface ShareState {
  * Generates a shareable URL containing the match summary encoded in the fragment or path.
  * We use a base64-encoded JSON blob.
  */
-export function generateShareUrl(gameState: GameState): string {
+export function generateShareUrl(gameState: GameState, t: any = (k: string) => k): string {
   const factions = getFactionCounts(gameState);
-  const moments = extractBigPlays(gameState).map((m) => m.text);
+  const moments = extractBigPlays(gameState, t).map((m) => m.text);
 
   const state: ShareState = {
     w: gameState.winner === 'Civil' ? 'C' : 'S',

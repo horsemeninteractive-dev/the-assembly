@@ -18,6 +18,7 @@ import { GameState, Player, PrivateInfo } from '../../../shared/types';
 import { cn, getProxiedUrl } from '../../utils/utils';
 import { OverseerIcon } from '../icons';
 import { extractBigPlays, BigPlay, BIG_PLAY_ICON } from '../../utils/game';
+import { useTranslation } from '../../contexts/I18nContext';
 
 type Slide =
   | { kind: 'intro' }
@@ -37,9 +38,10 @@ interface DebriefSequenceProps {
 // Helpers
 // ---------------------------------------------------------------------------
 
+// ROLE_STYLE labels are now sourced from t() at render time — this object
+// keeps only the visual tokens (colors, glows, ring colours).
 const ROLE_STYLE = {
   Civil: {
-    label: 'Civil',
     text: 'text-blue-500 dark:text-blue-400',
     border: 'border-blue-500/40 dark:border-blue-500/50',
     bg: 'bg-blue-500/10 dark:bg-blue-900/20',
@@ -47,7 +49,6 @@ const ROLE_STYLE = {
     ringColor: 'rgba(59,130,246,0.4)',
   },
   State: {
-    label: 'State Agent',
     text: 'text-red-500 dark:text-red-400',
     border: 'border-red-500/40 dark:border-red-500/50',
     bg: 'bg-red-500/10 dark:bg-red-900/20',
@@ -55,7 +56,6 @@ const ROLE_STYLE = {
     ringColor: 'rgba(239,68,68,0.45)',
   },
   Overseer: {
-    label: 'The Overseer',
     text: 'text-red-600 dark:text-red-100',
     border: 'border-red-500/60 dark:border-red-400/70',
     bg: 'bg-red-500/15 dark:bg-red-900/40',
@@ -88,16 +88,15 @@ function orderedPlayers(players: Player[]): Player[] {
 // ---------------------------------------------------------------------------
 
 const IntroSlide = ({ gameState }: { gameState: GameState }) => {
+  const { t } = useTranslation();
   const isCivil = gameState.winner === 'Civil';
-  const color = isCivil
-    ? 'text-blue-400'
-    : 'text-red-500';
+  const color = isCivil ? 'text-blue-400' : 'text-red-500';
   const glow = isCivil
     ? 'drop-shadow-[0_0_30px_rgba(59,130,246,0.4)] dark:drop-shadow-[0_0_30px_rgba(59,130,246,0.6)]'
     : 'drop-shadow-[0_0_30px_rgba(239,68,68,0.4)] dark:drop-shadow-[0_0_30px_rgba(239,68,68,0.6)]';
   const subtitle = isCivil
-    ? 'The Charter has been defended.'
-    : 'The Secretariat has fallen to the State.';
+    ? t('game.debrief.charter_defended')
+    : t('game.debrief.secretariat_fallen');
 
   return (
     <div className="flex flex-col items-center justify-center gap-6 text-center px-8">
@@ -107,7 +106,7 @@ const IntroSlide = ({ gameState }: { gameState: GameState }) => {
         transition={{ duration: 1, delay: 0.2 }}
         className="text-[10px] font-mono uppercase tracking-[0.3em] text-muted"
       >
-        The Assembly Has Concluded
+        {t('game.debrief.intro_title')}
       </motion.p>
 
       <motion.h1
@@ -116,7 +115,7 @@ const IntroSlide = ({ gameState }: { gameState: GameState }) => {
         transition={{ duration: 1.6, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className={cn('font-thematic text-4xl sm:text-5xl lg:text-7xl uppercase leading-tight px-4', color, glow)}
       >
-        {gameState.winReason ?? (isCivil ? 'Charter Restored' : 'State Supremacy')}
+        {gameState.winReason ?? (isCivil ? t('game.tracks.win_civil') : t('game.tracks.win_state'))}
       </motion.h1>
 
       <motion.p
@@ -138,37 +137,40 @@ const IntroSlide = ({ gameState }: { gameState: GameState }) => {
   );
 };
 
-const BigPlaysSlide = ({ plays }: { plays: BigPlay[] }) => (
-  <div className="flex flex-col items-center gap-8 px-8 w-full max-w-lg">
-    <motion.p
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-      className="text-[10px] font-mono uppercase tracking-[0.3em] text-muted"
-    >
-      Key Moments
-    </motion.p>
-    <div className="w-full space-y-3">
-      {plays.map((play, i) => {
-        const Icon = BIG_PLAY_ICON[play.icon];
-        return (
-          <motion.div
-            key={i}
-            initial={{ opacity: 0, x: -24 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.5, delay: 0.3 + i * 0.25, ease: 'easeOut' }}
-            className="flex items-center gap-4 bg-card/60 dark:bg-white/5 border border-default rounded-2xl px-5 py-4 backdrop-blur-sm"
-          >
-            <span className="text-secondary shrink-0">
-              <Icon className="w-5 h-5" />
-            </span>
-            <p className="text-sm text-primary font-mono leading-snug">{play.text}</p>
-          </motion.div>
-        );
-      })}
+const BigPlaysSlide = ({ plays }: { plays: BigPlay[] }) => {
+  const { t } = useTranslation();
+  return (
+    <div className="flex flex-col items-center gap-8 px-8 w-full max-w-lg">
+      <motion.p
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+        className="text-[10px] font-mono uppercase tracking-[0.3em] text-muted"
+      >
+        {t('game.debrief.key_moments')}
+      </motion.p>
+      <div className="w-full space-y-3">
+        {plays.map((play, i) => {
+          const Icon = BIG_PLAY_ICON[play.icon];
+          return (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -24 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 + i * 0.25, ease: 'easeOut' }}
+              className="flex items-center gap-4 bg-card/60 dark:bg-white/5 border border-default rounded-2xl px-5 py-4 backdrop-blur-sm"
+            >
+              <span className="text-secondary shrink-0">
+                <Icon className="w-5 h-5" />
+              </span>
+              <p className="text-sm text-primary font-mono leading-snug">{play.text}</p>
+            </motion.div>
+          );
+        })}
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 const PlayerSlide = ({
   player,
@@ -185,10 +187,12 @@ const PlayerSlide = ({
   agendaName?: string;
   agendaStatus?: string;
 }) => {
+  const { t } = useTranslation();
   const role = player.role ?? 'Civil';
   const style = ROLE_STYLE[role] ?? ROLE_STYLE.Civil;
   const isMe = player.id === myId;
   const displayName = player.name.replace(' (AI)', '');
+  const roleLabel = t(`debrief.roles.${role.toLowerCase()}`);
 
   return (
     <div className="flex flex-col items-center gap-6 px-8 text-center relative z-10 w-full h-full justify-center">
@@ -250,7 +254,7 @@ const PlayerSlide = ({
           {displayName}
           {isMe && (
             <span className="ml-2 text-[10px] font-mono text-yellow-500/70 uppercase tracking-widest align-middle">
-              You
+              {t('game.modals.game_over.you')}
             </span>
           )}
         </span>
@@ -269,7 +273,7 @@ const PlayerSlide = ({
         )}
       >
         {role === 'Overseer' && <OverseerIcon className="w-4 h-4 shrink-0" />}
-        <span>{style.label}</span>
+        <span>{roleLabel}</span>
       </motion.div>
 
       {/* Title role */}
@@ -302,8 +306,8 @@ const PlayerSlide = ({
         >
           <Target className="w-3 h-3" />
           {agendaName}
-          {agendaStatus === 'completed' && ' — Completed'}
-          {agendaStatus === 'failed' && ' — Failed'}
+          {agendaStatus === 'completed' && ` — ${t('game.modals.game_over.completed')}`}
+          {agendaStatus === 'failed' && ` — ${t('game.modals.game_over.failed')}`}
         </motion.div>
       )}
     </div>
@@ -317,6 +321,7 @@ const FinaleSlide = ({
   gameState: GameState;
   myId: string | undefined;
 }) => {
+  const { t } = useTranslation();
   const sorted = orderedPlayers(gameState.players);
 
   return (
@@ -326,7 +331,7 @@ const FinaleSlide = ({
         animate={{ opacity: 1 }}
         className="text-[10px] font-mono uppercase tracking-[0.3em] text-muted"
       >
-        All Identities Confirmed
+        {t('game.debrief.identities_confirmed')}
       </motion.p>
       <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 w-full">
         {sorted.map((p, i) => {
@@ -367,7 +372,7 @@ const FinaleSlide = ({
                 {displayName}
               </span>
               <span className={cn('text-[9px] font-mono uppercase tracking-widest font-bold', style.text)}>
-                {role === 'Overseer' ? 'Overseer' : role}
+                {t(`debrief.roles.${(role as string).toLowerCase()}`)}
               </span>
               {titleRole && (
                 <span className="text-[8px] font-mono text-red-400/70 uppercase tracking-widest">
@@ -393,11 +398,12 @@ export const DebriefSequence = ({
   onComplete,
   playSound,
 }: DebriefSequenceProps) => {
+  const { t } = useTranslation();
   // Build slide list once
   const slides = useMemo<Slide[]>(() => {
     const result: Slide[] = [{ kind: 'intro' }];
 
-    const plays = extractBigPlays(gameState);
+    const plays = extractBigPlays(gameState, t);
     if (plays.length > 0) result.push({ kind: 'bigplays', plays });
 
     const ordered = orderedPlayers(gameState.players);
@@ -499,7 +505,7 @@ export const DebriefSequence = ({
             transition={{ delay: 1.5 }}
             className="absolute bottom-8 flex items-center gap-1.5 text-[9px] font-mono uppercase tracking-[0.25em] text-muted opacity-60 pointer-events-none"
           >
-            Tap to advance <ChevronRight className="w-3 h-3" />
+            {t('game.debrief.tap_to_advance')} <ChevronRight className="w-3 h-3" />
           </motion.div>
 
           {/* Progress dots */}

@@ -5,6 +5,7 @@ import EmojiPicker, { Theme, EmojiStyle } from 'emoji-picker-react';
 import { GameState, Player } from '../../../../shared/types';
 import { EmojiRenderer } from '../../EmojiRenderer';
 import { cn, getProxiedUrl } from '../../../utils/utils';
+import { useTranslation } from '../../../contexts/I18nContext';
 
 interface ChatPanelProps {
   gameState: GameState;
@@ -40,7 +41,9 @@ export const ChatPanel = ({
   chatGhostRef,
   onChatScroll,
   playSound,
-}: ChatPanelProps) => (
+}: ChatPanelProps) => {
+  const { t } = useTranslation();
+  return (
   <AnimatePresence>
     {isOpen && (
       <motion.div
@@ -52,7 +55,7 @@ export const ChatPanel = ({
         <div className="h-14 px-4 flex items-center justify-between border-b border-subtle">
           <div className="flex items-center gap-2">
             <MessageSquare className="w-4 h-4 text-primary" />
-            <h3 className="font-thematic text-sm uppercase tracking-wider">Assembly Chat</h3>
+            <h3 className="font-thematic text-sm uppercase tracking-wider">{t('game.chat.title')}</h3>
           </div>
           <button
             onClick={() => {
@@ -80,7 +83,7 @@ export const ChatPanel = ({
                     <div className="px-4 py-1.5 rounded-full bg-surface border border-default flex items-center gap-2 shadow-xl">
                       <div className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
                       <span className="text-[10px] font-thematic uppercase tracking-[0.2em] text-primary">
-                        Round {item.round}
+                        {t('game.chat.round_separator', { count: item.round })}
                       </span>
                     </div>
                     <div className="h-[1px] w-12 bg-gradient-to-l from-transparent to-[#333]" />
@@ -164,8 +167,8 @@ export const ChatPanel = ({
                 {chatText === '' ? (
                   <span className="text-ghost">
                     {(me ? !me.isAlive : false) && gameState.phase !== 'GameOver'
-                      ? 'Dead players cannot speak...'
-                      : 'Type a message...'}
+                      ? t('game.chat.dead_cant_speak')
+                      : t('game.chat.placeholder')}
                   </span>
                 ) : (
                   <div className="flex items-center h-full">
@@ -184,8 +187,8 @@ export const ChatPanel = ({
                 onScroll={onChatScroll}
                 placeholder={
                   (me ? !me.isAlive : false) && gameState.phase !== 'GameOver'
-                    ? 'Dead players cannot speak...'
-                    : 'Type a message...'
+                    ? t('game.chat.dead_cant_speak')
+                    : t('game.chat.placeholder')
                 }
                 disabled={(me ? !me.isAlive : false) && gameState.phase !== 'GameOver'}
                 className={cn(
@@ -219,6 +222,7 @@ export const ChatPanel = ({
       </motion.div>
     )}
   </AnimatePresence>
-);
+  );
+};
 
 

@@ -15,6 +15,7 @@ import {
   CheckCircle,
 } from 'lucide-react';
 import { OverseerIcon } from './icons';
+import { useTranslation } from '../contexts/I18nContext';
 import { cn } from '../utils/utils';
 
 interface TutorialModalProps {
@@ -32,372 +33,350 @@ interface TutorialStep {
   content: React.ReactNode;
 }
 
-const STEPS: TutorialStep[] = [
-  {
-    id: 'premise',
-    title: 'The Assembly',
-    subtitle: 'A game of hidden loyalty',
-    icon: <Shield className="w-8 h-8" />,
-    accentColor: 'text-primary',
-    content: (
-      <div className="space-y-4">
-        <p className="text-secondary leading-relaxed">
-          The world ended with <span className="text-primary font-medium">The Crisis</span>. What
-          remains is The Assembly — a council of delegates trying to govern the ruins.
-        </p>
-        <p className="text-secondary leading-relaxed">
-          But not everyone wants to restore order. Some want to build a new State — and one among
-          them, the <span className="text-red-400 font-medium">Overseer</span>, is waiting to seize
-          total power.
-        </p>
-        <div className="bg-card rounded-xl p-4 border border-default">
-          <p className="text-tertiary text-sm font-mono uppercase tracking-widest mb-2">
-            The Assembly is
+export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete, onSkip }) => {
+  const { t } = useTranslation();
+  const [step, setStep] = useState(0);
+  const [direction, setDirection] = useState<1 | -1>(1);
+
+  const STEPS: TutorialStep[] = [
+    {
+      id: 'premise',
+      title: t('game.tutorial.premise.title'),
+      subtitle: t('game.tutorial.premise.subtitle'),
+      icon: <Shield className="w-8 h-8" />,
+      accentColor: 'text-primary',
+      content: (
+        <div className="space-y-4">
+          <p className="text-secondary leading-relaxed">
+            {t('game.tutorial.premise.p1', {
+              crisis: <span className="text-primary font-medium">The Crisis</span>,
+            })}
           </p>
-          <p className="text-primary text-sm leading-relaxed">
-            A <strong>social deduction game</strong> for 5–10 players. You are given a secret role.
-            Use it, lie with it, or die by it.
+          <p className="text-secondary leading-relaxed">
+            {t('game.tutorial.premise.p2', {
+              overseer: <span className="text-red-400 font-medium">Overseer</span>,
+            })}
           </p>
-        </div>
-      </div>
-    ),
-  },
-  {
-    id: 'roles',
-    title: 'Secret Roles',
-    subtitle: 'Three factions, one truth',
-    icon: <Eye className="w-8 h-8" />,
-    accentColor: 'text-primary',
-    content: (
-      <div className="space-y-3">
-        <div className="bg-blue-900/20 border border-blue-500/30 rounded-xl p-4 flex gap-4 items-start">
-          <Scale className="w-6 h-6 text-blue-400 shrink-0 mt-0.5" />
-          <div>
-            <div className="text-blue-400 font-bold uppercase tracking-wider text-sm mb-1">
-              Civil
-            </div>
-            <p className="text-secondary text-sm leading-relaxed">
-              The majority faction. You know nothing about who else is Civil. Enact{' '}
-              <strong>5 Civil directives</strong> to win — or execute the Overseer.
+          <div className="bg-card rounded-xl p-4 border border-default">
+            <p className="text-tertiary text-sm font-mono uppercase tracking-widest mb-2">
+              {t('game.tutorial.premise.label')}
+            </p>
+            <p className="text-primary text-sm leading-relaxed">
+              {t('game.tutorial.premise.desc')}
             </p>
           </div>
         </div>
-        <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-4 flex gap-4 items-start">
-          <Eye className="w-6 h-6 text-red-400 shrink-0 mt-0.5" />
-          <div>
-            <div className="text-red-400 font-bold uppercase tracking-wider text-sm mb-1">
-              State
-            </div>
-            <p className="text-secondary text-sm leading-relaxed">
-              The minority faction. You know who your allies are. Enact{' '}
-              <strong>6 State directives</strong> to win — or get the Overseer elected Chancellor.
-            </p>
-          </div>
-        </div>
-        <div className="bg-red-900/30 border border-red-600/50 rounded-xl p-4 flex gap-4 items-start">
-          <OverseerIcon className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
-          <div>
-            <div className="text-red-500 font-bold uppercase tracking-wider text-sm mb-1">
-              The Overseer
-            </div>
-            <p className="text-secondary text-sm leading-relaxed">
-              A State agent. You win if State wins. If you are{' '}
-              <strong>elected Chancellor after 3 State directives</strong>, the game ends
-              immediately.
-            </p>
-          </div>
-        </div>
-      </div>
-    ),
-  },
-  {
-    id: 'loop',
-    title: 'The Game Loop',
-    subtitle: 'Each round follows the same sequence',
-    icon: <Crown className="w-8 h-8" />,
-    accentColor: 'text-yellow-400',
-    content: (
-      <div className="space-y-3">
-        {[
-          {
-            num: '1',
-            label: 'Presidential Nomination',
-            desc: 'The current President nominates a Chancellor candidate. The presidential role rotates each round.',
-          },
-          {
-            num: '2',
-            label: 'Assembly Vote',
-            desc: 'All living players vote AYE or NAY on the proposed government. Majority AYE passes it.',
-          },
-          {
-            num: '3',
-            label: 'Legislative Session',
-            desc: 'The President draws 3 policy cards, discards 1, and passes 2 to the Chancellor. The Chancellor enacts one.',
-          },
-          {
-            num: '4',
-            label: 'Declarations',
-            desc: 'Both President and Chancellor publicly declare what cards they saw and passed. This is how trust is built — or broken.',
-          },
-        ].map((step) => (
-          <div key={step.num} className="flex gap-3 items-start">
-            <div className="w-7 h-7 rounded-full bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center shrink-0">
-              <span className="text-yellow-400 text-xs font-bold">{step.num}</span>
-            </div>
+      ),
+    },
+    {
+      id: 'roles',
+      title: t('game.tutorial.roles.title'),
+      subtitle: t('game.tutorial.roles.subtitle'),
+      icon: <Eye className="w-8 h-8" />,
+      accentColor: 'text-primary',
+      content: (
+        <div className="space-y-3">
+          <div className="bg-blue-900/20 border border-blue-500/30 rounded-xl p-4 flex gap-4 items-start">
+            <Scale className="w-6 h-6 text-blue-400 shrink-0 mt-0.5" />
             <div>
-              <div className="text-primary text-sm font-medium">{step.label}</div>
-              <div className="text-tertiary text-xs leading-relaxed mt-0.5">{step.desc}</div>
+              <div className="text-blue-400 font-bold uppercase tracking-wider text-sm mb-1">
+                {t('game.tutorial.roles.civil.label')}
+              </div>
+              <p className="text-secondary text-sm leading-relaxed">
+                {t('game.tutorial.roles.civil.desc')}
+              </p>
             </div>
           </div>
-        ))}
-        <div className="bg-card rounded-xl p-3 border border-default mt-2">
-          <p className="text-muted text-xs font-mono">
-            If 3 elections fail in a row, a <span className="text-orange-400">chaos policy</span> is
-            drawn automatically and enacted without a vote.
-          </p>
-        </div>
-      </div>
-    ),
-  },
-  {
-    id: 'voting',
-    title: 'Voting & Declarations',
-    subtitle: 'The heart of social deduction',
-    icon: <Vote className="w-8 h-8" />,
-    accentColor: 'text-purple-400',
-    content: (
-      <div className="space-y-4">
-        <p className="text-secondary leading-relaxed text-sm">
-          Votes are <strong className="text-primary">simultaneous and hidden</strong> until
-          revealed. You can't see how others voted before you cast yours.
-        </p>
-        <div className="grid grid-cols-2 gap-3">
-          <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-xl p-3 text-center">
-            <div className="text-emerald-400 font-bold text-lg font-thematic">AYE</div>
-            <p className="text-tertiary text-xs mt-1">Support this government</p>
-          </div>
-          <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-3 text-center">
-            <div className="text-red-400 font-bold text-lg font-thematic">NAY</div>
-            <p className="text-tertiary text-xs mt-1">Block this government</p>
-          </div>
-        </div>
-        <div className="bg-card rounded-xl p-4 border border-default space-y-2">
-          <div className="text-tertiary text-xs font-mono uppercase tracking-widest">
-            Declarations
-          </div>
-          <p className="text-secondary text-sm leading-relaxed">
-            After a policy is enacted, the President and Chancellor publicly declare what cards they
-            drew and passed. These claims can be{' '}
-            <span className="text-yellow-400">true or false</span> — the table must decide who to
-            believe.
-          </p>
-          <p className="text-muted text-xs italic">
-            Contradictions between the President's and Chancellor's declarations are your most
-            important clue.
-          </p>
-        </div>
-      </div>
-    ),
-  },
-  {
-    id: 'executive',
-    title: 'Executive Actions',
-    subtitle: 'Power grows as State advances',
-    icon: <Zap className="w-8 h-8" />,
-    accentColor: 'text-orange-400',
-    content: (
-      <div className="space-y-3">
-        <p className="text-secondary text-sm leading-relaxed">
-          Each time a State directive is enacted, the President may unlock a special executive
-          power. These grow more dangerous as State advances.
-        </p>
-        {[
-          { name: 'Policy Peek', desc: 'See the top 3 cards in the draw pile.' },
-          {
-            name: 'Investigate',
-            desc: 'Learn whether a player is Civil or State (not who specifically).',
-          },
-          {
-            name: 'Special Election',
-            desc: 'Choose who will be the next President, skipping normal rotation.',
-          },
-          {
-            name: 'Execution',
-            desc: "Permanently eliminate a player. If it's the Overseer, Civil wins instantly.",
-          },
-        ].map((action) => (
-          <div
-            key={action.name}
-            className="flex gap-3 items-start bg-card rounded-lg p-3 border border-default"
-          >
-            <Zap className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
+          <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-4 flex gap-4 items-start">
+            <Eye className="w-6 h-6 text-red-400 shrink-0 mt-0.5" />
             <div>
-              <div className="text-orange-400 text-sm font-medium">{action.name}</div>
-              <div className="text-tertiary text-xs mt-0.5">{action.desc}</div>
+              <div className="text-red-400 font-bold uppercase tracking-wider text-sm mb-1">
+                {t('game.tutorial.roles.state.label')}
+              </div>
+              <p className="text-secondary text-sm leading-relaxed">
+                {t('game.tutorial.roles.state.desc')}
+              </p>
             </div>
           </div>
-        ))}
-        <p className="text-faint text-xs italic">
-          Executive actions are given to the current President and must be used before the next
-          round begins.
-        </p>
-      </div>
-    ),
-  },
-  {
-    id: 'titles',
-    title: 'Title Roles',
-    subtitle: 'Special abilities assigned at random',
-    icon: <Crown className="w-8 h-8" />,
-    accentColor: 'text-yellow-400',
-    content: (
-      <div className="space-y-3">
-        <p className="text-secondary text-sm leading-relaxed">
-          At the start of each game, some players are secretly assigned a{' '}
-          <span className="text-yellow-400 font-medium">Title Role</span> — a one-time ability that
-          fires at a specific moment.
-        </p>
-        <div className="grid grid-cols-1 gap-2">
+          <div className="bg-red-900/30 border border-red-600/50 rounded-xl p-4 flex gap-4 items-start">
+            <OverseerIcon className="w-6 h-6 text-red-500 shrink-0 mt-0.5" />
+            <div>
+              <div className="text-red-500 font-bold uppercase tracking-wider text-sm mb-1">
+                {t('game.tutorial.roles.overseer.label')}
+              </div>
+              <p className="text-secondary text-sm leading-relaxed">
+                {t('game.tutorial.roles.overseer.desc')}
+              </p>
+            </div>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: 'loop',
+      title: t('game.tutorial.loop.title'),
+      subtitle: t('game.tutorial.loop.subtitle'),
+      icon: <Crown className="w-8 h-8" />,
+      accentColor: 'text-yellow-400',
+      content: (
+        <div className="space-y-3">
           {[
             {
-              name: 'Interdictor',
-              when: 'Start of round',
-              desc: 'Detain a player, blocking them from voting or being Chancellor.',
+              num: '1',
+              label: t('game.tutorial.loop.step_1.label'),
+              desc: t('game.tutorial.loop.step_1.desc'),
             },
             {
-              name: 'Broker',
-              when: 'After nomination',
-              desc: 'Veto the Chancellor nomination, forcing a re-nomination.',
+              num: '2',
+              label: t('game.tutorial.loop.step_2.label'),
+              desc: t('game.tutorial.loop.step_2.desc'),
             },
             {
-              name: 'Strategist',
-              when: 'Legislative session',
-              desc: 'Draw 4 policies instead of 3 as President.',
+              num: '3',
+              label: t('game.tutorial.loop.step_3.label'),
+              desc: t('game.tutorial.loop.step_3.desc'),
             },
             {
-              name: 'Auditor',
-              when: 'After enactment',
-              desc: 'Peek at the last 3 discarded policies.',
+              num: '4',
+              label: t('game.tutorial.loop.step_4.label'),
+              desc: t('game.tutorial.loop.step_4.desc'),
             },
-            { name: 'Assassin', when: 'After enactment', desc: 'Secretly execute another player.' },
-            {
-              name: 'Defector',
-              when: 'Voting Reveal',
-              desc: 'Secretly change your vote after the initial reveal to flip the outcome.',
-            },
-            {
-              name: 'Handler',
-              when: 'After enactment',
-              desc: 'Swap the next two players in the presidential rotation.',
-            },
-          ].map((role) => (
-            <div key={role.name} className="flex gap-3 items-start">
-              <div className="w-2 h-2 rounded-full bg-yellow-500/50 shrink-0 mt-1.5" />
+          ].map((step) => (
+            <div key={step.num} className="flex gap-3 items-start">
+              <div className="w-7 h-7 rounded-full bg-yellow-500/20 border border-yellow-500/40 flex items-center justify-center shrink-0">
+                <span className="text-yellow-400 text-xs font-bold">{step.num}</span>
+              </div>
               <div>
-                <span className="text-yellow-400 text-sm font-medium">{role.name}</span>
-                <span className="text-faint text-xs font-mono ml-2">({role.when})</span>
-                <p className="text-tertiary text-xs mt-0.5">{role.desc}</p>
+                <div className="text-primary text-sm font-medium">{step.label}</div>
+                <div className="text-tertiary text-xs leading-relaxed mt-0.5">{step.desc}</div>
               </div>
             </div>
           ))}
-        </div>
-        <p className="text-faint text-xs italic">
-          Title abilities are single-use. Check your Dossier to see if you have one.
-        </p>
-      </div>
-    ),
-  },
-  {
-    id: 'agendas',
-    title: 'Personal Agendas',
-    subtitle: 'Your hidden individual goal',
-    icon: <Target className="w-8 h-8" />,
-    accentColor: 'text-emerald-400',
-    content: (
-      <div className="space-y-4">
-        <p className="text-secondary text-sm leading-relaxed">
-          Every player is secretly assigned a{' '}
-          <span className="text-emerald-400 font-medium">Personal Agenda</span> — a hidden objective
-          that earns bonus XP and IP if completed, regardless of whether your faction wins or loses.
-        </p>
-        <div className="bg-emerald-900/15 border border-emerald-500/25 rounded-xl p-4 space-y-2">
-          <div className="text-emerald-400 text-xs font-mono uppercase tracking-widest">
-            Example Agendas
+          <div className="bg-card rounded-xl p-3 border border-default mt-2">
+            <p className="text-muted text-xs font-mono">
+              {t('game.tutorial.loop.chaos_desc', {
+                chaos: <span className="text-orange-400">chaos policy</span>,
+              })}
+            </p>
           </div>
-          <div className="space-y-2 text-sm">
+        </div>
+      ),
+    },
+    {
+      id: 'voting',
+      title: t('game.tutorial.voting.title'),
+      subtitle: t('game.tutorial.voting.subtitle'),
+      icon: <Vote className="w-8 h-8" />,
+      accentColor: 'text-purple-400',
+      content: (
+        <div className="space-y-4">
+          <p className="text-secondary leading-relaxed text-sm">
+            {t('game.tutorial.voting.p1', {
+              simultaneous: <strong className="text-primary">simultaneous and hidden</strong>,
+            })}
+          </p>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="bg-emerald-900/20 border border-emerald-500/30 rounded-xl p-3 text-center">
+              <div className="text-emerald-400 font-bold text-lg font-thematic">
+                {t('game.tutorial.voting.aye')}
+              </div>
+              <p className="text-tertiary text-xs mt-1">{t('game.tutorial.voting.aye_desc')}</p>
+            </div>
+            <div className="bg-red-900/20 border border-red-500/30 rounded-xl p-3 text-center">
+              <div className="text-red-400 font-bold text-lg font-thematic">
+                {t('game.tutorial.voting.nay')}
+              </div>
+              <p className="text-tertiary text-xs mt-1">{t('game.tutorial.voting.nay_desc')}</p>
+            </div>
+          </div>
+          <div className="bg-card rounded-xl p-4 border border-default space-y-2">
+            <div className="text-tertiary text-xs font-mono uppercase tracking-widest">
+              {t('game.tutorial.voting.decl_label')}
+            </div>
+            <p className="text-secondary text-sm leading-relaxed">
+              {t('game.tutorial.voting.decl_p1', {
+                true_or_false: <span className="text-yellow-400">true or false</span>,
+              })}
+            </p>
+            <p className="text-muted text-xs italic">{t('game.tutorial.voting.decl_hint')}</p>
+          </div>
+        </div>
+      ),
+    },
+    {
+      id: 'executive',
+      title: t('game.tutorial.executive.title'),
+      subtitle: t('game.tutorial.executive.subtitle'),
+      icon: <Zap className="w-8 h-8" />,
+      accentColor: 'text-orange-400',
+      content: (
+        <div className="space-y-3">
+          <p className="text-secondary text-sm leading-relaxed">
+            {t('game.tutorial.executive.p1')}
+          </p>
+          {Object.entries(t('game.tutorial.executive.actions', { returnObjects: true })).map(
+            ([key, action]: [string, any]) => (
+              <div
+                key={key}
+                className="flex gap-3 items-start bg-card rounded-lg p-3 border border-default"
+              >
+                <Zap className="w-4 h-4 text-orange-400 shrink-0 mt-0.5" />
+                <div>
+                  <div className="text-orange-400 text-sm font-medium">{action.name}</div>
+                  <div className="text-tertiary text-xs mt-0.5">{action.desc}</div>
+                </div>
+              </div>
+            )
+          )}
+          <p className="text-faint text-xs italic">{t('game.tutorial.executive.footer')}</p>
+        </div>
+      ),
+    },
+    {
+      id: 'titles',
+      title: t('game.tutorial.titles.title'),
+      subtitle: t('game.tutorial.titles.subtitle'),
+      icon: <Crown className="w-8 h-8" />,
+      accentColor: 'text-yellow-400',
+      content: (
+        <div className="space-y-3">
+          <p className="text-secondary text-sm leading-relaxed">
+            {t('game.tutorial.titles.p1', {
+              title_role: <span className="text-yellow-400 font-medium">Title Role</span>,
+            })}
+          </p>
+          <div className="grid grid-cols-1 gap-2">
             {[
-              'Vote Nay in at least 3 rounds',
-              'Be nominated as Chancellor at least twice',
-              'The game must end before round (player count + 3)',
-              'No chaos policy is enacted during the game',
-            ].map((a) => (
-              <div key={a} className="flex gap-2 items-start text-secondary">
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-500/50 shrink-0 mt-0.5" />
-                <span>{a}</span>
+              {
+                name: t('game.tutorial.titles.roles.interdictor.name'),
+                when: t('game.phases.nominate_chancellor'),
+                desc: t('game.tutorial.titles.roles.interdictor.desc'),
+              },
+              {
+                name: t('game.tutorial.titles.roles.broker.name'),
+                when: t('game.phases.nomination_review'),
+                desc: t('game.tutorial.titles.roles.broker.desc'),
+              },
+              {
+                name: t('game.tutorial.titles.roles.strategist.name'),
+                when: t('game.phases.legislative_president'),
+                desc: t('game.tutorial.titles.roles.strategist.desc'),
+              },
+              {
+                name: t('game.tutorial.titles.roles.auditor.name'),
+                when: t('game.phases.auditor_inspect'),
+                desc: t('game.tutorial.titles.roles.auditor.desc'),
+              },
+              {
+                name: t('game.tutorial.titles.roles.assassin.name'),
+                when: t('game.phases.assassin_target'),
+                desc: t('game.tutorial.titles.roles.assassin.desc'),
+              },
+              {
+                name: t('game.tutorial.titles.roles.defector.name'),
+                when: t('game.phases.defector_align'),
+                desc: t('game.tutorial.titles.roles.defector.desc'),
+              },
+              {
+                name: t('game.tutorial.titles.roles.handler.name'),
+                when: t('game.phases.legislative_chancellor'),
+                desc: t('game.tutorial.titles.roles.handler.desc'),
+              },
+            ].map((role) => (
+              <div key={role.name} className="flex gap-3 items-start">
+                <div className="w-2 h-2 rounded-full bg-yellow-500/50 shrink-0 mt-1.5" />
+                <div>
+                  <span className="text-yellow-400 text-sm font-medium">{role.name}</span>
+                  <p className="text-tertiary text-xs mt-0.5">{role.desc}</p>
+                </div>
               </div>
             ))}
           </div>
+          <p className="text-faint text-xs italic">{t('game.tutorial.titles.footer')}</p>
         </div>
-        <div className="bg-card rounded-xl p-3 border border-default">
-          <p className="text-muted text-xs leading-relaxed">
-            Completing your agenda awards <span className="text-emerald-400">+100 XP</span> and
-            bonus IP — the same as winning with your faction. Win <em>and</em> complete your agenda
-            for double rewards.
+      ),
+    },
+    {
+      id: 'agendas',
+      title: t('game.tutorial.agendas.title'),
+      subtitle: t('game.tutorial.agendas.subtitle'),
+      icon: <Target className="w-8 h-8" />,
+      accentColor: 'text-emerald-400',
+      content: (
+        <div className="space-y-4">
+          <p className="text-secondary text-sm leading-relaxed">
+            {t('game.tutorial.agendas.p1', {
+              agenda: <span className="text-emerald-400 font-medium">Personal Agenda</span>,
+            })}
           </p>
-        </div>
-        <p className="text-faint text-xs italic">
-          Your agenda is visible in your Dossier at all times. Others can't see it.
-        </p>
-      </div>
-    ),
-  },
-  {
-    id: 'tips',
-    title: 'Surviving The Assembly',
-    subtitle: 'Key things to remember',
-    icon: <FileText className="w-8 h-8" />,
-    accentColor: 'text-blue-400',
-    content: (
-      <div className="space-y-3">
-        {[
-          {
-            heading: 'Civil players: trust nobody',
-            body: "You outnumber State but you don't know who they are. Contradictory declarations, suspicious nominations, and patterns in voting are your only clues.",
-            color: 'text-blue-400',
-            bg: 'bg-blue-900/10 border-blue-500/20',
-          },
-          {
-            heading: 'State players: coordinate carefully',
-            body: "You know your allies but can't communicate openly. Coordinate through nominations, declarations, and subtle voting patterns — without being obvious.",
-            color: 'text-red-400',
-            bg: 'bg-red-900/10 border-red-500/20',
-          },
-          {
-            heading: 'Declarations are everything',
-            body: 'After every legislative session, both President and Chancellor declare what they saw. Cross-referencing these claims is how you detect lies.',
-            color: 'text-yellow-400',
-            bg: 'bg-yellow-900/10 border-yellow-500/20',
-          },
-          {
-            heading: 'Watch your Dossier',
-            body: 'Your role, title ability, and personal agenda are always visible in your Dossier — tap the icon in the header during a game.',
-            color: 'text-purple-400',
-            bg: 'bg-purple-900/10 border-purple-500/20',
-          },
-        ].map((tip) => (
-          <div key={tip.heading} className={cn('rounded-xl p-3 border', tip.bg)}>
-            <div className={cn('text-sm font-medium mb-1', tip.color)}>{tip.heading}</div>
-            <p className="text-tertiary text-xs leading-relaxed">{tip.body}</p>
+          <div className="bg-emerald-900/15 border border-emerald-500/25 rounded-xl p-4 space-y-2">
+            <div className="text-emerald-400 text-xs font-mono uppercase tracking-widest">
+              {t('game.tutorial.agendas.examples_label')}
+            </div>
+            <div className="space-y-2 text-sm">
+              {t('game.tutorial.agendas.examples', { returnObjects: true }).map((a: string) => (
+                <div key={a} className="flex gap-2 items-start text-secondary">
+                  <CheckCircle className="w-3.5 h-3.5 text-emerald-500/50 shrink-0 mt-0.5" />
+                  <span>{a}</span>
+                </div>
+              ))}
+            </div>
           </div>
-        ))}
-      </div>
-    ),
-  },
-];
-
-export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete, onSkip }) => {
-  const [step, setStep] = useState(0);
-  const [direction, setDirection] = useState<1 | -1>(1);
+          <div className="bg-card rounded-xl p-3 border border-default">
+            <p className="text-muted text-xs leading-relaxed">
+              {t('game.tutorial.agendas.footer', {
+                bonus: <span className="text-emerald-400">+100 XP</span>,
+                and: <em>and</em>,
+              })}
+            </p>
+          </div>
+          <p className="text-faint text-xs italic">{t('game.tutorial.agendas.footer_sub')}</p>
+        </div>
+      ),
+    },
+    {
+      id: 'tips',
+      title: t('game.tutorial.tips.title'),
+      subtitle: t('game.tutorial.tips.subtitle'),
+      icon: <FileText className="w-8 h-8" />,
+      accentColor: 'text-blue-400',
+      content: (
+        <div className="space-y-3">
+          {[
+            {
+              heading: t('game.tutorial.tips.civil.heading'),
+              body: t('game.tutorial.tips.civil.body'),
+              color: 'text-blue-400',
+              bg: 'bg-blue-900/10 border-blue-500/20',
+            },
+            {
+              heading: t('game.tutorial.tips.state.heading'),
+              body: t('game.tutorial.tips.state.body'),
+              color: 'text-red-400',
+              bg: 'bg-red-900/10 border-red-500/20',
+            },
+            {
+              heading: t('game.tutorial.tips.decl.heading'),
+              body: t('game.tutorial.tips.decl.body'),
+              color: 'text-yellow-400',
+              bg: 'bg-yellow-900/10 border-yellow-500/20',
+            },
+            {
+              heading: t('game.tutorial.tips.dossier.heading'),
+              body: t('game.tutorial.tips.dossier.body'),
+              color: 'text-purple-400',
+              bg: 'bg-purple-900/10 border-purple-500/20',
+            },
+          ].map((tip) => (
+            <div key={tip.heading} className={cn('rounded-xl p-3 border', tip.bg)}>
+              <div className={cn('text-sm font-medium mb-1', tip.color)}>{tip.heading}</div>
+              <p className="text-tertiary text-xs leading-relaxed">{tip.body}</p>
+            </div>
+          ))}
+        </div>
+      ),
+    },
+  ];
 
   const current = STEPS[step];
   const isFirst = step === 0;
@@ -504,7 +483,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete
                     className="flex items-center gap-1.5 px-4 py-2.5 bg-card text-tertiary rounded-xl border border-default hover:bg-hover hover:text-white transition-all text-sm font-mono"
                   >
                     <ChevronLeft className="w-4 h-4" />
-                    Back
+                    {t('game.tutorial.back')}
                   </button>
                 )}
                 <button
@@ -518,11 +497,11 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete
                 >
                   {isLast ? (
                     <>
-                      <CheckCircle className="w-4 h-4" /> Enter the Assembly
+                      <CheckCircle className="w-4 h-4" /> {t('game.tutorial.enter')}
                     </>
                   ) : (
                     <>
-                      Next <ChevronRight className="w-4 h-4" />
+                      {t('game.tutorial.next')} <ChevronRight className="w-4 h-4" />
                     </>
                   )}
                 </button>
@@ -533,7 +512,7 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete
                 onClick={onSkip}
                 className="w-full text-center text-ghost hover:text-muted text-xs font-mono uppercase tracking-widest transition-colors"
               >
-                Skip tutorial
+                {t('game.tutorial.skip')}
               </button>
             </div>
           </motion.div>

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
 import { Shuffle, Plus, Bot } from 'lucide-react';
-import { LobbyPracticeCreator } from './LobbyPracticeCreator';
 import { cn } from '../../utils/utils';
 import { User, RoomInfo, GameMode, RoomPrivacy } from '../../../shared/types';
+import { useTranslation } from '../../contexts/I18nContext';
 
 interface LobbyMatchmakingProps {
   user: User;
@@ -25,7 +25,6 @@ interface LobbyMatchmakingProps {
   onOpenPractice: () => void;
   playSound: (soundKey: string) => void;
 }
-
 export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
   user,
   rooms,
@@ -35,6 +34,7 @@ export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
   onOpenPractice,
   playSound,
 }) => {
+  const { t } = useTranslation();
   const [quickJoinStatus, setQuickJoinStatus] = useState<'idle' | 'searching' | 'found' | 'none'>(
     'idle'
   );
@@ -103,14 +103,14 @@ export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
           <div className="min-w-0">
             <div className="text-xs font-thematic leading-none">
               {quickJoinStatus === 'searching'
-                ? 'Searching…'
+                ? t('lobby.matchmaking.searching')
                 : quickJoinStatus === 'found'
-                  ? 'Joining!'
+                  ? t('lobby.matchmaking.joining')
                   : quickJoinStatus === 'none'
-                    ? 'No Rooms'
-                    : 'Quick Join'}
+                    ? t('lobby.matchmaking.no_rooms')
+                    : t('lobby.matchmaking.quick_join')}
             </div>
-            <div className="text-[8px] font-mono text-muted mt-0.5 uppercase tracking-wider">Best available room</div>
+            <div className="text-[8px] font-mono text-muted mt-0.5 uppercase tracking-wider">{t('lobby.matchmaking.quick_join_desc')}</div>
           </div>
         </button>
 
@@ -124,8 +124,8 @@ export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
             <Plus className="w-4 h-4" />
           </div>
           <div className="min-w-0">
-            <div className="text-xs font-thematic leading-none">Create Assembly</div>
-            <div className="text-[8px] font-mono mt-0.5 uppercase tracking-wider opacity-60">Convene your own</div>
+            <div className="text-xs font-thematic leading-none">{t('lobby.matchmaking.create')}</div>
+            <div className="text-[8px] font-mono mt-0.5 uppercase tracking-wider opacity-60">{t('lobby.matchmaking.create_desc')}</div>
           </div>
         </button>
 
@@ -139,8 +139,8 @@ export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
             <Bot className="w-4 h-4 text-muted" />
           </div>
           <div className="min-w-0">
-            <div className="text-xs font-thematic leading-none">Solo Practice</div>
-            <div className="text-[8px] font-mono text-muted mt-0.5 uppercase tracking-wider">Train vs AI bots</div>
+            <div className="text-xs font-thematic leading-none">{t('lobby.matchmaking.practice')}</div>
+            <div className="text-[8px] font-mono text-muted mt-0.5 uppercase tracking-wider">{t('lobby.matchmaking.practice_desc')}</div>
           </div>
         </button>
         
@@ -150,7 +150,7 @@ export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
         {/* Global War Meter */}
         <div className="mt-1">
           <p className="text-[8px] font-mono text-ghost uppercase tracking-[0.22em] px-1 mb-2">
-            Global War
+            {t('lobby.matchmaking.global_war')}
           </p>
           <div className="bg-surface-glass border border-subtle rounded-xl p-3 backdrop-blur-md">
             <div className="flex items-center justify-between text-[11px] font-mono uppercase tracking-widest mb-2 font-bold px-0.5">
@@ -168,8 +168,8 @@ export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
               />
             </div>
             <div className="flex items-center justify-between mt-2 font-mono text-[8px] tracking-tighter uppercase opacity-60">
-              <span className="text-blue-400">Total: {globalStats.civilWins}</span>
-              <span className="text-red-400">Total: {globalStats.stateWins}</span>
+              <span className="text-blue-400">{t('common.total')}: {globalStats.civilWins}</span>
+              <span className="text-red-400">{t('common.total')}: {globalStats.stateWins}</span>
             </div>
           </div>
         </div>
@@ -177,11 +177,11 @@ export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
         {/* Assembly Statistics */}
         <div className="mt-2 border-t border-subtle pt-4 mx-2">
             <div className="flex items-center justify-between mb-2">
-                <span className="text-[8px] font-mono text-ghost uppercase tracking-widest">Assemblies Running</span>
+                <span className="text-[8px] font-mono text-ghost uppercase tracking-widest">{t('lobby.matchmaking.stats_running')}</span>
                 <span className="text-xs font-mono text-primary font-bold">{rooms.filter(r => !r.isPractice).length}</span>
             </div>
             <div className="flex items-center justify-between">
-                <span className="text-[8px] font-mono text-ghost uppercase tracking-widest">Active Members</span>
+                <span className="text-[8px] font-mono text-ghost uppercase tracking-widest">{t('lobby.matchmaking.stats_members')}</span>
                 <span className="text-xs font-mono text-emerald-500 font-bold">
                     {rooms.reduce((acc, r) => acc + r.playerCount, 0) + Math.floor(Math.random() * 5) + 3}
                 </span>
@@ -217,12 +217,12 @@ export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
             <Shuffle className={cn('w-4 h-4 sm:w-[2.2vh] sm:h-[2.2vh]', quickJoinStatus === 'searching' && 'animate-spin')} />
             <span className="text-center leading-tight">
               {quickJoinStatus === 'searching'
-                ? 'Searching…'
+                ? t('lobby.matchmaking.searching')
                 : quickJoinStatus === 'found'
-                  ? 'Joining!'
+                  ? t('lobby.matchmaking.joining')
                   : quickJoinStatus === 'none'
-                    ? 'No Rooms'
-                    : 'Quick Join'}
+                    ? t('lobby.matchmaking.no_rooms')
+                    : t('lobby.matchmaking.quick_join')}
             </span>
           </button>
 
@@ -233,7 +233,7 @@ export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
             className="flex flex-col sm:flex-row flex-1 items-center justify-center gap-1 sm:gap-2 px-2 py-3 sm:px-[4vw] sm:py-[2vh] rounded-xl font-thematic text-[11px] sm:text-responsive-xl transition-all shadow-xl bg-red-900/40 hover:bg-red-800/50 text-white border border-red-700/50 backdrop-blur-xl"
           >
             <Plus className="w-4 h-4 sm:w-[2.2vh] sm:h-[2.2vh]" />
-            <span className="text-center leading-tight">Create</span>
+            <span className="text-center leading-tight">{t('common.create')}</span>
           </button>
 
           {/* Solo Practice */}
@@ -243,7 +243,7 @@ export const LobbyMatchmaking: React.FC<LobbyMatchmakingProps> = ({
             className="flex flex-col sm:flex-row flex-1 items-center justify-center gap-1 sm:gap-2 px-2 py-3 sm:px-[4vw] sm:py-[2vh] rounded-xl font-thematic text-[11px] sm:text-responsive-xl transition-all shadow-xl bg-surface-glass border border-subtle text-muted hover:text-primary hover:border-default backdrop-blur-xl"
           >
             <Bot className="w-4 h-4 sm:w-[2.2vh] sm:h-[2.2vh]" />
-            <span className="text-center leading-tight">Practice</span>
+            <span className="text-center leading-tight">{t('lobby.matchmaking.practice_short')}</span>
           </button>
         </motion.div>
       </div>

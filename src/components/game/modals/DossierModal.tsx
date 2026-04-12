@@ -13,19 +13,6 @@ interface DossierModalProps {
   playSound: (key: string) => void;
 }
 
-const TITLE_ROLE_DESCRIPTIONS: Record<TitleRole, string> = {
-  Assassin: 'Eliminate a player from the game.',
-  Strategist: 'Draw an extra policy (4 total) when you are President.',
-  Broker: 'Force a re-nomination if the current one is unfavorable.',
-  Handler: 'Swap the next two players in the presidential order.',
-  Auditor: 'Peek at the last 3 discarded policies after a legislative session.',
-  Interdictor: 'Detain a player for one round.',
-  Archivist: 'Inspect the entire Discard Pile once per game.',
-  Defector: 'Secretly flip your vote after the initial reveal to change the outcome.',
-  Quorum: 'Call for an emergency re-vote during high-tension failed elections.',
-  Cipher: 'Send an anonymous dispatch to the room during the legislative phase.',
-};
-
 const AgendaStatusBadge = ({ status }: { status: AgendaStatus }) => {
   const { t } = useTranslation();
   if (status === 'completed')
@@ -45,7 +32,7 @@ const AgendaStatusBadge = ({ status }: { status: AgendaStatus }) => {
   return (
     <div className="flex items-center gap-1 px-2 py-0.5 rounded-xl bg-subtle border border-strong text-tertiary text-[10px] font-mono uppercase tracking-widest shrink-0">
       <Clock className="w-3 h-3" />
-      <span>Active</span>
+      <span>{t('game.dossier.active')}</span>
     </div>
   );
 };
@@ -121,10 +108,10 @@ export const DossierModal = ({ isOpen, onClose, privateInfo, playSound }: Dossie
                       </div>
                       <div className="text-responsive-xs text-muted italic leading-tight">
                         {privateInfo.role === 'Civil'
-                          ? 'Defend the Charter. The Crisis must not consume the Secretariat.'
+                          ? t('game.roles.civil.flavor')
                           : privateInfo.role === 'Overseer'
-                            ? 'Ascend to the Chancellorship. State Supremacy awaits.'
-                            : 'Enact State directives. Elevate the Overseer to power.'}
+                            ? t('game.roles.overseer.flavor')
+                            : t('game.roles.state.flavor')}
                       </div>
                     </div>
 
@@ -189,10 +176,10 @@ export const DossierModal = ({ isOpen, onClose, privateInfo, playSound }: Dossie
                         {privateInfo.titleRole ? (
                           <div className="space-y-0.5">
                             <div className="text-responsive-sm font-bold text-primary uppercase tracking-wider">
-                              {privateInfo.titleRole}
+                              {t(`game.titles.${privateInfo.titleRole.toLowerCase()}.name`)}
                             </div>
                             <div className="text-responsive-xs text-tertiary leading-tight">
-                              {TITLE_ROLE_DESCRIPTIONS[privateInfo.titleRole]}
+                              {t(`game.titles.${privateInfo.titleRole.toLowerCase()}.desc`)}
                             </div>
                           </div>
                         ) : (

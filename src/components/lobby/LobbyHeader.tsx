@@ -16,6 +16,7 @@ import { getFrameStyles, getBackgroundTexture } from '../../utils/cosmetics';
 import { getRankTier, getRankLabel } from '../../utils/ranks';
 import { RankIcon } from '../icons';
 import { CLIENT_VERSION } from '../../sharedConstants';
+import { useTranslation } from '../../contexts/I18nContext';
 
 interface LobbyHeaderProps {
   user: User;
@@ -40,6 +41,7 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
   globalStats,
   playSound,
 }) => {
+  const { t } = useTranslation();
   const total = globalStats.civilWins + globalStats.stateWins || 1;
   const civilPct = (globalStats.civilWins / total) * 100;
   const statePct = (globalStats.stateWins / total) * 100;
@@ -63,19 +65,19 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
           <div className="min-w-0">
             <div className="flex items-baseline gap-2">
               <h1 className="text-responsive-sm sm:text-responsive-xl font-thematic text-primary tracking-wide leading-none truncate uppercase">
-                THE ASSEMBLY
+                {t('common.title')}
               </h1>
               <span className="text-[8px] font-mono text-red-500/60 border border-red-900/40 rounded px-1 py-0.5 leading-none shrink-0">
                 {CLIENT_VERSION}
               </span>
             </div>
             <p className="text-responsive-xs uppercase tracking-widest text-muted font-mono mt-0.5">
-              Assembly Lobby
+              {t('lobby.header.subtitle')}
             </p>
           </div>
 
           <div className="ml-2 hidden sm:block">
-            <Tooltip content="Leaderboard">
+            <Tooltip content={t('lobby.header.leaderboard')}>
               <button
                 onMouseEnter={() => playSound('hover')}
                 onClick={() => {
@@ -116,7 +118,7 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
                   getRankTier(user.stats.elo).color
                 )}
               >
-                {getRankLabel(user.stats.elo)}
+                {t(`lobby.ranks.${getRankTier(user.stats.elo).name.toLowerCase()}`)}
               </span>
               <span className="text-[10px] font-mono text-primary font-bold">
                 {user.stats.elo} ELO
@@ -144,7 +146,7 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
         </div>
 
         <div className="flex items-center gap-2 sm:gap-4 flex-1 justify-end">
-          <Tooltip content="My Profile">
+          <Tooltip content={t('lobby.header.profile')}>
             <button
               onMouseEnter={() => playSound('hover')}
               onClick={() => {
@@ -158,7 +160,7 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
                   {user.username}
                 </div>
                 <div className="text-responsive-xs uppercase tracking-widest text-muted font-mono">
-                  View Profile
+                  {t('lobby.header.view_profile')}
                 </div>
               </div>
               <div className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] rounded-xl bg-card border border-default flex items-center justify-center group-hover:border-red-900/50 transition-colors relative">
@@ -192,7 +194,7 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
 
           {/* Leaderboard — mobile only (desktop version is in the title group) */}
           <div className="sm:hidden">
-            <Tooltip content="Leaderboard">
+            <Tooltip content={t('lobby.header.leaderboard')}>
               <button
                 onMouseEnter={() => playSound('hover')}
                 onClick={() => {
@@ -206,7 +208,7 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
             </Tooltip>
           </div>
 
-          <Tooltip content="How to Play">
+          <Tooltip content={t('lobby.header.how_to_play')}>
             <button
               onMouseEnter={() => playSound('hover')}
               onClick={() => {
@@ -219,7 +221,7 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
             </button>
           </Tooltip>
 
-          <Tooltip content="Logout">
+          <Tooltip content={t('lobby.header.logout')}>
             <button
               onMouseEnter={() => playSound('hover')}
               onClick={() => {
@@ -268,13 +270,13 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
         {/* Compact War Meter (Mobile Only) — expanded width */}
         <div className="w-full max-w-[90%] mt-1 space-y-1">
           <div className="flex items-center justify-between font-mono text-[9px] uppercase tracking-widest px-1">
-            <span className="text-blue-500 font-bold">Civil {civilPct.toFixed(1)}%</span>
+            <span className="text-blue-500 font-bold">{t('landing.factions.civil.title')} {civilPct.toFixed(1)}%</span>
             <span className="text-primary/60 font-medium">
               <span className="text-blue-500">{globalStats.civilWins}</span>
               <span className="mx-1">v</span>
               <span className="text-red-500">{globalStats.stateWins}</span>
             </span>
-            <span className="text-red-500 font-bold">{statePct.toFixed(1)}% State</span>
+            <span className="text-red-500 font-bold">{statePct.toFixed(1)}% {t('landing.factions.state.title')}</span>
           </div>
           <div className="h-1.5 w-full bg-black/40 rounded-full overflow-hidden flex ring-1 ring-white/5">
             <div className="bg-blue-600 h-full" style={{ width: `${civilPct}%` }} />

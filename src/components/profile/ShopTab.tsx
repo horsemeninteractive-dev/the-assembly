@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from '../../contexts/I18nContext';
 import { User, CosmeticItem } from '../../../shared/types';
 import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../../sharedConstants';
 import { Coins, User as UserIcon, Scroll, Pause, Play } from 'lucide-react';
@@ -15,6 +16,7 @@ interface ShopTabProps {
 }
 
 export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, playingItemId }: ShopTabProps) {
+  const { t } = useTranslation();
   const [shopCategory, setShopCategory] = useState<
     'frame' | 'policy' | 'vote' | 'music' | 'sound' | 'background'
   >('frame');
@@ -61,9 +63,9 @@ export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, pla
         {/* Row 1 */}
         <div className="flex gap-1 sm:gap-2 p-1 bg-elevated rounded-2xl border border-subtle">
           {[
-            { id: 'frame', label: 'Frames' },
-            { id: 'policy', label: 'Directives' },
-            { id: 'vote', label: 'Votes' },
+            { id: 'frame', label: t('profile.inventory.categories.frame') },
+            { id: 'policy', label: t('profile.inventory.categories.policy') },
+            { id: 'vote', label: t('profile.inventory.categories.vote') },
           ].map((cat) => (
             <button
               key={cat.id}
@@ -85,9 +87,9 @@ export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, pla
         {/* Row 2 */}
         <div className="flex gap-1 sm:gap-2 p-1 bg-elevated rounded-2xl border border-subtle">
           {[
-            { id: 'music', label: 'Music' },
-            { id: 'sound', label: 'Sounds' },
-            { id: 'background', label: 'Backgrounds' },
+            { id: 'music', label: t('profile.inventory.categories.music') },
+            { id: 'sound', label: t('profile.inventory.categories.sound') },
+            { id: 'background', label: t('profile.inventory.categories.background') },
           ].map((cat) => (
             <button
               key={cat.id}
@@ -195,7 +197,7 @@ export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, pla
               </div>
               <h4 className="font-serif italic text-lg mb-1 text-primary">{item.name}</h4>
               <p className="text-[10px] text-muted font-mono uppercase mb-1">
-                {item.type === 'policy' ? 'Directive Style' : `${item.type} Style`}
+                {item.type === 'policy' ? t('profile.shop.item_type_policy') : t('profile.shop.item_style', { type: t(`profile.inventory.categories.${item.type}`) })}
               </p>
               <p
                 className={cn(
@@ -203,7 +205,7 @@ export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, pla
                   getRarity(item.price).color
                 )}
               >
-                {getRarity(item.price).name}
+                {t(`profile.inventory.rarities.${getRarity(item.price).name.toLowerCase()}`)}
               </p>
               <p className="text-[10px] text-ghost font-sans mb-4 line-clamp-2">
                 {item.description}
@@ -214,14 +216,14 @@ export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, pla
                   disabled
                   className="w-full py-2 bg-card text-muted rounded-xl text-[10px] font-mono uppercase tracking-widest border border-default cursor-not-allowed"
                 >
-                  Owned
+                  {t('profile.shop.btn_owned')}
                 </button>
               ) : item.price === 0 ? (
                 <button
                   disabled
                   className="w-full py-2 bg-card text-muted rounded-xl text-[10px] font-mono uppercase tracking-widest border border-default cursor-not-allowed"
                 >
-                  Locked (Pass)
+                  {t('profile.shop.btn_locked_pass')}
                 </button>
               ) : (
                 <button
@@ -233,7 +235,7 @@ export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, pla
                   className="w-full py-2 bg-red-900 text-white rounded-xl text-[10px] font-thematic uppercase tracking-widest hover:bg-red-800 transition-all flex items-center justify-center gap-2 disabled:opacity-50"
                 >
                   <Coins className="w-3 h-3" />
-                  {item.price} PTS
+                  {t('profile.shop.btn_buy_pts', { price: item.price })}
                 </button>
               )}
             </div>

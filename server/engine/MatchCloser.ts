@@ -22,6 +22,7 @@ import { ACHIEVEMENT_MAP } from '../../src/utils/achievements';
 import { AGENDA_MAP } from '../game/personalAgendas';
 import { computeEloChange } from './utils';
 import type { IEngineCore } from './IEngineCore';
+import { getUserSocketId } from '../redis';
 
 export class MatchCloser {
   constructor(private readonly engine: IEngineCore) {}

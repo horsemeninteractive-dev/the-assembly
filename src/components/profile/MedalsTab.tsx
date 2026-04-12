@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from '../../contexts/I18nContext';
 import { motion } from 'motion/react';
 import { Check, Medal } from 'lucide-react';
 import { User } from '../../../shared/types';
@@ -13,6 +14,7 @@ interface MedalsTabProps {
 }
 
 export function MedalsTab({ user, token, onUpdateUser, playSound }: MedalsTabProps) {
+  const { t } = useTranslation();
   const [pinnedAchievements, setPinnedAchievements] = useState<string[]>(
     user.pinnedAchievements ?? []
   );
@@ -80,7 +82,7 @@ export function MedalsTab({ user, token, onUpdateUser, playSound }: MedalsTabPro
         </div>
         <div className="flex-1 min-w-0">
           <div className="text-[10px] font-mono uppercase tracking-[0.2em] text-muted mb-1">
-            Collection Progress
+            {t('profile.medals.summary_title')}
           </div>
           <div className="text-xl font-thematic text-primary tracking-wide">
             {earnedTotal} <span className="text-faint text-sm">/ {totalAchievements}</span>
@@ -99,18 +101,18 @@ export function MedalsTab({ user, token, onUpdateUser, playSound }: MedalsTabPro
             {Math.round((earnedTotal / totalAchievements) * 100)}%
           </div>
           <div className="text-[9px] font-mono text-faint uppercase tracking-widest">
-            complete
+            {t('profile.medals.summary_complete')}
           </div>
         </div>
       </div>
 
       {/* Pin hint */}
       <p className="text-[10px] font-mono text-faint text-center -mt-4">
-        Pin up to 3 medals to your public profile card.&nbsp;
+        {t('profile.medals.pin_hint_desc')}&nbsp;
         {pinnedAchievements.length > 0
-          ? `${pinnedAchievements.length}/3 pinned.`
-          : 'Click an earned medal to pin it.'}
-        {pinSaving && <span className="text-yellow-400 ml-1">Saving…</span>}
+          ? t('profile.medals.pin_hint_status', { count: pinnedAchievements.length })
+          : t('profile.medals.pin_hint_empty')}
+        {pinSaving && <span className="text-yellow-400 ml-1">{t('profile.medals.saving')}</span>}
       </p>
 
       {/* Achievements by category */}
@@ -119,7 +121,7 @@ export function MedalsTab({ user, token, onUpdateUser, playSound }: MedalsTabPro
         return (
           <div key={cat}>
             <div className="text-[9px] font-mono uppercase tracking-[0.25em] text-muted mb-3 border-b border-subtle pb-2">
-              {cat}
+              {t(`profile.medals.categories.${cat.toLowerCase()}`)}
             </div>
             <div className="space-y-2">
               {defs.map((def) => {
@@ -162,8 +164,8 @@ export function MedalsTab({ user, token, onUpdateUser, playSound }: MedalsTabPro
 
                     {/* Rewards */}
                     <div className="text-[9px] font-mono text-faint shrink-0 text-right hidden sm:block">
-                      <div>+{def.xpReward} XP</div>
-                      <div>+{def.cpReward} CP</div>
+                      <div>{t('profile.medals.xp_reward', { amount: def.xpReward })}</div>
+                      <div>{t('profile.medals.cp_reward', { amount: def.cpReward })}</div>
                     </div>
 
                     {/* Pin indicator */}

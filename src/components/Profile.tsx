@@ -39,6 +39,7 @@ import { AdminTools } from './profile/AdminTab';
 import { ChallengesTab } from './profile/ChallengesTab';
 import { ClanTab } from './profile/ClanTab';
 
+import { useTranslation, Trans } from '../contexts/I18nContext';
 interface ProfileProps {
   user: User;
   onClose: () => void;
@@ -68,6 +69,7 @@ export const Profile: React.FC<ProfileProps> = ({
   onJoinRoom,
   mode,
 }) => {
+  const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState<
     | 'stats'
     | 'shop'
@@ -140,7 +142,7 @@ export const Profile: React.FC<ProfileProps> = ({
       return;
     }
     if (newName.length < 3 || newName.length > 20) {
-      setError('Username must be 3-20 characters');
+      setError(t('profile.username_update.error_length'));
       return;
     }
     setIsSavingName(true);
@@ -154,7 +156,7 @@ export const Profile: React.FC<ProfileProps> = ({
 
       if (!res.ok) {
         const text = await res.text();
-        let errorMsg = 'Update failed';
+        let errorMsg = t('profile.username_update.failed');
         try {
           const json = JSON.parse(text);
           errorMsg = json.error || errorMsg;
@@ -242,7 +244,7 @@ export const Profile: React.FC<ProfileProps> = ({
               )}
             </div>
             <div className="absolute -bottom-1.5 -right-1.5 bg-red-900 border border-red-500 text-white text-[9px] font-mono px-1.5 py-0.5 rounded-lg shadow-lg">
-              LVL {getLevelFromXp(user.stats.xp)}
+              {t('profile.lvl_label')} {getLevelFromXp(user.stats.xp)}
             </div>
           </div>
 
@@ -292,7 +294,7 @@ export const Profile: React.FC<ProfileProps> = ({
                       setError('');
                     }}
                     className="p-1 rounded-md text-ghost hover:text-primary hover:bg-white/5 transition-all"
-                    title="Edit username"
+                    title={t('profile.edit_username')}
                   >
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
@@ -301,7 +303,7 @@ export const Profile: React.FC<ProfileProps> = ({
                   <div ref={shareRef} className="relative">
                     <button
                       onClick={() => { playSound('click'); setShareOpen((v) => !v); }}
-                      title="Share profile"
+                      title={t('profile.public_profile')}
                       className={cn(
                         'p-1 rounded-md transition-all',
                         shareOpen
@@ -323,7 +325,7 @@ export const Profile: React.FC<ProfileProps> = ({
                         >
                           {/* URL preview */}
                           <div className="px-3 pt-3 pb-2 border-b border-subtle">
-                            <div className="text-[9px] font-mono uppercase tracking-widest text-faint mb-1">Public Profile</div>
+                            <div className="text-[9px] font-mono uppercase tracking-widest text-faint mb-1">{t('profile.public_profile')}</div>
                             <div className="text-[10px] font-mono text-muted truncate">{profileUrl.replace('https://', '')}</div>
                           </div>
 
@@ -336,7 +338,7 @@ export const Profile: React.FC<ProfileProps> = ({
                               {shareCopied
                                 ? <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                                 : <Copy className="w-3.5 h-3.5 shrink-0" />}
-                              {shareCopied ? 'Copied!' : 'Copy Link'}
+                              {shareCopied ? t('profile.share.copied') : t('profile.share.copy_link')}
                             </button>
 
                             <a
@@ -347,7 +349,7 @@ export const Profile: React.FC<ProfileProps> = ({
                               className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-mono text-secondary hover:text-primary hover:bg-white/5 transition-all"
                             >
                               <Twitter className="w-3.5 h-3.5 shrink-0" />
-                              Share on X / Twitter
+                              {t('profile.share.on_twitter')}
                             </a>
 
                             <a
@@ -360,7 +362,7 @@ export const Profile: React.FC<ProfileProps> = ({
                               <svg className="w-3.5 h-3.5 shrink-0" viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
                               </svg>
-                              Share on Facebook
+                              {t('profile.share.on_facebook')}
                             </a>
 
                             <a
@@ -371,7 +373,7 @@ export const Profile: React.FC<ProfileProps> = ({
                               className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-mono text-secondary hover:text-primary hover:bg-white/5 transition-all"
                             >
                               <MessageCircle className="w-3.5 h-3.5 shrink-0" />
-                              Share on WhatsApp
+                              {t('profile.share.on_whatsapp')}
                             </a>
 
                             {typeof navigator.share === 'function' && (
@@ -380,7 +382,7 @@ export const Profile: React.FC<ProfileProps> = ({
                                 className="w-full flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-mono text-secondary hover:text-primary hover:bg-white/5 transition-all text-left"
                               >
                                 <Share2 className="w-3.5 h-3.5 shrink-0" />
-                                More Options…
+                                {t('profile.share.more')}
                               </button>
                             )}
                           </div>
@@ -418,18 +420,18 @@ export const Profile: React.FC<ProfileProps> = ({
               <div className="flex items-center gap-1.5 px-2 py-1 bg-card rounded-xl border border-default shrink-0">
                 <Coins className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
                 <span className="text-xs font-mono text-emerald-500 whitespace-nowrap">
-                  {user.stats.points} IP
+                  {user.stats.points} {t('profile.ip_label')}
                 </span>
               </div>
               <div className="flex items-center gap-1.5 px-2 py-1 bg-card rounded-xl border border-default shrink-0">
                 <Zap className="w-3.5 h-3.5 text-purple-500 shrink-0" />
                 <span className="text-xs font-mono text-purple-500 whitespace-nowrap">
-                  {user.cabinetPoints ?? 0} CP
+                  {user.cabinetPoints ?? 0} {t('profile.cp_label')}
                 </span>
               </div>
               <div className="w-full max-w-[200px] mt-1 sm:mt-0 sm:ml-2">
                 <div className="flex justify-between text-[9px] text-gray-400 mb-0.5">
-                  <span>XP</span>
+                  <span>{t('profile.xp_label')}</span>
                   <span>
                     {getXpInCurrentLevel(user.stats.xp)} /{' '}
                     {getXpForNextLevel(getLevelFromXp(user.stats.xp))}
@@ -462,18 +464,18 @@ export const Profile: React.FC<ProfileProps> = ({
         {/* Tabs */}
         <div className="flex flex-wrap border-b border-subtle">
           {[
-            { id: 'stats', label: 'Stats' },
-            { id: 'inventory', label: 'Inventory' },
-            { id: 'achievements', label: 'Medals' },
-            { id: 'challenges', label: 'Challenges' },
-            { id: 'clan', label: 'Clan' },
-            { id: 'shop', label: 'Shop' },
-            { id: 'pass', label: 'Pass' },
-            { id: 'friends', label: 'Friends' },
-            { id: 'referrals', label: 'Referrals' },
-            { id: 'history', label: 'History' },
-            { id: 'settings', label: 'Settings' },
-            ...(user.isAdmin ? [{ id: 'admin', label: 'Admin' }] : []),
+            { id: 'stats', label: t('profile.tabs.stats') },
+            { id: 'inventory', label: t('profile.tabs.inventory') },
+            { id: 'achievements', label: t('profile.tabs.achievements') },
+            { id: 'challenges', label: t('profile.tabs.challenges') },
+            { id: 'clan', label: t('profile.tabs.clan') },
+            { id: 'shop', label: t('profile.tabs.shop') },
+            { id: 'pass', label: t('profile.tabs.pass') },
+            { id: 'friends', label: t('profile.tabs.friends') },
+            { id: 'referrals', label: t('profile.tabs.referrals') },
+            { id: 'history', label: t('profile.tabs.history') },
+            { id: 'settings', label: t('profile.tabs.settings') },
+            ...(user.isAdmin ? [{ id: 'admin', label: t('profile.tabs.admin') }] : []),
           ].map((tab) => (
             <button
               key={tab.id}
@@ -518,6 +520,7 @@ export const Profile: React.FC<ProfileProps> = ({
 };
 
 function ReferralsTab({ user, playSound }: { user: User; playSound: (s: string) => void }) {
+  const { t } = useTranslation();
   const [copied, setCopied] = React.useState(false);
   const refLink = `https://theassembly.web.app/register?ref=${user.referralCode || user.id.substring(0, 8).toUpperCase()}`;
 
@@ -534,9 +537,9 @@ function ReferralsTab({ user, playSound }: { user: User; playSound: (s: string) 
         <div className="w-16 h-16 bg-emerald-900/20 border border-emerald-500/30 rounded-3xl flex items-center justify-center mx-auto mb-4">
           <Share2 className="w-8 h-8 text-emerald-400" />
         </div>
-        <h2 className="text-2xl font-bold tracking-tight text-primary">Grow the Assembly</h2>
+        <h2 className="text-2xl font-bold tracking-tight text-primary">{t('profile.referrals.title')}</h2>
         <p className="text-sm text-muted max-w-md mx-auto">
-          Invite new players to the secret chambers and earn rewards when they prove their loyalty.
+          {t('profile.referrals.subtitle')}
         </p>
       </div>
 
@@ -546,16 +549,19 @@ function ReferralsTab({ user, playSound }: { user: User; playSound: (s: string) 
             <Zap className="w-24 h-24 text-yellow-400" />
           </div>
           <div className="relative">
-            <h3 className="text-sm font-mono uppercase tracking-widest text-emerald-400 mb-1">Active Reward</h3>
-            <p className="text-lg font-semibold text-primary">150 Cabinet Points</p>
+            <h3 className="text-sm font-mono uppercase tracking-widest text-emerald-400 mb-1">{t('profile.referrals.active_reward')}</h3>
+            <p className="text-lg font-semibold text-primary">150 {t('profile.cp_label')}</p>
             <p className="text-xs text-ghost mt-2 leading-relaxed">
-              Earned by <span className="text-primary font-bold underline">BOTH</span> you and your friend when they reach <span className="text-yellow-400 font-bold">Level 15</span>.
+              {t('profile.referrals.reward_desc', {
+                interpolation: { escapeValue: false },
+                components: { 1: <span className="text-primary font-bold underline" />, 3: <span className="text-yellow-400 font-bold" /> }
+              })}
             </p>
           </div>
         </div>
 
         <div className="p-6 bg-elevated border border-brand/20 rounded-3xl space-y-4 shadow-xl shadow-brand/5">
-          <h3 className="text-xs font-mono uppercase tracking-widest text-faint">Your Referral Link</h3>
+          <h3 className="text-xs font-mono uppercase tracking-widest text-faint">{t('profile.referrals.link_label')}</h3>
           <div className="flex items-center gap-2">
             <div className="flex-1 bg-card border border-default px-4 py-3 rounded-2xl font-mono text-xs text-primary truncate">
               {refLink}
@@ -573,7 +579,7 @@ function ReferralsTab({ user, playSound }: { user: User; playSound: (s: string) 
             </button>
           </div>
           <p className="text-[10px] font-mono text-faint uppercase text-center">
-            {copied ? "Link copied to clipboard!" : "Share this link with friends to start earning"}
+            {copied ? t('profile.referrals.copied_hint') : t('profile.referrals.copy_hint')}
           </p>
         </div>
       </div>
@@ -582,9 +588,9 @@ function ReferralsTab({ user, playSound }: { user: User; playSound: (s: string) 
         <div className="flex items-start gap-3">
           <Clock className="w-5 h-5 text-ghost mt-0.5 shrink-0" />
           <div className="space-y-1">
-            <p className="text-xs font-semibold text-muted">Progress Tracking</p>
+            <p className="text-xs font-semibold text-muted">{t('profile.referrals.tracking_title')}</p>
             <p className="text-[11px] text-faint leading-relaxed">
-              Rewards are processed automatically once the referral target hits the level milestone. There is no limit to how many players you can refer.
+              {t('profile.referrals.tracking_desc')}
             </p>
           </div>
         </div>

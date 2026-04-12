@@ -12,6 +12,8 @@ deploy.ps1
 !package-lock.json
 !tsconfig.json
 !metadata.json
+!src/locales/*.json
+!public/manifest.json
 the-assembly.code-workspace
 .antigravity/
 .gemini/
