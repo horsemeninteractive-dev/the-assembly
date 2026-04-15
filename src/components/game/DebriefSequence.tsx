@@ -115,7 +115,18 @@ const IntroSlide = ({ gameState }: { gameState: GameState }) => {
         transition={{ duration: 1.6, delay: 0.5, ease: [0.16, 1, 0.3, 1] }}
         className={cn('font-thematic text-4xl sm:text-5xl lg:text-7xl uppercase leading-tight px-4', color, glow)}
       >
-        {gameState.winReason ?? (isCivil ? t('game.tracks.win_civil') : t('game.tracks.win_state'))}
+        {(() => {
+          const reason = gameState.winReason;
+          if (!reason) return isCivil ? t('game.tracks.win_civil') : t('game.tracks.win_state');
+          const map: Record<string, string> = {
+            'CHARTER RESTORED': 'charter_restored',
+            'STATE SUPREMACY': 'state_supremacy',
+            'THE OVERSEER HAS BEEN EXECUTED': 'overseer_executed',
+            'THE OVERSEER HAS ASCENDED': 'overseer_ascended'
+          };
+          const key = map[reason];
+          return key ? t(`game.tracks.win_reasons.${key}`) : reason;
+        })()}
       </motion.h1>
 
       <motion.p
@@ -178,6 +189,7 @@ const PlayerSlide = ({
   total,
   myId,
   agendaName,
+  agendaId,
   agendaStatus,
 }: {
   player: Player;
@@ -185,6 +197,7 @@ const PlayerSlide = ({
   total: number;
   myId: string | undefined;
   agendaName?: string;
+  agendaId?: string;
   agendaStatus?: string;
 }) => {
   const { t } = useTranslation();
@@ -192,7 +205,7 @@ const PlayerSlide = ({
   const style = ROLE_STYLE[role] ?? ROLE_STYLE.Civil;
   const isMe = player.id === myId;
   const displayName = player.name.replace(' (AI)', '');
-  const roleLabel = t(`debrief.roles.${role.toLowerCase()}`);
+  const roleLabel = t(`game.debrief.roles.${role.toLowerCase()}`);
 
   return (
     <div className="flex flex-col items-center gap-6 px-8 text-center relative z-10 w-full h-full justify-center">
@@ -285,7 +298,7 @@ const PlayerSlide = ({
           className="flex items-center gap-2 text-[10px] font-mono text-red-400/80 uppercase tracking-[0.2em]"
         >
           <Shield className="w-3 h-3" />
-          {player.titleRole}
+          {t(`game.titles.${player.titleRole.toLowerCase()}.name`)}
         </motion.div>
       )}
 
@@ -305,7 +318,7 @@ const PlayerSlide = ({
           )}
         >
           <Target className="w-3 h-3" />
-          {agendaName}
+          {agendaId ? t(`game.agendas.${agendaId}.name`) : agendaName}
           {agendaStatus === 'completed' && ` — ${t('game.modals.game_over.completed')}`}
           {agendaStatus === 'failed' && ` — ${t('game.modals.game_over.failed')}`}
         </motion.div>
@@ -372,11 +385,11 @@ const FinaleSlide = ({
                 {displayName}
               </span>
               <span className={cn('text-[9px] font-mono uppercase tracking-widest font-bold', style.text)}>
-                {t(`debrief.roles.${(role as string).toLowerCase()}`)}
+                {t(`game.debrief.roles.${(role as string).toLowerCase()}`)}
               </span>
               {titleRole && (
                 <span className="text-[8px] font-mono text-red-400/70 uppercase tracking-widest">
-                  {titleRole}
+                  {t(`game.titles.${titleRole.toLowerCase()}.name`)}
                 </span>
               )}
             </motion.div>
@@ -442,10 +455,19 @@ export const DebriefSequence = ({
   const current = slides[step];
 
   // Resolve agenda info for the current player slide
-  const agendaName = (() => {
-    if (current?.kind !== 'player') return undefined;
-    if (current.player.id === myId) return privateInfo?.personalAgenda?.name;
-    return gameState.spectatorRoles?.[current.player.id]?.agendaName;
+  const { agendaName, agendaId } = (() => {
+    if (current?.kind !== 'player') return { agendaName: undefined, agendaId: undefined };
+    if (current.player.id === myId) {
+      return { 
+        agendaName: privateInfo?.personalAgenda?.name, 
+        agendaId: privateInfo?.personalAgenda?.id 
+      };
+    }
+    const spec = gameState.spectatorRoles?.[current.player.id];
+    return { 
+      agendaName: spec?.agendaName, 
+      agendaId: spec?.agendaId 
+    };
   })();
   const agendaStatus = (() => {
     if (current?.kind !== 'player' || current.player.id !== myId) return undefined;
@@ -491,6 +513,7 @@ export const DebriefSequence = ({
                   total={current.total}
                   myId={myId}
                   agendaName={agendaName}
+                  agendaId={agendaId}
                   agendaStatus={agendaStatus}
                 />
               )}

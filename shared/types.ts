@@ -480,7 +480,7 @@ export interface GameState {
     activeVotingStyle?: string;
   }[];
   spectatorRoles?: {
-    [playerId: string]: { role: string; titleRole?: string; agendaName?: string };
+    [playerId: string]: { role: string; titleRole?: string; agendaName?: string; agendaId?: string };
   };
   privacy: RoomPrivacy;
   inviteCode?: string; // only set when privacy === 'private'

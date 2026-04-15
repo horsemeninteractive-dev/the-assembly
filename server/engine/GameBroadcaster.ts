@@ -96,6 +96,7 @@ export class GameBroadcaster {
                 {
                   role: p.role ?? 'Unknown',
                   titleRole: p.titleRole,
+                  agendaId: p.personalAgenda,
                   agendaName: p.personalAgenda
                     ? (AGENDA_MAP.get(p.personalAgenda)?.name ?? p.personalAgenda)
                     : undefined,

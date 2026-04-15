@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Bot, User } from 'lucide-react';
+import { Bot } from 'lucide-react';
 import { cn } from '../../utils/utils';
 import { User as UserType } from '../../../shared/types';
+import { useTranslation } from '../../contexts/I18nContext';
 
 interface LobbyPracticeCreatorProps {
   user: UserType;
@@ -30,6 +31,7 @@ export const LobbyPracticeCreator: React.FC<LobbyPracticeCreatorProps> = ({
   onJoinRoom,
   playSound,
 }) => {
+  const { t } = useTranslation();
   const [maxPlayers, setMaxPlayers] = useState(5);
   const [mode, setMode] = useState<'Casual' | 'Classic' | 'Crisis'>('Casual');
   const [difficulty, setDifficulty] = useState<'Casual' | 'Normal' | 'Elite'>('Normal');
@@ -38,18 +40,24 @@ export const LobbyPracticeCreator: React.FC<LobbyPracticeCreatorProps> = ({
     e.preventDefault();
     const practiceRoomId = `Practice-${user.username}-${Math.floor(Math.random() * 1000)}`;
     onJoinRoom(
-      practiceRoomId, 
-      maxPlayers, 
-      0, // No timer for practice by default or we can add it
-      mode, 
-      false, 
-      'private', 
-      undefined, 
-      undefined, 
-      true, 
+      practiceRoomId,
+      maxPlayers,
+      0,
+      mode,
+      false,
+      'private',
+      undefined,
+      undefined,
+      true,
       difficulty
     );
     onClose();
+  };
+
+  const difficultyDesc = (d: 'Casual' | 'Normal' | 'Elite') => {
+    if (d === 'Casual') return t('lobby.practice.difficulty_casual_desc');
+    if (d === 'Normal') return t('lobby.practice.difficulty_normal_desc');
+    return t('lobby.practice.difficulty_elite_desc');
   };
 
   return (
@@ -78,10 +86,10 @@ export const LobbyPracticeCreator: React.FC<LobbyPracticeCreatorProps> = ({
               </div>
               <div>
                 <h2 className="text-responsive-xl font-serif italic leading-none">
-                  Solo Practice
+                  {t('lobby.practice.title')}
                 </h2>
                 <p className="text-responsive-xs text-muted uppercase tracking-widest font-mono mt-1">
-                  Vs Artificial Intelligence
+                  {t('lobby.practice.subtitle')}
                 </p>
               </div>
             </div>
@@ -90,7 +98,7 @@ export const LobbyPracticeCreator: React.FC<LobbyPracticeCreatorProps> = ({
               <div className="space-y-2">
                 <div className="flex items-center justify-between ml-1">
                   <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono">
-                    Total Players
+                    {t('lobby.practice.total_players')}
                   </label>
                   <span className="text-responsive-sm font-mono text-red-500">{maxPlayers}</span>
                 </div>
@@ -103,14 +111,14 @@ export const LobbyPracticeCreator: React.FC<LobbyPracticeCreatorProps> = ({
                   className="w-full h-1.5 bg-card rounded-lg appearance-none cursor-pointer accent-red-500"
                 />
                 <div className="flex justify-between text-[8px] text-ghost font-mono uppercase tracking-tighter">
-                  <span>5 (Fast)</span>
-                  <span>10 (Complex)</span>
+                  <span>{t('lobby.practice.players_min')}</span>
+                  <span>{t('lobby.practice.players_max')}</span>
                 </div>
               </div>
 
               <div className="space-y-2">
                 <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono ml-1">
-                  Game Mode
+                  {t('lobby.creator.game_mode')}
                 </label>
                 <div className="flex gap-2">
                   {(['Casual', 'Classic', 'Crisis'] as const).map((m) => (
@@ -138,7 +146,7 @@ export const LobbyPracticeCreator: React.FC<LobbyPracticeCreatorProps> = ({
 
               <div className="space-y-2">
                 <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono ml-1">
-                  AI Difficulty
+                  {t('lobby.practice.ai_difficulty')}
                 </label>
                 <div className="flex gap-2">
                   {(['Casual', 'Normal', 'Elite'] as const).map((d) => (
@@ -161,9 +169,7 @@ export const LobbyPracticeCreator: React.FC<LobbyPracticeCreatorProps> = ({
                   ))}
                 </div>
                 <p className="text-[8px] text-ghost italic ml-1 pt-1">
-                  {difficulty === 'Casual' ? 'AIs play simply and honestly.' :
-                   difficulty === 'Normal' ? 'AIs use standard strategies and deception.' :
-                   'AIs are highly deceptive and coordinate effectively.'}
+                  {difficultyDesc(difficulty)}
                 </p>
               </div>
 
@@ -176,13 +182,13 @@ export const LobbyPracticeCreator: React.FC<LobbyPracticeCreatorProps> = ({
                   }}
                   className="flex-1 py-[1.5vh] border border-subtle text-responsive-sm text-muted font-serif italic rounded-xl hover:bg-card transition-colors"
                 >
-                  Back
+                  {t('common.back')}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 py-[1.5vh] bg-red-600 text-white text-responsive-sm font-serif italic rounded-xl hover:bg-red-500 transition-all shadow-xl shadow-red-900/20"
                 >
-                  Convene Assembly
+                  {t('lobby.practice.btn_start')}
                 </button>
               </div>
             </form>

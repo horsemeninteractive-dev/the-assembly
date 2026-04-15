@@ -9,6 +9,7 @@ import { getRankTier, getRankLabel } from '../utils/ranks';
 import { ACHIEVEMENT_MAP } from '../utils/achievements';
 import { apiUrl, cn, getProxiedUrl } from '../utils/utils';
 import { ClanEmblem } from './clans/ClanEmblem';
+import { useTranslation } from '../contexts/I18nContext';
 
 // ── Types ─────────────────────────────────────────────────────────────────────
 
@@ -65,6 +66,17 @@ function safeRate(wins: number, played: number): number {
 function formatKD(kills: number, deaths: number): string {
   if (!deaths) return kills > 0 ? `${kills}.0` : '—';
   return (kills / deaths).toFixed(2);
+}
+
+// ── Skeleton ──────────────────────────────────────────────────────────────────
+
+function Skeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn('rounded-lg bg-elevated animate-pulse', className)}
+      style={{ animation: 'pulse 2s cubic-bezier(0.4,0,0.6,1) infinite' }}
+    />
+  );
 }
 
 // ── Sub-components ────────────────────────────────────────────────────────────
@@ -187,20 +199,10 @@ function PinnedAchievement({ id }: { id: string }) {
   );
 }
 
-// ── Skeleton ──────────────────────────────────────────────────────────────────
-
-function Skeleton({ className }: { className?: string }) {
-  return (
-    <div
-      className={cn('rounded-lg bg-elevated animate-pulse', className)}
-      style={{ animation: 'pulse 2s cubic-bezier(0.4,0,0.6,1) infinite' }}
-    />
-  );
-}
-
 // ── Main Component ────────────────────────────────────────────────────────────
 
 export function PlayerCard({ username }: { username: string }) {
+  const { t } = useTranslation();
   const [profile, setProfile] = useState<PublicProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -281,13 +283,13 @@ export function PlayerCard({ username }: { username: string }) {
           <div className="w-5 h-5 rounded bg-white/10 border border-subtle flex items-center justify-center">
             <span className="text-[8px] font-bold text-primary">A</span>
           </div>
-          The Assembly
+          {t('common.title')}
         </a>
         <a
           href="/"
           className="flex items-center gap-1.5 text-xs font-mono uppercase tracking-widest text-muted hover:text-primary transition-colors px-3 py-1.5 rounded-lg border border-subtle hover:border-default"
         >
-          Play Now
+          {t('playercard.play_now')}
           <ChevronRight className="w-3 h-3" />
         </a>
       </header>
@@ -322,18 +324,18 @@ export function PlayerCard({ username }: { username: string }) {
                 <Users className="w-8 h-8 text-red-500/60" />
               </div>
               <div>
-                <div className="text-lg font-thematic tracking-wide text-primary">{error}</div>
+                <div className="text-lg font-thematic tracking-wide text-primary">{t(`playercard.errors.${error.replace(/ /g, '_').toLowerCase()}`, { defaultValue: error })}</div>
                 <div className="text-xs font-mono text-muted mt-1">
                   {error === 'Player not found'
-                    ? 'This player does not exist or their profile is private.'
-                    : 'Check your connection and try again.'}
+                    ? t('playercard.errors.player_not_found_desc')
+                    : t('playercard.errors.generic_desc')}
                 </div>
               </div>
               <a
                 href="/"
                 className="mt-2 px-5 py-2.5 bg-white text-black rounded-xl text-sm font-mono font-bold hover:bg-gray-200 transition-colors"
               >
-                Play The Assembly
+                {t('playercard.join_assembly')}
               </a>
             </motion.div>
           )}
@@ -360,11 +362,11 @@ export function PlayerCard({ username }: { username: string }) {
                   className="absolute inset-0 opacity-5 pointer-events-none"
                   style={{
                     background: `radial-gradient(circle at 80% 50%, ${
-                      rankTier?.name === 'Diamond' ? '#93c5fd'
-                      : rankTier?.name === 'Platinum' ? '#67e8f9'
-                      : rankTier?.name === 'Gold' ? '#fbbf24'
-                      : rankTier?.name === 'Silver' ? '#d1d5db'
-                      : '#b45309'
+                       rankTier?.name === 'Diamond' ? '#93c5fd'
+                       : rankTier?.name === 'Platinum' ? '#67e8f9'
+                       : rankTier?.name === 'Gold' ? '#fbbf24'
+                       : rankTier?.name === 'Silver' ? '#d1d5db'
+                       : '#b45309'
                     }, transparent 70%)`,
                   }}
                 />
@@ -393,7 +395,7 @@ export function PlayerCard({ username }: { username: string }) {
                   {/* Identity */}
                   <div className="flex-1 min-w-0">
                     <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-muted mb-0.5">
-                      Player Profile
+                      {t('playercard.player_profile')}
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="text-2xl font-thematic tracking-wide text-primary leading-tight break-all">
@@ -420,7 +422,7 @@ export function PlayerCard({ username }: { username: string }) {
                         {getRankLabel(profile.stats.elo)}
                       </span>
                       <span className="text-xs font-mono text-muted">·</span>
-                      <span className="text-xs font-mono text-secondary font-bold tabular-nums">{profile.stats.elo} ELO</span>
+                      <span className="text-xs font-mono text-secondary font-bold tabular-nums">{profile.stats.elo} {t('playercard.elo_label')}</span>
                     </div>
 
                     {/* ELO progress to next tier */}
@@ -436,7 +438,7 @@ export function PlayerCard({ username }: { username: string }) {
                         </div>
                         {rankTier.name !== 'Diamond' && (
                           <div className="text-[9px] font-mono text-faint">
-                            {rankTier.maxElo - profile.stats.elo} ELO to next tier
+                            {t('playercard.elo_to_next', { amount: rankTier.maxElo - profile.stats.elo })}
                           </div>
                         )}
                       </div>
@@ -445,7 +447,7 @@ export function PlayerCard({ username }: { username: string }) {
                     {profile.createdAt && (
                       <div className="flex items-center gap-1.5 mt-2 text-[10px] font-mono text-faint">
                         <Calendar className="w-3 h-3" />
-                        Joined {new Date(profile.createdAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })}
+                        {t('playercard.joined_on', { date: new Date(profile.createdAt).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' }) })}
                       </div>
                     )}
                   </div>
@@ -463,14 +465,14 @@ export function PlayerCard({ username }: { username: string }) {
                     )}
                   >
                     {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                    {copied ? 'Copied!' : 'Share Profile'}
+                    {copied ? t('playercard.copied') : t('playercard.share_profile')}
                   </button>
                   <a
                     href="/"
                     className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white text-black text-xs font-mono uppercase tracking-widest hover:bg-gray-200 transition-colors font-bold"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
-                    Play The Assembly
+                    {t('playercard.join_assembly')}
                   </a>
                 </div>
               </motion.div>
@@ -483,24 +485,24 @@ export function PlayerCard({ username }: { username: string }) {
                 className="grid grid-cols-2 sm:grid-cols-4 gap-3"
               >
                 <StatPill
-                  label="Games"
+                  label={t('playercard.stats.games')}
                   value={profile.stats.gamesPlayed}
                   icon={<Shield className="w-3 h-3" />}
                 />
                 <StatPill
-                  label="Win Rate"
+                  label={t('playercard.stats.win_rate')}
                   value={`${winRate}%`}
                   icon={<Trophy className="w-3 h-3" />}
                   accent="text-yellow-500"
                 />
                 <StatPill
-                  label="Kills"
+                  label={t('playercard.stats.kills')}
                   value={profile.stats.kills}
                   icon={<Zap className="w-3 h-3" />}
                   accent="text-red-400"
                 />
                 <StatPill
-                  label="K/D Ratio"
+                  label={t('playercard.stats.kd_ratio')}
                   value={formatKD(profile.stats.kills, profile.stats.deaths)}
                   icon={<Swords className="w-3 h-3" />}
                 />
@@ -517,7 +519,7 @@ export function PlayerCard({ username }: { username: string }) {
                   <div className="flex items-center gap-2">
                     <Medal className="w-3.5 h-3.5 text-yellow-400" />
                     <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-muted">
-                      Pinned Achievements
+                      {t('profile.tabs.achievements')}
                     </span>
                     <div className="flex-1 h-px bg-subtle" />
                   </div>
@@ -539,11 +541,11 @@ export function PlayerCard({ username }: { username: string }) {
                 <div className="flex items-center gap-2 mb-1">
                   <TrendingUp className="w-3.5 h-3.5 text-muted" />
                   <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-muted">
-                    Win Rate by Role
+                    {t('playercard.stats.win_rate_role')}
                   </span>
                 </div>
                 <RoleBar
-                  label="Civil"
+                  label={t('game.factions.civil.title')}
                   wins={profile.stats.civilWins}
                   games={profile.stats.civilGames}
                   color="text-sky-400"
@@ -551,7 +553,7 @@ export function PlayerCard({ username }: { username: string }) {
                   delay={0}
                 />
                 <RoleBar
-                  label="State"
+                  label={t('game.factions.state.title')}
                   wins={profile.stats.stateWins}
                   games={profile.stats.stateGames}
                   color="text-red-400"
@@ -559,7 +561,7 @@ export function PlayerCard({ username }: { username: string }) {
                   delay={100}
                 />
                 <RoleBar
-                  label="Overseer"
+                  label={t('game.factions.overseer.title')}
                   wins={profile.stats.overseerWins}
                   games={profile.stats.overseerGames}
                   color="text-violet-400"
@@ -578,11 +580,11 @@ export function PlayerCard({ username }: { username: string }) {
                 <div className="flex items-center gap-2 mb-1">
                   <Trophy className="w-3.5 h-3.5 text-muted" />
                   <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-muted">
-                    Performance by Mode
+                    {t('playercard.stats.perf_mode')}
                   </span>
                 </div>
                 <RoleBar
-                  label="Ranked"
+                  label={t('game.modes.ranked')}
                   wins={profile.stats.rankedWins}
                   games={profile.stats.rankedGames}
                   color="text-yellow-400"
@@ -590,7 +592,7 @@ export function PlayerCard({ username }: { username: string }) {
                   delay={50}
                 />
                 <RoleBar
-                  label="Casual"
+                  label={t('game.modes.casual')}
                   wins={profile.stats.casualWins}
                   games={profile.stats.casualGames}
                   color="text-emerald-400"
@@ -598,7 +600,7 @@ export function PlayerCard({ username }: { username: string }) {
                   delay={150}
                 />
                 <RoleBar
-                  label="Classic"
+                  label={t('game.modes.classic')}
                   wins={profile.stats.classicWins}
                   games={profile.stats.classicGames}
                   color="text-amber-400"
@@ -615,37 +617,37 @@ export function PlayerCard({ username }: { username: string }) {
                 className="grid grid-cols-2 sm:grid-cols-3 gap-3"
               >
                 <StatPill
-                  label="Total Wins"
+                  label={t('playercard.stats.total_wins')}
                   value={profile.stats.wins}
                   icon={<Check className="w-3 h-3" />}
                   accent="text-emerald-400"
                 />
                 <StatPill
-                  label="Agendas Done"
+                  label={t('playercard.stats.agendas_done')}
                   value={profile.stats.agendasCompleted}
                   icon={<Scroll className="w-3 h-3" />}
                   accent="text-violet-400"
                 />
                 <StatPill
-                  label="Deaths"
+                  label={t('playercard.stats.deaths')}
                   value={profile.stats.deaths}
                   icon={<Heart className="w-3 h-3" />}
                   accent="text-red-400"
                 />
                 <StatPill
-                  label="Civil Games"
+                  label={t('profile.stats.civil_games')}
                   value={profile.stats.civilGames}
                   icon={<Star className="w-3 h-3" />}
                   accent="text-sky-400"
                 />
                 <StatPill
-                  label="State Games"
+                  label={t('profile.stats.state_games')}
                   value={profile.stats.stateGames}
                   icon={<Eye className="w-3 h-3" />}
                   accent="text-red-400"
                 />
                 <StatPill
-                  label="Overseer Games"
+                  label={t('profile.stats.overseer_games')}
                   value={profile.stats.overseerGames}
                   icon={<Shield className="w-3 h-3" />}
                   accent="text-violet-400"
@@ -663,10 +665,10 @@ export function PlayerCard({ username }: { username: string }) {
                   <Medal className="w-6 h-6 text-yellow-400" />
                 </div>
                 <div className="flex-1 min-w-0">
-                  <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-muted mb-0.5">Achievements Earned</div>
+                  <div className="text-[10px] font-mono uppercase tracking-[0.25em] text-muted mb-0.5">{t('playercard.stats.achievements')}</div>
                   <div className="text-xl font-mono font-bold text-primary">
                     {profile.earnedAchievementsCount}
-                    <span className="text-sm text-muted font-normal ml-1">medals</span>
+                    <span className="text-sm text-muted font-normal ml-1">{t('playercard.stats.medals')}</span>
                   </div>
                 </div>
               </motion.div>
@@ -679,16 +681,16 @@ export function PlayerCard({ username }: { username: string }) {
                 className="text-center pt-4 pb-8 space-y-3"
               >
                 <div className="text-xs font-mono text-muted uppercase tracking-widest">
-                  Think you can beat them?
+                  {t('playercard.think_can_beat')}
                 </div>
                 <a
                   href="/"
                   className="inline-flex items-center gap-2 px-8 py-3.5 bg-white text-black rounded-2xl font-mono font-bold uppercase tracking-widest text-sm hover:bg-gray-200 transition-colors shadow-xl shadow-white/10"
                 >
-                  Join The Assembly
+                  {t('playercard.join_assembly')}
                   <ChevronRight className="w-4 h-4" />
                 </a>
-                <div className="text-[10px] font-mono text-faint">Free to play · No download required</div>
+                <div className="text-[10px] font-mono text-faint">{t('playercard.free_to_play')}</div>
               </motion.div>
             </motion.div>
           )}

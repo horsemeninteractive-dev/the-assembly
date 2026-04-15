@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Globe, Users2, Lock } from 'lucide-react';
 import { cn } from '../../utils/utils';
 import { RoomPrivacy, User } from '../../../shared/types';
+import { useTranslation } from '../../contexts/I18nContext';
 
 interface LobbyRoomCreatorProps {
   user: User;
@@ -32,6 +33,7 @@ export const LobbyRoomCreator: React.FC<LobbyRoomCreatorProps> = ({
   playSound,
   maintenanceMode,
 }) => {
+  const { t } = useTranslation();
   const [newRoomName, setNewRoomName] = useState('');
   const [maxPlayers, setMaxPlayers] = useState(5);
   const [actionTimer, setActionTimer] = useState(60);
@@ -45,6 +47,36 @@ export const LobbyRoomCreator: React.FC<LobbyRoomCreatorProps> = ({
       onClose();
     }
   };
+
+  const modeDesc = (m: 'Casual' | 'Ranked' | 'Classic' | 'Crisis') => {
+    switch (m) {
+      case 'Ranked': return t('lobby.creator.mode_ranked_desc');
+      case 'Classic': return t('lobby.creator.mode_classic_desc');
+      case 'Crisis': return t('lobby.creator.mode_crisis_desc');
+      default: return t('lobby.creator.mode_casual_desc');
+    }
+  };
+
+  const privacyOptions = [
+    {
+      value: 'public' as const,
+      label: t('lobby.creator.privacy_public'),
+      icon: <Globe className="w-3.5 h-3.5" />,
+      desc: t('lobby.creator.privacy_public_desc'),
+    },
+    {
+      value: 'friends' as const,
+      label: t('lobby.creator.privacy_friends'),
+      icon: <Users2 className="w-3.5 h-3.5" />,
+      desc: t('lobby.creator.privacy_friends_desc'),
+    },
+    {
+      value: 'private' as const,
+      label: t('lobby.creator.privacy_private'),
+      icon: <Lock className="w-3.5 h-3.5" />,
+      desc: t('lobby.creator.privacy_private_desc'),
+    },
+  ];
 
   return (
     <AnimatePresence>
@@ -67,12 +99,12 @@ export const LobbyRoomCreator: React.FC<LobbyRoomCreatorProps> = ({
             className="relative w-full max-w-md bg-surface-glass border border-subtle rounded-3xl p-[4vh] shadow-2xl backdrop-blur-2xl"
           >
             <h2 className="text-responsive-xl font-serif italic mb-[3vh]">
-              Establish New Assembly
+              {t('lobby.creator.title')}
             </h2>
             <form onSubmit={handleCreateRoom} className="space-y-[2vh]">
               <div className="space-y-2">
                 <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono ml-1">
-                  Room Name
+                  {t('lobby.creator.room_name')}
                 </label>
                 <input
                   autoFocus
@@ -80,7 +112,7 @@ export const LobbyRoomCreator: React.FC<LobbyRoomCreatorProps> = ({
                   value={newRoomName}
                   onChange={(e) => setNewRoomName(e.target.value)}
                   className="w-full bg-elevated border border-subtle rounded-xl py-[1.2vh] px-4 text-responsive-sm text-primary focus:outline-none focus:border-red-900/50 transition-colors"
-                  placeholder="e.g. Berlin 1933"
+                  placeholder={t('lobby.creator.room_name_placeholder')}
                   maxLength={40}
                   required
                 />
@@ -88,7 +120,7 @@ export const LobbyRoomCreator: React.FC<LobbyRoomCreatorProps> = ({
               <div className="space-y-2">
                 <div className="flex items-center justify-between ml-1">
                   <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono">
-                    Max Players
+                    {t('lobby.creator.max_players')}
                   </label>
                   <span className="text-responsive-sm font-mono text-red-500">{maxPlayers}</span>
                 </div>
@@ -101,17 +133,17 @@ export const LobbyRoomCreator: React.FC<LobbyRoomCreatorProps> = ({
                   className="w-full h-1.5 bg-card rounded-lg appearance-none cursor-pointer accent-red-500"
                 />
                 <div className="flex justify-between text-[8px] text-ghost font-mono uppercase tracking-tighter">
-                  <span>5 Players</span>
-                  <span>10 Players</span>
+                  <span>{t('lobby.creator.players_min')}</span>
+                  <span>{t('lobby.creator.players_max')}</span>
                 </div>
               </div>
               <div className="space-y-2">
                 <div className="flex items-center justify-between ml-1">
                   <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono">
-                    Action Timer
+                    {t('lobby.creator.action_timer')}
                   </label>
                   <span className="text-responsive-sm font-mono text-red-500">
-                    {actionTimer === 0 ? 'OFF' : `${actionTimer}s`}
+                    {actionTimer === 0 ? t('lobby.creator.timer_off') : `${actionTimer}s`}
                   </span>
                 </div>
                 <input
@@ -124,121 +156,49 @@ export const LobbyRoomCreator: React.FC<LobbyRoomCreatorProps> = ({
                   className="w-full h-1.5 bg-card rounded-lg appearance-none cursor-pointer accent-red-500"
                 />
                 <div className="flex justify-between text-[8px] text-ghost font-mono uppercase tracking-tighter">
-                  <span>OFF</span>
+                  <span>{t('lobby.creator.timer_off')}</span>
                   <span>120s</span>
                 </div>
               </div>
               <div className="space-y-2">
                 <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono ml-1">
-                  Game Mode
+                  {t('lobby.creator.game_mode')}
                 </label>
                 <div className="flex gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      playSound('click');
-                      setMode('Ranked');
-                    }}
-                    className={cn(
-                      'flex-1 py-[1vh] rounded-xl border text-responsive-xs font-mono uppercase tracking-widest transition-all',
-                      mode === 'Ranked'
-                        ? 'bg-yellow-900/20 border-yellow-500 text-yellow-500'
-                        : 'bg-elevated border-subtle text-ghost'
-                    )}
-                  >
-                    Ranked
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      playSound('click');
-                      setMode('Casual');
-                    }}
-                    className={cn(
-                      'flex-1 py-[1vh] rounded-xl border text-responsive-xs font-mono uppercase tracking-widest transition-all',
-                      mode === 'Casual'
-                        ? 'bg-blue-900/20 border-blue-500 text-blue-400'
-                        : 'bg-elevated border-subtle text-ghost'
-                    )}
-                  >
-                    Casual
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      playSound('click');
-                      setMode('Classic');
-                    }}
-                    className={cn(
-                      'flex-1 py-[1vh] rounded-xl border text-responsive-xs font-mono uppercase tracking-widest transition-all',
-                      mode === 'Classic'
-                        ? 'bg-emerald-900/20 border-emerald-500 text-emerald-500'
-                        : 'bg-elevated border-subtle text-ghost'
-                    )}
-                  >
-                    Classic
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      playSound('click');
-                      setMode('Crisis');
-                    }}
-                    className={cn(
-                      'flex-1 py-[1vh] rounded-xl border text-responsive-xs font-mono uppercase tracking-widest transition-all',
-                      mode === 'Crisis'
-                        ? 'bg-purple-900/20 border-purple-500 text-purple-400'
-                        : 'bg-elevated border-subtle text-ghost'
-                    )}
-                  >
-                    Crisis
-                  </button>
+                  {(['Ranked', 'Casual', 'Classic', 'Crisis'] as const).map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => { playSound('click'); setMode(m); }}
+                      className={cn(
+                        'flex-1 py-[1vh] rounded-xl border text-responsive-xs font-mono uppercase tracking-widest transition-all',
+                        mode === m
+                          ? m === 'Ranked' ? 'bg-yellow-900/20 border-yellow-500 text-yellow-500'
+                            : m === 'Casual' ? 'bg-blue-900/20 border-blue-500 text-blue-400'
+                            : m === 'Classic' ? 'bg-emerald-900/20 border-emerald-500 text-emerald-500'
+                            : 'bg-purple-900/20 border-purple-500 text-purple-400'
+                          : 'bg-elevated border-subtle text-ghost'
+                      )}
+                    >
+                      {m}
+                    </button>
+                  ))}
                 </div>
-                <p className="text-[8px] text-ghost italic ml-1 pt-1">
-                  {mode === 'Ranked'
-                    ? 'ELO and full points awarded.'
-                    : mode === 'Classic'
-                      ? 'Standard roles/rules. No ELO, reduced points.'
-                      : mode === 'Crisis'
-                        ? 'Round-based Event Cards. High risk, high points.'
-                        : 'No ELO changes, reduced points.'}
-                </p>
+                <p className="text-[8px] text-ghost italic ml-1 pt-1">{modeDesc(mode)}</p>
               </div>
 
               {/* Privacy */}
               <div className="space-y-2">
                 <label className="text-responsive-xs uppercase tracking-widest text-ghost font-mono ml-1">
-                  Privacy
+                  {t('lobby.creator.privacy')}
                 </label>
                 <div className="grid grid-cols-3 gap-2">
-                  {[
-                    {
-                      value: 'public' as const,
-                      label: 'Public',
-                      icon: <Globe className="w-3.5 h-3.5" />,
-                      desc: 'Anyone can join',
-                    },
-                    {
-                      value: 'friends' as const,
-                      label: 'Friends Only',
-                      icon: <Users2 className="w-3.5 h-3.5" />,
-                      desc: 'Your friends only',
-                    },
-                    {
-                      value: 'private' as const,
-                      label: 'Private',
-                      icon: <Lock className="w-3.5 h-3.5" />,
-                      desc: 'Invite code',
-                    },
-                  ].map((opt) => (
+                  {privacyOptions.map((opt) => (
                     <button
                       key={opt.value}
                       type="button"
                       onMouseEnter={() => playSound('hover')}
-                      onClick={() => {
-                        playSound('click');
-                        setPrivacy(opt.value);
-                      }}
+                      onClick={() => { playSound('click'); setPrivacy(opt.value); }}
                       className={cn(
                         'flex flex-col items-center gap-1 py-2 px-1 rounded-xl border text-center transition-all',
                         privacy === opt.value
@@ -256,32 +216,29 @@ export const LobbyRoomCreator: React.FC<LobbyRoomCreatorProps> = ({
                 </div>
                 {privacy === 'private' && (
                   <p className="text-[9px] text-faint font-mono ml-1 italic">
-                    An invite code will be generated when the room is created.
+                    {t('lobby.creator.invite_code_hint')}
                   </p>
                 )}
               </div>
               <div className="flex gap-3">
                 <button
                   type="button"
-                  onClick={() => {
-                    playSound('click');
-                    onClose();
-                  }}
+                  onClick={() => { playSound('click'); onClose(); }}
                   className="flex-1 py-[1.2vh] border border-subtle text-responsive-xs text-muted font-serif italic rounded-xl hover:bg-card transition-colors"
                 >
-                  Cancel
+                  {t('common.cancel')}
                 </button>
                 <button
                   type="submit"
                   disabled={maintenanceMode && !user.isAdmin}
                   className={cn(
                     "flex-1 py-[1.2vh] text-responsive-xs font-serif italic rounded-xl transition-colors",
-                    maintenanceMode && !user.isAdmin 
-                      ? "bg-card text-ghost border border-subtle cursor-not-allowed" 
+                    maintenanceMode && !user.isAdmin
+                      ? "bg-card text-ghost border border-subtle cursor-not-allowed"
                       : "btn-primary hover:bg-subtle"
                   )}
                 >
-                  {maintenanceMode && !user.isAdmin ? 'Maintenance' : 'Create Room'}
+                  {maintenanceMode && !user.isAdmin ? t('lobby.creator.btn_maintenance') : t('lobby.creator.btn_create')}
                 </button>
               </div>
             </form>
@@ -291,5 +248,3 @@ export const LobbyRoomCreator: React.FC<LobbyRoomCreatorProps> = ({
     </AnimatePresence>
   );
 };
-
-

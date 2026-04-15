@@ -4,6 +4,7 @@ import { MUSIC_TRACKS, SOUND_PACKS } from '../utils/audio';
 import { getProxiedUrl } from '../utils/utils';
 import * as aiSpeech from '../services/aiSpeech';
 import { socket } from '../socket';
+import { useTranslation } from '../contexts/I18nContext';
 
 interface UseAudioEngineProps {
   user: User | null;
@@ -26,6 +27,7 @@ export function useAudioEngine({
   ttsVoice,
   ttsVolume,
 }: UseAudioEngineProps) {
+  const { t } = useTranslation();
   const musicAudioRef = useRef<HTMLAudioElement | null>(null);
 
   const playSound = useCallback(
@@ -77,7 +79,8 @@ export function useAudioEngine({
   useEffect(() => {
     const handlePowerUsed = async (data: { role: string }) => {
       if (!isSoundOn) return;
-      const text = `${data.role} power used`;
+      const translatedRole = t(`game.titles.${data.role.toLowerCase()}.name`);
+      const text = t('game.narration.power_used', { role: translatedRole });
       aiSpeech.speak(text, { voice: ttsVoice, volume: ttsVolume / 100 });
     };
 
@@ -85,7 +88,7 @@ export function useAudioEngine({
     return () => {
       socket.off('powerUsed', handlePowerUsed);
     };
-  }, [isSoundOn, ttsVoice, ttsVolume]);
+  }, [isSoundOn, ttsVoice, ttsVolume, t]);
 
   // Pause audio and cancel TTS when the app is backgrounded / tab hidden (especially on mobile)
   useEffect(() => {

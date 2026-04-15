@@ -1,12 +1,12 @@
 {
   "common": {
-    "title": "EL MONTAJE",
+    "title": "LA ASAMBLEA",
     "loading": "Cargando...",
     "error": "Error",
     "success": "Éxito",
     "cancel": "Cancelar",
     "confirm": "Confirmar",
-    "back": "Atrás",
+    "back": "Volver",
     "save": "Guardar",
     "close": "Cerrar",
     "leave": "Salir",
@@ -17,23 +17,32 @@
     "create": "Crear",
     "active": "Activo",
     "searching": "Buscando...",
-    "error_invalid_email": "Dirección de correo electrónico no válida"
+    "error_invalid_email": "Dirección de correo electrónico no válida",
+    "aye": "SÍ",
+    "civil_short": "Civilización",
+    "invite": "Invitar",
+    "lvl": "Nivel",
+    "results": "Resultados",
+    "search": "Buscar",
+    "sent": "Enviado",
+    "state_short": "Personal",
+    "status": "Estado"
   },
   "auth": {
-    "back": "Atrás",
+    "back": "Volver",
     "recovery_title": "Recuperación de cuenta",
-    "welcome_back": "Bienvenido de nuevo, delegado",
-    "register_assembly": "Registrarse para la Asamblea",
+    "welcome_back": "Bienvenido de nuevo, Delegado",
+    "register_assembly": "Regístrate para la Asamblea",
     "form": {
       "username": "Nombre de usuario",
-      "username_placeholder": "Identificador del agente",
+      "username_placeholder": "Identificador de agente",
       "email": "Correo electrónico",
       "password": "Clave segura",
-      "forgot_password": "¿Olvidó la clave?",
+      "forgot_password": "¿Olvidaste la clave?",
       "sign_in": "Iniciar sesión",
       "create_account": "Crear cuenta",
-      "or_continue": "O continuar con",
-      "register_prompt": "¿No tienes una cuenta? Registrarse",
+      "or_continue": "O continúa con",
+      "register_prompt": "¿No tienes una cuenta? Regístrate",
       "login_prompt": "¿Ya tienes una cuenta? Iniciar sesión",
       "choose_avatar": "Elige Avatar"
     }
@@ -44,26 +53,26 @@
       "play": "Jugar ahora"
     },
     "hero": {
-      "tagline": "Un juego de deducción social de roles ocultos, intriga política,",
-      "cta_play": "y confianza imposible.",
-      "discover": "Juega ahora — Gratis"
+      "tagline": "Un juego de deducción social de roles ocultos, intriga política,\ny confianza imposible.",
+      "cta_play": "Juega ahora — Gratis",
+      "discover": "Descubrir"
     },
     "about": {
-      "label": "Descubre",
-      "title": "¿Qué es The Assembly?",
+      "label": "¿Qué es la Asamblea?",
+      "title": "Roles ocultos. Estacas públicas.",
       "subtitle": "Un thriller político desarrollado en tiempo real. De 5 a 10 jugadores asumen roles secretos y deben engañarse, deducir y superarse unos a otros en una serie de rondas legislativas de alta presión.",
-      "stat_players": "Jugadores por juego",
-      "stat_policies": "Cartas de políticas apiladas en tu contra",
+      "stat_players": "Jugadores por partido",
+      "stat_policies": "Cartas políticas en su contra",
       "stat_agendas": "Agendas personales para completar",
-      "quote": "El viejo mundo terminó con La Crisis. Ahora sólo queda la Asamblea...",
+      "quote": "El viejo mundo terminó con La Crisis. Ahora sólo queda la Asamblea…",
       "quote_cta": "¿Defenderás la Carta Civil o construirás el nuevo Estado?"
     },
     "factions": {
-      "label": "Elige tu bando",
+      "label": "Elige tu lado",
       "title": "Dos facciones. Una Asamblea.",
-      "subtitle": "Cada jugador es asignado secretamente a una facción al comienzo de cada juego. La mayoría no sabrá en quién puede confiar.",
+      "subtitle": "Cada jugador es asignado en secreto a una facción al comienzo de cada juego. La mayoría no sabrá en quién puede confiar.",
       "civil": {
-        "title": "Civil",
+        "title": "Civiles",
         "desc": "La mayoría. Aislado en tu lealtad. No sabes quiénes son tus aliados, sólo que todo está en tu contra y que alguien en esta mesa es un traidor.",
         "win_1": "Promulgar 5 directivas civiles",
         "win_2": "Ejecutar al supervisor"
@@ -72,11 +81,11 @@
         "title": "Estado",
         "desc": "La minoría. Escondido entre los delegados civiles, coordinando en secreto. Conoces a tus aliados. Lo que necesitas es el momento adecuado.",
         "win_1": "Promulgar 6 directivas estatales",
-        "win_2": "Elegir al supervisor como canciller"
+        "win_2": "Elegir al Supervisor como Canciller"
       },
       "overseer": {
         "title": "El supervisor",
-        "desc": "Un agente estatal que tal vez no conozca a los demás jugadores estatales. Su elección como Canciller después de 3 directivas estatales pone fin al juego inmediatamente."
+        "desc": "Un agente del Estado que tal vez no conozca a los demás actores del Estado. Su elección como Canciller después de 3 directivas estatales pone fin al juego inmediatamente."
       },
       "win_conditions": "Condiciones de victoria"
     },
@@ -84,10 +93,12 @@
       "label": "Cómo se juega",
       "title": "Una ronda. Cinco momentos.",
       "subtitle": "Cada ronda obliga a todos los jugadores a participar, declarar y ser juzgados. No hay forma de esconderse.",
-      "step_1": "El Presidente nombra a un Canciller. En quién confías y a quién nominas lo revela todo.",
+      "label_1": "Nominación",
+      "step_1": "El Presidente nombra un Canciller. En quién confías y a quién nominas lo revela todo.",
+      "label_2": "Votación",
       "step_2": "Todos los jugadores votan simultáneamente. Público, ineludible y abierto a interpretación.",
-      "label_3": "Sesión legislativa",
-      "step_3": "El presidente roba 3 cartas de política, descarta 1 y pasa 2 al canciller. Se promulgará uno.",
+      "label_3": "Sesión Legislativa",
+      "step_3": "El Presidente roba 3 cartas de política, descarta 1 y pasa 2 al Canciller. Se promulgará uno.",
       "label_4": "Declaraciones",
       "step_4": "Ambas partes declaran lo sucedido en la sesión. Estas declaraciones pueden ser mentiras, mentiras descaradas y convincentes.",
       "label_5": "Acción Ejecutiva",
@@ -97,23 +108,23 @@
       "label": "Qué está incluido",
       "title": "Más que un juego de mesa.",
       "item_1": {
-        "label": "De 5 a 10 jugadores",
-        "desc": "Escale desde una deducción estricta hasta un engaño extenso."
+        "label": "5 a 10 jugadores",
+        "desc": "Escale desde la deducción estricta hasta el engaño generalizado."
       },
       "item_2": {
         "label": "Jugadores de IA",
-        "desc": "Llena los asientos vacíos con IA, cada uno con su propia personalidad."
+        "desc": "Llene los asientos vacíos con IA, cada uno con su propia personalidad."
       },
       "item_3": {
-        "label": "Roles de título",
-        "desc": "Poderes de un solo uso: Interdictor, Asesino, Corredor y más."
+        "label": "Funciones del título",
+        "desc": "Poderes de un solo uso: Interdictor, Assassin, Broker y más."
       },
       "item_4": {
         "label": "Agendas personales",
         "desc": "20 objetivos ocultos independientes de tu facción."
       },
       "item_5": {
-        "label": "Modo Crisis",
+        "label": "Modo crisis",
         "desc": "Directivas de caos opcionales que reescriben las reglas a mitad del juego."
       },
       "item_6": {
@@ -137,7 +148,7 @@
   },
   "lobby": {
     "header": {
-      "subtitle": "Lobby de asamblea",
+      "subtitle": "Vestíbulo de la Asamblea",
       "leaderboard": "Tabla de clasificación",
       "profile": "Mi perfil",
       "view_profile": "Ver perfil",
@@ -149,32 +160,32 @@
       "trainee": "Aprendiz",
       "delegate": "Delegado",
       "official": "Oficial",
-      "high_delegate": "Alto delegado",
+      "high_delegate": "Alto Delegado",
       "consul": "Cónsul",
-      "assembly_master": "Maestro de asamblea",
+      "assembly_master": "Maestro de montaje",
       "overseer": "Supervisor"
     },
     "matchmaking": {
-      "title": "Armar una partida",
-      "subtitle": "Únase a una cola competitiva o encuentre una sala informal.",
-      "searching": "Buscando...",
-      "joining": "¡Uniéndose!",
-      "no_rooms": "No hay salas",
-      "quick_join": "Unión rápida",
-      "quick_join_desc": "La mejor sala disponible",
-      "create": "Crear asamblea",
-      "create_desc": "Convoca la tuya propia",
+      "title": "Armar una cerilla",
+      "subtitle": "Únase a una cola competitiva o busque una sala informal.",
+      "searching": "Buscando…",
+      "joining": "¡Unión!",
+      "no_rooms": "Sin habitaciones",
+      "quick_join": "Únete rápido",
+      "quick_join_desc": "La mejor habitación disponible",
+      "create": "Crear ensamblaje",
+      "create_desc": "Convoca el tuyo propio",
       "practice": "Práctica en solitario",
-      "practice_desc": "Entrenar contra robots de IA",
+      "practice_desc": "Tren contra robots de IA",
       "practice_short": "Práctica",
       "global_war": "Guerra global",
       "stats_running": "Asambleas en ejecución",
       "stats_members": "Miembros activos"
     },
     "browser": {
-      "rejoin_title": "Asamblea activa encontrada",
+      "rejoin_title": "Ensamblaje activo encontrado",
       "rejoin_subtitle": "Te desconectaste de: {{name}}",
-      "rejoin_btn": "Volver a unirte al juego",
+      "rejoin_btn": "Volver a unirse al juego",
       "status_recruiting": "Reclutamiento",
       "status_in_progress": "En progreso",
       "privacy_public": "Público",
@@ -191,9 +202,9 @@
       "sort_full": "Completo",
       "empty_no_rooms": "No se encontraron salas activas.",
       "empty_no_match": "Ninguna habitación coincide con tus filtros.",
-      "empty_create_prompt": "Sea el primero en crear uno",
+      "empty_create_prompt": "Sé el primero en crear uno",
       "empty_clear_filters": "Borrar filtros",
-      "private_modal_title": "Sala privada",
+      "private_modal_title": "Habitación Privada",
       "private_modal_subtitle": "Ingrese el código de invitación de 4 caracteres.",
       "private_modal_cancel": "Cancelar"
     },
@@ -203,50 +214,108 @@
     "footer": {
       "published_by": "Publicado por",
       "credits": "Créditos",
-      "legal": "Información Legal"
+      "legal": "Información legal"
+    },
+    "creator": {
+      "title": "Establecer una nueva asamblea",
+      "room_name": "Nombre de la habitación",
+      "room_name_placeholder": "p.ej. Berlín 1933",
+      "max_players": "Jugadores máximos",
+      "players_min": "5 jugadores",
+      "players_max": "10 jugadores",
+      "action_timer": "Temporizador de acción",
+      "timer_off": "APAGADO",
+      "game_mode": "Modo de juego",
+      "mode_ranked_desc": "ELO y puntos completos otorgados.",
+      "mode_casual_desc": "Sin cambios de ELO, puntos reducidos.",
+      "mode_classic_desc": "Roles/reglas estándar. Sin ELO, puntos reducidos.",
+      "mode_crisis_desc": "Tarjetas de eventos basadas en rondas. Alto riesgo, puntos altos.",
+      "privacy": "Privacidad",
+      "privacy_public": "Público",
+      "privacy_public_desc": "Cualquiera puede unirse",
+      "privacy_friends": "Sólo amigos",
+      "privacy_friends_desc": "Sólo tus amigos",
+      "privacy_private": "Privado",
+      "privacy_private_desc": "Código de invitación",
+      "invite_code_hint": "Se generará un código de invitación cuando se cree la sala.",
+      "btn_create": "Crear sala",
+      "btn_maintenance": "Mantenimiento"
+    },
+    "practice": {
+      "title": "Práctica en solitario",
+      "subtitle": "Contra la inteligencia artificial",
+      "total_players": "Total de jugadores",
+      "players_min": "5 (Rápido)",
+      "players_max": "10 (complejo)",
+      "ai_difficulty": "Dificultad de la IA",
+      "difficulty_casual_desc": "Las IA juegan de forma sencilla y honesta.",
+      "difficulty_normal_desc": "Las IA utilizan estrategias estándar y engaños.",
+      "difficulty_elite_desc": "Las IA son muy engañosas y se coordinan de forma eficaz.",
+      "btn_start": "Convocar Asamblea"
     }
   },
   "game": {
+    "roles": {
+      "civil": {
+        "name": "Civiles",
+        "flavor": "Proteger la Carta. No confíes en nadie."
+      },
+      "state": {
+        "name": "Estado",
+        "flavor": "Implementar la visión del Estado. Identifica a tus aliados."
+      },
+      "overseer": {
+        "name": "Supervisor",
+        "flavor": "Sabotear la Asamblea desde dentro. Conviértete en canciller."
+      }
+    },
     "round": "Ronda {{round}}",
     "phase": "Fase: {{phase}}",
-    "civil_directives": "Directivas Civiles",
-    "state_directives": "Directivas Estatales",
+    "civil_directives": "Directivas civiles",
+    "state_directives": "Directivas estatales",
     "winner": "{{faction}} ¡Gana!",
-    "gameOver": "G A M E O V E R",
+    "gameOver": "JUEGO SOBRE V E R",
+    "modes": {
+      "casual": "Informal",
+      "ranked": "Clasificado",
+      "classic": "Clásico",
+      "crisis": "Crisis"
+    },
     "phases": {
       "lobby": "Esperando jugadores ({{current}}/{{max}})...",
       "nominate_chancellor": "{{name}} está nominando a un Canciller.",
       "nomination_review": "La Asamblea está revisando la nominación.",
-      "interdictor_review": "Interdictor está eligiendo un objetivo.",
+      "interdictor_review": "Interdictor es elegir un objetivo.",
       "broker_review": "El corredor está revisando la nominación.",
       "voting": "La Asamblea está votando.",
       "legislative_president": "El presidente está revisando directivas.",
-      "strategist_deck": "El estratega está mirando el mazo.",
+      "strategist_deck": "El estratega está mirando la baraja.",
       "legislative_chancellor": "El Canciller está promulgando una directiva.",
-      "auditor_inspect": "El auditor está inspeccionando la pila de descartes.",
+      "auditor_inspect": "El auditor está inspeccionando la pila de descarte.",
       "defector_align": "El desertor está considerando una realineación secreta.",
       "quorum_revote": "El Quórum está decidiendo una nueva votación de emergencia.",
       "assassin_target": "Assassin está eligiendo un objetivo."
     },
     "dossier": {
-      "title": "Su expediente secreto",
+      "title": "Tu expediente secreto",
       "identity": "Identidad secreta",
-      "identity_civil": "Identidad política: Civil",
-      "identity_overseer": "Identidad política: Supervisor",
-      "identity_state": "Identidad política: Estado",
-      "agenda": "Agenda personal",
+      "identity_civil": "Civil",
+      "identity_overseer": "Supervisor",
+      "identity_state": "Estado",
+      "agenda": "Agenda Personal",
       "agenda_none": "No hay agenda asignada.",
       "agenda_bonus": "Completar esto otorga XP e IP adicionales equivalentes a una victoria de facción.",
-      "title_role": "Rol de título",
-      "title_none": "No hay ningún rol de título asignado.",
+      "title_role": "Rol del título",
+      "title_none": "No se ha asignado ningún papel principal.",
       "faction_state": "Facción estatal",
       "awaiting": "Esperando asignación de roles...",
-      "close": "Cerrar dossier"
+      "close": "Cerrar Dossier",
+      "active": "ACTIVO"
     },
     "powers": {
       "peek": {
-        "name": "Vistazo de política",
-        "desc": "El presidente muestra una vista previa de las 3 directivas principales"
+        "name": "Vistazo a las políticas",
+        "desc": "El presidente adelanta las 3 directivas principales"
       },
       "kill": {
         "name": "Ejecución",
@@ -254,75 +323,101 @@
       },
       "inv": {
         "name": "Investigación",
-        "desc": "El presidente investiga el partido de un jugador"
+        "desc": "Presidente investiga partido de un jugador"
       },
       "spec": {
-        "name": "Elección especial",
-        "desc": "El presidente elige el siguiente candidato"
+        "name": "Elección Especial",
+        "desc": "El presidente elige al próximo candidato"
       },
       "win": {
-        "name": "Victoria del estado",
+        "name": "Victoria del Estado",
         "desc": "El estado gana inmediatamente"
       },
       "investigate": "Investigar",
-      "special_election": "Elección especial",
+      "special_election": "Elección Especial",
       "execution": "Ejecución",
-      "policy_peek": "Vistazo de política"
+      "policy_peek": "Vistazo a la política"
+    },
+    "policies": {
+      "civil": {
+        "name": "Civiles",
+        "directive": "Directiva Civil"
+      },
+      "state": {
+        "name": "Estado",
+        "directive": "Directiva estatal"
+      }
     },
     "titles": {
       "interdictor": {
         "name": "Interdictor",
-        "action": "Detener"
+        "action": "Detener",
+        "desc": "Impide que un jugador participe en la siguiente votación."
       },
       "broker": {
         "name": "Corredor",
-        "action": "Veto"
+        "action": "Veto",
+        "desc": "Obliga a una nueva nominación si la elección actual no es satisfactoria."
       },
       "strategist": {
         "name": "Estratega",
-        "action": "Sorteo 4"
+        "action": "Sorteo 4",
+        "desc": "Saca una carta directiva extra durante la sesión legislativa."
       },
       "auditor": {
         "name": "Auditor",
-        "action": "Inspeccionar"
+        "action": "Inspeccionar",
+        "desc": "Obtiene acceso para ver las cartas superiores de la pila de descarte directiva."
       },
       "assassin": {
         "name": "Asesino",
-        "action": "Ejecutar"
+        "action": "Ejecutar",
+        "desc": "Puede apuntar a cualquier jugador para su eliminación inmediata."
       },
       "handler": {
         "name": "Manejador",
-        "action": "Intercambiar"
+        "action": "Redirigir",
+        "desc": "Intercambia los cargos de los dos Presidentes siguientes en el orden."
       },
       "defector": {
         "name": "Desertor",
-        "action": "Voto invertido"
+        "action": "Voto invertido",
+        "desc": "Cambia en secreto el resultado de su votación al final de una sesión."
       },
       "archivist": {
-        "name": "Archivista",
-        "action": "Inspección profunda"
+        "name": "Archivero",
+        "action": "Inspección profunda",
+        "desc": "Visualiza las 3 primeras cartas del mazo en cualquier momento."
       },
       "quorum": {
         "name": "Quórum",
-        "action": "Nueva votación de emergencia"
+        "action": "Nueva votación de emergencia",
+        "desc": "Fuerza una nueva votación inmediatamente después de una nominación fallida."
       },
       "cipher": {
         "name": "Cifrado",
-        "action": "Despacho"
+        "action": "Envío",
+        "desc": "Envía un mensaje privado anónimo a cualquier jugador."
       }
     },
     "tracks": {
-      "civil_label": "Civil",
+      "civil_label": "Civiles",
       "state_label": "Estado",
-      "deck": "Baraja",
+      "deck": "Cubierta",
       "discard": "Descartar",
       "spectators": "Espectadores ({{count}})",
       "election_tracker": "Rastreador de elecciones",
-      "win_civil": "Estatuto restaurado",
+      "win_civil": "Carta restaurada",
       "win_civil_desc": "Civil gana inmediatamente",
-      "win_state": "Supremacía estatal",
+      "win_state": "Supremacía del Estado",
       "win_state_desc": "El estado gana inmediatamente",
-      "quorum_revote": "REVOTAR"
+      "quorum_revote": "REVOTAR",
+      "win_reasons": {
+        "charter_restored": "Carta restaurada",
+        "state_supremacy": "Supremacía del Estado",
+        "overseer_executed": "El supervisor ha sido ejecutado",
+        "overseer_ascended": "El Supervisor ha Ascendido"
+      }
     },
     "player_card": {
       "candidate": "Candidato",
@@ -338,16 +433,16 @@
       "detain": "Detener",
       "censure": "Censura",
       "selected": "Seleccionado",
-      "exclude_hint": "Excluir de nominaciones",
-      "proven_not_overseer": "Probado no supervisor",
+      "exclude_hint": "Excluir de las nominaciones",
+      "proven_not_overseer": "Se ha demostrado que no es supervisor",
       "aria_label": "Jugador {{name}}{{you}}"
     },
     "action_bar": {
       "current_phase": "Fase actual",
       "crisis_active": "Crisis activa",
       "anonymous_dispatch": "Envío anónimo interceptado",
-      "encrypted_dispatch": "Canal de envío cifrado",
-      "cipher_placeholder": "Introducir mensaje (máximo 80 caracteres)...",
+      "encrypted_dispatch": "Canal de despacho cifrado",
+      "cipher_placeholder": "Ingrese el mensaje (máximo 80 caracteres)...",
       "quick_reactions": "Reacciones rápidas",
       "toggle_reactions": "Alternar reacciones",
       "mute": "Silenciar micrófono",
@@ -356,11 +451,11 @@
       "start_video": "Iniciar vídeo",
       "declaring": "Los jugadores están declarando directivas.",
       "handler_active": "Handler está usando su poder.",
-      "censure_debate": "La Asamblea está debatiendo una moción de censura.",
+      "censure_debate": "La Asamblea debate una moción de censura.",
       "snap_volunteers": "Los voluntarios están dando un paso al frente para las elecciones anticipadas.",
       "crisis_incoming": "Evento de crisis entrante...",
       "investigating": "El presidente está investigando la lealtad de un jugador.",
-      "calling_special": "El presidente convocará elecciones especiales.",
+      "calling_special": "El presidente convoca a elecciones especiales.",
       "executing": "El presidente está ejecutando a un jugador.",
       "peeking": "El presidente está revisando las tres políticas principales.",
       "deciding": "El presidente está decidiendo una acción ejecutiva.",
@@ -368,116 +463,898 @@
       "in_session": "La Asamblea está en sesión.",
       "nominate_prompt": "Toca un jugador en el tablero para nominarlo como Canciller.",
       "nominate_watch": "Mire la nominación: revela en quién confía el presidente.",
-      "detained_cant_vote": "Estás detenido y no puedes votar en esta ronda.",
+      "detained_cant_vote": "Está detenido y no puede votar en esta ronda.",
       "voting_prompt": "Vote SÍ para apoyar a este gobierno o NO para bloquearlo.",
-      "discard_prompt": "Descarta una tarjeta de póliza. Los otros dos van al Canciller.",
-      "pass_watch": "El Presidente está eligiendo qué política pasar al Canciller.",
-      "declaration_hint": "Las declaraciones le dicen a la mesa lo que se extrajo y se aprobó. Puede que sean mentiras.",
+      "discard_prompt": "Descarta una carta de póliza. Los otros dos van al Canciller.",
+      "pass_watch": "El Presidente está eligiendo qué política pasar a la Canciller.",
+      "declaration_hint": "Las declaraciones le dicen a la mesa lo que se sacó y se aprobó. Puede que sean mentiras.",
       "enact_prompt": "Promulgar una política. Puede proponer un veto si se promulgan más de 5 directivas estatales.",
-      "enact_watch": "El Canciller está eligiendo qué política promulgar.",
+      "enact_watch": "El Canciller está eligiendo qué política implementar.",
       "investigate_prompt": "Selecciona un jugador para investigar la lealtad de su grupo.",
       "special_prompt": "Selecciona un jugador para que sea el próximo presidente.",
       "execute_prompt": "Selecciona un jugador para ejecutar.",
-      "peek_prompt": "Revisa las 3 primeras cartas del mazo.",
+      "peek_prompt": "Revisa las 3 primeras cartas de la baraja.",
       "must_use_power": "Debes utilizar tu poder ejecutivo.",
       "pres_must_use": "El Presidente debe utilizar su poder ejecutivo.",
-      "lobby_ready_prompt": "Presione Ready Up cuando esté listo para comenzar. El juego comienza cuando todos los jugadores están listos."
+      "lobby_ready_prompt": "Presione Ready Up cuando esté listo para comenzar. El juego comienza cuando todos los jugadores están listos.",
+      "game_over_title": "Juego terminado",
+      "see_results": "Ver resultados de montaje",
+      "play_again": "Jugar de nuevo",
+      "skip_power": "Saltar energía",
+      "ready_up": "Listo",
+      "ready": "¡Listo!",
+      "host_label": "Anfitrión",
+      "ready_count": "{{count}} / {{total}} Listo",
+      "lock_room": "Cuarto de bloqueo",
+      "unlock_room": "Desbloquear habitación",
+      "force_start": "Forzar inicio del juego",
+      "need_players_ranked": "Se necesitan más de 5 jugadores para las clasificatorias",
+      "no_players": "Sin jugadores",
+      "voted_for": "Votado por {{name}}",
+      "censure_select": "Seleccione un jugador en su tarjeta para censurar (excluir de la próxima nominación)",
+      "snap_volunteer_prompt": "Cualquier jugador puede ofrecerse como voluntario para ser el próximo presidente.",
+      "volunteered": "Voluntario",
+      "volunteer": "Voluntario",
+      "ready_to_serve": "{{count}} Listo para publicar",
+      "prediction_logged": "Predicción registrada: {{faction}} Victoria",
+      "prediction_reward": "Se acreditarán 50 IP si tu facción prevalece.",
+      "predict_prompt": "Predecir unidad o engaño para",
+      "send": "Enviar",
+      "char_counter": "{{count}}/80 Caracteres",
+      "title_strategist_prompt": "¿Usar el poder del estratega para trazar una política adicional?",
+      "title_broker_prompt": "¿Usar el poder del intermediario para forzar una nueva nominación?",
+      "title_handler_prompt": "¿Usar el poder de Handler para intercambiar a los siguientes dos jugadores en el orden presidencial?",
+      "title_auditor_prompt": "¿Usar el poder del Auditor para echar un vistazo a la pila de descartes?",
+      "title_archivist_prompt": "¿Usar el poder del Archivista para echar un vistazo a la pila de descarte?",
+      "title_defector_prompt": "¿Defecto? ¿Invertir en secreto su voto al resultado opuesto?",
+      "title_quorum_prompt": "¿Utilizar el poder del quórum para convocar una nueva votación de emergencia?",
+      "title_assassin_prompt": "Seleccione un jugador para ejecutar en su tarjeta u omita.",
+      "title_interdictor_prompt": "Seleccione un jugador para detenerlo en su tarjeta u omítalo.",
+      "title_flip_vote": "Voto invertido",
+      "title_yes": "Sí",
+      "title_no": "No"
     },
     "chat": {
-      "title": "Chat de asamblea",
+      "title": "Charla de asamblea",
       "round_separator": "Ronda {{count}}",
       "dead_cant_speak": "Los jugadores muertos no pueden hablar...",
-      "placeholder": "Escribe un mensaje..."
+      "placeholder": "Escribe un mensaje...",
+      "chanCivilStateEnacted": {
+        "0": "Me entregaron dos directivas estatales. El Presidente debe una explicación a la Asamblea.",
+        "1": "No había ninguna directiva civil en lo que recibí. Dirija sus preguntas al Presidente.",
+        "2": "Promulgué lo que me dieron. El Presidente controla el descarte.",
+        "3": "El presidente me pasó la mano muerta. No tuve elección.",
+        "4": "Pregúntele al Presidente por qué sólo me pasaron directivas del Estado.",
+        "5": "Mis manos estaban atadas por la elección del Presidente.",
+        "6": "Soy simplemente el instrumento de la voluntad del Presidente.",
+        "7": "La pila de descartes del Presidente cuenta la verdadera historia.",
+        "8": "No me culpen por la incompetencia del presidente.",
+        "9": "El presidente no me dio otra opción.",
+        "10": "Sólo vi directivas estatales. El presidente esconde algo.",
+        "11": "Las elecciones del Presidente no me dejaron otra alternativa.",
+        "12": "Revisa la pila de descarte. El presidente no me dio opción.",
+        "13": "Estoy tan decepcionado como usted, pero el Presidente me pasó dos tarjetas de Estado.",
+        "14": "El Presidente es quien filtró el sorteo. Pregúntales.",
+        "15": "Tuve que promulgar una directiva estatal porque eso es todo lo que recibí.",
+        "16": "Al parecer, la mano del Presidente estaba llena de Estado.",
+        "17": "No soy yo quien descartó la tarjeta Civil. El presidente lo es.",
+        "18": "La elección del Presidente estuvo puramente orientada al Estado.",
+        "19": "Sólo soy el mensajero. El presidente escribió el mensaje.",
+        "20": "El descarte del presidente fue más revelador que sus palabras.",
+        "21": "Se me pasó una mano estrictamente estatal. El presidente tiene las cartas.",
+        "22": "No soy yo quien filtra las directivas. Pregúntale al presidente.",
+        "23": "Las elecciones del Presidente me dejaron un único camino.",
+        "24": "Cumplí con mi deber con las opciones limitadas que me brindó el Presidente.",
+        "25": "La narrativa del presidente no coincide con la mano que recibí.",
+        "26": "Promulgué una directiva estatal porque el presidente no me dio ninguna alternativa civil.",
+        "27": "El sorteo supuestamente fue todo del Estado, al menos eso dice el Presidente.",
+        "28": "El descarte del Presidente en la Secretaría fue probablemente donde murió nuestra esperanza.",
+        "29": "Estoy vinculado por la elección de la Presidencia, que fue íntegramente estatal.",
+        "30": "El Presidente es el filtro; Yo soy sólo la salida. Culpe al filtro.",
+        "31": "Una mano muerta de la Presidencia. Hice lo que tenía que hacer.",
+        "32": "Las opciones del presidente fueron... restrictivas, por decir lo menos.",
+        "33": "El presidente me entregó un cáliz envenenado."
+      },
+      "chanStateStateEnacted": {
+        "0": "El empate fue contra nosotros. Esto es obra de la baraja, no mía.",
+        "1": "No tenía ninguna alternativa viable. El Presidente puede comprobarlo.",
+        "2": "A veces la Secretaría decide por nosotros.",
+        "3": "Una mano difícil, pero debemos seguir adelante.",
+        "4": "Las probabilidades no estaban a nuestro favor en esta ronda.",
+        "5": "La baraja está claramente manipulada en contra de la Carta.",
+        "6": "Hice lo que tenía que hacer por el Estado.",
+        "7": "Las cartas no estaban a nuestro favor.",
+        "8": "Culpe al mazo, no al jugador.",
+        "9": "El Estado exige sacrificio, y esto fue todo.",
+        "10": "El empate fue desafortunado. Debemos adaptarnos.",
+        "11": "A veces es difícil aceptar la voluntad de la Secretaría.",
+        "12": "Actué en el mejor interés de la situación actual.",
+        "13": "La aleatoriedad del mazo es un desafío para todos nosotros.",
+        "14": "A veces el camino del Estado es el único abierto.",
+        "15": "Seguí la lógica de las cartas que me repartieron.",
+        "16": "El empate estuvo fuertemente inclinado hacia el Estado.",
+        "17": "Debemos permanecer unidos a pesar de este revés.",
+        "18": "Esta vez las cartas dictaron el resultado.",
+        "19": "Estoy comprometido con la Asamblea, incluso cuando el sorteo sea duro.",
+        "20": "La marea del Estado está subiendo. Simplemente estamos flotando sobre los restos del sorteo.",
+        "21": "La probabilidad estaba en nuestra contra. Incluso la Secretaría tiene días malos.",
+        "22": "Una promulgación forzada de la voluntad del Estado. Debemos aguantar.",
+        "23": "Esta vez los dados del destino corrieron para el Estado.",
+        "24": "No leas demasiado en un solo sorteo. La baraja es voluble.",
+        "25": "La influencia del Estado está entretejida en el tejido mismo de esta baraja.",
+        "26": "Una promulgación obligatoria para el régimen actual. Nada más.",
+        "27": "La mano del Canciller a menudo está atada por la aleatoriedad de la Secretaría.",
+        "28": "Las cartas estaban pesadas. Todos somos víctimas del empate.",
+        "29": "A veces el camino del Estado es el único camino pavimentado.",
+        "30": "El empate fue una anomalía estadística que favoreció a nuestros rivales.",
+        "31": "No tengo ninguna malicia, sólo las cartas que el Presidente consideró adecuadas.",
+        "32": "La Secretaría respira directivas del Estado cuando menos las necesitamos.",
+        "33": "Una jugada forzada en un juego de opciones limitadas."
+      },
+      "presCivilStateEnacted": {
+        "0": "Aprobé una directiva civil. El Canciller ejerció su propia discreción.",
+        "1": "Había una opción Civil en esa mano. Haz de eso lo que quieras.",
+        "2": "Les di una opción. Eligieron el Estado.",
+        "3": "El Canciller es responsable de esa promulgación. Les pasé una opción civil.",
+        "4": "Me sorprende la decisión del Canciller. Les envié una directiva civil.",
+        "5": "El Canciller claramente tiene su propia agenda.",
+        "6": "Yo hice mi parte. El Canciller falló en la Asamblea.",
+        "7": "Ofrecí un camino civil. Lo rechazaron.",
+        "8": "La traición del Canciller es suya.",
+        "9": "No puedo controlar las acciones del Canciller.",
+        "10": "Pasé tarjeta Civil. ¿Por qué el Canciller eligió Estado?",
+        "11": "El Canciller tenía una opción. Eligieron mal.",
+        "12": "Estoy cuestionando la lealtad del Canciller después de esa medida.",
+        "13": "Les di la opción de ser Civil. Ellos declinaron.",
+        "14": "La promulgación del Canciller no refleja la mano que pasé.",
+        "15": "Estoy profundamente preocupado por la decisión del Canciller.",
+        "16": "El Canciller tenía en la mano una directiva civil.",
+        "17": "Hice mi parte para mantenernos civiles. El Canciller no lo hizo.",
+        "18": "Los verdaderos colores del Canciller están a la vista.",
+        "19": "No puedo responder por la traición del Canciller.",
+        "20": "Les envié una selección de futuros. Eligieron uno más oscuro.",
+        "21": "La promulgación de la Canciller es una bofetada directa a la Presidencia.",
+        "22": "Estoy en shock. El Canciller tenía una directiva civil en sus manos.",
+        "23": "El Canciller tiene algunas explicaciones que dar a la Asamblea.",
+        "24": "Hice mi parte para preservar la Carta. El Canciller no lo hizo.",
+        "25": "Las acciones del Canciller son cada vez más erráticas, o tal vez calculadas.",
+        "26": "Pasé tarjeta Civil. La elección del Canciller es su propia carga.",
+        "27": "¿Por qué el Canciller haría esto? Les di un camino civil claro.",
+        "28": "La Canciller está jugando un juego peligroso con el Estado.",
+        "29": "Proporcioné la opción de ser Civil. El Canciller lo rechazó.",
+        "30": "La lealtad del Canciller a la Carta está oficialmente en duda.",
+        "31": "Estoy tan confundido como el resto de ustedes. Les pasé una tarjeta Civil.",
+        "32": "El Canciller tenía una bifurcación en el camino. eligieron el camino del Estado.",
+        "33": "No puedo apoyar la decisión del Canciller. No fue mi mano."
+      },
+      "presStateStateEnacted": {
+        "0": "Tres sorteos estatales. Ninguno de nosotros tuvo elección.",
+        "1": "La baraja iba en contra de la Carta en esta ronda.",
+        "2": "Transmití lo que pude. La mano estaba comprometida.",
+        "3": "La Secretaría nos está poniendo a prueba. No hay cartas de Civil en ese sorteo.",
+        "4": "Un empate de Estado puro. Mis manos estaban atadas.",
+        "5": "La baraja no es nuestra amiga hoy.",
+        "6": "No tenía tarjetas civiles para aprobar. Créeme.",
+        "7": "La influencia del Estado es fuerte en este mazo.",
+        "8": "Estoy tan frustrado como tú.",
+        "9": "Las cartas estaban en nuestra contra desde el principio.",
+        "10": "Un triple empate estatal. No había nada que pudiera hacer.",
+        "11": "La baraja está claramente favoreciendo al Estado en estos momentos.",
+        "12": "Estoy tan atascado como tú con estas tarjetas.",
+        "13": "La Secretaría nos está empujando hacia el Estado.",
+        "14": "No hubo cartas Civil disponibles en ese sorteo.",
+        "15": "El empate fue un fracaso total para la Carta.",
+        "16": "No tenía ninguna opción de Civil para transmitir.",
+        "17": "La baraja se está mostrando muy poco cooperativa hoy.",
+        "18": "A veces estamos a merced del empate.",
+        "19": "La influencia del Estado es fuerte en este mazo.",
+        "20": "Tres tarjetas de estado me devolvieron la mirada. Incluso la Secretaría guardó silencio.",
+        "21": "Una mano pura del Estado. No hay elección para mí, ni para el Canciller.",
+        "22": "Las probabilidades finalmente nos alcanzaron. No hay ni una sola tarjeta civil a la vista.",
+        "23": "El sesgo de la baraja hacia el Estado fue total en esta ronda.",
+        "24": "Pasé por el Estado porque no había nada más que pasar.",
+        "25": "Un fracaso total de las directivas civiles. Estamos a merced del empate.",
+        "26": "El sorteo fue una sinfonía de directivas del Estado. Yo soy sólo el conductor.",
+        "27": "Cero opciones para la Carta. Mis manos estaban atadas por las cartas.",
+        "28": "La Secretaría está teniendo una ronda oscura. Tarjetas triples de Estado.",
+        "29": "Busqué una tarjeta Civil. No encontré ninguno. El empate fue absoluto.",
+        "30": "El sorteo estuvo compuesto íntegramente por directivas del Estado. Desgraciado.",
+        "31": "Ni una sola pizca de lógica civil en esa mano. Todo el Estado.",
+        "32": "El sorteo de la Secretaría fue un monocromo de directivas del Estado.",
+        "33": "Estoy tan decepcionado como cualquiera. La baraja definitivamente está en nuestra contra."
+      },
+      "governmentFailed": {
+        "0": "Una sesión perdida. No podemos seguir paralizando a la Secretaría.",
+        "1": "El punto muerto no sirve a nadie aquí. La crisis no espera.",
+        "2": "Necesitamos formar un gobierno funcional. Ahora.",
+        "3": "La Asamblea está dividida. Esto es peligroso.",
+        "4": "Otra votación fallida. El Estado se fortalece con cada retraso.",
+        "5": "Se nos acaba el tiempo.",
+        "6": "El estancamiento sólo ayuda al Estado.",
+        "7": "Debemos llegar a un acuerdo.",
+        "8": "Este punto muerto es inaceptable.",
+        "9": "La Asamblea nos está fallando.",
+        "10": "Estamos paralizados. Esto es exactamente lo que quiere el Estado.",
+        "11": "Cada votación fallida es una victoria para nuestros enemigos.",
+        "12": "La indecisión de la Asamblea es nuestra mayor debilidad.",
+        "13": "Debemos encontrar puntos en común o afrontar las consecuencias.",
+        "14": "Este obstruccionismo está destruyendo la Carta.",
+        "15": "La crisis se profundiza mientras discutimos.",
+        "16": "No podemos permitirnos otra ronda de fracasos.",
+        "17": "El Estado se ríe de nuestra división.",
+        "18": "Necesitamos liderazgo, no un punto muerto.",
+        "19": "La Asamblea está haciendo girar sus ruedas.",
+        "20": "Cada voto en contra es un impulso de vida para las ambiciones del Estado.",
+        "21": "Estamos discutiendo mientras la Carta arde. ¡Formad gobierno!",
+        "22": "Esta indecisión es una sentencia de muerte para la Asamblea.",
+        "23": "La Secretaría desprecia el vacío. Debemos llenarlo de liderazgo.",
+        "24": "¿Estamos aquí para debatir o promulgar la Carta? Formar un gobierno.",
+        "25": "El Estado prospera a la sombra de nuestro desacuerdo.",
+        "26": "Otro intento fallido. Nos estamos volviendo tan débiles como nuestros enemigos.",
+        "27": "La falta de unidad de la Asamblea es su propia perdición.",
+        "28": "Le estamos dando al Estado la ventaja a través de nuestra propia división.",
+        "29": "Un gobierno de paja es mejor que ningún gobierno.",
+        "30": "La crisis sólo se intensifica mientras nos estancamos. ¡Haz una elección!",
+        "31": "La Secretaría está cada vez más impaciente con nuestra parálisis.",
+        "32": "El obstruccionismo es un veneno lento para la Carta.",
+        "33": "Estamos discutiendo sobre títulos mientras el edificio arde a nuestro alrededor."
+      },
+      "investigateCivil": {
+        "0": "La investigación confirma su alineación, {nombre} es Civil.",
+        "1": "No se encontró nada preocupante. {nombre} es leal a Charter.",
+        "2": "{nombre} parece apoyar a la Asamblea.",
+        "3": "He borrado {nombre}. Son uno de nosotros.",
+        "4": "Mis hallazgos sobre {nombre} son positivos. Apoyan la Carta.",
+        "5": "{name} definitivamente está de nuestro lado.",
+        "6": "Confío completamente en {nombre}.",
+        "7": "La investigación fue exitosa. {nombre} es civil.",
+        "8": "{nombre} es un verdadero aliado.",
+        "9": "He verificado la lealtad de {nombre}.",
+        "10": "Investigué a {nombre} y encontré un ciudadano leal.",
+        "11": "No se encontró nada preocupante. {nombre} es leal a Charter.",
+        "12": "Mi informe sobre {nombre} es totalmente positivo.",
+        "13": "Me complace informar que {nombre} es civil.",
+        "14": "{name} tiene toda mi confianza después de esta investigación.",
+        "15": "Los datos confirman la fidelidad de {nombre}.",
+        "16": "He verificado que {nombre} está de nuestro lado.",
+        "17": "{name} es un sólido aliado de la Carta.",
+        "18": "No se detectó influencia del Estado en {nombre}.",
+        "19": "Respaldo la alineación civil de {nombre}.",
+        "20": "Mi investigación sobre {nombre} fue exhaustiva. Están limpios.",
+        "21": "El flujo de datos es claro: {nombre} es un ciudadano de la Carta.",
+        "22": "He despejado a {nombre} de toda sospecha. Son uno de nosotros.",
+        "23": "El historial de {nombre} es un testimonio del deber civil.",
+        "24": "No encontré nada más que lealtad en el perfil de {nombre}.",
+        "25": "{nombre} es un faro de esperanza civil en esta investigación.",
+        "26": "Mi informe sobre {nombre} es brillante. Son auténticamente civiles.",
+        "27": "He verificado el cumplimiento de {nombre} con los protocolos de la Carta.",
+        "28": "No hay rastros de influencia estatal en la historia reciente de {nombre}.",
+        "29": "{name} ha pasado todas las pruebas de fidelidad que realicé.",
+        "30": "Estoy satisfecho con la alineación de {nombre}. Definitivamente son civiles.",
+        "31": "La investigación confirma que {nombre} representa a la Asamblea.",
+        "32": "El historial de {nombre} es tan claro como un día soleado en la Secretaría.",
+        "33": "Responderé bajo juramento por la alineación civil de {nombre}."
+      },
+      "investigateState": {
+        "0": "La investigación confirma su alineación, {nombre} es Estado.",
+        "1": "La investigación es… inquietante. Observe a {nombre} de cerca.",
+        "2": "He aprendido algo fundamental sobre {nombre}. Proceda con precaución.",
+        "3": "La lealtad de {nombre} no es hacia la Carta.",
+        "4": "No puedo confiar en {nombre} después de lo que he visto.",
+        "5": "Las pruebas contra {nombre} son concluyentes.",
+        "6": "{nombre} es una amenaza para la Carta.",
+        "7": "He descubierto los verdaderos colores de {nombre}.",
+        "8": "Cuidado con {nombre}.",
+        "9": "La investigación reveló la traición de {nombre}.",
+        "10": "{nombre} no es quien dice ser. Son Estado.",
+        "11": "He encontrado evidencia de los vínculos estatales de {nombre}.",
+        "12": "La investigación sobre {nombre} fue una llamada de atención.",
+        "13": "{nombre} es un agente durmiente del Estado.",
+        "14": "En conciencia ya no puedo confiar en {nombre}.",
+        "15": "La verdad sobre {nombre} ha salido a la luz: son del Estado.",
+        "16": "{name} está trabajando contra nosotros desde dentro.",
+        "17": "He visto lo suficiente para saber que {nombre} es un traidor.",
+        "18": "La investigación sobre {nombre} reveló un oscuro secreto.",
+        "19": "Tenga cuidado: {nombre} es un agente del Estado.",
+        "20": "La investigación de {nombre} fue un descenso a la traición del Estado.",
+        "21": "Encontré pruebas en los registros de {nombre} que conmocionarán a la Asamblea.",
+        "22": "{nombre} es un lobo vestido de civil. Son Estado.",
+        "23": "La investigación confirma mis peores temores sobre {nombre}.",
+        "24": "He descubierto una red de vínculos estatales conectados con {nombre}.",
+        "25": "{nombre} es un peligro para todo lo que representa la Carta.",
+        "26": "Mi investigación sobre {nombre} fue una revelación de traición.",
+        "27": "Los datos no mienten: {nombre} es un operativo del Estado.",
+        "28": "Encontré pruebas de la colaboración de {nombre} con nuestros enemigos.",
+        "29": "{nombre} no es quien dice ser. Es un agente del Estado.",
+        "30": "La investigación sobre {nombre} reveló un patrón de sabotaje dirigido por el Estado.",
+        "31": "No puedo enfatizar esto lo suficiente: {nombre} está alineado con el Estado.",
+        "32": "{nombre} se ha visto comprometido por la influencia del Estado.",
+        "33": "Las pruebas contra {nombre} son indiscutibles. Son Estado."
+      },
+      "suspiciousNominee": {
+        "0": "Interesante elección de Canciller.",
+        "1": "Seguiré atentamente a este gobierno.",
+        "2": "Esa designación plantea interrogantes dentro de la Secretaría.",
+        "3": "No estoy seguro de que {nombre} sea la persona adecuada para este puesto.",
+        "4": "¿Por qué {nombre}? Hay opciones más confiables.",
+        "5": "No me gusta esta nominación.",
+        "6": "Este gobierno parece sospechoso.",
+        "7": "Estoy vigilando de cerca a {nombre}.",
+        "8": "Tengo mis dudas sobre esta elección.",
+        "9": "Esta nominación es cuestionable.",
+        "10": "Tengo mis reservas sobre {nombre} como Canciller.",
+        "11": "¿Es {nombre} realmente lo mejor que podemos hacer?",
+        "12": "Esta nominación parece un riesgo calculado.",
+        "13": "Siento un patrón aquí que no me gusta.",
+        "14": "{name} aún no se ha ganado exactamente nuestra confianza.",
+        "15": "Esta elección de Canciller es... inesperada.",
+        "16": "No estoy convencido de que {nombre} sea la opción adecuada.",
+        "17": "Hay algo extraño en esta nominación.",
+        "18": "Me gustaría saber más de {nombre} antes de votar.",
+        "19": "Esta nominación es demasiado conveniente para algunos.",
+        "20": "No soy el único que encuentra sospechosa esta pareja de gobiernos.",
+        "21": "La nominación de {nombre} parece una medida estratégica para el Estado.",
+        "22": "Siento una agenda oculta detrás de la elección de {nombre}.",
+        "23": "¿Por qué este gobierno específico? ¿Por qué {nombre} ahora mismo?",
+        "24": "Esta nominación parece diseñada para promover los objetivos del Estado.",
+        "25": "Tengo serias dudas sobre las motivaciones detrás de este par.",
+        "26": "El alineamiento de este gobierno es... cuestionable en el mejor de los casos.",
+        "27": "Me preocupa que esta nominación sea un paso hacia el dominio del Estado.",
+        "28": "La elección de {nombre} como Canciller debería preocupar a todos aquí.",
+        "29": "Huelo una rata en este proceso de nominación.",
+        "30": "Este gobierno parece demasiado perfectamente alineado con los intereses del Estado.",
+        "31": "Tengo mis dudas sobre esta dinámica de poder específica.",
+        "32": "La presencia de {nombre} en este gobierno es una señal de alerta.",
+        "33": "No me siento cómodo con la influencia potencial de esta pareja."
+      },
+      "highSuspicion": {
+        "0": "Tengo un muy mal presentimiento sobre {nombre}.",
+        "1": "{nombre} está actuando en contra de los intereses de la Asamblea.",
+        "2": "Los datos sugieren que {nombre} no es quien dice ser.",
+        "3": "Necesitamos marginar a {nombre} antes de que sea demasiado tarde.",
+        "4": "Lo digo en voz alta: {nombre} está trabajando para el Estado.",
+        "5": "{nombre} es un traidor.",
+        "6": "Estoy seguro de que {nombre} es el estado.",
+        "7": "Necesitamos deshacernos de {nombre}.",
+        "8": "No confíes en {nombre} bajo ninguna circunstancia.",
+        "9": "{nombre} nos está saboteando.",
+        "10": "Estoy 99% seguro de que {nombre} es un agente estatal.",
+        "11": "Las pruebas contra {nombre} están aumentando.",
+        "12": "No podemos permitir que {nombre} se acerque al asiento del Canciller.",
+        "13": "{nombre} es un peligro claro y presente para la Carta.",
+        "14": "He visto a {nombre} sabotearnos antes.",
+        "15": "No dejes que las palabras de {nombre} te engañen; son Estado.",
+        "16": "La Asamblea debe unirse contra {nombre}.",
+        "17": "{nombre} es un cáncer en esta sala.",
+        "18": "Pido una investigación inmediata de {nombre}.",
+        "19": "{nombre} es el enemigo interior.",
+        "20": "La traición de {name} es una mancha en la historia de la Asamblea.",
+        "21": "Estamos siendo testigos de la lenta destrucción de la Carta por parte de {nombre}.",
+        "22": "El Estado ha encontrado a su campeón en {nombre}. Debemos actuar.",
+        "23": "Pido la eliminación inmediata de {nombre} de toda autoridad.",
+        "24": "{nombre} ha mostrado sus verdaderos colores, y son los colores del Estado.",
+        "25": "Las pruebas contra {nombre} son irreprochables. Son un traidor.",
+        "26": "No podemos darnos el lujo de permitir que {nombre} continúe con su sabotaje.",
+        "27": "{nombre} es un parásito que se alimenta de la debilidad de la Asamblea.",
+        "28": "Estoy exponiendo a {nombre} como lo que es: un agente doble del Estado.",
+        "29": "Las acciones de {name} son un ataque directo a los principios de la Carta.",
+        "30": "Se acabó el tiempo de las dudas. {name} es definitivamente nuestro enemigo.",
+        "31": "Debemos aislar a {nombre} antes de que nos destruyan desde dentro.",
+        "32": "La influencia del Estado es clara en cada movimiento que hace {nombre}.",
+        "33": "No descansaré hasta que {nombre} rinda cuentas por su traición."
+      },
+      "defendingSelf": {
+        "0": "Mi historial es claro. Sirvo a la Carta.",
+        "1": "No dejes que las sospechas nublen tu juicio. Soy Civil.",
+        "2": "Las acusaciones contra mí son distracciones infundadas.",
+        "3": "Sólo he trabajado para el éxito de la Asamblea.",
+        "4": "Mire los hechos, no los rumores. Soy leal.",
+        "5": "No tengo nada que ocultar.",
+        "6": "Mi lealtad a la Carta es inquebrantable.",
+        "7": "Estoy siendo incriminado.",
+        "8": "Las acusaciones son falsas.",
+        "9": "Soy tan civilizado como parece.",
+        "10": "Mis acciones siempre han sido en interés de la Carta.",
+        "11": "Estoy siendo atacado porque soy una amenaza para el Estado.",
+        "12": "No creas las mentiras que se difunden sobre mí.",
+        "13": "Tengo una larga trayectoria de servicio fiel a la Asamblea.",
+        "14": "Soy víctima de una campaña de desprestigio dirigida por el Estado.",
+        "15": "Mi lealtad está fuera de toda duda.",
+        "16": "Probaré mi inocencia con mis acciones.",
+        "17": "El Estado quiere que dudes de mí.",
+        "18": "Soy un verdadero creyente en la Carta.",
+        "19": "No me dejaré intimidar por estas afirmaciones falsas.",
+        "20": "Mi lealtad a la Carta es mi único amo. Soy Civil.",
+        "21": "No dejes que estas mentiras coordinadas te distraigan de mi historial.",
+        "22": "He sacrificado mucho por la Asamblea. Mi alineación es clara.",
+        "23": "El Estado quiere que me vean como un enemigo porque soy una amenaza para ellos.",
+        "24": "Invito a cualquier investigación. Mis registros son un libro abierto para la Carta.",
+        "25": "Soy tan Civil como las leyes mismas. Mis acciones lo demostrarán.",
+        "26": "Las acusaciones en mi contra son un fino velo de agresión estatal.",
+        "27": "Mantengo la Carta, incluso cuando el resto de ustedes dudan de mí.",
+        "28": "Sólo he trabajado para salvaguardar nuestro camino dentro de la Secretaría.",
+        "29": "Mi conciencia está tranquila. Sirvo a la Asamblea, no al Estado.",
+        "30": "Estos ataques están destinados a debilitar mi determinación. No lo conseguirán.",
+        "31": "Soy un verdadero patriota. No dejes que estos rumores infundados te influyan.",
+        "32": "He luchado por la Carta cuando otros permanecían en silencio.",
+        "33": "Mi compromiso con la causa Civil está más allá de cualquier cuestionamiento."
+      },
+      "praisingCivil": {
+        "0": "Confío en {nombre}. Sus acciones hablan por sí solas.",
+        "1": "{name} ha demostrado su lealtad a la Asamblea.",
+        "2": "Necesitamos más personas como {nombre} en el poder.",
+        "3": "Confío en la alineación de {nombre}.",
+        "4": "{nombre} es un verdadero patriota de la Carta.",
+        "5": "{nombre} es un gran líder.",
+        "6": "Apoyo plenamente a {nombre}.",
+        "7": "{nombre} está haciendo un gran trabajo.",
+        "8": "Podemos contar con {nombre}.",
+        "9": "{nombre} es un rayo de esperanza para la Asamblea.",
+        "10": "Siempre supe que {nombre} era un verdadero patriota.",
+        "11": "He visto a {nombre} tomar decisiones difíciles para la Carta.",
+        "12": "Tenemos suerte de tener a {nombre} de nuestro lado.",
+        "13": "{nombre} es un modelo de virtud civil.",
+        "14": "Confiaría mi vida en {nombre}.",
+        "15": "{nombre} es el tipo de líder que necesitamos en este momento.",
+        "16": "{nombre} es un pilar de la Asamblea.",
+        "17": "{nombre} es un verdadero activo para esta sala.",
+        "18": "No tengo nada más que respeto por {nombre}.",
+        "19": "La Asamblea es más fuerte con {nombre} en ella.",
+        "20": "La dedicación de {name} a la Carta es una inspiración para todos nosotros.",
+        "21": "Haríamos bien en seguir el ejemplo de {nombre} en este asunto.",
+        "22": "{name} es un ejemplo brillante de lo que significa ser verdaderamente civilizado.",
+        "23": "Tengo plena fe en el juicio y el carácter de {nombre}.",
+        "24": "{nombre} es una mano firme en estos tiempos turbulentos para la Asamblea.",
+        "25": "Estoy firmemente al lado de {nombre} en nuestra misión compartida para la Carta.",
+        "26": "{nombre} es uno de los pocos aquí que realmente comprende nuestro deber.",
+        "27": "La Secretaría tiene la suerte de contar con un servidor tan leal como {nombre}.",
+        "28": "{name} ha demostrado constantemente su compromiso con nuestra causa.",
+        "29": "Tengo a {nombre} en la más alta consideración como compañero patriota.",
+        "30": "Estamos más seguros con {nombre} en una posición de autoridad.",
+        "31": "{name} es un verdadero defensor de los principios civiles que apreciamos.",
+        "32": "Confiaría en el juicio de {nombre} incluso en las rondas más oscuras.",
+        "33": "La lealtad de {name} es la base sobre la que debe construirse la Asamblea."
+      },
+      "neutralSupport": {
+        "0": "Estoy dispuesto a darle una oportunidad a {nombre}.",
+        "1": "{name} parece una opción razonable por ahora.",
+        "2": "Veamos qué puede hacer {nombre}.",
+        "3": "Todavía no tengo ningún motivo para dudar de {nombre}.",
+        "4": "Un nuevo comienzo con {nombre} podría ser lo que necesitamos.",
+        "5": "Soy neutral con respecto a {nombre} por ahora.",
+        "6": "Veamos cómo se desempeña {nombre}.",
+        "7": "Estoy abierto a la nominación de {nombre}.",
+        "8": "Todavía no estoy seguro acerca de {nombre}.",
+        "9": "Esperaré y veré con {nombre}.",
+        "10": "Demos a {nombre} el beneficio de la duda por ahora.",
+        "11": "{name} merece una oportunidad de demostrar su valía.",
+        "12": "Soy cautelosamente optimista acerca de {nombre}.",
+        "13": "Apoyaré a {nombre} hasta que me den una razón para no hacerlo.",
+        "14": "{name} parece una apuesta segura para esta ronda.",
+        "15": "Estoy dispuesto a trabajar con {nombre}.",
+        "16": "Veamos si {nombre} puede guiarnos eficazmente.",
+        "17": "Mantengo la mente abierta sobre {nombre}.",
+        "18": "{nombre} es una cantidad desconocida, pero votaré Sí.",
+        "19": "Estoy de acuerdo con {nombre} para este gobierno.",
+        "20": "{name} parece una elección estable para este punto de la ronda.",
+        "21": "Estoy preparado para apoyar la nominación de {nombre} como constructor de puentes.",
+        "22": "{name} aún no nos ha dado ningún motivo para dudar de ellos, procedamos.",
+        "23": "Una nominación de {nombre} parece lógica dada nuestra situación actual.",
+        "24": "Voto \"Sí\" por {nombre} en función de su desempeño hasta el momento.",
+        "25": "{nombre} es un candidato razonable para liderar este gobierno.",
+        "26": "Estoy dispuesto a pasar por alto mis dudas iniciales sobre {nombre} por ahora.",
+        "27": "{name} ha sido relativamente consistente en su retórica civil.",
+        "28": "Soy optimista de que {nombre} actuará en el mejor interés de la Carta.",
+        "29": "Sigamos adelante con {nombre} y veamos adónde nos lleva.",
+        "30": "Le doy a {nombre} el beneficio de la duda en esta ronda.",
+        "31": "{nombre} parece ser una opción pragmática para el clima actual.",
+        "32": "Apoyo a {nombre} con el fin de romper este punto muerto.",
+        "33": "{name} se ha ganado la oportunidad de liderar el próximo ciclo directivo."
+      },
+      "banter": {
+        "0": "Lo que está en juego está aumentando. Debemos permanecer alerta.",
+        "1": "La Secretaría nos está observando a todos.",
+        "2": "Un paso en falso y la Carta cae.",
+        "3": "La confianza es un bien escaso en estos tiempos.",
+        "4": "Centrémonos en las directivas. La Asamblea depende de nosotros.",
+        "5": "El Estado siempre está mirando.",
+        "6": "Debemos tener cuidado.",
+        "7": "La Asamblea está en peligro.",
+        "8": "Necesitamos ser más inteligentes.",
+        "9": "El Estado se acerca.",
+        "10": "Las sombras se alargan sobre la Asamblea.",
+        "11": "Somos la última línea de defensa de la Carta.",
+        "12": "Cada decisión que tomamos resuena en la Secretaría.",
+        "13": "El alcance del Estado es largo, pero nuestra determinación es fuerte.",
+        "14": "En esta habitación, hasta las paredes tienen oídos.",
+        "15": "El futuro de la Carta está en nuestras manos.",
+        "16": "Debemos ser la luz en la oscuridad.",
+        "17": "La victoria del Estado no es inevitable.",
+        "18": "Somos los guardianes de la Asamblea.",
+        "19": "La Carta prevalecerá si nos mantenemos unidos.",
+        "20": "La Secretaría no se ocupa de la certeza, sólo de la probabilidad.",
+        "21": "Todos somos sólo jugadores en un juego que no entendemos del todo.",
+        "22": "El Estado es un depredador que nunca duerme. Debemos estar preparados.",
+        "23": "El silencio es muchas veces el fuerte grito de un agente del Estado.",
+        "24": "La Asamblea es una máquina delicada. Un engranaje roto puede arruinarlo todo.",
+        "25": "Las sombras del pasado están alcanzando a la Secretaría.",
+        "26": "La confianza es un lujo que no podemos permitirnos en este clima de sospecha.",
+        "27": "La Carta es una promesa que sólo nosotros podemos cumplir.",
+        "28": "El Estado es un espejo que nos refleja nuestras propias debilidades.",
+        "29": "Cada ronda es una batalla por el alma de la Asamblea.",
+        "30": "Vivimos en una era de crisis sin precedentes. La vigilancia es la palabra clave.",
+        "31": "El historial de la Secretaría mostrará quiénes de nosotros fueron verdaderamente leales.",
+        "32": "El camino hacia la victoria está pavimentado con el coraje de llamar la atención del Estado.",
+        "33": "Somos los arquitectos del futuro o los sepultureros del pasado."
+      },
+      "powerUsage": {
+        "0": "Estoy utilizando mi poder para garantizar el éxito de la Asamblea.",
+        "1": "Este poder es necesario para proteger la Carta.",
+        "2": "Debo usar este poder para descubrir la verdad.",
+        "3": "La situación exige esta acción.",
+        "4": "Estoy usando este poder para asegurar nuestro futuro.",
+        "5": "Esta es la única manera de proceder.",
+        "6": "Estoy utilizando este poder por el bien de la Asamblea.",
+        "7": "Este poder nos ayudará a identificar las amenazas.",
+        "8": "No tengo más remedio que usar este poder.",
+        "9": "Estoy usando este poder para fortalecer nuestra posición.",
+        "10": "Estoy ejerciendo mi autoridad para la estabilidad de la sala.",
+        "11": "Esta acción es obligatoria por la emergencia actual.",
+        "12": "Estoy usando este poder para proteger nuestros intereses colectivos.",
+        "13": "La Carta permite esta medida en tiempos de crisis.",
+        "14": "Doy este paso para que el Estado no gane terreno.",
+        "15": "Este es un uso necesario del poder de mi título.",
+        "16": "Estoy actuando para preservar la integridad de la Asamblea.",
+        "17": "Este poder es una herramienta para la defensa de la Carta.",
+        "18": "Estoy usando esta habilidad para aclarar la situación.",
+        "19": "Estoy utilizando este poder para defender los principios de la Carta.",
+        "20": "La autoridad de mi título se ejerce para garantizar nuestra seguridad colectiva.",
+        "21": "Esta capacidad es una intervención necesaria para el bien de la Asamblea.",
+        "22": "Estoy utilizando este poder para aclarar el camino a seguir para la Carta.",
+        "23": "La situación se ha deteriorado lo suficiente como para justificar esta acción.",
+        "24": "Estoy utilizando esta autoridad para garantizar que el Estado no prevalezca.",
+        "25": "Este es un deber que desempeño sin placer, sino con total compromiso.",
+        "26": "Estoy dando este paso para proteger a los inocentes y exponer a los culpables.",
+        "27": "Mi poder es un escudo para la Carta y lo estoy utilizando ahora.",
+        "28": "Esta intervención está diseñada para estabilizar nuestra democracia en ruinas.",
+        "29": "Estoy utilizando esta capacidad para evitar un colapso total del control del Estado.",
+        "30": "La Secretaría ordena esta acción ante tal incertidumbre.",
+        "31": "Estoy actuando para garantizar la supervivencia a largo plazo de la Asamblea.",
+        "32": "Este poder es una carga que llevo por todos ustedes. Debe usarse.",
+        "33": "Estoy usando esta autoridad para traer claridad a una sala nublada por la duda."
+      },
+      "cipherDispatch": {
+        "0": "Un contacto en la Secretaría sugiere que no eres lo que pareces.",
+        "1": "Los datos son claros: mantengamos el rumbo y la Carta prevalecerá.",
+        "2": "Se requiere vigilancia. Las sombras se están profundizando en torno a la Asamblea.",
+        "3": "No confíen en la administración actual. Están comprometidos.",
+        "4": "La influencia del Estado es localizada. Mira más de cerca a tus aliados.",
+        "5": "Un mensaje codificado para usted: el resultado de la próxima sesión es fundamental."
+      }
     },
     "game_header": {
-      "prediction_civil": "Civil {{percent}}%",
+      "prediction_civil": "Civiles {{percent}}%",
       "prediction_state": "Estado {{percent}}%",
-      "spectator_vote": "{{count}} Voto de los espectadores",
+      "spectator_vote": "{{count}} Voto del espectador",
       "spectator_votes": "{{count}} Votos de los espectadores",
-      "open_chat": "Chat abierto",
+      "open_chat": "Abrir chat",
       "round_history": "Historia de la ronda",
       "phase_reference": "Referencia de fase",
-      "your_dossier": "Tu dossier",
+      "your_dossier": "Su expediente",
       "my_profile": "Mi perfil",
-      "leave_assembly": "Dejar la asamblea"
+      "leave_assembly": "Salir de la Asamblea",
+      "title": "LA ASAMBLEA",
+      "practice_mode": "MODO PRÁCTICA",
+      "invite_tooltip": "Comparte este código para invitar jugadores",
+      "timer_label": "Tiempo restante",
+      "modes": {
+        "casual": "Informal",
+        "ranked": "Clasificado",
+        "classic": "Clásico",
+        "crisis": "Crisis"
+      }
+    },
+    "agendas": {
+      "chaos_agent": {
+        "name": "Agente del Caos",
+        "desc": "El rastreador de elecciones debe llegar a 3 y desencadenar una política de caos al menos una vez."
+      },
+      "the_purist": {
+        "name": "El purista",
+        "desc": "Se deben promulgar al menos 3 directivas civiles antes de que finalice el juego."
+      },
+      "the_dissenter": {
+        "name": "El disidente",
+        "desc": "Su voto debe diferir del resultado mayoritario en al menos 3 rondas."
+      },
+      "the_dove": {
+        "name": "La paloma",
+        "desc": "Vote Sí en cada ronda en la que vote."
+      },
+      "the_hawk": {
+        "name": "El Halcón",
+        "desc": "Vote No en al menos 3 rondas."
+      },
+      "stonewalled": {
+        "name": "Bloqueado",
+        "desc": "Vote No por al menos 2 gobiernos que luego fracasan."
+      },
+      "short_session": {
+        "name": "Sesión corta",
+        "desc": "El juego debe terminar antes de la ronda (cuenta de jugadores + 3)."
+      },
+      "the_long_game": {
+        "name": "El juego largo",
+        "desc": "El juego debe durar al menos (recuento de jugadores + 6) rondas."
+      },
+      "the_loyalist": {
+        "name": "El leal",
+        "desc": "Vote Sí por al menos 3 gobiernos que aprueben y promulguen una directiva civil."
+      },
+      "nominated": {
+        "name": "Nominado",
+        "desc": "Ser nominado como Canciller al menos 2 veces."
+      },
+      "deadlock": {
+        "name": "Punto muerto",
+        "desc": "Ser candidato a presidente o canciller en al menos 1 gobierno fallido."
+      },
+      "prolific": {
+        "name": "Prolífico",
+        "desc": "Promulgar personalmente al menos 2 políticas como Canciller."
+      },
+      "the_veteran": {
+        "name": "El veterano",
+        "desc": "Servir como Canciller al menos una vez."
+      },
+      "unity": {
+        "name": "Unidad",
+        "desc": "No se implementa ninguna política de caos en ningún momento durante el juego."
+      },
+      "the_mandate": {
+        "name": "El mandato",
+        "desc": "Se deben promulgar al menos 4 directivas estatales antes de que finalice el juego."
+      },
+      "clean_sweep": {
+        "name": "Barrido limpio",
+        "desc": "Promulgar una directiva civil como Canciller."
+      },
+      "the_weathervane": {
+        "name": "La veleta",
+        "desc": "Cambie su voto en relación con el voto de su ronda anterior al menos 4 veces."
+      },
+      "productive_session": {
+        "name": "Sesión Productiva",
+        "desc": "Más de la mitad de todas las rondas deben dar como resultado la implementación exitosa de una política."
+      },
+      "close_race": {
+        "name": "Carrera cerrada",
+        "desc": "El juego debe terminar con ambas pistas de políticas dentro de 2 directivas entre sí."
+      },
+      "the_swing_vote": {
+        "name": "El voto decisivo",
+        "desc": "Ser Presidente o Canciller en un gobierno que pase exactamente por 1 voto."
+      }
+    },
+    "round_history": {
+      "title": "Historia de la ronda",
+      "empty": "Aún no se ha formado ningún gobierno",
+      "round": "Ronda {{round}}",
+      "chaos": "Caos",
+      "vetoed": "Vetado",
+      "rejected": "Rechazado",
+      "no_policy": "Sin política",
+      "civil": "Civiles",
+      "state": "Estado",
+      "pres_short": "Presidente",
+      "chan_short": "Chan",
+      "president": "Presidente",
+      "chancellor": "Canciller",
+      "drew": "Dibujó",
+      "passed": "Aprobado",
+      "received": "Recibió",
+      "votes": "Votos",
+      "aye": "Sí",
+      "nay": "No",
+      "executive": "Ejecutivo",
+      "actions": {
+        "investigate": "Investigación",
+        "execution": "Ejecución",
+        "specialelection": "Elección Especial",
+        "policypeek": "Vistazo directivo"
+      }
     },
     "modals": {
+      "game_over": {
+        "banners": {
+          "civil_win_default": "La Carta se cumple",
+          "state_win_default": "El Estado prevalece",
+          "inconclusive": "Disentimiento abortado",
+          "civil_desc": "Las fuerzas civiles han defendido la asamblea.",
+          "state_desc": "El Estado se ha infiltrado con éxito en la asamblea.",
+          "abort_desc": "La sesión terminó prematuramente."
+        },
+        "performance_header": "Rendimiento del partido",
+        "victory": "Victoria",
+        "defeat": "Derrota",
+        "elo": "ELO",
+        "casual": "Partido casual",
+        "xp": "XP ganado",
+        "ip": "IP obtenida",
+        "clan_xp": "XP del clan",
+        "agenda": "Agenda Personal",
+        "achievements_header": "Medallas obtenidas",
+        "revelations_header": "Revelaciones de identidad",
+        "you": "Tú",
+        "action_log": "Registro de partidos",
+        "action_replay": "Reconstruir",
+        "action_shared": "Enlace copiado!",
+        "action_share": "Compartir repetición",
+        "action_play_again": "Jugar de nuevo",
+        "action_lobby": "Volver al vestíbulo",
+        "completed": "Completado",
+        "failed": "Fallido"
+      },
       "friend_request": {
         "title": "Solicitud de amistad",
-        "description": "<1>{{username}}</1> quiere ser amigo.",
-        "deny": "Denegar",
+        "description": "<1>{{username}}</1> quiere que seamos amigos.",
+        "deny": "Negar",
         "accept": "Aceptar"
       },
       "investigation": {
         "title": "Resultado de la investigación",
-        "is_a": "{{name}} es:",
-        "civil": "CIVIL",
+        "is_a": "{{name}} es un:",
+        "civil": "CIVILES",
         "state": "ESTADO",
         "understood": "Entendido"
       },
       "policy_peek": {
-        "title": "Vista previa de directiva",
+        "title": "Vista previa de la directiva",
         "subtitle": "Las 3 directivas principales en la baraja:",
         "empty": "La pila está actualmente vacía.",
-        "end": "End Peek"
+        "end": "Vistazo final"
       },
       "declaration": {
         "title": "Declaración Directiva",
         "subtitle": "¿Qué declararás?",
-        "hint": "Puede informar con sinceridad o engañar a la Asamblea.",
+        "hint": "Podrá informar con veracidad o engañar a la Asamblea.",
         "drew_label": "Lo que robaste <1>(3 cartas)</1>",
         "passed_label": "Lo que pasaste <1>(2 cartas)</1>",
-        "received_label": "Lo que recibiste <1>(2 cartas)</1>",
-        "result_drew": "Dibujó: <1>{{civ}} Civil</1> / <3>{{sta}} Estado</3>",
-        "result_passed": "Aprobado: <1>{{civ}} Civil</1> / <3>{{sta}} Estado</3>",
+        "received_label": "Lo que recibiste <1>(2 tarjetas)</1>",
+        "result_drew": "Drew: <1>{{civ}} Civil</1> / <3>{{sta}} Estado</3>",
+        "result_passed": "Aprobado: <1>{{civ}} Civil</1> / <3>{{sta}} Estatal</3>",
         "result_received": "Recibido: <1>{{civ}} Civil</1> / <3>{{sta}} Estado</3>",
-        "submit": "Enviar declaración"
+        "submit": "Presentar Declaración"
       },
       "player_profile": {
         "loading": "Cargando perfil...",
         "failed": "No se pudo cargar el perfil.",
         "close": "Cerrar",
         "wins": "Victorias",
-        "played": "Jugadas",
+        "played": "Jugado",
         "win_rate": "Tasa de victorias",
-        "kills": "Muertes",
+        "kills": "Mata",
         "pinned_achievements": "Medallas fijadas",
-        "empty_slot": "— espacio vacío —",
+        "empty_slot": "— ranura vacía —",
         "add_friend": "Agregar aliado",
         "remove_friend": "Eliminar aliado",
         "request_sent": "Solicitud enviada"
       }
     },
     "assembly_log": {
-      "title": "Registro de asamblea",
-      "event_num": "Evento #{{count}}"
+      "title": "Registro de ensamblaje",
+      "event_num": "Evento #{{count}}",
+      "round_marker": "--- Ronda {{round}} ---",
+      "nominated": "{{name}} nominó a {{target}} como Canciller.",
+      "elected": "{{name}} elegido Canciller.",
+      "veto_requested": "{{name}} (Canciller) solicitó un veto.",
+      "veto_agreed": "{{name}} (Presidente) aceptó el veto. La sesión falló.",
+      "veto_denied": "{{name}} (Presidente) negó el Veto. El canciller debe jugar.",
+      "rejected": "La Asamblea rechazó la nominación.",
+      "civil_enacted": "Se promulgó una directiva civil.",
+      "state_enacted": "Se promulgó una directiva estatal.",
+      "executive_action": "Acción Ejecutiva: {{action}} realizada el {{target}}.",
+      "declared": "{{name}} ({{type}}) declaradas {{action}} {{civ}} Directivas Civiles y {{sta}} Estatales.{{drew}}",
+      "drew_info": "(dibujó {{civ}}C/{{sta}}S)",
+      "passed_word": "aprobado",
+      "received_word": "recibido",
+      "executed": "{{name}} fue ejecutado.",
+      "investigated": "{{name}} investigado {{target}}.",
+      "special_election": "{{name}} convocó a elecciones especiales para {{target}}.",
+      "ready": "{{name}} está listo.",
+      "not_ready": "{{name}} no está listo.",
+      "all_ready": "¡Todos los jugadores humanos listos! Empezando el juego...",
+      "host_started": "El anfitrión comenzó el juego.",
+      "room_locked": "Habitación cerrada por el anfitrión.",
+      "room_unlocked": "Habitación desbloqueada por el anfitrión.",
+      "spectator_predicted": "Un espectador ha pronosticado una victoria {{prediction}}.",
+      "room_created": "Habitación {{id}} creada en modo {{mode}}.",
+      "room_created_practice": "Sala {{id}} creada como sesión de práctica en solitario.",
+      "reconnected": "{{name}} reconectado.",
+      "joined": "{{name}} se unió al lobby.",
+      "need_players": "Necesita al menos 5 jugadores para prepararse.",
+      "prediction_unity": "Unidad",
+      "prediction_deception": "Engaño"
     },
     "debrief": {
-      "intro_title": "La asamblea ha concluido",
+      "intro_title": "La Asamblea ha concluido",
       "charter_defended": "La Carta ha sido defendida.",
       "secretariat_fallen": "La Secretaría ha recaído en el Estado.",
       "key_moments": "Momentos clave",
       "identities_confirmed": "Todas las identidades confirmadas",
-      "tap_to_advance": "Toque para avanzar",
+      "tap_to_advance": "Toca para avanzar",
       "roles": {
-        "civil": "Civil",
+        "civil": "Civiles",
         "state": "Agente estatal",
         "overseer": "El supervisor"
       },
       "plays": {
-        "assassin": "{{assassin}} eliminó a {{killed}} como el Asesino",
+        "assassin": "{{assassin}} eliminado {{killed}} como Asesino",
         "execution_one": "{{name}} fue ejecutado por decreto presidencial",
         "execution_many": "{{names}} fueron ejecutados por decreto presidencial",
-        "chaos_one": "Una directiva de caos fue impuesta a la Asamblea",
-        "chaos_many": "{{count}} directivas de caos desestabilizaron a la Asamblea",
+        "chaos_one": "Se impuso una directiva de caos a la Asamblea",
+        "chaos_many": "{{count}} directivas del caos desestabilizaron la Asamblea",
         "veto_one": "El gobierno invocó su poder de veto",
         "veto_many": "El veto fue ejercido {{count}} veces",
-        "marathon": "Una epopeya Batalla de voluntades de {{count}} rondas",
-        "deadlock": "Ambas facciones mantuvieron a la Asamblea en un punto muerto al filo de la navaja"
+        "marathon": "Una batalla de voluntades épica de {{count}} ronda",
+        "deadlock": "Ambas facciones mantuvieron la Asamblea en un punto muerto al filo de la navaja"
       }
     },
+    "match_replay": {
+      "title": "Repetición del partido",
+      "subtitle": "Análisis de la ronda posterior al partido",
+      "reveal_truth": "Revelar la verdad",
+      "hide_deceptions": "Ocultar engaños",
+      "no_history": "No hay historial de rondas disponible",
+      "government_header": "Ronda {{round}} Gobierno",
+      "president": "Presidente",
+      "chancellor": "Canciller",
+      "session_summary": "Resumen de la sesión",
+      "chaos_forced": "Caos forzado",
+      "rejected": "Rechazado",
+      "fail_veto": "Gobierno fue vetado",
+      "fail_default": "La votación del gobierno fracasó",
+      "enacted": "Directiva promulgada",
+      "power_triggered": "Poder ejecutivo activado: {{action}}",
+      "legislative_hand": "La mano legislativa",
+      "pres_deck": "Cubierta del presidente",
+      "deception_detected": "Engaño",
+      "actual_draw": "Sorteo real",
+      "hidden": "Oculto",
+      "public_claim": "Reclamo Público",
+      "chan_hand": "La mano del canciller",
+      "conflicting_stories": "Historias contradictorias",
+      "actual_received": "Real recibido",
+      "voting_records": "Registros de votación",
+      "aye": "Sí",
+      "nay": "No",
+      "no_vote": "No se registraron votos",
+      "footer_info": "Las declaraciones mostradas son lo que los jugadores afirmaron públicamente. Habilite el modo verdad para ver tarjetas reales.",
+      "close": "Cerrar repetición"
+    },
+    "narration": {
+      "nomination": "La Asamblea está en sesión. Presidente, nombre a su Canciller.",
+      "voting_start": "La votación está abierta. Emita sus votos.",
+      "election_passed": "La Asamblea confirma el nombramiento. Comienza la sesión legislativa.",
+      "election_failed": "La nominación es rechazada. La palabra vuelve al Presidente.",
+      "directive_civil": "Carta asegurada.",
+      "directive_state": "El Estado avanza.",
+      "executive_investigate": "Verificación de identidad completa.",
+      "executive_peek": "Previsión directiva comprometida.",
+      "executive_election": "Se han convocado elecciones especiales.",
+      "executive_assassinate": "Orden de terminación ejecutada.",
+      "chaos": "El orden se ha derrumbado. Se impone el gobierno del caos.",
+      "veto_request": "Se ha propuesto un veto.",
+      "veto_confirm": "El gobierno ha ejercido el poder de veto.",
+      "power_used": "{{role}} potencia activada."
+    },
+    "president_pick": {
+      "label": "La Asamblea",
+      "selecting": "Selección del primer presidente",
+      "reveal_label": "Primer Presidente"
+    },
     "tutorial": {
-      "back": "Atrás",
+      "back": "Volver",
       "next": "Siguiente",
       "enter": "Ingresa a la Asamblea",
       "skip": "Saltar tutorial",
@@ -493,7 +1370,7 @@
       },
       "roles": {
         "civil": {
-          "name": "Civil",
+          "name": "Civiles",
           "flavor": "Defender la Carta. La crisis no debe consumir la Secretaría."
         },
         "state": {
@@ -501,8 +1378,8 @@
           "flavor": "Promulgar directivas estatales. Eleve al Supervisor al poder."
         },
         "overseer": {
-          "name": "El Supervisor",
-          "flavor": "Asciende a la Cancillería. La supremacía del Estado aguarda."
+          "name": "El supervisor",
+          "flavor": "Ascender a la Cancillería. La supremacía del Estado aguarda."
         }
       },
       "loop": {
@@ -510,15 +1387,15 @@
         "subtitle": "Cada ronda sigue la misma secuencia",
         "step_1": {
           "label": "Nominación presidencial",
-          "desc": "El presidente actual nomina a un candidato a canciller. El rol presidencial rota en cada ronda."
+          "desc": "El actual Presidente nomina a un candidato a Canciller. El rol presidencial rota en cada ronda."
         },
         "step_2": {
-          "label": "Votación de la Asamblea",
+          "label": "Voto de la Asamblea",
           "desc": "Todos los jugadores vivos votan SÍ o NO al gobierno propuesto. La mayoría sí lo aprueba."
         },
         "step_3": {
-          "label": "Sesión legislativa",
-          "desc": "El presidente roba 3 cartas de política, descarta 1 y pasa 2 al Canciller. El Canciller promulga uno."
+          "label": "Sesión Legislativa",
+          "desc": "El Presidente roba 3 cartas de política, descarta 1 y pasa 2 al Canciller. El Canciller promulga uno."
         },
         "step_4": {
           "label": "Declaraciones",
@@ -527,33 +1404,33 @@
         "chaos_desc": "Si fallan 3 elecciones seguidas, se extrae un {{chaos}} automáticamente y se promulga sin votación."
       },
       "voting": {
-        "title": "Votaciones y declaraciones",
+        "title": "Votaciones y Declaraciones",
         "subtitle": "El corazón de la deducción social",
         "p1": "Los votos son {{simultaneous}} hasta que se revelen. No puedes ver cómo votaron los demás antes de emitir el tuyo.",
         "aye": "SÍ",
-        "aye_desc": "Apoyar a este gobierno",
+        "aye_desc": "Apoye a este gobierno",
         "nay": "NO",
-        "nay_desc": "Bloquear este gobierno",
+        "nay_desc": "Bloquear a este gobierno",
         "decl_label": "Declaraciones",
-        "decl_p1": "Después de promulgar una política, el Presidente y el Canciller declaran públicamente qué cartas sacaron y aprobaron. Estas afirmaciones pueden ser {{true_or_false}}: la mesa debe decidir a quién creer.",
-        "decl_hint": "Las contradicciones entre las declaraciones del presidente y del canciller son la pista más importante."
+        "decl_p1": "Una vez promulgada una política, el presidente y el canciller declaran públicamente qué cartas sacaron y aprobaron. Estas afirmaciones pueden ser {{true_or_false}}: la mesa debe decidir a quién creer.",
+        "decl_hint": "Las contradicciones entre las declaraciones del presidente y de la canciller son la pista más importante."
       },
       "executive": {
-        "title": "Acciones ejecutivas",
+        "title": "Acciones Ejecutivas",
         "subtitle": "El poder crece a medida que avanza el Estado",
         "p1": "Cada vez que se promulga una directiva estatal, el Presidente puede desbloquear un poder ejecutivo especial. Estos se vuelven más peligrosos a medida que avanza el Estado.",
         "actions": {
           "peek": {
-            "name": "Vistazo de política",
+            "name": "Vistazo a las políticas",
             "desc": "Mira las 3 primeras cartas del mazo de robo."
           },
           "investigate": {
             "name": "Investigar",
-            "desc": "Averigua si un jugador es Civil o Estatal (no quién específicamente)."
+            "desc": "Conozca si un jugador es Civil o Estatal (no quién específicamente)."
           },
           "special": {
-            "name": "Elección especial",
-            "desc": "Elige quién será el próximo presidente, omitiendo la rotación normal."
+            "name": "Elección Especial",
+            "desc": "Elige quién será el próximo presidente, saltándote la rotación normal."
           },
           "execution": {
             "name": "Ejecución",
@@ -576,7 +1453,7 @@
           "desc": "Forzar una nueva nominación si la actual es desfavorable."
         },
         "handler": {
-          "name": "Handler",
+          "name": "Entrenador de animales",
           "desc": "Intercambia los siguientes dos jugadores en el orden presidencial."
         },
         "auditor": {
@@ -585,7 +1462,7 @@
         },
         "interdictor": {
           "name": "Interdictor",
-          "desc": "Detiene a un jugador durante una ronda."
+          "desc": "Detener a un jugador durante una ronda."
         },
         "archivist": {
           "name": "Archivero",
@@ -601,32 +1478,32 @@
         },
         "cipher": {
           "name": "Cifrado",
-          "desc": "Envíe un despacho anónimo a la sala durante la fase legislativa."
+          "desc": "Enviar un despacho anónimo a la sala durante la fase legislativa."
         }
       },
       "agendas": {
         "title": "Agendas personales",
         "subtitle": "Tu objetivo individual oculto",
-        "p1": "A cada jugador se le asigna en secreto un {{agenda}}, un objetivo oculto que obtiene XP e IP adicionales si se completa, independientemente de si tu facción gana o pierde.",
+        "p1": "A cada jugador se le asigna en secreto un {{agenda}}, un objetivo oculto que obtiene XP e IP adicionales si se completa, independientemente de si su facción gana o pierde.",
         "examples_label": "Ejemplos de agendas",
         "examples": [
-          "Votar en contra en al menos 3 rondas",
+          "Vote No en al menos 3 rondas",
           "Ser nominado como Canciller al menos dos veces",
-          "El juego debe terminar antes de la ronda (recuento de jugadores + 3)",
-          "No se promulga ninguna política de caos durante el juego"
+          "El juego debe terminar antes de la ronda (cuenta de jugadores + 3)",
+          "No se implementa ninguna política de caos durante el juego"
         ],
         "footer": "Completar tu agenda otorga {{bonus}} y IP adicional, lo mismo que ganar con tu facción. Gana {{and}} y completa tu agenda para obtener recompensas dobles.",
         "footer_sub": "Tu agenda está visible en tu Dossier en todo momento. Otros no pueden verlo."
       },
       "tips": {
-        "title": "Sobrevivir a la Asamblea",
+        "title": "Sobreviviendo a la Asamblea",
         "subtitle": "Cosas clave para recordar",
         "civil": {
-          "heading": "Jugadores civiles: no confíes en nadie",
-          "body": "Superas en número al Estado, pero no sabes quiénes son. Declaraciones contradictorias, nominaciones sospechosas y patrones de votación son sus únicas pistas."
+          "heading": "Actores civiles: no confíen en nadie",
+          "body": "Superas en número al Estado pero no sabes quiénes son. Declaraciones contradictorias, nominaciones sospechosas y patrones de votación son sus únicas pistas."
         },
         "state": {
-          "heading": "Jugadores estatales: coordinad cuidadosamente.",
+          "heading": "Actores estatales: coordinen cuidadosamente",
           "body": "Conoces a tus aliados pero no puedes comunicarte abiertamente. Coordine mediante nominaciones, declaraciones y patrones de votación sutiles, sin ser obvio."
         },
         "decl": {
@@ -634,64 +1511,64 @@
           "body": "Después de cada sesión legislativa, tanto el Presidente como el Canciller declaran lo que vieron. Al hacer referencias cruzadas a estas afirmaciones es como se detectan mentiras."
         },
         "dossier": {
-          "heading": "Mire su dossier",
-          "body": "Tu rol, tu capacidad de título y tu agenda personal siempre están visibles en tu Dossier: toca el ícono en el encabezado durante un juego."
+          "heading": "Mire su Dossier",
+          "body": "Tu rol, tu título y tu agenda personal siempre están visibles en tu Dossier: toca el ícono en el encabezado durante un juego."
         }
       },
       "dossier": {
-        "title": "Dossier confidencial",
+        "title": "Dossier Confidencial",
         "identity": "Identidad política",
         "identity_civil": "Civil",
         "identity_state": "Agente estatal",
         "identity_overseer": "El supervisor",
-        "agenda": "Agenda personal",
+        "agenda": "Agenda Personal",
         "agenda_bonus": "Completar esto otorga XP e IP adicionales.",
         "agenda_none": "No hay agenda personal asignada.",
-        "title_role": "Rol de título",
-        "title_none": "No hay ningún rol de título asignado.",
+        "title_role": "Rol del título",
+        "title_none": "No se ha asignado ningún papel principal.",
         "faction_state": "Facción estatal",
-        "awaiting": "En espera de asignación...",
-        "close": "Cerrar dossier",
+        "awaiting": "Esperando asignación...",
+        "close": "Cerrar Dossier",
         "active": "Activo"
       },
       "game_over": {
         "title": "Resultados del partido",
         "banners": {
           "civil_win_default": "Carta restaurada",
-          "state_win_default": "Supremacía del estado",
+          "state_win_default": "Supremacía del Estado",
           "inconclusive": "No concluyente",
           "civil_desc": "La Carta ha sido defendida.",
           "state_desc": "La Secretaría ha recaído en el Estado.",
-          "abort_desc": "La Asamblea ha colapsado debido a una desconexión."
+          "abort_desc": "La Asamblea ha colapsado por una desconexión."
         },
         "performance_header": "Rendimiento del partido",
         "victory": "Victoria lograda",
         "defeat": "Misión fallida",
         "elo": "ELO",
-        "xp": "XP",
-        "ip": "IP",
-        "clan_xp": "Clan XP",
-        "casual": "Casual",
+        "xp": "EXP",
+        "ip": "propiedad intelectual",
+        "clan_xp": "XP del clan",
+        "casual": "Informal",
         "achievements_header": "Logros desbloqueados",
         "revelations_header": "Revelaciones de identidad",
         "agenda": "Agenda",
         "title_role": "Título",
-        "you": "Usted",
+        "you": "Tú",
         "action_log": "Ver registro de ensamblaje",
         "action_replay": "Reconstruir partido",
-        "action_share": "Copiar enlace compartido",
+        "action_share": "Copiar compartir enlace",
         "action_shared": "Enlace copiado",
         "action_play_again": "Jugar de nuevo",
-        "action_lobby": "Lobby",
+        "action_lobby": "Vestíbulo",
         "completed": "Completado",
         "failed": "Fallido"
       },
       "match_replay": {
         "title": "Repetición del partido",
-        "subtitle": "Reconstrucción posterior al partido",
+        "subtitle": "Reconstrucción post-partido",
         "hide_deceptions": "Ocultar engaños",
         "reveal_truth": "Revelar la verdad",
-        "no_history": "No se registró historial para este partido",
+        "no_history": "No hay historial registrado para este partido",
         "government_header": "Ronda {{round}} Gobierno",
         "president": "Presidente",
         "chancellor": "Canciller",
@@ -701,278 +1578,292 @@
         "fail_veto": "Ambas partes acordaron ejercer el poder de veto.",
         "fail_default": "La Asamblea no pudo confirmar esta coalición.",
         "enacted": "Directiva promulgada",
-        "power_triggered": "Poder activado: {{action}}",
+        "power_triggered": "Energía activada: {{action}}",
         "legislative_hand": "Mano legislativa",
-        "pres_deck": "Mazo del presidente",
-        "chan_hand": "Mano del canciller",
+        "pres_deck": "Cubierta del presidente",
+        "chan_hand": "La mano del canciller",
         "deception_detected": "Engaño detectado",
         "conflicting_stories": "Historias contradictorias",
         "actual_draw": "Sorteo real",
-        "actual_received": "Recibido real",
-        "public_claim": "Reclamación pública",
+        "actual_received": "Real recibido",
+        "public_claim": "Reclamo Público",
         "hidden": "OCULTO",
         "voting_records": "Registros de votación",
         "aye": "Sí",
         "nay": "No",
-        "no_vote": "No se realizó ninguna votación en esta ronda",
-        "footer_info": "La repetición utiliza datos de archivo descifrados. Utilice la línea de tiempo de arriba para navegar a través de los hitos del partido.",
-        "close": "Cerrar reconstrucción"
+        "no_vote": "No se celebró ninguna votación en esta ronda",
+        "footer_info": "La reproducción utiliza datos de archivo descifrados. Utilice la línea de tiempo de arriba para navegar a través de los hitos del partido.",
+        "close": "Cerrar la reconstrucción"
       },
       "modals": {
         "friend_request": {
           "title": "Solicitud de aliado",
-          "description": "<1>{{username}}</1> quiere ser aliado.",
+          "description": "<1>{{username}}</1> quiere ser aliados.",
           "deny": "Negar",
           "accept": "Aceptar"
         },
         "declaration": {
-          "drew_label": "<1>Reclamo:</1> Saqué...",
-          "result_drew": "Saqué <1>{{civ}}C</1> & <3>{{sta}}S</3>",
+          "drew_label": "<1>Afirmación:</1> Dibujé...",
+          "result_drew": "Dibujé <1>{{civ}}C</1> y <3>{{sta}}S</3>",
           "passed_label": "<1>Reclamo:</1> Pasé...",
           "received_label": "<1>Reclamo:</1> Recibí...",
-          "result_passed": "Pasé <1>{{civ}}C</1> & <3>{{sta}}S</3>",
+          "result_passed": "Pasé <1>{{civ}}C</1> y <3>{{sta}}S</3>",
           "result_received": "Recibí <1>{{civ}}C</1> & <3>{{sta}}S</3>",
-          "submit": "Enviar declaración"
-        }
-      },
-      "how_to_play": {
-        "title": "Cómo jugar",
-        "subtitle": "Referencia de reglas",
-        "tabs": {
-          "overview": "Descripción general",
-          "roles": "Roles",
-          "loop": "Ciclo del juego",
-          "titles": "Títulos",
-          "agendas": "Agendas",
-          "tips": "Consejos"
-        },
-        "overview": {
-          "p1": "La asamblea es un {{social_deduction_game}} para 5 a 10 jugadores. A cada jugador se le asigna en secreto una facción (civil o estatal) y debe trabajar con o contra los demás para lograr la condición de victoria de su facción.",
-          "civil_wins_label": "Civil gana al",
-          "civil_wins": [
-            "promulgar 5 directivas civiles",
-            "ejecutar al supervisor"
-          ],
-          "state_wins_label": "el estado gana al",
-          "state_wins": [
-            "promulgar 6 directivas estatales",
-            "elegir al canciller supervisor (después de 3 estados)"
-          ],
-          "crisis_label": "Modo crisis (alta intensidad)",
-          "crisis_desc": "Una variante caótica con {{event_cards}}. En cada ronda, se sortea un evento aleatorio que puede congelar el rastreador de elecciones, bloquear el chat o forzar elecciones anticipadas inmediatas.",
-          "deck_label": "Mazo de políticas",
-          "deck_desc": "El mazo contiene cartas de políticas {{civil_count}} y {{state_count}}. La baraja está en contra de Civil: la deducción y la coordinación son esenciales.",
-          "tracker_label": "Seguimiento de elecciones",
-          "tracker_desc": "Si fallan tres elecciones seguidas, se extrae un {{chaos_policy}} de la parte superior del mazo y se promulga automáticamente sin votación."
-        },
-        "roles_tab": {
-          "civil": {
-            "label": "Civil",
-            "desc": "La mayoría. No sabes quiénes son tus aliados. Utilice declaraciones, patrones de votación y nominaciones para encontrar a los agentes del Estado y detenerlos."
-          },
-          "state": {
-            "label": "Estado",
-            "desc": "La minoría. Sabes quiénes son tus aliados. Coordinar en secreto para promulgar directivas estatales o hacer que el Supervisor sea elegido Canciller."
-          },
-          "overseer": {
-            "label": "El Supervisor",
-            "desc": "Un agente estatal que no conoce a los demás jugadores estatales. Gana con el Estado. Si se elige Canciller después de que se promulguen 3 directivas estatales, el estado gana inmediatamente.",
-            "distribution_hint": "Con 5 o 6 jugadores, el Supervisor conoce a los demás agentes estatales."
-          },
-          "distribution_label": "Distribución de funciones"
-        },
-        "loop_tab": {
-          "step_1": {
-            "label": "Nominación",
-            "desc": "El presidente actual nomina a un canciller. El mismo jugador no puede actuar como Canciller en rondas consecutivas (o como Presidente en juegos más grandes)."
-          },
-          "step_2": {
-            "label": "Votar",
-            "desc": "Todos los jugadores vivos votan simultáneamente SÍ o NO. Una estricta mayoría de AYE aprueba el gobierno. Los empates y las divisiones iguales fracasan."
-          },
-          "step_3": {
-            "label": "Sesión legislativa",
-            "desc": "El presidente roba 3 cartas, descarta 1 boca abajo y pasa 2 al canciller. El canciller promulga uno, descarta el otro. Ninguno puede ver lo que el otro descartó."
-          },
-          "step_4": {
-            "label": "Declaraciones",
-            "desc": "El presidente declara cuántos Civiles/Estatales sacaron y aprobaron. El Canciller declara cuántos recibieron y promulgaron. Estas afirmaciones pueden ser mentiras."
-          },
-          "step_5": {
-            "label": "Acción ejecutiva",
-            "desc": "Si se promulgó una directiva estatal y el conteo de jugadores/directiva activa un poder, el presidente debe usarlo antes de que termine la ronda."
-          }
-        },
-        "titles_tab": {
-          "intro": "Los roles de título se asignan aleatoriamente al inicio del juego. Cada uno es de un solo uso y se dispara en un punto específico de la ronda. Consulta tu Dossier para ver si tienes uno.",
-          "roles": {
-            "interdictor": {
-              "name": "Interdictor",
-              "when": "Inicio de cada ronda",
-              "desc": "Antes de la nominación: detenga a un jugador para esta ronda. No pueden votar ni ser nominados como Canciller. Una vez usado."
-            },
-            "broker": {
-              "name": "Corredor",
-              "when": "Después de la nominación",
-              "desc": "Revisar la nominación del Canciller y vetarla, obligando al Presidente a nominar nuevamente. Una vez usado."
-            },
-            "strategist": {
-              "name": "Estratega",
-              "when": "Como presidente",
-              "desc": "Cuando seas presidente, roba 4 cartas de política en lugar de 3 y luego descarta 2. Una vez usadas."
-            },
-            "auditor": {
-              "name": "Auditor",
-              "when": "Después de la promulgación",
-              "desc": "Eche un vistazo a las últimas 3 cartas de la pila de descarte. Útil para rastrear qué políticas han desaparecido. Una vez usado."
-            },
-            "assassin": {
-              "name": "Asesino",
-              "when": "Después de la promulgación (como presidente)",
-              "desc": "Cuando seas presidente, ejecuta en secreto a cualquier jugador vivo después de que termine la ronda. Una vez usado."
-            },
-            "handler": {
-              "name": "Controlador",
-              "when": "Después de la promulgación",
-              "desc": "Intercambia los siguientes dos jugadores en la rotación presidencial. El segundo llega a ser presidente antes que el primero. Una vez usado."
-            },
-            "defector": {
-              "name": "Desertor",
-              "when": "Votación (Revelación)",
-              "desc": "Cambie secretamente su voto después de la revelación inicial pero antes de que se finalice el resultado. Esto puede convertir un empate 5-5 en un pase de 6-4. Una vez usado."
-            },
-            "archivist": {
-              "name": "Archivero",
-              "when": "Después de la promulgación",
-              "desc": "Inspección profunda: eche un vistazo a las 3 primeras cartas de la pila de robo antes de que comience la siguiente ronda. Una vez usado."
-            },
-            "quorum": {
-              "name": "Quórum",
-              "when": "Después del fracaso electoral",
-              "desc": "Sesión de emergencia: forzar una nueva votación inmediata sobre el último gobierno fallido, sin pasar por el próximo presidente. Una vez usado."
-            },
-            "cipher": {
-              "name": "Cifrar",
-              "when": "Cualquier fase",
-              "desc": "Envía un mensaje cifrado unidireccional a cualquier jugador. Solo ellos pueden ver el texto que envías. Una vez usado."
-            }
-          }
-        },
-        "agendas_tab": {
-          "p1": "Cada jugador recibe un {{personal_agenda}} oculto al comienzo de cada juego. Completarlo gana {{xp_bonus}}, equivalente a ganar con tu facción, independientemente del resultado del juego.",
-          "list_label": "Las 20 agendas",
-          "agendas": {
-            "chaos_agent": {
-              "name": "Agente del Caos",
-              "desc": "Activar una política de caos al menos una vez"
-            },
-            "purist": {
-              "name": "El Purista",
-              "desc": "Al menos 3 directivas civiles promulgadas"
-            },
-            "dissenter": {
-              "name": "El disidente",
-              "desc": "Vota contra la mayoría más de 3 veces"
-            },
-            "dove": {
-              "name": "La Paloma",
-              "desc": "Vota Sí en cada ronda elegible"
-            },
-            "hawk": {
-              "name": "El Halcón",
-              "desc": "Vota No en al menos 3 rondas"
-            },
-            "stonewalled": {
-              "name": "Stonewalled",
-              "desc": "Vota No en 2 gobiernos que fallan"
-            },
-            "short_session": {
-              "name": "Sesión corta",
-              "desc": "El juego termina antes de la ronda (jugadores + 3)"
-            },
-            "long_game": {
-              "name": "El juego largo",
-              "desc": "El juego dura al menos (jugadores + 6) rondas"
-            },
-            "loyalist": {
-              "name": "El Leal",
-              "desc": "Vota Sí en 3 gobiernos civiles"
-            },
-            "nominated": {
-              "name": "Nominado",
-              "desc": "Ser nominado Canciller dos veces"
-            },
-            "deadlock": {
-              "name": "Punto muerto",
-              "desc": "Estar en al menos 1 gobierno fallido"
-            },
-            "prolific": {
-              "name": "Prolífico",
-              "desc": "Promulgar 2 políticas como Canciller"
-            },
-            "veteran": {
-              "name": "El Veterano",
-              "desc": "Servir como Canciller al menos una vez"
-            },
-            "unity": {
-              "name": "Unidad",
-              "desc": "No hay política de caos durante el juego"
-            },
-            "mandate": {
-              "name": "El Mandato",
-              "desc": "Al menos 4 directivas estatales promulgadas"
-            },
-            "clean_sweep": {
-              "name": "Barrido limpio",
-              "desc": "Promulgar una directiva civil como Canciller"
-            },
-            "weathervane": {
-              "name": "La Veleta",
-              "desc": "Cambiar tu voto 4+ veces"
-            },
-            "productive": {
-              "name": "Sesión productiva",
-              "desc": "Más de la mitad de las rondas promulgan una política"
-            },
-            "close_race": {
-              "name": "Carrera cerrada",
-              "desc": "Pistas dentro de 2 directivas al final del juego"
-            },
-            "swing_vote": {
-              "name": "El voto decisivo",
-              "desc": "Estar en un gobierno que pasa por 1 voto"
-            }
-          }
-        },
-        "tips_tab": {
-          "civil": {
-            "label": "Para jugadores civiles",
-            "tips": [
-              "Declaraciones de referencia cruzada: si el presidente dice que aprobaron 1C/1S pero el canciller dice que recibieron 2S, alguien está mintiendo.",
-              "Seguimiento del registro de votación. La votación consistente por el No sin explicación es sospechosa.",
-              "Tenga cuidado con las acciones ejecutivas: investigue basándose en evidencia, no en intuiciones.",
-              "La baraja está cargada de Estado. Algunas políticas estatales que se están promulgando no prueban que nadie sea culpable."
-            ]
-          },
-          "state": {
-            "label": "Para actores estatales",
-            "tips": [
-              "Coordine las declaraciones cuidadosamente. Contradecir la afirmación de su aliado estatal es una revelación.",
-              "Nomine a sus aliados estatales como Canciller cuando sea posible, pero no tan obviamente que parezca sospechoso.",
-              "Culpa a las malas manos. \"Sólo tenía cartas de Estado\" es plausible porque la baraja tiene muchos Estados.",
-              "El Supervisor debe permanecer callado y sin llamar la atención hasta que llegue el momento adecuado."
-            ]
-          },
-          "general": {
-            "label": "General",
-            "tips": [
-              "Utilice el chat y las declaraciones juntas. Lo que dicen los jugadores importa.",
-              "Tu agenda personal puede entrar en conflicto con la mejor jugada de tu facción. Esa tensión es intencional.",
-              "El botón de historial redondo muestra cada gobierno, cada voto y cada declaración."
-            ]
-          }
+          "submit": "Presentar Declaración"
         }
       }
+    },
+    "how_to_play": {
+      "title": "Cómo jugar",
+      "subtitle": "Referencia de reglas",
+      "back_to_lobby": "Volver al vestíbulo",
+      "tabs": {
+        "overview": "Descripción general",
+        "roles": "Funciones",
+        "loop": "Bucle del juego",
+        "titles": "Títulos",
+        "agendas": "Agendas",
+        "tips": "Consejos"
+      },
+      "overview": {
+        "p1": "La Asamblea es un {{social_deduction_game}} para 5 a 10 jugadores. A cada jugador se le asigna en secreto una facción (civil o estatal) y debe trabajar con o contra los demás para lograr la condición de victoria de su facción.",
+        "civil_wins_label": "Civil gana por",
+        "civil_wins": [
+          "Promulgación de cinco directivas civiles",
+          "Ejecutar al supervisor"
+        ],
+        "state_wins_label": "El estado gana por",
+        "state_wins": [
+          "Promulgación de 6 directivas estatales",
+          "Elección del Canciller Supervisor (después de 3 estados)"
+        ],
+        "crisis_label": "Modo de crisis (alta intensidad)",
+        "crisis_desc": "Una variante caótica que presenta {{event_cards}}. En cada ronda, se sortea un evento aleatorio que puede congelar el rastreador de elecciones, bloquear el chat o forzar elecciones anticipadas inmediatas.",
+        "deck_label": "Cubierta de políticas",
+        "deck_desc": "El mazo contiene cartas de política {{civil_count}} y {{state_count}}. La baraja está en contra de Civil: la deducción y la coordinación son esenciales.",
+        "tracker_label": "Rastreador de elecciones",
+        "tracker_desc": "Si fallan tres elecciones seguidas, se extrae un {{chaos_policy}} de la parte superior del mazo y se promulga automáticamente sin votación."
+      },
+      "roles_tab": {
+        "civil": {
+          "label": "Civiles",
+          "desc": "La mayoría. No sabes quiénes son tus aliados. Utilice declaraciones, patrones de votación y nominaciones para encontrar a los agentes del Estado y detenerlos."
+        },
+        "state": {
+          "label": "Estado",
+          "desc": "La minoría. Sabes quiénes son tus aliados. Coordinar en secreto para promulgar directivas estatales o hacer que el Supervisor sea elegido Canciller."
+        },
+        "overseer": {
+          "label": "El supervisor",
+          "desc": "Un agente del Estado que no conoce a los demás jugadores del Estado. Gana con el Estado. Si se elige Canciller después de que se promulguen 3 directivas estatales, el estado gana inmediatamente.",
+          "distribution_hint": "Con 5 o 6 jugadores, el Supervisor conoce a los demás agentes estatales."
+        },
+        "distribution_label": "Distribución de roles"
+      },
+      "loop_tab": {
+        "step_1": {
+          "label": "Nominación",
+          "desc": "El actual Presidente nombra un Canciller. El mismo jugador no puede actuar como Canciller en rondas consecutivas (o como Presidente en juegos más grandes)."
+        },
+        "step_2": {
+          "label": "Votar",
+          "desc": "Todos los jugadores vivos votan simultáneamente SÍ o NO. Una estricta mayoría de AYE aprueba el gobierno. Los empates y las divisiones iguales fracasan."
+        },
+        "step_3": {
+          "label": "Sesión Legislativa",
+          "desc": "El presidente roba 3 cartas, descarta 1 boca abajo y pasa 2 al canciller. El canciller promulga uno, descarta el otro. Ninguno puede ver lo que el otro descartó."
+        },
+        "step_4": {
+          "label": "Declaraciones",
+          "desc": "El presidente declara cuántos Civiles/Estatales sacaron y aprobaron. El Canciller declara cuántos recibieron y promulgaron. Estas afirmaciones pueden ser mentiras."
+        },
+        "step_5": {
+          "label": "Acción Ejecutiva",
+          "desc": "Si se promulgó una directiva estatal y el conteo de jugadores/directiva activa un poder, el presidente debe usarlo antes de que termine la ronda."
+        }
+      },
+      "titles_tab": {
+        "intro": "Los roles de título se asignan aleatoriamente al comienzo del juego. Cada uno es de un solo uso y se dispara en un punto específico de la ronda. Consulta tu Dossier para ver si tienes uno.",
+        "roles": {
+          "interdictor": {
+            "name": "Interdictor",
+            "when": "Inicio de cada ronda",
+            "desc": "Antes de la nominación: detener a un jugador para esta ronda. No pueden votar ni ser nominados como Canciller. Una vez usado."
+          },
+          "broker": {
+            "name": "Corredor",
+            "when": "Después de la nominación",
+            "desc": "Revisar la nominación de Canciller y vetarla, obligando al Presidente a nominar nuevamente. Una vez usado."
+          },
+          "strategist": {
+            "name": "Estratega",
+            "when": "Como presidente",
+            "desc": "Cuando seas presidente, roba 4 cartas de política en lugar de 3 y luego descarta 2. Una vez usadas."
+          },
+          "auditor": {
+            "name": "Auditor",
+            "when": "Después de la promulgación",
+            "desc": "Echa un vistazo a las últimas 3 cartas de la pila de descarte. Útil para rastrear qué políticas han desaparecido. Una vez usado."
+          },
+          "assassin": {
+            "name": "Asesino",
+            "when": "Después de la promulgación (como Presidente)",
+            "desc": "Cuando seas presidente, ejecuta en secreto a cualquier jugador vivo una vez finalizada la ronda. Una vez usado."
+          },
+          "handler": {
+            "name": "Manejador",
+            "when": "Después de la promulgación",
+            "desc": "Intercambia a los siguientes dos jugadores en la rotación presidencial. El segundo llega a ser presidente antes que el primero. Una vez usado."
+          },
+          "defector": {
+            "name": "Desertor",
+            "when": "Votación (Revelar)",
+            "desc": "Cambie su voto en secreto después de la revelación inicial pero antes de que se finalice el resultado. Esto puede convertir un empate 5-5 en un pase de 6-4. Una vez usado."
+          },
+          "archivist": {
+            "name": "Archivero",
+            "when": "Después de la promulgación",
+            "desc": "Inspección profunda: eche un vistazo a las 3 primeras cartas del mazo de robo antes de que comience la siguiente ronda. Una vez usado."
+          },
+          "quorum": {
+            "name": "Quórum",
+            "when": "Después del fracaso electoral",
+            "desc": "Sesión de emergencia: forzar una nueva votación inmediata sobre el último gobierno fallido, sin pasar por el próximo presidente. Una vez usado."
+          },
+          "cipher": {
+            "name": "Cifrado",
+            "when": "Cualquier fase",
+            "desc": "Envía un mensaje cifrado unidireccional a cualquier jugador. Solo ellos pueden ver el texto que envías. Una vez usado."
+          }
+        }
+      },
+      "agendas_tab": {
+        "p1": "Cada jugador recibe un {{personal_agenda}} oculto al comienzo de cada juego. Completarlo gana {{xp_bonus}}, equivalente a ganar con tu facción, independientemente del resultado del juego.",
+        "list_label": "Las 20 agendas",
+        "agendas": {
+          "chaos_agent": {
+            "name": "Agente del Caos",
+            "desc": "Activar una política de caos al menos una vez"
+          },
+          "purist": {
+            "name": "El purista",
+            "desc": "Al menos tres directivas civiles promulgadas"
+          },
+          "dissenter": {
+            "name": "El disidente",
+            "desc": "Vota en contra de la mayoría más de 3 veces"
+          },
+          "dove": {
+            "name": "La paloma",
+            "desc": "Vote Sí en cada ronda elegible"
+          },
+          "hawk": {
+            "name": "El Halcón",
+            "desc": "Vote No en al menos 3 rondas"
+          },
+          "stonewalled": {
+            "name": "Bloqueado",
+            "desc": "Vote No por 2 gobiernos que fracasan"
+          },
+          "short_session": {
+            "name": "Sesión corta",
+            "desc": "El juego termina antes de la ronda (jugadores + 3)"
+          },
+          "long_game": {
+            "name": "El juego largo",
+            "desc": "El juego dura al menos (jugadores + 6) rondas"
+          },
+          "loyalist": {
+            "name": "El leal",
+            "desc": "Vote Sí a 3 gobiernos de promulgación civil"
+          },
+          "nominated": {
+            "name": "Nominado",
+            "desc": "Ser nominado Canciller dos veces"
+          },
+          "deadlock": {
+            "name": "Punto muerto",
+            "desc": "Estar en al menos 1 gobierno fallido"
+          },
+          "prolific": {
+            "name": "Prolífico",
+            "desc": "Promulgar 2 políticas como Canciller"
+          },
+          "veteran": {
+            "name": "El veterano",
+            "desc": "Servir como Canciller al menos una vez"
+          },
+          "unity": {
+            "name": "Unidad",
+            "desc": "Política sin caos durante el juego"
+          },
+          "mandate": {
+            "name": "El mandato",
+            "desc": "Al menos cuatro directivas estatales promulgadas"
+          },
+          "clean_sweep": {
+            "name": "Barrido limpio",
+            "desc": "Promulgar una directiva civil como Canciller"
+          },
+          "weathervane": {
+            "name": "La veleta",
+            "desc": "Cambia tu voto más de 4 veces"
+          },
+          "productive": {
+            "name": "Sesión Productiva",
+            "desc": "Más de la mitad de las rondas promulgan una política"
+          },
+          "close_race": {
+            "name": "Carrera cerrada",
+            "desc": "Pistas dentro de 2 directivas al final del juego"
+          },
+          "swing_vote": {
+            "name": "El voto decisivo",
+            "desc": "Estar en un gobierno que pasa por 1 voto"
+          }
+        }
+      },
+      "tips_tab": {
+        "civil": {
+          "label": "Para jugadores civiles",
+          "tips": [
+            "Declaraciones cruzadas: si el Presidente dice que aprobaron el 1C/1S pero el Canciller dice que recibieron el 2S, alguien miente.",
+            "Realice un seguimiento del registro de votación. La votación consistente por el No sin explicación es sospechosa.",
+            "Tenga cuidado con las acciones ejecutivas: investigue basándose en evidencia, no en intuiciones.",
+            "La baraja está cargada de Estado. Algunas políticas estatales que se están promulgando no prueban que nadie sea culpable."
+          ]
+        },
+        "state": {
+          "label": "Para actores estatales",
+          "tips": [
+            "Coordine las declaraciones con cuidado. Contradecir la afirmación de su aliado estatal es una revelación.",
+            "Nomine a sus aliados estatales como Canciller cuando sea posible, pero no tan obviamente que parezca sospechoso.",
+            "Culpa a las malas manos. \"Sólo tenía cartas de Estado\" es plausible porque la baraja tiene muchos Estados.",
+            "El Supervisor debe permanecer callado y sin llamar la atención hasta que llegue el momento adecuado."
+          ]
+        },
+        "general": {
+          "label": "Generalidades",
+          "tips": [
+            "Utilice el chat y las declaraciones juntas. Lo que dicen los jugadores importa.",
+            "Tu agenda personal puede entrar en conflicto con la mejor jugada de tu facción. Esa tensión es intencional.",
+            "El botón redondo del historial muestra cada gobierno, cada votación y cada declaración."
+          ]
+        }
+      }
+    },
+    "voting": {
+      "aye": "¡SÍ!",
+      "aye_sub": "(SÍ)",
+      "nay": "¡NO!",
+      "nay_sub": "(NO)",
+      "detained": "Estás detenido y no puedes votar en esta ronda"
+    },
+    "legislative": {
+      "discard": "Descartar",
+      "enact": "Promulgar",
+      "propose_veto": "Proponer veto",
+      "send_dispatch": "Enviar envío anónimo"
     }
   },
   "profile": {
@@ -980,19 +1871,709 @@
       "general": {
         "language": "Idioma",
         "language_desc": "Seleccione su idioma preferido",
-        "light_mode": "Modo claro",
-        "light_mode_desc": "Alternar modo claro para la interfaz",
+        "light_mode": "Modo de luz",
+        "light_mode_desc": "Alternar modo de luz para la interfaz",
         "ui_scale": "Escala de interfaz de usuario",
         "ui_scale_desc": "Ajustar la escala de los elementos de la interfaz",
         "recovery_email": "Correo electrónico de recuperación",
         "recovery_email_desc": "Se utiliza para recuperar su cuenta si pierde su token",
         "recovery_email_placeholder": "Ingrese el correo electrónico de recuperación...",
-        "no_recovery_email": "No configurado"
+        "no_recovery_email": "No establecido",
+        "fullscreen": "Pantalla completa"
       },
       "tabs": {
-        "general": "General",
+        "general": "Generalidades",
         "audio": "Audio",
         "voice": "Voz"
+      },
+      "audio": {
+        "music": "Música",
+        "music_volume": "Volumen de música",
+        "sfx": "Efectos de sonido",
+        "sfx_volume": "Volumen de efectos especiales"
+      },
+      "voice": {
+        "ai_voice": "Voz del narrador de IA",
+        "tts_voice": "Selección de voz",
+        "tts_default": "Valor predeterminado del sistema",
+        "narrator_volume": "Volumen del Narrador",
+        "narrator_volume_desc": "Controla el volumen de los anuncios de voz de IA en el juego."
+      }
+    },
+    "lvl_label": "Nivel",
+    "ip_label": "propiedad intelectual",
+    "cp_label": "CP",
+    "xp_label": "Experiencia",
+    "edit_username": "Editar nombre de usuario",
+    "public_profile": "Perfil público",
+    "username_update": {
+      "error_length": "El nombre de usuario debe tener entre 3 y 20 caracteres",
+      "failed": "No se pudo actualizar el nombre de usuario"
+    },
+    "share": {
+      "copied": "Enlace copiado!",
+      "copy_link": "Copiar enlace de perfil",
+      "on_twitter": "Compartir en Twitter",
+      "on_facebook": "Compartir en Facebook",
+      "on_whatsapp": "Compartir en WhatsApp",
+      "more": "Más opciones"
+    },
+    "tabs": {
+      "stats": "Estadísticas",
+      "inventory": "Inventario",
+      "achievements": "Medallas",
+      "challenges": "Desafíos",
+      "clan": "Clan",
+      "shop": "Tienda",
+      "pass": "Pase",
+      "friends": "Aliados",
+      "referrals": "Referencias",
+      "history": "Historia",
+      "settings": "Ajustes",
+      "admin": "Administrador"
+    },
+    "stats": {
+      "rank_rating": "Calificación de rango",
+      "elo": "ELO",
+      "elo_to_next": "{{amount}} a {{tier}}",
+      "games_played": "Juegos jugados",
+      "win_rate": "Tasa de victorias",
+      "total_wins": "Ganancias totales",
+      "civil_games": "Juegos Civiles",
+      "state_games": "Juegos Estatales",
+      "overseer_games": "Juegos de supervisores",
+      "kills": "Mata",
+      "deaths": "Muertes",
+      "agendas_completed": "Agendas completadas",
+      "account_created": "Cuenta creada",
+      "civil_wins": "Victorias civiles",
+      "state_wins": "El estado gana",
+      "overseer_wins": "El supervisor gana",
+      "ranked_wins": "Victorias clasificatorias",
+      "ranked_games": "Juegos clasificados",
+      "casual_wins": "Victorias casuales",
+      "casual_games": "Juegos casuales",
+      "classic_wins": "Victorias clásicas",
+      "classic_games": "Juegos clásicos"
+    },
+    "challenges": {
+      "loading": "Cargando desafíos...",
+      "error_load": "No se pudieron cargar los desafíos",
+      "error_no_data": "No hay datos de desafío disponibles",
+      "retry": "Reintentar",
+      "xp_reward": "{{amount}} XP",
+      "ip_reward": "{{amount}} IP",
+      "claimed": "Reclamado",
+      "section_complete": "{{count}}/{{total}} Completo",
+      "tiers": {
+        "daily": "Protocolos diarios",
+        "weekly": "Tareas semanales",
+        "seasonal": "Objetivos estacionales"
+      },
+      "countdown": {
+        "now": "Restableciendo ahora",
+        "days": "Se reinicia en {{d}}d {{h}}h",
+        "hours": "Se reinicia en {{h}}h {{m}}m",
+        "minutes": "Se reinicia en {{m}}m {{s}}s"
+      },
+      "list": {
+        "daily_win_any": {
+          "name": "Victoria",
+          "desc": "Gana cualquier juego."
+        },
+        "daily_win_civil": {
+          "name": "Defensor de la Carta",
+          "desc": "Gana una partida como jugador Civil."
+        },
+        "daily_win_state": {
+          "name": "Servidor del Estado",
+          "desc": "Gana un juego como agente estatal o supervisor."
+        },
+        "daily_play_2": {
+          "name": "Participante activo",
+          "desc": "Juega 2 juegos."
+        },
+        "daily_agenda_complete": {
+          "name": "Misión cumplida",
+          "desc": "Completa tu agenda personal."
+        },
+        "daily_elected_president": {
+          "name": "Autoridad presidencial",
+          "desc": "Ser elegido Presidente en cualquier juego."
+        },
+        "daily_elected_chancellor": {
+          "name": "El Canciller",
+          "desc": "Ser elegido Canciller en cualquier juego."
+        },
+        "daily_enact_civil": {
+          "name": "Legislador",
+          "desc": "Promulgar una directiva civil como Canciller."
+        },
+        "daily_enact_state": {
+          "name": "Ejecutor de directivas",
+          "desc": "Promulgar una directiva del Estado como Canciller."
+        },
+        "daily_survive_state_win": {
+          "name": "Sobreviviente",
+          "desc": "Sobrevive hasta el final de un juego que gana el Estado."
+        },
+        "daily_win_ranked": {
+          "name": "Contendiente clasificado",
+          "desc": "Gana un juego clasificado."
+        },
+        "daily_win_quick": {
+          "name": "Resolución rápida",
+          "desc": "Gana un juego en 6 rondas o menos."
+        },
+        "daily_vote_nay_win": {
+          "name": "El disidente",
+          "desc": "Vote No por un gobierno que aún gana sus elecciones."
+        },
+        "daily_win_overseer": {
+          "name": "Soberano de las Sombras",
+          "desc": "Gana una partida como supervisor."
+        },
+        "daily_play_casual": {
+          "name": "Asamblea informal",
+          "desc": "Juega un juego en modo Casual."
+        },
+        "daily_play_classic": {
+          "name": "Asistencia clásica",
+          "desc": "Juega un juego en modo Clásico."
+        },
+        "daily_win_classic": {
+          "name": "Víctor clásico",
+          "desc": "Gana una partida en modo Clásico."
+        },
+        "daily_chaos_occurs": {
+          "name": "En el caos",
+          "desc": "Juega un juego en el que se promulga una política de caos."
+        },
+        "daily_veto_occurs": {
+          "name": "Punto muerto",
+          "desc": "Juega un juego donde se ejerce un veto."
+        },
+        "daily_nominated_twice": {
+          "name": "Dos veces nominado",
+          "desc": "Ser nominado como Canciller al menos dos veces en un solo juego."
+        },
+        "daily_win_long": {
+          "name": "Sesión larga",
+          "desc": "Gana un juego que dure al menos 10 rondas."
+        },
+        "daily_voted_aye_failed": {
+          "name": "Traicionado por el voto",
+          "desc": "Vote Sí por un gobierno que fracasa en sus elecciones."
+        },
+        "daily_civil_full_track": {
+          "name": "Carta completa",
+          "desc": "Juega un juego en el que se promulgan 5 directivas civiles."
+        },
+        "daily_president_twice": {
+          "name": "Líder experimentado",
+          "desc": "Ser elegido Presidente al menos dos veces en un juego."
+        },
+        "daily_play_3": {
+          "name": "Jugador prolífico",
+          "desc": "Juega 3 juegos hoy."
+        },
+        "daily_win_civil_survive_assassination": {
+          "name": "Resiliente",
+          "desc": "Gana una partida como Civil mientras el Supervisor esté vivo."
+        },
+        "daily_large_game": {
+          "name": "Gran Asamblea",
+          "desc": "Juega un juego con 8 o más jugadores."
+        },
+        "daily_win_large_game": {
+          "name": "Reglas de la mayoría",
+          "desc": "Gana un juego con 8 o más jugadores."
+        },
+        "daily_enact_2_civil": {
+          "name": "Doble legislador",
+          "desc": "Promulga 2 directivas civiles como Canciller en un solo juego."
+        },
+        "daily_win_state_5plus_players": {
+          "name": "Operativo Estatal",
+          "desc": "Gana como Estado o Supervisor en un juego con al menos 5 jugadores."
+        },
+        "weekly_win_3": {
+          "name": "Víctor experimentado",
+          "desc": "Gana 3 juegos esta semana."
+        },
+        "weekly_play_5": {
+          "name": "Miembro dedicado de la Asamblea",
+          "desc": "Juega 5 juegos esta semana."
+        },
+        "weekly_win_civil_3": {
+          "name": "Campeón de la Carta",
+          "desc": "Gana 3 juegos como jugador Civil."
+        },
+        "weekly_win_state_2": {
+          "name": "Operativo Estatal",
+          "desc": "Gana 2 juegos como agente estatal o supervisor."
+        },
+        "weekly_agenda_3": {
+          "name": "Impulsado por una agenda",
+          "desc": "Completa 3 agendas personales esta semana."
+        },
+        "weekly_win_ranked_2": {
+          "name": "Operador clasificado",
+          "desc": "Gana 2 juegos clasificados esta semana."
+        },
+        "weekly_enact_civil_3": {
+          "name": "Registro legislativo",
+          "desc": "Promulga 3 directivas civiles como Canciller en cualquier juego."
+        },
+        "weekly_chancellor_3": {
+          "name": "Canciller frecuente",
+          "desc": "Ser elegido Canciller 3 veces en cualquier juego."
+        },
+        "weekly_win_overseer": {
+          "name": "Supremacía de las Sombras",
+          "desc": "Gana una partida como supervisor."
+        },
+        "weekly_play_classic_2": {
+          "name": "Modo Clásico Regular",
+          "desc": "Juega 2 juegos en modo Clásico."
+        },
+        "weekly_win_5": {
+          "name": "Fuerza dominante",
+          "desc": "Gana 5 juegos esta semana."
+        },
+        "weekly_play_10": {
+          "name": "Incondicional de la Asamblea",
+          "desc": "Juega 10 juegos esta semana."
+        },
+        "weekly_president_5": {
+          "name": "Carrera presidencial",
+          "desc": "Ser elegido presidente 5 veces en cualquier juego."
+        },
+        "weekly_agenda_5": {
+          "name": "Maestro de agendas",
+          "desc": "Completa 5 agendas personales esta semana."
+        },
+        "weekly_win_civil_5": {
+          "name": "Guardián del estatuto",
+          "desc": "Gana 5 juegos como jugador Civil."
+        },
+        "weekly_enact_state_3": {
+          "name": "Ejecutor estatal",
+          "desc": "Promulga 3 directivas estatales como Canciller en cualquier juego."
+        },
+        "weekly_win_2_modes": {
+          "name": "Versátil",
+          "desc": "Gana al menos un juego en 2 modos diferentes esta semana."
+        },
+        "weekly_win_ranked_3": {
+          "name": "Veterano clasificado",
+          "desc": "Gana 3 juegos clasificados esta semana."
+        },
+        "weekly_chancellor_5": {
+          "name": "Canciller de Registro",
+          "desc": "Ser elegido Canciller en 5 juegos."
+        },
+        "weekly_survive_5_games": {
+          "name": "Resistencia",
+          "desc": "Sobrevive hasta el final de 5 juegos."
+        },
+        "seasonal_play_30": {
+          "name": "Asamblea Ordinaria",
+          "desc": "Juega 30 partidos esta temporada."
+        },
+        "seasonal_win_15": {
+          "name": "Campeón de temporada",
+          "desc": "Gana 15 juegos esta temporada."
+        },
+        "seasonal_win_ranked_5": {
+          "name": "Veterano clasificado",
+          "desc": "Gana 5 juegos clasificados esta temporada."
+        },
+        "seasonal_agenda_10": {
+          "name": "El Maestro de la Agenda",
+          "desc": "Completa 10 agendas personales esta temporada."
+        },
+        "seasonal_win_civil_10": {
+          "name": "Pilar de la Carta",
+          "desc": "Gana 10 juegos como jugador Civil esta temporada."
+        },
+        "seasonal_win_state_5": {
+          "name": "Estado supremacista",
+          "desc": "Gana 5 juegos como agente estatal o supervisor esta temporada."
+        },
+        "seasonal_play_50": {
+          "name": "Verdadero asambleísta",
+          "desc": "Juega 50 partidos esta temporada."
+        },
+        "seasonal_chancellor_20": {
+          "name": "El Canciller Eterno",
+          "desc": "Ser elegido Canciller en 20 partidos esta temporada."
+        },
+        "seasonal_agenda_20": {
+          "name": "La agenda absolutista",
+          "desc": "Completa 20 agendas personales esta temporada."
+        },
+        "seasonal_win_ranked_10": {
+          "name": "Leyenda clasificada",
+          "desc": "Gana 10 juegos clasificados esta temporada."
+        },
+        "seasonal_enact_civil_15": {
+          "name": "Legado legislativo",
+          "desc": "Promulgue 15 directivas civiles como Canciller a lo largo de esta temporada."
+        },
+        "seasonal_win_25": {
+          "name": "Víctor legendario",
+          "desc": "Gana 25 juegos esta temporada."
+        }
+      }
+    },
+    "referrals": {
+      "title": "Programa de recomendación",
+      "subtitle": "Invita amigos a la Asamblea y gana recompensas.",
+      "active_reward": "Recompensa activa",
+      "reward_desc": "Gana <1>150 CP</1> por cada amigo que se una usando tu enlace y juegue su <3>primer partido</3>.",
+      "link_label": "Su enlace de referencia",
+      "copy_hint": "Toque para copiar su enlace de invitación único",
+      "copied_hint": "Enlace copiado al portapapeles",
+      "tracking_title": "Seguimiento automatizado",
+      "tracking_desc": "Las recompensas se acreditan automáticamente en su cuenta una vez que su referencia completa su primera partida de 10 jugadores."
+    },
+    "clans": {
+      "members": {
+        "self_label": "Tú",
+        "xp_contributed": "{{count}} XP aportado",
+        "btn_promote": "Promover a Oficial",
+        "btn_demote": "Degradar a miembro",
+        "btn_transfer": "Transferir Presidencia",
+        "btn_kick": "Eliminar del clan"
+      },
+      "challenges": {
+        "daily": "Protocolo diario",
+        "weekly": "Tareas semanales",
+        "seasonal": "Objetivos estacionales",
+        "xp_reward": "{{count}} XP",
+        "loading": "Accediendo a los archivos del clan...",
+        "loading_error": "No se pudieron recuperar datos objetivos.",
+        "retry": "Volver a conectarse al archivo"
+      },
+      "leaderboard": {
+        "lvl_summary": "Nivel {{level}} · {{count}} Miembros",
+        "title": "Clasificaciones globales de clanes",
+        "empty": "No se encontraron clanes.",
+        "rank": "#{{rank}}",
+        "your_clan": "Tu clan"
+      },
+      "create": {
+        "title": "Encontré un nuevo clan",
+        "tag_label": "Etiqueta de clan (4-5 caracteres)",
+        "tag_placeholder": "ASLY",
+        "name_label": "Nombre del clan",
+        "name_placeholder": "La Primera Asamblea",
+        "desc_label": "Información",
+        "desc_placeholder": "Propósito de tu clan...",
+        "btn_creating": "Fundación...",
+        "btn_submit": "Establecer clan",
+        "error_failed": "No se pudo fundar el clan"
+      },
+      "search": {
+        "title": "Explorar clanes",
+        "placeholder": "Nombre o etiqueta del clan...",
+        "no_results": "No hay clanes que coincidan con \"{{query}}\""
+      },
+      "no_clan": {
+        "title": "Lealtad aislada",
+        "hint": "Únase a un clan para ganar recompensas compartidas y ascender en la clasificación global.",
+        "btn_create": "Camino del fundador",
+        "btn_find": "Explorar clanes",
+        "btn_leaderboard": "Clasificaciones"
+      },
+      "manage": {
+        "btn_share": "Copiar enlace de invitación",
+        "btn_edit": "Modificar clan",
+        "btn_save": "Confirmar cambios",
+        "btn_saving": "Comprometiendo...",
+        "xp_label": "XP de nivel de clan",
+        "total_xp": "{{count}} XP total acumulado",
+        "contribution": "{{count}} XP aportado",
+        "overview": "Descripción general",
+        "challenges": "Objetivos",
+        "invite_label": "Invitar al clan",
+        "invite_placeholder": "Encuentra jugador para invitar...",
+        "members_label": "Miembros del clan"
+      },
+      "invites": {
+        "banner_title": "Invitación del clan",
+        "banner_desc": "{{inviter}} te invitó a unirte {{clan}} [{{tag}}]",
+        "btn_accept": "Aceptar",
+        "btn_decline": "Rechazar"
+      },
+      "alerts": {
+        "leave_confirm": "¿Estás seguro de que quieres dejar este clan?",
+        "disband_confirm": "CRÍTICO: Esto eliminará permanentemente el clan. ¿Proceder?",
+        "kick_confirm": "¿Quitar a este miembro?",
+        "transfer_confirm": "¿Transferir la presidencia del clan a este miembro?"
+      },
+      "loading": "Conectándose al archivo...",
+      "loading_error": "La conexión al archivo falló."
+    },
+    "inventory": {
+      "categories": {
+        "frame": "Fronteras",
+        "badge": "Insignias",
+        "policy": "Políticas",
+        "vote": "Votos",
+        "music": "Música",
+        "sound": "Sonidos",
+        "background": "Fondos"
+      },
+      "vote_aye": "Sí Token",
+      "vote_yes": "Sí Token",
+      "item_type_policy": "Aspecto de política",
+      "rarities": {
+        "common": "Común",
+        "uncommon": "Poco común",
+        "rare": "Raro",
+        "epic": "Épico",
+        "legendary": "Legendario"
+      },
+      "btn_equipped": "Equipado",
+      "btn_equip": "Equipar"
+    },
+    "medals": {
+      "summary_title": "Colección de medallas",
+      "summary_complete": "Finalización",
+      "pin_hint_desc": "Toca las medallas obtenidas para fijarlas.",
+      "pin_hint_status": "{{count}} / 3 fijados",
+      "pin_hint_empty": "No hay medallas fijadas",
+      "saving": "Guardando...",
+      "categories": {
+        "milestone": "Hitos",
+        "role": "Logros de roles",
+        "title": "Logros de títulos",
+        "gameplay": "Logros del juego"
+      },
+      "xp_reward": "+{{amount}} XP",
+      "cp_reward": "+{{amount}}CP",
+      "list": {
+        "first_assembly": {
+          "name": "Primera sesión",
+          "desc": "Juega tu primer juego."
+        },
+        "veteran": {
+          "name": "Delegado experimentado",
+          "desc": "Juega 25 juegos."
+        },
+        "elder": {
+          "name": "Anciano de la Asamblea",
+          "desc": "Juega 100 juegos."
+        },
+        "first_victory": {
+          "name": "Para que conste",
+          "desc": "Gana tu primer juego."
+        },
+        "ten_wins": {
+          "name": "Comandante probado",
+          "desc": "Gana 10 juegos."
+        },
+        "fifty_wins": {
+          "name": "Gran Campeón",
+          "desc": "Gana 50 juegos."
+        },
+        "civil_first_win": {
+          "name": "Funcionario público",
+          "desc": "Gana tu primer juego como Civil."
+        },
+        "civil_ten_wins": {
+          "name": "Defensor del estatuto",
+          "desc": "Gana 10 juegos como Civil."
+        },
+        "civil_twenty_wins": {
+          "name": "Guardián de la Carta",
+          "desc": "Gana 20 juegos como Civil."
+        },
+        "state_first_win": {
+          "name": "Agente en la sombra",
+          "desc": "Gana tu primer juego como Estado."
+        },
+        "state_ten_wins": {
+          "name": "Operativo Estatal",
+          "desc": "Gana 10 juegos como Estado."
+        },
+        "state_twenty_wins": {
+          "name": "Puño de Hierro",
+          "desc": "Gana 20 juegos como Estado."
+        },
+        "overseer_played": {
+          "name": "El arquitecto",
+          "desc": "Juega un juego como Supervisor."
+        },
+        "overseer_win": {
+          "name": "Intocable",
+          "desc": "Gana una partida como supervisor."
+        },
+        "power_used": {
+          "name": "Cartas sobre la mesa",
+          "desc": "Utilice cualquier habilidad de rol de título."
+        },
+        "assassins_mark": {
+          "name": "Marca del asesino",
+          "desc": "Ejecuta a un jugador usando la habilidad Asesino."
+        },
+        "overseer_hunter": {
+          "name": "El fin del supervisor",
+          "desc": "Mata al supervisor como asesino."
+        },
+        "agenda_first": {
+          "name": "Agenda Oculta",
+          "desc": "Completa una agenda personal."
+        },
+        "agenda_ten": {
+          "name": "Maestro de agenda",
+          "desc": "Completa 10 agendas personales."
+        },
+        "agenda_twentyfive": {
+          "name": "Maestro táctico",
+          "desc": "Completa 25 agendas personales."
+        },
+        "first_kill": {
+          "name": "Decisión Ejecutiva",
+          "desc": "Ejecutar a un jugador como presidente."
+        },
+        "five_kills": {
+          "name": "Purga",
+          "desc": "Ejecuta a 5 jugadores en todos los juegos."
+        },
+        "clean_sweep": {
+          "name": "Barrido limpio",
+          "desc": "Gana un juego sin una sola directiva estatal."
+        },
+        "long_game": {
+          "name": "Guerra de desgaste",
+          "desc": "Sobrevive a una partida que llega a la ronda 12."
+        },
+        "landslide": {
+          "name": "Deslizamiento de tierra",
+          "desc": "Gana una elección en la que todos los jugadores voten Sí."
+        }
+      }
+    },
+    "history": {
+      "loading": "Cargando datos de archivo...",
+      "btn_replay": "Reconstruir",
+      "btn_decrypting": "Descifrando...",
+      "no_matches": "No se encontraron datos de archivo",
+      "first_game_hint": "Los datos de tu primer partido aparecerán aquí.",
+      "error_data_unavailable": "Datos no disponibles",
+      "error_fetch_failed": "Error en la recuperación del archivo",
+      "roles": {
+        "civil": "Civiles",
+        "state": "Estado",
+        "overseer": "Supervisor"
+      },
+      "outcomes": {
+        "victory": "Victoria",
+        "defeat": "Derrota",
+        "aborted": "Abortado"
+      }
+    },
+    "admin": {
+      "tabs": {
+        "rooms": "Habitaciones",
+        "users": "Usuarios",
+        "system": "Sistema",
+        "logs": "Auditoría"
+      },
+      "broadcast": {
+        "title": "Transmisión global",
+        "placeholder": "Ingresar mensaje de anuncio...",
+        "btn_send": "Transmisión"
+      },
+      "config": {
+        "maintenance": "Modo de mantenimiento del sistema",
+        "xp_boost": "Multiplicador de XP global",
+        "ip_boost": "Multiplicador global de propiedad intelectual"
+      },
+      "rooms": {
+        "filter_placeholder": "ID de habitación o anfitrión...",
+        "btn_refresh": "Actualizar",
+        "purge_confirm": "¿Borrar todas las salas inactivas?",
+        "btn_purge": "Salas de purga",
+        "active_sessions": "Sesiones activas",
+        "host_label": "Anfitrión: {{name}}",
+        "users_summary": "{{current}} / {{max}} Delegados"
+      },
+      "logs": {
+        "sessions": "Sesiones Históricas",
+        "persisted_log": "Registros Archivados: {{id}}",
+        "waiting": "Esperando datos...",
+        "empty": "No se encontraron registros de auditoría"
+      }
+    },
+    "shop": {
+      "title": "Solicitud de cosméticos",
+      "subtitle": "Intercambie IP y CP por marcos de borde, insignias y más.",
+      "btn_purchase": "Solicitud ({{amount}})",
+      "item_type_policy": "Aspecto de política",
+      "item_style": "{{type}} Estilo",
+      "btn_owned": "Propiedad",
+      "btn_locked_pass": "Pase de recompensa",
+      "btn_buy_pts": "Comprar · {{price}} IP"
+    },
+    "pass": {
+      "title": "Pase de montaje",
+      "subtitle": "Temporada 1: La crisis",
+      "lvl_label": "Nivel {{lvl}}",
+      "xp_to_next": "{{xp}} / {{needed}} XP",
+      "max_level": "Nivel máximo",
+      "item_level": "Nivel {{lvl}} Recompensa",
+      "claimed": "Reclamado",
+      "unlocked": "Desbloqueado",
+      "locked": "Clasificado",
+      "season": "Temporada {{number}}",
+      "season_desc": "Completa desafíos y gana XP para desbloquear cosméticos exclusivos.",
+      "level": "Nivel",
+      "xp_summary": "{{amount}} XP obtenida",
+      "footer_season": "Temporada {{number}} · Activo",
+      "footer_premium_hint": "Las recompensas premium se desbloquean al subir de nivel. Sigue jugando.",
+      "btn_claim": "Reclamo",
+      "btn_claimed": "Reclamado",
+      "btn_locked": "Bloqueado",
+      "rewards": {
+        "geometric_grid": "Cuadrícula geométrica",
+        "purple_rain": "Lluvia Púrpura",
+        "static_noise": "Ruido estático",
+        "purple_pill": "Pastilla morada"
+      },
+      "reward_types": {
+        "cp": "Puntos de claridad",
+        "cp_count": "{{count}} PC",
+        "background": "Fondo",
+        "vote": "Estilo de votación",
+        "music": "Pista de música",
+        "frame": "Marco de borde",
+        "reward": "Recompensa"
+      }
+    },
+    "leaderboard": {
+      "title": "Tabla de clasificación",
+      "loading": "Cargando...",
+      "no_data": "Aún no hay datos. ¡Juega algunos {{mode}} juegos!",
+      "column_player": "Jugador",
+      "column_rank_elo": "Rango · ELO",
+      "your_position": "Su posición",
+      "you": "Tú",
+      "modes": {
+        "overall": "General",
+        "ranked": "Clasificado",
+        "casual": "Informal",
+        "classic": "Clásico",
+        "crisis": "Crisis"
+      },
+      "stats": {
+        "win_rate": "Ganar%",
+        "games": "Juegos",
+        "wins": "Victorias",
+        "elo": "ELO"
       }
     }
   },
@@ -1003,38 +2584,69 @@
       "members": "Miembros",
       "no_desc": "No se proporciona descripción.",
       "share_clan": "Compartir clan",
-      "roster": "Lista del clan",
-      "contribution": "Contrib.",
+      "roster": "Lista de clanes",
+      "contribution": "Contribuir.",
       "founded_on": "Clan fundado en {{date}}",
       "not_found": "Clan no encontrado",
       "load_failed": "No se pudo cargar el clan",
-      "check_tag": "Verifique la etiqueta del clan e inténtelo nuevamente.",
-      "return_home": "Volver a Inicio"
+      "check_tag": "Comprueba la etiqueta del clan y vuelve a intentarlo.",
+      "return_home": "Regresar a casa"
     },
     "friends": {
-      "search_placeholder": "Buscar jugadores por nombre de usuario...",
+      "search_placeholder": "Buscar jugadores por nombre de usuario…",
       "search_btn": "Aliados",
-      "search_min_chars": "Escribe al menos 2 caracteres para buscar",
-      "searching": "Buscando...",
+      "search_min_chars": "Escriba al menos 2 caracteres para buscar",
+      "searching": "Buscando…",
       "search_no_results": "No se encontraron jugadores para \"{{query}}\"",
       "status_sent": "Enviado",
       "friends_label": "Aliados",
       "pending_requests": "Solicitudes pendientes ({{count}})",
-      "wants_to_be_friends": "Quiere ser aliado",
+      "wants_to_be_friends": "Quiere ser aliados",
       "no_friends": "Aún no hay aliados.",
       "no_friends_hint": "Busca jugadores arriba o agrega a alguien de un juego.",
       "online": "En línea ({{count}})",
       "offline": "Sin conexión ({{count}})",
-      "in_game": "En asamblea · {{roomId}}",
-      "in_lobby": "En el lobby",
+      "in_game": "En montaje · {{roomId}}",
+      "in_lobby": "En el vestíbulo",
       "recently_played": "Jugado recientemente con",
       "time_m_ago": "Hace {{count}}m",
       "time_h_ago": "Hace {{count}}h",
-      "time_d_ago": "Hace {{count}}d",
+      "time_d_ago": "{{count}}hace días",
       "add_friend": "Agregar aliado",
       "invite_title": "Invitar a la asamblea",
-      "join_title": "Unirse a su asamblea",
+      "join_title": "Únete a su asamblea",
       "remove_title": "Eliminar aliado"
+    }
+  },
+  "playercard": {
+    "play_now": "Jugar ahora",
+    "player_profile": "Perfil del jugador",
+    "elo_label": "ELO",
+    "elo_to_next": "{{amount}} ELO al siguiente nivel",
+    "joined_on": "Se unió {{date}}",
+    "share_profile": "Compartir perfil",
+    "copied": "¡Copiado!",
+    "join_assembly": "Únase a la Asamblea",
+    "think_can_beat": "¿Crees que puedes vencerlos?",
+    "free_to_play": "Gratis para jugar · No se requiere descarga",
+    "stats": {
+      "games": "Juegos",
+      "win_rate": "Tasa de victorias",
+      "kills": "Mata",
+      "kd_ratio": "Relación K/D",
+      "win_rate_role": "Tasa de victorias por rol",
+      "perf_mode": "Rendimiento por modo",
+      "total_wins": "Ganancias totales",
+      "agendas_done": "Agendas hechas",
+      "deaths": "Muertes",
+      "achievements": "Logros obtenidos",
+      "medals": "medallas"
+    },
+    "errors": {
+      "player_not_found": "Jugador no encontrado",
+      "player_not_found_desc": "Este jugador no existe o su perfil es privado.",
+      "failed_to_load_profile": "No se pudo cargar el perfil",
+      "generic_desc": "Comprueba tu conexión y vuelve a intentarlo."
     }
   }
 }

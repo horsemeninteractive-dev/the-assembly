@@ -1,5 +1,4 @@
 const fs = require('fs');
-const { translate } = require('@vitalets/google-translate-api');
 const path = require('path');
 
 const fileContent = fs.readFileSync('src/locales/en.json', 'utf8');
@@ -40,7 +39,6 @@ function protect(str) {
 
 // Unprotect
 function unprotect(str, placeholders) {
-  // Translate API sometimes adds spaces: [ 0 ] or [0 ]
   return str.replace(/\[\s*(\d+)\s*\]/g, (match, idx) => {
     return placeholders[idx] || match;
   });
@@ -56,31 +54,35 @@ const langs = [
   { code: 'ko', file: 'ko.json' }
 ];
 
+async function translateText(text, targetLang) {
+  const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=en&tl=${targetLang}&dt=t&q=${encodeURIComponent(text)}`;
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+  const data = await res.json();
+  return data[0].map(item => item[0]).join('');
+}
+
 async function translateAll() {
   for (const lang of langs) {
     console.log(`Starting translation for ${lang.code}...`);
-    // Create a fresh clone of the English object structure
     const newData = JSON.parse(fileContent);
     
-    // Batch into chunks to respect API limits
-    const BATCH_SIZE = 40;
+    const BATCH_SIZE = 25; // Smaller batch for stability
     
     for (let i = 0; i < flatStrings.length; i += BATCH_SIZE) {
       const batch = flatStrings.slice(i, i + BATCH_SIZE);
       const batchProtected = batch.map(item => protect(item.original));
-      const textToTranslate = batchProtected.map(b => b.protectedStr).join(' \\n '); // Use a very specific separator
+      const textToTranslate = batchProtected.map(b => b.protectedStr).join(' ||| ');
       
       try {
-        const res = await translate(textToTranslate, { to: lang.code });
-        const translatedLines = res.text.split(/ \\\s*n\s*|\\n|\n/); // Various ways it might split back
+        const translatedText = await translateText(textToTranslate, lang.code);
+        const translatedLines = translatedText.split(/\s*\|\|\|\s*/);
         
-        // Match up translated lines
         for (let j = 0; j < batch.length; j++) {
           const item = batch[j];
-          const transLine = translatedLines[j] || batchProtected[j].protectedStr;
+          const transLine = translatedLines[j] !== undefined ? translatedLines[j] : batchProtected[j].protectedStr;
           const finalStr = unprotect(transLine.trim(), batchProtected[j].placeholders);
           
-          // Inject back into object
           let current = newData;
           for (let k = 0; k < item.path.length - 1; k++) {
             current = current[item.path[k]];
@@ -88,12 +90,10 @@ async function translateAll() {
           current[item.path[item.path.length - 1]] = finalStr;
         }
         
-        // Wait a tiny bit to avoid rate limiting
-        await new Promise(r => setTimeout(r, 600));
+        await new Promise(r => setTimeout(r, 1500)); // Sleep to avoid rate limits
         process.stdout.write('.');
       } catch (err) {
         console.error(`\nError on batch ${i} for ${lang.code}:`, err.message);
-        // Fallback: just put english text back for failed chunks
         for (let j = 0; j < batch.length; j++) {
           const item = batch[j];
           let current = newData;
@@ -102,13 +102,14 @@ async function translateAll() {
           }
           current[item.path[item.path.length - 1]] = item.original;
         }
+        await new Promise(r => setTimeout(r, 3000));
       }
     }
     
-    fs.writeFileSync(`src/locales/${lang.file}`, JSON.stringify(newData, null, 2));
+    fs.writeFileSync(`src/locales/${lang.file}`, JSON.stringify(newData, null, 2) + '\n');
     console.log(`\nFinished ${lang.file}`);
   }
-  console.log('All translations complete.');
+  console.log('All translations complete via GTX method.');
 }
 
 translateAll();

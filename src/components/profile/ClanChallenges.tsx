@@ -82,10 +82,10 @@ function ClanChallengeCard({ challenge }: { challenge: EnrichedChallenge }) {
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2 mb-0.5">
-            <p className={cn('text-sm font-semibold leading-tight', done ? 'text-muted line-through' : 'text-primary')}>{challenge.name}</p>
+            <p className={cn('text-sm font-semibold leading-tight', done ? 'text-muted line-through' : 'text-primary')}>{t(`profile.challenges.list.${challenge.id}.name`)}</p>
             <span className={cn('text-[9px] font-mono uppercase tracking-widest shrink-0', done ? 'text-muted' : 'text-faint')}>{challenge.progress}/{challenge.target}</span>
           </div>
-          <p className="text-xs text-tertiary leading-snug mb-3">{challenge.description}</p>
+          <p className="text-xs text-tertiary leading-snug mb-3">{t(`profile.challenges.list.${challenge.id}.desc`)}</p>
           <div className="h-1.5 w-full bg-surface rounded-full overflow-hidden mb-2">
             <motion.div initial={{ width: 0 }} animate={{ width: `${pct}%` }} transition={{ duration: 0.6, ease: 'easeOut' }} className={cn('h-full rounded-full', done ? 'opacity-50 ' + barColor : barColor)} />
           </div>

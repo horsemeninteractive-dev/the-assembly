@@ -67,4 +67,13 @@ export const debugError = (...args: any[]) => {
   console.error('Assembly Error:', ...args);
 };
 
-
+export function parseAiChat(rawText: string, t: (key: string, args?: any) => string): string {
+  if (rawText.startsWith('$$aiChat:')) {
+    const parts = rawText.substring(9).split('|');
+    const key = parts[0];
+    const targetName = parts[1] || '';
+    const translated = t(key, { name: targetName });
+    return translated.replace(/\{name\}/gi, targetName);
+  }
+  return rawText;
+}

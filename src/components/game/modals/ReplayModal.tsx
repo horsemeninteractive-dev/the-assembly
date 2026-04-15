@@ -1,5 +1,5 @@
-
 import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   History, 
@@ -67,13 +67,13 @@ export const ReplayModal = ({ gameState, isOpen, onClose, playSound }: ReplayMod
     playSound('hover');
   };
 
-  return (
+  return ReactDOM.createPortal(
     <AnimatePresence>
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[100] bg-backdrop backdrop-blur-xl flex items-center justify-center p-4 lg:p-8"
+        className="fixed inset-0 z-[9999] bg-backdrop-heavy backdrop-blur-xl flex items-center justify-center p-4 lg:p-8"
       >
         <motion.div
           initial={{ scale: 0.9, y: 20 }}
@@ -220,7 +220,11 @@ export const ReplayModal = ({ gameState, isOpen, onClose, playSound }: ReplayMod
                             <div className="mt-4 pt-4 border-t border-white/5">
                               <p className="text-[9px] font-mono text-orange-400 uppercase tracking-widest flex items-center justify-center gap-2">
                                 <TrendingUp className="w-3 h-3" />
-                                {t('game.match_replay.power_triggered', { action: currentRound.executiveAction })}
+                                {t('game.match_replay.power_triggered', { 
+                                  action: currentRound.executiveAction 
+                                    ? t(`game.powers.${currentRound.executiveAction.replace(/([A-Z])/g, '_$1').toLowerCase().replace(/^_/, '')}`)
+                                    : ''
+                                })}
                               </p>
                             </div>
                           )}
@@ -374,6 +378,7 @@ export const ReplayModal = ({ gameState, isOpen, onClose, playSound }: ReplayMod
           </div>
         </motion.div>
       </motion.div>
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body
   );
 };

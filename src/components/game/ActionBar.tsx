@@ -427,7 +427,7 @@ export const ActionBar = ({
                   disabled={!cipherMessage.trim()}
                   className="px-6 py-2 bg-emerald-600 hover:bg-emerald-550 text-white rounded-xl font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Send
+                  {t('common.submit')}
                 </button>
                 <button
                   onClick={() => setShowCipherInput(false)}
@@ -457,20 +457,13 @@ export const ActionBar = ({
             ].includes(gameState.titlePrompt.role) ? (
               <>
                 <div className="text-responsive-xs font-mono uppercase tracking-widest text-muted text-center">
-                  {gameState.titlePrompt.role === 'Strategist' &&
-                    'Use Strategist power to draw an extra policy?'}
-                  {gameState.titlePrompt.role === 'Broker' &&
-                    'Use Broker power to force a re-nomination?'}
-                  {gameState.titlePrompt.role === 'Handler' &&
-                    'Use Handler power to swap the next two players in the presidential order?'}
-                  {gameState.titlePrompt.role === 'Auditor' &&
-                    'Use Auditor power to peek at the discard pile?'}
-                  {gameState.titlePrompt.role === 'Archivist' &&
-                    'Use Archivist power to peek at the discard pile?'}
-                  {gameState.titlePrompt.role === 'Defector' &&
-                    'Defect? Secretly flip your vote to the opposite result?'}
-                  {gameState.titlePrompt.role === 'Quorum' &&
-                    'Use Quorum power to call for an emergency re-vote?'}
+                  {gameState.titlePrompt.role === 'Strategist' && t('game.action_bar.title_strategist_prompt')}
+                  {gameState.titlePrompt.role === 'Broker' && t('game.action_bar.title_broker_prompt')}
+                  {gameState.titlePrompt.role === 'Handler' && t('game.action_bar.title_handler_prompt')}
+                  {gameState.titlePrompt.role === 'Auditor' && t('game.action_bar.title_auditor_prompt')}
+                  {gameState.titlePrompt.role === 'Archivist' && t('game.action_bar.title_archivist_prompt')}
+                  {gameState.titlePrompt.role === 'Defector' && t('game.action_bar.title_defector_prompt')}
+                  {gameState.titlePrompt.role === 'Quorum' && t('game.action_bar.title_quorum_prompt')}
                 </div>
                 <div className="flex gap-[2vw] w-full max-w-[30vh]">
                   <button
@@ -484,7 +477,7 @@ export const ActionBar = ({
                     }}
                     className="flex-1 py-[1vh] btn-primary rounded-xl font-bold hover:bg-subtle transition-all"
                   >
-                    {gameState.titlePrompt.role === 'Defector' ? 'Flip Vote' : 'Yes'}
+                    {gameState.titlePrompt.role === 'Defector' ? t('game.action_bar.title_flip_vote') : t('game.action_bar.title_yes')}
                   </button>
                   <button
                     onMouseEnter={() => playSound('hover')}
@@ -494,17 +487,15 @@ export const ActionBar = ({
                     }}
                     className="flex-1 py-[1vh] bg-subtle text-primary rounded-xl font-bold hover:bg-muted-bg transition-all"
                   >
-                    No
+                    {t('game.action_bar.title_no')}
                   </button>
                 </div>
               </>
             ) : (
               <>
                 <div className="text-responsive-xs font-mono uppercase tracking-widest text-muted text-center">
-                  {gameState.titlePrompt.role === 'Assassin' &&
-                    'Select a player to execute on their card, or skip.'}
-                  {gameState.titlePrompt.role === 'Interdictor' &&
-                    'Select a player to detain on their card, or skip.'}
+                  {gameState.titlePrompt.role === 'Assassin' && t('game.action_bar.title_assassin_prompt')}
+                  {gameState.titlePrompt.role === 'Interdictor' && t('game.action_bar.title_interdictor_prompt')}
                 </div>
                 <button
                   onMouseEnter={() => playSound('hover')}
@@ -514,7 +505,7 @@ export const ActionBar = ({
                   }}
                   className="px-[4vw] py-[1vh] bg-subtle text-primary rounded-xl font-bold hover:bg-muted-bg transition-all"
                 >
-                  Skip Power
+                  {t('game.action_bar.skip_power')}
                 </button>
               </>
             )}
@@ -528,7 +519,7 @@ export const ActionBar = ({
           <div className="flex gap-[1vw] sm:gap-[2vw] w-full justify-center h-full items-center">
             {gameState.detainedPlayerId === me?.id ? (
               <div className="text-purple-400 font-mono text-responsive-xs uppercase tracking-widest text-center animate-pulse">
-                You are detained and cannot vote this round
+                {t('game.voting.detained')}
               </div>
             ) : (
               <>
@@ -544,10 +535,10 @@ export const ActionBar = ({
                   )}
                 >
                   <span className="text-responsive-2xl sm:text-responsive-3xl font-thematic uppercase leading-none">
-                    AYE!
+                    {t('game.voting.aye')}
                   </span>
                   <span className="text-responsive-xs font-mono uppercase tracking-widest opacity-60">
-                    (YES)
+                    {t('game.voting.aye_sub')}
                   </span>
                 </button>
                 <button
@@ -562,10 +553,10 @@ export const ActionBar = ({
                   )}
                 >
                   <span className="text-responsive-2xl sm:text-responsive-3xl font-thematic uppercase leading-none">
-                    NAY!
+                    {t('game.voting.nay')}
                   </span>
                   <span className="text-responsive-xs font-mono uppercase tracking-widest opacity-60">
-                    (NO)
+                    {t('game.voting.nay_sub')}
                   </span>
                 </button>
               </>
@@ -600,7 +591,7 @@ export const ActionBar = ({
                     <Eye className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" />
                   )}
                   <span className="text-responsive-xs font-mono uppercase tracking-widest">
-                    Discard
+                    {t('game.legislative.discard')}
                   </span>
                 </motion.button>
               ))}
@@ -635,7 +626,7 @@ export const ActionBar = ({
                     <Eye className="w-[3vh] h-[3vh] sm:w-[4vh] sm:h-[4vh]" />
                   )}
                   <span className="text-responsive-xs font-mono uppercase tracking-widest">
-                    Enact
+                    {t('game.legislative.enact')}
                   </span>
                 </motion.button>
               ))}
@@ -654,7 +645,7 @@ export const ActionBar = ({
               }}
               className="absolute bottom-1 sm:bottom-2 left-1/2 -translate-x-1/2 text-[9px] sm:text-[10px] text-purple-400 font-mono uppercase tracking-widest hover:text-purple-300 bg-black/40 px-3 py-0.5 rounded-full backdrop-blur-sm border border-purple-400/20"
             >
-              Propose Veto
+              {t('game.legislative.propose_veto')}
             </button>
           )}
 
@@ -669,7 +660,7 @@ export const ActionBar = ({
               }}
               className="absolute bottom-1 sm:bottom-2 left-1/2 -translate-x-1/2 text-[9px] sm:text-[10px] text-emerald-400 font-mono uppercase tracking-widest hover:text-emerald-300 bg-black/40 px-3 py-0.5 rounded-full backdrop-blur-sm border border-emerald-400/20"
             >
-              Send Anonymous Dispatch
+              {t('game.legislative.send_dispatch')}
             </button>
           )}
 
@@ -678,17 +669,17 @@ export const ActionBar = ({
           <div className="flex flex-col gap-[1vh] w-full max-w-xs h-full justify-center">
             <div className="text-center p-[1vh] sm:p-[2vh] rounded-2xl border-2 mb-2 bg-card border-default text-muted">
               <div className="text-responsive-xl font-thematic tracking-wide uppercase">
-                Game Over
+                {t('game.action_bar.game_over_title')}
               </div>
               <div className="text-responsive-xs font-mono uppercase tracking-widest">
-                See Assembly Results
+                {t('game.action_bar.see_results')}
               </div>
             </div>
             <button
               onClick={onPlayAgain}
               className="py-[1vh] sm:py-[1.5vh] btn-primary font-thematic text-responsive-xl rounded-xl hover:bg-subtle transition-all shadow-xl shadow-white/5"
             >
-              Play Again
+              {t('game.action_bar.play_again')}
             </button>
           </div>
         )}
@@ -697,9 +688,9 @@ export const ActionBar = ({
         {gameState.phase === 'Censure_Action' && me?.isAlive && (
           <div className="flex flex-col gap-[1vh] w-full justify-center h-full items-center">
             <div className="text-responsive-xs font-mono uppercase tracking-widest text-muted text-center max-w-lg px-4">
-              {me.censureVoteId 
-                ? `Voted for ${gameState.players.find(p => p.id === me.censureVoteId)?.name || 'a player'}`
-                : 'Select a player on their card to censure (exclude from next nomination)'}
+              {me.censureVoteId
+                ? t('game.action_bar.voted_for', { name: gameState.players.find(p => p.id === me.censureVoteId)?.name || '' })
+                : t('game.action_bar.censure_select')}
             </div>
           </div>
         )}
@@ -708,11 +699,11 @@ export const ActionBar = ({
         {gameState.phase === 'Snap_Election' && me?.isAlive && (
           <div className="flex flex-col gap-[1vh] w-full justify-center h-full items-center">
             <div className="text-responsive-xs font-mono uppercase tracking-widest text-muted text-center mb-1">
-              Any player may volunteer to be the next President.
+              {t('game.action_bar.snap_volunteer_prompt')}
             </div>
             {gameState.snapElectionVolunteers?.includes(me.id) ? (
               <div className="px-8 py-3 rounded-2xl bg-purple-900/40 border border-purple-500/50 text-purple-200 font-bold uppercase tracking-widest animate-pulse">
-                Volunteered
+                {t('game.action_bar.volunteered')}
               </div>
             ) : (
               <button
@@ -722,11 +713,11 @@ export const ActionBar = ({
                 }}
                 className="px-8 py-3 rounded-2xl bg-purple-600 hover:bg-purple-500 text-white font-bold uppercase tracking-[0.2em] shadow-lg shadow-purple-500/20 transition-all hover:scale-105 active:scale-95"
               >
-                Volunteer
+                {t('game.action_bar.volunteer')}
               </button>
             )}
             <div className="text-[10px] font-mono text-faint uppercase mt-1">
-              {gameState.snapElectionVolunteers?.length || 0} Ready to serve
+              {t('game.action_bar.ready_to_serve', { count: gameState.snapElectionVolunteers?.length || 0 })}
             </div>
           </div>
         )}
@@ -806,10 +797,10 @@ export const ActionBar = ({
                         : 'btn-primary shadow-white/5'
                     )}
                   >
-                    {me?.isReady ? 'Ready!' : 'Ready Up'}
+                    {me?.isReady ? t('common.ready') : t('common.not_ready')}
                   </button>
                   <span className="text-responsive-xs uppercase tracking-widest text-muted">
-                    {readyCount} / {totalHuman} Ready
+                    {t('game.action_bar.ready_count', { count: readyCount, total: totalHuman })}
                   </span>
                 </div>
 
@@ -871,7 +862,7 @@ export const ActionBar = ({
                       </Tooltip>
                     </div>
                     <span className="text-[8px] font-mono text-faint uppercase tracking-widest text-center">
-                      Host
+                      {t('game.action_bar.host_label')}
                     </span>
                   </div>
                 )}

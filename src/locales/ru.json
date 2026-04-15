@@ -1,1040 +1,2652 @@
 {
   "common": {
-    "title": "THE ASSEMBLY",
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "back": "Back",
-    "save": "Save",
-    "close": "Close",
-    "leave": "Leave",
-    "ready": "Ready!",
-    "not_ready": "Ready Up",
-    "submit": "Submit",
-    "total": "Total",
-    "create": "Create",
-    "active": "Active",
-    "searching": "Searching...",
-    "error_invalid_email": "Invalid email address"
+    "title": "АССАМБЛЕЯ",
+    "loading": "Загрузка...",
+    "error": "Ошибка",
+    "success": "Успех",
+    "cancel": "Отменить",
+    "confirm": "Подтвердить",
+    "back": "Назад",
+    "save": "Сохранить",
+    "close": "Закрыть",
+    "leave": "Уйти",
+    "ready": "Готовый!",
+    "not_ready": "Готово",
+    "submit": "Отправить",
+    "total": "Итого",
+    "create": "Создать",
+    "active": "Активный",
+    "searching": "Ищем...",
+    "error_invalid_email": "Неверный адрес электронной почты",
+    "aye": "ДА",
+    "civil_short": "Гражданский",
+    "invite": "Пригласить",
+    "lvl": "Уровень",
+    "results": "Результаты",
+    "search": "Поиск",
+    "sent": "Отправил",
+    "state_short": "Ста",
+    "status": "Статус"
   },
   "auth": {
-    "back": "Back",
-    "recovery_title": "Account Recovery",
-    "welcome_back": "Welcome back, Delegate",
-    "register_assembly": "Register for the Assembly",
+    "back": "Назад",
+    "recovery_title": "Восстановление учетной записи",
+    "welcome_back": "С возвращением, делегат",
+    "register_assembly": "Зарегистрируйтесь на Ассамблею",
     "form": {
-      "username": "Username",
-      "username_placeholder": "Agent Handle",
-      "email": "Email",
-      "password": "Secure Key",
-      "forgot_password": "Forgot Key?",
-      "sign_in": "Sign In",
-      "create_account": "Create Account",
-      "or_continue": "Or continue with",
-      "register_prompt": "Don't have an account? Register",
-      "login_prompt": "Already have an account? Login",
-      "choose_avatar": "Choose Avatar"
+      "username": "Имя пользователя",
+      "username_placeholder": "Дескриптор агента",
+      "email": "Электронная почта",
+      "password": "Безопасный ключ",
+      "forgot_password": "Забыли ключ?",
+      "sign_in": "Войти",
+      "create_account": "Создать учетную запись",
+      "or_continue": "Или продолжите",
+      "register_prompt": "У вас нет учетной записи? Зарегистрироваться",
+      "login_prompt": "У вас уже есть аккаунт? Войти",
+      "choose_avatar": "Выбрать аватар"
     }
   },
   "landing": {
     "nav": {
-      "login": "Log In",
-      "play": "Play Now"
+      "login": "Войти",
+      "play": "Играйте сейчас"
     },
     "hero": {
-      "tagline": "A social deduction game of hidden roles, political intrigue,\nand impossible trust.",
-      "cta_play": "Play Now — Free",
-      "discover": "Discover"
+      "tagline": "Социальная дедуктивная игра со скрытыми ролями, политическими интригами,\nи невозможное доверие.",
+      "cta_play": "Играйте сейчас — бесплатно",
+      "discover": "Откройте для себя"
     },
     "about": {
-      "label": "What Is The Assembly?",
-      "title": "Hidden Roles. Public Stakes.",
-      "subtitle": "A political thriller played out in real time. 5 to 10 players take on secret roles and must deceive, deduce, and outmanoeuvre one another across a series of high-pressure legislative rounds.",
-      "stat_players": "Players per game",
-      "stat_policies": "Policy cards stacked against you",
-      "stat_agendas": "Personal agendas to complete",
-      "quote": "The old world ended with The Crisis. Now, only The Assembly stands…",
-      "quote_cta": "Will you defend the Civil Charter, or will you build the new State?"
+      "label": "Что такое Ассамблея?",
+      "title": "Скрытые роли. Общественные ставки.",
+      "subtitle": "Политический триллер, разворачивающийся в реальном времени. От 5 до 10 игроков берут на себя секретные роли и должны обманывать, делать выводы и перехитрить друг друга в серии напряженных законодательных раундов.",
+      "stat_players": "Игроков за игру",
+      "stat_policies": "Политические карты против вас",
+      "stat_agendas": "Личные планы для выполнения",
+      "quote": "Старый мир закончился с Кризисом. Теперь остается только Ассамблея…",
+      "quote_cta": "Будете ли вы защищать Гражданскую хартию или построите новое государство?"
     },
     "factions": {
-      "label": "Choose Your Side",
-      "title": "Two Factions. One Assembly.",
-      "subtitle": "Every player is secretly assigned to a faction at the start of each game. The majority will not know who they can trust.",
+      "label": "Выберите свою сторону",
+      "title": "Две фракции. Одна Ассамблея.",
+      "subtitle": "Каждый игрок тайно приписывается к какой-либо фракции в начале каждой игры. Большинство не будет знать, кому они могут доверять.",
       "civil": {
-        "title": "Civil",
-        "desc": "The majority. Isolated in your loyalty. You don't know who your allies are — only that the deck is stacked against you, and that someone at this table is a traitor.",
-        "win_1": "Enact 5 Civil directives",
-        "win_2": "Execute the Overseer"
+        "title": "Гражданский",
+        "desc": "Большинство. Изолирован в своей лояльности. Вы не знаете, кто ваши союзники — только то, что колода сложена против вас, и что кто-то за этим столом — предатель.",
+        "win_1": "Принять 5 Гражданских директив",
+        "win_2": "Казнить надзирателя"
       },
       "state": {
-        "title": "State",
-        "desc": "The minority. Hidden among the Civil delegates, secretly coordinating. You know your allies. What you need is the right moment.",
-        "win_1": "Enact 6 State directives",
-        "win_2": "Elect the Overseer as Chancellor"
+        "title": "Государство",
+        "desc": "Меньшинство. Скрыт среди гражданских делегатов, тайно координируя свои действия. Вы знаете своих союзников. Что вам нужно, так это подходящий момент.",
+        "win_1": "Принять 6 государственных директив",
+        "win_2": "Избрать Смотрителя канцлером"
       },
       "overseer": {
-        "title": "The Overseer",
-        "desc": "A State agent who may not know the other State players. Their election as Chancellor after 3 State directives ends the game immediately."
+        "title": "Надзиратель",
+        "desc": "Агент штата, который может не знать других игроков штата. Их избрание канцлером после трех государственных директив немедленно завершает игру."
       },
-      "win_conditions": "Win Conditions"
+      "win_conditions": "Условия победы"
     },
     "loop": {
-      "label": "How It Plays",
-      "title": "One Round. Five Moments.",
-      "subtitle": "Each round forces every player to participate, declare, and be judged. There is no hiding.",
-      "step_1": "The President nominates a Chancellor. Who you trust — and who you nominate — reveals everything.",
-      "step_2": "All players vote simultaneously. Public, inescapable, and open to interpretation.",
-      "label_3": "Legislative Session",
-      "step_3": "The President draws 3 policy cards, discards 1, passes 2 to the Chancellor. One will be enacted.",
-      "label_4": "Declarations",
-      "step_4": "Both sides declare what happened in the session. These statements can be lies — blatant, convincing lies.",
-      "label_5": "Executive Action",
-      "step_5": "Enough State policies and the President wields power — investigations, detentions, executions."
+      "label": "Как это работает",
+      "title": "Один раунд. Пять мгновений.",
+      "subtitle": "Каждый раунд заставляет каждого игрока участвовать, заявлять и быть оцененным. Никакого сокрытия.",
+      "label_1": "Номинация",
+      "step_1": "Президент назначает канцлера. Кому вы доверяете и кого назначаете, все раскрывается.",
+      "label_2": "Голосование",
+      "step_2": "Все игроки голосуют одновременно. Публичное, неизбежное и открытое для интерпретации.",
+      "label_3": "Законодательная сессия",
+      "step_3": "Президент тянет 3 карты политики, сбрасывает 1 и передает 2 канцлеру. Один из них будет принят.",
+      "label_4": "Объявления",
+      "step_4": "Обе стороны заявляют о том, что произошло на заседании. Эти заявления могут быть ложью — откровенной, убедительной ложью.",
+      "label_5": "Исполнительные действия",
+      "step_5": "Достаточно государственной политики, и у президента есть власть — расследования, задержания, казни."
     },
     "features": {
-      "label": "What's Included",
-      "title": "More Than a Board Game.",
+      "label": "Что включено",
+      "title": "Больше, чем настольная игра.",
       "item_1": {
-        "label": "5–10 Players",
-        "desc": "Scale from tight deduction to sprawling deception."
+        "label": "5–10 игроков",
+        "desc": "Масштабируйте от жесткого вывода до обширного обмана."
       },
       "item_2": {
-        "label": "AI Players",
-        "desc": "Fill empty seats with AI — each with its own personality."
+        "label": "ИИ-игроки",
+        "desc": "Заполните пустые места ИИ — каждый со своей индивидуальностью."
       },
       "item_3": {
-        "label": "Title Roles",
-        "desc": "One-use powers — Interdictor, Assassin, Broker and more."
+        "label": "Титульные роли",
+        "desc": "Одноразовые способности — Заградитель, Убийца, Брокер и другие."
       },
       "item_4": {
-        "label": "Personal Agendas",
-        "desc": "20 hidden objectives independent of your faction."
+        "label": "Личные планы",
+        "desc": "20 скрытых целей, независимых от вашей фракции."
       },
       "item_5": {
-        "label": "Crisis Mode",
-        "desc": "Optional chaos directives that rewrite the rules mid-game."
+        "label": "Кризисный режим",
+        "desc": "Дополнительные директивы хаоса, которые переписывают правила в середине игры."
       },
       "item_6": {
-        "label": "Clan System",
-        "desc": "Form a clan, set a banner, build a legacy."
+        "label": "Клановая система",
+        "desc": "Создайте клан, установите знамя, создайте наследие."
       },
       "item_7": {
-        "label": "Season Ranks",
-        "desc": "Climb the ladder. Earn IP. Unlock cosmetics."
+        "label": "Сезонные ранги",
+        "desc": "Поднимитесь по лестнице. Заработайте ИП. Разблокировать косметику."
       },
       "item_8": {
-        "label": "Free to Play",
-        "desc": "All gameplay is free. Cosmetics are optional."
+        "label": "Бесплатная игра",
+        "desc": "Весь игровой процесс бесплатен. Косметика не обязательна."
       }
     },
     "cta": {
-      "title": "Take Your Seat.",
-      "subtitle": "Free to play. No downloads. The Assembly awaits.",
-      "button": "Create Account"
+      "title": "Займите свое место.",
+      "subtitle": "Бесплатно играть. Никаких загрузок. Ассамблея ждет.",
+      "button": "Создать учетную запись"
     }
   },
   "lobby": {
     "header": {
-      "subtitle": "Assembly Lobby",
-      "leaderboard": "Leaderboard",
-      "profile": "My Profile",
-      "view_profile": "View Profile",
-      "how_to_play": "How to Play",
-      "logout": "Logout"
+      "subtitle": "Вестибюль Ассамблеи",
+      "leaderboard": "Таблица лидеров",
+      "profile": "Мой профиль",
+      "view_profile": "Просмотр профиля",
+      "how_to_play": "Как играть",
+      "logout": "Выйти"
     },
     "ranks": {
-      "initiate": "Initiate",
-      "trainee": "Trainee",
-      "delegate": "Delegate",
-      "official": "Official",
-      "high_delegate": "High Delegate",
-      "consul": "Consul",
-      "assembly_master": "Assembly Master",
-      "overseer": "Overseer"
+      "initiate": "Инициировать",
+      "trainee": "Стажер",
+      "delegate": "Делегат",
+      "official": "Официальный",
+      "high_delegate": "Высокий делегат",
+      "consul": "Консул",
+      "assembly_master": "Мастер сборки",
+      "overseer": "Надзиратель"
     },
     "matchmaking": {
-      "title": "Assemble a Match",
-      "subtitle": "Join a competitive queue or find a casual room.",
-      "searching": "Searching…",
-      "joining": "Joining!",
-      "no_rooms": "No Rooms",
-      "quick_join": "Quick Join",
-      "quick_join_desc": "Best available room",
-      "create": "Create Assembly",
-      "create_desc": "Convene your own",
-      "practice": "Solo Practice",
-      "practice_desc": "Train vs AI bots",
-      "practice_short": "Practice",
-      "global_war": "Global War",
-      "stats_running": "Assemblies Running",
-      "stats_members": "Active Members"
+      "title": "Собери спичку",
+      "subtitle": "Присоединяйтесь к соревновательной очереди или найдите обычную комнату.",
+      "searching": "Поиск…",
+      "joining": "Присоединяюсь!",
+      "no_rooms": "Нет номеров",
+      "quick_join": "Быстрое присоединение",
+      "quick_join_desc": "Лучший доступный номер",
+      "create": "Создать сборку",
+      "create_desc": "Соберите свой собственный",
+      "practice": "Индивидуальная практика",
+      "practice_desc": "Поезд против ИИ-ботов",
+      "practice_short": "Практика",
+      "global_war": "Глобальная война",
+      "stats_running": "Выполняемые сборки",
+      "stats_members": "Активные участники"
     },
     "browser": {
-      "rejoin_title": "Active Assembly Found",
-      "rejoin_subtitle": "You disconnected from: {{name}}",
-      "rejoin_btn": "Rejoin Game",
-      "status_recruiting": "Recruiting",
-      "status_in_progress": "In Progress",
-      "privacy_public": "Public",
-      "privacy_private": "Private",
-      "privacy_friends": "Friends",
-      "status_locked": "Locked",
+      "rejoin_title": "Найдена активная сборка",
+      "rejoin_subtitle": "Вы отключились от: {{name}}",
+      "rejoin_btn": "Повторно присоединиться к игре",
+      "status_recruiting": "Рекрутинг",
+      "status_in_progress": "В процессе",
+      "privacy_public": "Публичный",
+      "privacy_private": "Частное",
+      "privacy_friends": "Друзья",
+      "status_locked": "Заблокировано",
       "players_count": "{{count}}/{{max}}",
-      "btn_join": "Join",
-      "btn_watch": "Watch",
-      "filter_joinable": "Joinable",
-      "filter_active": "Active",
-      "sort_label": "Sort",
-      "sort_new": "New",
-      "sort_full": "Full",
-      "empty_no_rooms": "No active rooms found.",
-      "empty_no_match": "No rooms match your filters.",
-      "empty_create_prompt": "Be the first to create one",
-      "empty_clear_filters": "Clear filters",
-      "private_modal_title": "Private Room",
-      "private_modal_subtitle": "Enter the 4-character invite code.",
-      "private_modal_cancel": "Cancel"
+      "btn_join": "Присоединяйтесь",
+      "btn_watch": "Смотреть",
+      "filter_joinable": "Присоединяемый",
+      "filter_active": "Активный",
+      "sort_label": "Сортировать",
+      "sort_new": "Новый",
+      "sort_full": "Полный",
+      "empty_no_rooms": "Активных комнат не найдено.",
+      "empty_no_match": "Ни один номер не соответствует вашим фильтрам.",
+      "empty_create_prompt": "Будьте первым, кто создаст его",
+      "empty_clear_filters": "Очистить фильтры",
+      "private_modal_title": "Отдельная комната",
+      "private_modal_subtitle": "Введите 4-значный пригласительный код.",
+      "private_modal_cancel": "Отменить"
     },
     "sidebar": {
-      "actions": "Actions"
+      "actions": "Действия"
     },
     "footer": {
-      "published_by": "Published by",
-      "credits": "Credits",
-      "legal": "Legal Info"
+      "published_by": "Опубликовано",
+      "credits": "Кредиты",
+      "legal": "Юридическая информация"
+    },
+    "creator": {
+      "title": "Создать новую ассамблею",
+      "room_name": "Название комнаты",
+      "room_name_placeholder": "например Берлин 1933 год",
+      "max_players": "Максимальное количество игроков",
+      "players_min": "5 игроков",
+      "players_max": "10 игроков",
+      "action_timer": "Таймер действия",
+      "timer_off": "ВЫКЛ",
+      "game_mode": "Игровой режим",
+      "mode_ranked_desc": "Присуждаются ELO и полные баллы.",
+      "mode_casual_desc": "Никаких изменений ЭЛО, снижение очков.",
+      "mode_classic_desc": "Стандартные роли/правила. Нет ЭЛО, снижены баллы.",
+      "mode_crisis_desc": "Карты событий на основе раундов. Высокий риск, высокие баллы.",
+      "privacy": "Конфиденциальность",
+      "privacy_public": "Общественный",
+      "privacy_public_desc": "Присоединиться может каждый",
+      "privacy_friends": "Только друзья",
+      "privacy_friends_desc": "Только твои друзья",
+      "privacy_private": "Частное",
+      "privacy_private_desc": "Пригласительный код",
+      "invite_code_hint": "Пригласительный код будет сгенерирован при создании комнаты.",
+      "btn_create": "Создать комнату",
+      "btn_maintenance": "Техническое обслуживание"
+    },
+    "practice": {
+      "title": "Индивидуальная практика",
+      "subtitle": "Против искусственного интеллекта",
+      "total_players": "Всего игроков",
+      "players_min": "5 (Быстро)",
+      "players_max": "10 (Комплекс)",
+      "ai_difficulty": "Сложность ИИ",
+      "difficulty_casual_desc": "ИИ играют просто и честно.",
+      "difficulty_normal_desc": "ИИ используют стандартные стратегии и обман.",
+      "difficulty_elite_desc": "ИИ очень обманчивы и эффективно координируют свои действия.",
+      "btn_start": "Созвать собрание"
     }
   },
   "game": {
-    "round": "Round {{round}}",
-    "phase": "Phase: {{phase}}",
-    "civil_directives": "Civil Directives",
-    "state_directives": "State Directives",
-    "winner": "{{faction}} Wins!",
-    "gameOver": "G A M E   O V E R",
+    "roles": {
+      "civil": {
+        "name": "Гражданский",
+        "flavor": "Защищайте Хартию. Не доверяйте никому."
+      },
+      "state": {
+        "name": "Государство",
+        "flavor": "Реализуйте видение государства. Определите своих союзников."
+      },
+      "overseer": {
+        "name": "Надзиратель",
+        "flavor": "Саботируйте Ассамблею изнутри. Стать канцлером."
+      }
+    },
+    "round": "Раунд {{round}}",
+    "phase": "Фаза: {{phase}}",
+    "civil_directives": "Гражданские директивы",
+    "state_directives": "Государственные директивы",
+    "winner": "{{faction}} Победа!",
+    "gameOver": "Г А М Е О В Е Р",
+    "modes": {
+      "casual": "Казуальный",
+      "ranked": "Рейтинг",
+      "classic": "Классический",
+      "crisis": "Кризис"
+    },
     "phases": {
-      "lobby": "Waiting for players ({{current}}/{{max}})...",
-      "nominate_chancellor": "{{name}} is nominating a Chancellor.",
-      "nomination_review": "The Assembly is reviewing the nomination.",
-      "interdictor_review": "Interdictor is choosing a target.",
-      "broker_review": "Broker is reviewing the nomination.",
-      "voting": "The Assembly is voting.",
-      "legislative_president": "President is reviewing directives.",
-      "strategist_deck": "Strategist is looking at the deck.",
-      "legislative_chancellor": "Chancellor is enacting a directive.",
-      "auditor_inspect": "Auditor is inspecting the discard pile.",
-      "defector_align": "The Defector is considering a secret realignment.",
-      "quorum_revote": "The Quorum is deciding on an emergency re-vote.",
-      "assassin_target": "Assassin is choosing a target."
+      "lobby": "Ожидание игроков ({{current}}/{{max}})...",
+      "nominate_chancellor": "{{name}} выдвигает кандидатуру канцлера.",
+      "nomination_review": "Ассамблея рассматривает кандидатуру.",
+      "interdictor_review": "Интердиктор выбирает цель.",
+      "broker_review": "Брокер рассматривает кандидатуру.",
+      "voting": "Ассамблея голосует.",
+      "legislative_president": "Президент рассматривает директивы.",
+      "strategist_deck": "Стратег смотрит на колоду.",
+      "legislative_chancellor": "Канцлер издает директиву.",
+      "auditor_inspect": "Аудитор осматривает стопку сброса.",
+      "defector_align": "Перебежчик обдумывает тайную реорганизацию.",
+      "quorum_revote": "Кворум принимает решение о проведении экстренного повторного голосования.",
+      "assassin_target": "Убийца выбирает цель."
     },
     "dossier": {
-      "title": "Your Secret Dossier",
-      "identity": "Secret Identity",
-      "identity_civil": "Political Identity: Civil",
-      "identity_overseer": "Political Identity: Overseer",
-      "identity_state": "Political Identity: State",
-      "agenda": "Personal Agenda",
-      "agenda_none": "No agenda assigned.",
-      "agenda_bonus": "Completing this awards bonus XP and IP equal to a faction win.",
-      "title_role": "Title Role",
-      "title_none": "No title role assigned.",
-      "faction_state": "State Faction",
-      "awaiting": "Awaiting role assignment...",
-      "close": "Close Dossier"
+      "title": "Ваше секретное досье",
+      "identity": "Секретная личность",
+      "identity_civil": "Гражданский",
+      "identity_overseer": "Надзиратель",
+      "identity_state": "Государство",
+      "agenda": "Личная повестка дня",
+      "agenda_none": "Повестка дня не назначена.",
+      "agenda_bonus": "За выполнение этого задания вы получаете бонус XP и IP, равный победе фракции.",
+      "title_role": "Титул Роль",
+      "title_none": "Заглавная роль не назначена.",
+      "faction_state": "Государственная фракция",
+      "awaiting": "Ожидание назначения роли...",
+      "close": "Закрыть досье",
+      "active": "АКТИВНЫЙ"
     },
     "powers": {
       "peek": {
-        "name": "Policy Peek",
-        "desc": "President previews top 3 directives"
+        "name": "Обзор политики",
+        "desc": "Президент представляет три главных директивы"
       },
       "kill": {
-        "name": "Execution",
-        "desc": "President executes a player"
+        "name": "Исполнение",
+        "desc": "Президент казнит игрока"
       },
       "inv": {
-        "name": "Investigation",
-        "desc": "President investigates a player's party"
+        "name": "Расследование",
+        "desc": "Президент расследует партию игрока"
       },
       "spec": {
-        "name": "Special Election",
-        "desc": "President chooses next candidate"
+        "name": "Специальные выборы",
+        "desc": "Президент выбирает следующего кандидата"
       },
       "win": {
-        "name": "State Victory",
-        "desc": "State wins immediately"
+        "name": "Государственная Победа",
+        "desc": "Государство выигрывает немедленно"
       },
-      "investigate": "Investigate",
-      "special_election": "Special Election",
-      "execution": "Execution",
-      "policy_peek": "Policy Peek"
+      "investigate": "Расследовать",
+      "special_election": "Специальные выборы",
+      "execution": "Исполнение",
+      "policy_peek": "Обзор политики"
+    },
+    "policies": {
+      "civil": {
+        "name": "Гражданский",
+        "directive": "Гражданская директива"
+      },
+      "state": {
+        "name": "Государство",
+        "directive": "Государственная директива"
+      }
     },
     "titles": {
       "interdictor": {
-        "name": "Interdictor",
-        "action": "Detain"
+        "name": "Запретитель",
+        "action": "Задержать",
+        "desc": "Не позволяет игроку участвовать в следующем голосовании."
       },
       "broker": {
-        "name": "Broker",
-        "action": "Veto"
+        "name": "Брокер",
+        "action": "Вето",
+        "desc": "Принудительно выдвигает новую кандидатуру, если текущий выбор неудовлетворителен."
       },
       "strategist": {
-        "name": "Strategist",
-        "action": "Draw 4"
+        "name": "Стратег",
+        "action": "Ничья 4",
+        "desc": "Во время законодательной сессии вытягивает дополнительную карту директив."
       },
       "auditor": {
-        "name": "Auditor",
-        "action": "Inspect"
+        "name": "Аудитор",
+        "action": "Осмотреть",
+        "desc": "Получает доступ к просмотру верхних карт стопки сброса директив."
       },
       "assassin": {
-        "name": "Assassin",
-        "action": "Execute"
+        "name": "Убийца",
+        "action": "Выполнить",
+        "desc": "Может быть нацелен на любого игрока для немедленного устранения."
       },
       "handler": {
-        "name": "Handler",
-        "action": "Swap"
+        "name": "Обработчик",
+        "action": "Перенаправление",
+        "desc": "Меняет позиции следующих двух президентов по порядку."
       },
       "defector": {
-        "name": "Defector",
-        "action": "Flip Vote"
+        "name": "Перебежчик",
+        "action": "Перевернутое голосование",
+        "desc": "Тайно меняет результат своего голосования в конце сессии."
       },
       "archivist": {
-        "name": "Archivist",
-        "action": "Deep Inspect"
+        "name": "Архивариус",
+        "action": "Глубокая проверка",
+        "desc": "Просматривает 3 верхние карты колоды в любое время."
       },
       "quorum": {
-        "name": "Quorum",
-        "action": "Emergency Re-vote"
+        "name": "Кворум",
+        "action": "Экстренное повторное голосование",
+        "desc": "Вызывает новое голосование сразу после неудачного выдвижения."
       },
       "cipher": {
-        "name": "Cipher",
-        "action": "Dispatch"
+        "name": "Шифр",
+        "action": "Отправка",
+        "desc": "Отправляет анонимное личное сообщение любому игроку."
       }
     },
     "tracks": {
-      "civil_label": "Civil",
-      "state_label": "State",
-      "deck": "Deck",
-      "discard": "Discard",
-      "spectators": "Spectators ({{count}})",
-      "election_tracker": "Election Tracker",
-      "win_civil": "Charter Restored",
-      "win_civil_desc": "Civil wins immediately",
-      "win_state": "State Supremacy",
-      "win_state_desc": "State wins immediately",
-      "quorum_revote": "REVOTE"
+      "civil_label": "Гражданский",
+      "state_label": "Государство",
+      "deck": "Колода",
+      "discard": "Сбросить",
+      "spectators": "Зрители ({{count}})",
+      "election_tracker": "Отслеживание выборов",
+      "win_civil": "Устав восстановлен",
+      "win_civil_desc": "Гражданские побеждают немедленно",
+      "win_state": "Государственное превосходство",
+      "win_state_desc": "Государство выигрывает немедленно",
+      "quorum_revote": "ОТМЕНИТЬ",
+      "win_reasons": {
+        "charter_restored": "Устав восстановлен",
+        "state_supremacy": "Государственное превосходство",
+        "overseer_executed": "Надзирателя казнили",
+        "overseer_ascended": "Смотритель вознесся"
+      }
     },
     "player_card": {
-      "candidate": "Candidate",
-      "nominated": "Nominated",
-      "eliminated": "Eliminated",
-      "president": "President",
-      "chancellor": "Chancellor",
-      "detained": "Detained",
-      "censured": "Censured",
-      "reconnecting": "Reconnecting",
-      "nominate": "Nominate",
-      "execute": "Execute",
-      "detain": "Detain",
-      "censure": "Censure",
-      "selected": "Selected",
-      "exclude_hint": "Exclude from nominations",
-      "proven_not_overseer": "Proven Not Overseer",
-      "aria_label": "Player {{name}}{{you}}"
+      "candidate": "Кандидат",
+      "nominated": "Номинирован",
+      "eliminated": "Устранено",
+      "president": "Президент",
+      "chancellor": "Канцлер",
+      "detained": "Задержан",
+      "censured": "Осужден",
+      "reconnecting": "Повторное подключение",
+      "nominate": "Номинировать",
+      "execute": "Выполнить",
+      "detain": "Задержать",
+      "censure": "Порицание",
+      "selected": "Выбрано",
+      "exclude_hint": "Исключить из номинаций",
+      "proven_not_overseer": "Доказано, что он не надзиратель",
+      "aria_label": "Игрок {{name}}{{you}}"
     },
     "action_bar": {
-      "current_phase": "Current Phase",
-      "crisis_active": "Crisis Active",
-      "anonymous_dispatch": "Intercepted Anonymous Dispatch",
-      "encrypted_dispatch": "Encrypted Dispatch Channel",
-      "cipher_placeholder": "Enter message (max 80 chars)...",
-      "quick_reactions": "Quick Reactions",
-      "toggle_reactions": "Toggle Reactions",
-      "mute": "Mute Mic",
-      "unmute": "Unmute Mic",
-      "stop_video": "Stop Video",
-      "start_video": "Start Video",
-      "declaring": "Players are declaring directives.",
-      "handler_active": "Handler is using their power.",
-      "censure_debate": "The Assembly is debating a Censure Motion.",
-      "snap_volunteers": "Volunteers are stepping forward for the Snap Election.",
-      "crisis_incoming": "Crisis Event Incoming...",
-      "investigating": "President is investigating a player's loyalty.",
-      "calling_special": "President is calling a Special Election.",
-      "executing": "President is executing a player.",
-      "peeking": "President is reviewing the top three policies.",
-      "deciding": "President is deciding on an executive action.",
-      "victorious": "{{faction}} faction victorious!",
-      "in_session": "The Assembly is in session.",
-      "nominate_prompt": "Tap a player on the board to nominate them as Chancellor.",
-      "nominate_watch": "Watch the nomination — it reveals who the President trusts.",
-      "detained_cant_vote": "You are detained and cannot vote this round.",
-      "voting_prompt": "Vote AYE to support this government or NAY to block it.",
-      "discard_prompt": "Discard one policy card. The other two go to the Chancellor.",
-      "pass_watch": "The President is choosing which policy to pass to the Chancellor.",
-      "declaration_hint": "Declarations tell the table what was drawn and passed. They may be lies.",
-      "enact_prompt": "Enact one policy. You may propose a Veto if 5+ State directives are enacted.",
-      "enact_watch": "The Chancellor is choosing which policy to enact.",
-      "investigate_prompt": "Select a player to investigate their party loyalty.",
-      "special_prompt": "Select a player to be the next President.",
-      "execute_prompt": "Select a player to execute.",
-      "peek_prompt": "Review the top 3 cards of the deck.",
-      "must_use_power": "You must use your executive power.",
-      "pres_must_use": "The President must use their executive power.",
-      "lobby_ready_prompt": "Press Ready Up when you're ready to start. The game begins when all players are ready."
+      "current_phase": "Текущая фаза",
+      "crisis_active": "Кризис активен",
+      "anonymous_dispatch": "Перехваченное анонимное сообщение",
+      "encrypted_dispatch": "Зашифрованный канал отправки",
+      "cipher_placeholder": "Введите сообщение (максимум 80 символов)...",
+      "quick_reactions": "Быстрая реакция",
+      "toggle_reactions": "Переключить реакции",
+      "mute": "Отключить микрофон",
+      "unmute": "Включить микрофон",
+      "stop_video": "Остановить видео",
+      "start_video": "Начать видео",
+      "declaring": "Игроки объявляют директивы.",
+      "handler_active": "Хэндлер использует свою силу.",
+      "censure_debate": "Ассамблея обсуждает вотум порицания.",
+      "snap_volunteers": "Добровольцы выступают за досрочные выборы.",
+      "crisis_incoming": "Приближается кризисное событие...",
+      "investigating": "Президент расследует лояльность игрока.",
+      "calling_special": "Президент объявляет внеочередные выборы.",
+      "executing": "Президент казнит игрока.",
+      "peeking": "Президент рассматривает три основные политики.",
+      "deciding": "Президент принимает решение об исполнительной власти.",
+      "victorious": "{{faction}} фракция победила!",
+      "in_session": "Ассамблея заседает.",
+      "nominate_prompt": "Коснитесь игрока на доске, чтобы назначить его канцлером.",
+      "nominate_watch": "Следите за номинацией — она показывает, кому доверяет президент.",
+      "detained_cant_vote": "Вы задержаны и не можете голосовать в этом туре.",
+      "voting_prompt": "Голосуйте «ЗА», чтобы поддержать это правительство, или «против», чтобы заблокировать его.",
+      "discard_prompt": "Сбросьте одну карту политики. Двое других идут к канцлеру.",
+      "pass_watch": "Президент выбирает, какую политику передать канцлеру.",
+      "declaration_hint": "Объявления сообщают таблице, что было нарисовано и передано. Возможно, это ложь.",
+      "enact_prompt": "Принять одну политику. Вы можете предложить наложить вето, если будет принято более 5 государственных директив.",
+      "enact_watch": "Канцлер выбирает, какую политику проводить.",
+      "investigate_prompt": "Выберите игрока, чтобы проверить его партийную лояльность.",
+      "special_prompt": "Выберите игрока, который станет следующим президентом.",
+      "execute_prompt": "Выберите игрока для выполнения.",
+      "peek_prompt": "Просмотрите три верхние карты колоды.",
+      "must_use_power": "Вы должны использовать свою исполнительную власть.",
+      "pres_must_use": "Президент должен использовать свою исполнительную власть.",
+      "lobby_ready_prompt": "Нажмите «Готово», когда будете готовы начать. Игра начинается, когда все игроки готовы.",
+      "game_over_title": "Игра окончена",
+      "see_results": "См. результаты сборки",
+      "play_again": "Сыграйте еще раз",
+      "skip_power": "Пропустить мощность",
+      "ready_up": "Готово",
+      "ready": "Готовый!",
+      "host_label": "Хозяин",
+      "ready_count": "{{count}} / {{total}} Готово",
+      "lock_room": "Шлюзовая комната",
+      "unlock_room": "Разблокировать комнату",
+      "force_start": "Принудительный запуск игры",
+      "need_players_ranked": "Требуется 5+ игроков для рейтингового турнира",
+      "no_players": "Нет игроков",
+      "voted_for": "Проголосовали за {{name}}",
+      "censure_select": "Выберите игрока на своей карточке, которого нужно осудить (исключить из следующей номинации)",
+      "snap_volunteer_prompt": "Любой игрок может добровольно стать следующим президентом.",
+      "volunteered": "Добровольно",
+      "volunteer": "Волонтер",
+      "ready_to_serve": "{{count}} Готово к работе",
+      "prediction_logged": "Зарегистрировано предсказание: {{faction}} Победа",
+      "prediction_reward": "50 IP будут засчитаны, если ваша фракция одержит победу.",
+      "predict_prompt": "Предскажите единство или обман для",
+      "send": "Отправить",
+      "char_counter": "{{count}}/80 символов",
+      "title_strategist_prompt": "Использовать силу стратега, чтобы провести дополнительную политику?",
+      "title_broker_prompt": "Использовать полномочия брокера, чтобы добиться повторной номинации?",
+      "title_handler_prompt": "Использовать силу Хэндлера, чтобы поменять двух следующих игроков в президентском порядке?",
+      "title_auditor_prompt": "Использовать силу одитора, чтобы заглянуть в стопку сброса?",
+      "title_archivist_prompt": "Использовать силу Архивариуса, чтобы заглянуть в стопку сброса?",
+      "title_defector_prompt": "Дефект? Тайно перевернуть свой голос на противоположный результат?",
+      "title_quorum_prompt": "Использовать полномочия кворума, чтобы вызвать экстренное повторное голосование?",
+      "title_assassin_prompt": "Выберите игрока, которого хотите выполнить, на его карте, или пропустите.",
+      "title_interdictor_prompt": "Выберите игрока, которого хотите задержать, на своей карте или пропустите.",
+      "title_flip_vote": "Перевернутое голосование",
+      "title_yes": "Да",
+      "title_no": "Нет"
     },
     "chat": {
-      "title": "Assembly Chat",
-      "round_separator": "Round {{count}}",
-      "dead_cant_speak": "Dead players cannot speak...",
-      "placeholder": "Type a message..."
+      "title": "Чат сборки",
+      "round_separator": "Раунд {{count}}",
+      "dead_cant_speak": "Мертвые игроки не могут говорить...",
+      "placeholder": "Введите сообщение...",
+      "chanCivilStateEnacted": {
+        "0": "Мне вручили две государственные директивы. Президент обязан дать Ассамблее объяснение.",
+        "1": "В том, что я получил, не было гражданской директивы. Направьте свои вопросы Президенту.",
+        "2": "Я исполнял то, что мне дали. Президент контролирует сброс.",
+        "3": "Президент протянул мне мертвую руку. У меня не было выбора.",
+        "4": "Спросите президента, почему они передали государственные директивы только мне.",
+        "5": "Мои руки были связаны выбором президента.",
+        "6": "Я всего лишь инструмент воли президента.",
+        "7": "Стопка сброса президента рассказывает реальную историю.",
+        "8": "Не обвиняйте меня в некомпетентности президента.",
+        "9": "Президент не оставил мне другого выхода.",
+        "10": "Я видел только директивы государства. Президент что-то скрывает.",
+        "11": "Выбор президента не оставил мне альтернативы.",
+        "12": "Проверьте стопку сброса. Президент не оставил мне выбора.",
+        "13": "Я так же разочарован, как и вы, но президент вручил мне две государственные карточки.",
+        "14": "Президент – это тот, кто фильтровал жеребьевку. Спросите их.",
+        "15": "Мне пришлось принять постановление штата, потому что это все, что я получил.",
+        "16": "Судя по всему, рука президента была полна государства.",
+        "17": "Это не я сбросил Гражданскую карту. Президент есть.",
+        "18": "Выбор президента был чисто государственным.",
+        "19": "Я всего лишь посланник. Обращение написал президент.",
+        "20": "Отказ президента был более красноречивым, чем их слова.",
+        "21": "Мне была передана сугубо государственная рука. Карты в руках президента.",
+        "22": "Я не тот, кто фильтрует директивы. Спросите президента.",
+        "23": "Выбор президента оставил мне единственный путь.",
+        "24": "Я выполнил свой долг, пользуясь ограниченными возможностями, предоставленными Президентом.",
+        "25": "Повествование президента не соответствует той руке, которую я получил.",
+        "26": "Я принял государственную директиву, потому что президент не дал мне гражданской альтернативы.",
+        "27": "Жеребьевка якобы была полностью государственной — по крайней мере, так говорит президент.",
+        "28": "Отказ президента в Секретариате, вероятно, стал тем местом, где умерли наши надежды.",
+        "29": "Я связан выбором президента, который был полностью государственным.",
+        "30": "Президент — это фильтр; Я всего лишь результат. Виноват фильтр.",
+        "31": "Мертвая рука президента. Я сделал то, что должен был.",
+        "32": "Выбор президента был... мягко говоря, ограничительным.",
+        "33": "Президент вручил мне отравленную чашу."
+      },
+      "chanStateStateEnacted": {
+        "0": "Ничья была против нас. Это дело рук колоды, а не мое.",
+        "1": "У меня не было жизнеспособной альтернативы. Президент может проверить.",
+        "2": "Иногда Секретариат решает за нас.",
+        "3": "Трудная рука, но мы должны действовать.",
+        "4": "В этом раунде шансы были не в нашу пользу.",
+        "5": "Колода явно противоречит Уставу.",
+        "6": "Я сделал то, что должен был сделать для государства.",
+        "7": "Карты сложились не в нашу пользу.",
+        "8": "Вините колоду, а не игрока.",
+        "9": "Государство требует жертв, и вот оно.",
+        "10": "Жеребьевка оказалась неудачной. Мы должны адаптироваться.",
+        "11": "Волю Секретариата иногда трудно принять.",
+        "12": "Я действовал в интересах сложившейся ситуации.",
+        "13": "Случайность колоды — это вызов для всех нас.",
+        "14": "Иногда путь государства является единственным открытым.",
+        "15": "Я следовал логике карт, которые мне сдали.",
+        "16": "Жеребьевка была в значительной степени ориентирована на государство.",
+        "17": "Мы должны оставаться едиными, несмотря на эту неудачу.",
+        "18": "На этот раз карты предопределили исход.",
+        "19": "Я предан Ассамблее, даже когда жребий труден.",
+        "20": "Состояние штата растет. Мы просто плывём на обломках розыгрыша.",
+        "21": "Вероятность была против нас. Даже у Секретариата бывают плохие дни.",
+        "22": "Принудительное исполнение воли государства. Мы должны терпеть.",
+        "23": "На этот раз жребий судьбы выпал в пользу государства.",
+        "24": "Не вкладывайте слишком много в один розыгрыш. Колода непостоянна.",
+        "25": "Влияние государства вплетено в саму ткань этой колоды.",
+        "26": "Обязательный нормативный акт для действующего режима. Ничего больше.",
+        "27": "Руки канцлера часто связаны случайностью действий Секретариата.",
+        "28": "Карты были взвешены. Мы все жертвы ничьей.",
+        "29": "Иногда путь Государства — единственный проложенный путь.",
+        "30": "Ничья стала статистической аномалией и пошла на пользу нашим соперникам.",
+        "31": "У меня нет злого умысла, есть только те карты, которые президент счел подходящими.",
+        "32": "Секретариат дышит государственными директивами, когда они нам нужны меньше всего.",
+        "33": "Принудительная игра в игре с ограниченным выбором."
+      },
+      "presCivilStateEnacted": {
+        "0": "Я принял Гражданскую директиву. Канцлер действовал по своему усмотрению.",
+        "1": "В этой раздаче был гражданский вариант. Делайте из этого что хотите.",
+        "2": "Я дал им выбор. Они выбрали государство.",
+        "3": "Ответственность за принятие этого закона несет канцлер. Я передал им Гражданский вариант.",
+        "4": "Я удивлен решением канцлера. Я отправил им Гражданскую директиву.",
+        "5": "У канцлера явно есть свои собственные планы.",
+        "6": "Я сделал свою часть. Канцлер провалил Ассамблею.",
+        "7": "Я предложил Гражданский путь. Они отвергли это.",
+        "8": "Предательство канцлера — это их собственное предательство.",
+        "9": "Я не могу контролировать действия канцлера.",
+        "10": "Я сдал гражданскую карту. Почему канцлер выбрал штат?",
+        "11": "У канцлера был выбор. Они выбрали неудачно.",
+        "12": "Я сомневаюсь в лояльности канцлера после этого шага.",
+        "13": "Я дал им возможность быть гражданскими. Они отказались.",
+        "14": "Постановление канцлера не отражает ту руку, которую я передал.",
+        "15": "Я глубоко обеспокоен решением канцлера.",
+        "16": "Канцлер имел в руках гражданскую директиву.",
+        "17": "Я внес свой вклад в то, чтобы мы оставались гражданскими. Канцлер этого не сделал.",
+        "18": "Истинное лицо канцлера проявляется.",
+        "19": "Я не могу отвечать за предательство канцлера.",
+        "20": "Я отправил им выбор фьючерсов. Выбрали более тёмный.",
+        "21": "Постановление канцлера является прямой пощечиной президенту.",
+        "22": "Я потрясен. У канцлера была в руках гражданская директива.",
+        "23": "Канцлеру нужно кое-что объяснить Ассамблее.",
+        "24": "Я внес свой вклад в сохранение Хартии. Канцлер этого не сделал.",
+        "25": "Действия канцлера становятся все более хаотичными или, возможно, расчетливыми.",
+        "26": "Я сдал гражданскую карту. Выбор канцлера — это их собственное бремя.",
+        "27": "Зачем канцлеру это делать? Я дал им четкий гражданский путь.",
+        "28": "Канцлер ведет опасную игру с государством.",
+        "29": "Я предоставил возможность быть Гражданским. Канцлер отверг это предложение.",
+        "30": "Верность канцлера Хартии официально находится под вопросом.",
+        "31": "Я в таком же замешательстве, как и все вы. Я передал им гражданскую карту.",
+        "32": "Канцлер оказался на развилке дорог. они выбрали путь государства.",
+        "33": "Я не могу поддержать решение канцлера. Это была не моя рука."
+      },
+      "presStateStateEnacted": {
+        "0": "Три ничьи штата. Ни у кого из нас не было выбора.",
+        "1": "В этом раунде колода работала против Хартии.",
+        "2": "Я передал все, что мог. Рука была повреждена.",
+        "3": "Секретариат нас проверяет. В этом розыгрыше нет гражданских карт.",
+        "4": "Чистая государственная ничья. Мои руки были связаны.",
+        "5": "Колода сегодня нам не друг.",
+        "6": "У меня не было гражданских карточек, которые можно было бы сдать. Поверьте мне.",
+        "7": "В этой колоде сильно влияние государства.",
+        "8": "Я так же расстроен, как и ты.",
+        "9": "Карты были сложены против нас с самого начала.",
+        "10": "Тройная ничья штата. Я ничего не мог сделать.",
+        "11": "Колода сейчас явно благоприятствует Государству.",
+        "12": "Я так же, как и ты, застрял в этих карточках.",
+        "13": "Секретариат подталкивает нас к государству.",
+        "14": "В этом розыгрыше не было доступных гражданских карт.",
+        "15": "Жеребьевка стала полным провалом для Хартии.",
+        "16": "У меня не было никаких вариантов перехода от Civil.",
+        "17": "Колода сегодня очень отказывается сотрудничать.",
+        "18": "Иногда мы зависим от ничьей.",
+        "19": "В этой колоде сильно влияние государства.",
+        "20": "На меня уставились три карточки штата. Даже Секретариат молчал.",
+        "21": "Чистая государственная рука. У меня нет выбора, нет выбора у канцлера.",
+        "22": "Шансы наконец настигли нас. Ни одной гражданской карточки не видно.",
+        "23": "В этом раунде уклон колоды в сторону Государства был тотальным.",
+        "24": "Я отказался от штата, потому что больше нечего было передавать.",
+        "25": "Полное отмена гражданских директив. Мы во власти ничьей.",
+        "26": "Жеребьевка представляла собой симфонию государственных директив. Я всего лишь дирижер.",
+        "27": "Ноль вариантов Устава. Мои руки были связаны картами.",
+        "28": "Секретариат переживает темный раунд. Тройные государственные карты.",
+        "29": "Я искал гражданскую карту. Я не нашел ни одного. Ничья была стопроцентной.",
+        "30": "Жеребьевка полностью состояла из государственных директив. Неудачно.",
+        "31": "Ни единого намека на гражданскую логику в этой руке. Все Государство.",
+        "32": "Розыгрыш Секретариата представлял собой монохромную схему государственных директив.",
+        "33": "Я разочарован так же, как и все остальные. Колода определенно против нас."
+      },
+      "governmentFailed": {
+        "0": "Пустая сессия. Мы не можем продолжать тормозить работу Секретариата.",
+        "1": "Тупик здесь никому не служит. Кризис не ждет.",
+        "2": "Нам необходимо сформировать функциональное правительство. Сейчас.",
+        "3": "Ассамблея разделена. Это опасно.",
+        "4": "Очередное неудавшееся голосование. Государство становится сильнее с каждой задержкой.",
+        "5": "У нас заканчивается время.",
+        "6": "Затягивание только помогает государству.",
+        "7": "Мы должны прийти к соглашению.",
+        "8": "Этот тупик неприемлем.",
+        "9": "Ассамблея подводит нас.",
+        "10": "Мы парализованы. Это именно то, чего хочет государство.",
+        "11": "Каждое неудачное голосование – это победа наших врагов.",
+        "12": "Нерешительность Ассамблеи — наша самая большая слабость.",
+        "13": "Мы должны найти общий язык или столкнуться с последствиями.",
+        "14": "Этот обструкционизм разрушает Устав.",
+        "15": "Пока мы спорим, кризис углубляется.",
+        "16": "Мы не можем допустить еще одного раунда неудач.",
+        "17": "Государство смеется над нашим разделением.",
+        "18": "Нам нужно лидерство, а не тупик.",
+        "19": "Ассамблея набирает обороты.",
+        "20": "Каждый голос «против» — это импульс жизни для амбиций государства.",
+        "21": "Мы ссоримся, пока горит Хартия. Сформируйте правительство!",
+        "22": "Эта нерешительность является смертным приговором для Ассамблеи.",
+        "23": "Секретариат презирает вакуум. Мы должны наполнить его лидерством.",
+        "24": "Мы здесь для того, чтобы обсуждать или принять Хартию? Сформируйте правительство.",
+        "25": "Государство процветает в тени наших разногласий.",
+        "26": "Еще одна неудачная попытка. Мы становимся такими же слабыми, как и наши враги.",
+        "27": "Отсутствие единства в Ассамблее само по себе губительно.",
+        "28": "Мы даем государству преимущество через наше собственное подразделение.",
+        "29": "Подставное правительство лучше, чем отсутствие правительства вообще.",
+        "30": "Кризис только усиливается, пока мы стоим на месте. Сделайте выбор!",
+        "31": "Секретариат становится все более нетерпеливым из-за нашего паралича.",
+        "32": "Обструкционизм – это медленный яд для Хартии.",
+        "33": "Мы спорим о титулах, пока вокруг нас горит здание."
+      },
+      "investigateCivil": {
+        "0": "Расследование подтверждает их принадлежность: {имя} является гражданским.",
+        "1": "Ничего тревожного не обнаружено. {name} предан Хартии.",
+        "2": "{name}, похоже, поддерживает Ассамблею.",
+        "3": "Я очистил {имя}. Они одни из нас.",
+        "4": "Мои выводы по {имя} положительные. Они поддерживают Хартию.",
+        "5": "{name} определенно на нашей стороне.",
+        "6": "Я полностью доверяю {имя}.",
+        "7": "Расследование прошло успешно. {name} является гражданским лицом.",
+        "8": "{name} — настоящий союзник.",
+        "9": "Я подтвердил лояльность {name}.",
+        "10": "Я изучил {имя} и нашел лояльного гражданина.",
+        "11": "Ничего тревожного не обнаружено. {name} предан Хартии.",
+        "12": "Мой отзыв о {name} полностью положительный.",
+        "13": "Я рад сообщить, что {name} является гражданским.",
+        "14": "После этого расследования я полностью доверяю {имя}.",
+        "15": "Данные подтверждают лояльность {name}.",
+        "16": "Я убедился, что {name} на нашей стороне.",
+        "17": "{name} — надежный союзник Хартии.",
+        "18": "В {имя} не обнаружено влияния государства.",
+        "19": "Я поддерживаю гражданскую позицию {name}.",
+        "20": "Мое расследование в отношении {имя} было исчерпывающим. Они чистые.",
+        "21": "Поток данных ясен: {имя} — гражданин Хартии.",
+        "22": "Я снял с {name} все подозрения. Они одни из нас.",
+        "23": "Послужной список {name} является свидетельством гражданского долга.",
+        "24": "В профиле {name} я не нашел ничего, кроме лояльности.",
+        "25": "{name} — маяк гражданской надежды в этом расследовании.",
+        "26": "Мой отчет о {name} блестящий. Они подлинно гражданские.",
+        "27": "Я подтвердил соблюдение {имя} протоколов Хартии.",
+        "28": "В недавней истории {имя} нет никаких следов государственного влияния.",
+        "29": "{name} прошел все тесты на лояльность, которые я проводил.",
+        "30": "Я удовлетворен мировоззрением {name}. Они определенно гражданские.",
+        "31": "Расследование подтверждает, что {имя} представляет Ассамблею.",
+        "32": "Послужной список {name} очевиден, как солнечный день в Секретариате.",
+        "33": "Я ручаюсь за гражданскую принадлежность {name} под присягой."
+      },
+      "investigateState": {
+        "0": "Расследование подтверждает их причастность: {имя} является государственным.",
+        "1": "Расследование… тревожное. Внимательно следите за {name}.",
+        "2": "Я узнал кое-что важное о {имя}. Действуйте осторожно.",
+        "3": "{name} не подчиняется Уставу.",
+        "4": "Я не могу доверять {имя} после того, что я видел.",
+        "5": "Доказательства против {имя} убедительны.",
+        "6": "{name} представляет угрозу Уставу.",
+        "7": "Я раскрыл истинное лицо {name}.",
+        "8": "Остерегайтесь {name}.",
+        "9": "Расследование выявило предательство {имя}.",
+        "10": "{name} не тот, кем себя называет. Они государственные.",
+        "11": "Я нашел доказательства связей {name} с государством.",
+        "12": "Расследование в отношении {имя} стало тревожным звонком.",
+        "13": "{name} — спящий агент штата.",
+        "14": "Я больше не могу с чистой совестью доверять {имя}.",
+        "15": "Правда о {имя} раскрыта: они принадлежат государству.",
+        "16": "{name} работает против нас изнутри.",
+        "17": "Я видел достаточно, чтобы знать, что {имя} — предатель.",
+        "18": "Расследование в отношении {имя} раскрыло мрачную тайну.",
+        "19": "Имейте в виду: {name} является оперативником штата.",
+        "20": "Расследование в отношении {имя} было расценено как предательство государства.",
+        "21": "В записях {name} я нашел доказательства, которые шокируют Ассамблею.",
+        "22": "{name} — волк в гражданской одежде. Они государственные.",
+        "23": "Расследование подтверждает мои худшие опасения относительно {имя}.",
+        "24": "Я обнаружил сеть государственных связей, связанных с {имя}.",
+        "25": "{name} представляет опасность для всего, что отстаивает Хартия.",
+        "26": "Мое расследование в отношении {имя} оказалось предательством.",
+        "27": "Данные не лгут: {имя} является оперативником штата.",
+        "28": "Я нашел доказательства сотрудничества {name} с нашими врагами.",
+        "29": "{name} не тот, за кого себя выдает. Они являются агентами государства.",
+        "30": "Расследование в отношении {имя} выявило практику саботажа со стороны государства.",
+        "31": "Я не могу не подчеркнуть это достаточно: {name} соответствует государству.",
+        "32": "{имя} подверглось риску из-за влияния государства.",
+        "33": "Доказательства против {имя} неоспоримы. Они государственные."
+      },
+      "suspiciousNominee": {
+        "0": "Интересный выбор канцлера.",
+        "1": "Я буду внимательно следить за этим правительством.",
+        "2": "Это назначение вызывает вопросы в Секретариате.",
+        "3": "Я не уверен, что {name} подходит на эту роль.",
+        "4": "Почему {имя}? Есть более надежные варианты.",
+        "5": "Мне не нравится эта номинация.",
+        "6": "Это правительство кажется подозрительным.",
+        "7": "Я внимательно слежу за {имя}.",
+        "8": "У меня есть сомнения по поводу этого выбора.",
+        "9": "Эта номинация сомнительна.",
+        "10": "У меня есть сомнения относительно {name} в качестве канцлера.",
+        "11": "Действительно ли {name} — лучшее, что мы можем сделать?",
+        "12": "Эта номинация кажется осознанным риском.",
+        "13": "Я чувствую здесь закономерность, которая мне не нравится.",
+        "14": "{name} еще не заслужил нашего доверия.",
+        "15": "Этот выбор канцлера... неожиданный.",
+        "16": "Я не уверен, что {имя} подходит.",
+        "17": "Что-то не так с этой номинацией.",
+        "18": "Прежде чем мы проголосуем, я хотел бы услышать больше от {name}.",
+        "19": "Для некоторых эта номинация слишком удобна.",
+        "20": "Я не единственный, кто находит эту правительственную пару подозрительной.",
+        "21": "Выдвижение кандидатуры {имя} кажется стратегическим шагом для штата.",
+        "22": "Я чувствую скрытую цель, стоящую за выбором {имя}.",
+        "23": "Почему именно это правительство? Почему {имя} именно сейчас?",
+        "24": "Похоже, что эта номинация призвана способствовать достижению целей государства.",
+        "25": "У меня есть серьезные сомнения относительно мотивов этой пары.",
+        "26": "Позиция этого правительства... в лучшем случае сомнительна.",
+        "27": "Я обеспокоен тем, что эта номинация является шагом к доминированию государства.",
+        "28": "Выбор {name} канцлером должен беспокоить всех присутствующих здесь.",
+        "29": "Я чувствую неладное в этом процессе выдвижения кандидатур.",
+        "30": "Кажется, что это правительство слишком идеально соответствует интересам государства.",
+        "31": "У меня есть опасения по поводу этой конкретной динамики власти.",
+        "32": "Присутствие {name} в этом правительстве является тревожным сигналом.",
+        "33": "Меня не устраивает потенциальное влияние этой пары."
+      },
+      "highSuspicion": {
+        "0": "У меня очень плохое предчувствие по поводу {имя}.",
+        "1": "{имя} действует против интересов Ассамблеи.",
+        "2": "Данные показывают, что {имя} не тот, за кого себя выдает.",
+        "3": "Нам нужно маргинализировать {имя}, пока не стало слишком поздно.",
+        "4": "Я заявляю: {имя} работает на штат.",
+        "5": "{имя} — предатель.",
+        "6": "Я уверен, что {имя} — это штат.",
+        "7": "Нам нужно избавиться от {имя}.",
+        "8": "Не доверяйте {name} ни при каких обстоятельствах.",
+        "9": "{name} саботирует нас.",
+        "10": "Я на 99 % уверен, что {имя} — государственный агент.",
+        "11": "Улик против {имя} становится всё больше.",
+        "12": "Мы не можем позволить {name} приближаться к креслу канцлера.",
+        "13": "{name} представляет собой явную и реальную угрозу Уставу.",
+        "14": "Я уже видел, как {name} устраивал нам саботаж.",
+        "15": "Не позволяйте словам {name} обмануть вас; они государственные.",
+        "16": "Ассамблея должна объединиться против {имя}.",
+        "17": "{name} — рак в этой комнате.",
+        "18": "Я призываю к немедленному расследованию дела {имя}.",
+        "19": "{name} — внутренний враг.",
+        "20": "Предательство {name} — это пятно на истории Ассамблеи.",
+        "21": "Мы являемся свидетелями медленного разрушения Хартии {имя}.",
+        "22": "Штат нашел своего защитника в лице {имя}. Мы должны действовать.",
+        "23": "Я призываю к немедленному отстранению {name} от всех полномочий.",
+        "24": "{name} показало свое истинное лицо, и они являются цветами штата.",
+        "25": "Доказательства против {имя} безупречны. Они предатели.",
+        "26": "Мы не можем позволить, чтобы {имя} продолжало свой саботаж.",
+        "27": "{name} — паразит, питающийся слабостью Ассамблеи.",
+        "28": "Я разоблачаю {имя} тем, кем они являются: двойным агентом государства.",
+        "29": "Действия {name} являются прямым посягательством на принципы Хартии.",
+        "30": "Время сомнений прошло. {name} определенно наш враг.",
+        "31": "Мы должны изолировать {имя}, прежде чем они уничтожат нас изнутри.",
+        "32": "Влияние государства очевидно в каждом шаге {имя}.",
+        "33": "Я не успокоюсь, пока {имя} не будет привлечен к ответственности за свое предательство."
+      },
+      "defendingSelf": {
+        "0": "Моя запись ясна. Я служу Уставу.",
+        "1": "Не позволяйте подозрениям затмить ваше суждение. Я Гражданский.",
+        "2": "Обвинения в мой адрес — это беспочвенное отвлечение внимания.",
+        "3": "Я всегда работал только ради успеха Ассамблеи.",
+        "4": "Смотрите на факты, а не на слухи. Я лоялен.",
+        "5": "Мне нечего скрывать.",
+        "6": "Моя верность Уставу непоколебима.",
+        "7": "Меня подставляют.",
+        "8": "Обвинения ложны.",
+        "9": "Я такой же вежливый, как и они.",
+        "10": "Мои действия всегда отвечали интересам Хартии.",
+        "11": "Меня преследуют, потому что я представляю угрозу для государства.",
+        "12": "Не верьте лжи, которую обо мне распространяют.",
+        "13": "У меня долгая история верного служения Ассамблее.",
+        "14": "Я стал жертвой клеветнической кампании, проводимой государством.",
+        "15": "Моя преданность не подлежит сомнению.",
+        "16": "Я докажу свою невиновность своими действиями.",
+        "17": "Государство хочет, чтобы вы сомневались во мне.",
+        "18": "Я искренне верю в Хартию.",
+        "19": "Меня не запугают эти ложные утверждения.",
+        "20": "Моя верность Хартии — мой единственный господин. Я Гражданский.",
+        "21": "Не позволяйте этой скоординированной лжи отвлекать вас от моих записей.",
+        "22": "Я многим пожертвовал ради Ассамблеи. Моя установка ясна.",
+        "23": "Государство хочет, чтобы вы считали меня врагом, потому что я для него угроза.",
+        "24": "Я призываю к любому расследованию. Мои записи — открытая книга для Хартии.",
+        "25": "Я так же вежлив, как и сами законы. Мои действия докажут это.",
+        "26": "Обвинения в мой адрес — это тонкая завеса государственной агрессии.",
+        "27": "Я придерживаюсь Устава, даже когда остальные во мне сомневаются.",
+        "28": "Я всегда работал только для того, чтобы защитить наш путь в Секретариате.",
+        "29": "Моя совесть чиста. Я служу Ассамблее, а не государству.",
+        "30": "Эти атаки призваны ослабить мою решимость. Им это не удастся.",
+        "31": "Я настоящий патриот. Не позволяйте этим беспочвенным слухам повлиять на вас.",
+        "32": "Я боролся за Хартию, когда другие хранили молчание.",
+        "33": "Моя приверженность Гражданскому делу не подлежит никакому сомнению."
+      },
+      "praisingCivil": {
+        "0": "Я доверяю {имя}. Их действия говорят сами за себя.",
+        "1": "{name} доказали свою лояльность Ассамблее.",
+        "2": "Нам нужно больше таких людей, как {name}, у власти.",
+        "3": "Я уверен в мировоззрении {name}.",
+        "4": "{имя} — настоящий патриот Хартии.",
+        "5": "{имя} — великий лидер.",
+        "6": "Я полностью поддерживаю {имя}.",
+        "7": "{name} отлично справляется со своей работой.",
+        "8": "Мы можем рассчитывать на {имя}.",
+        "9": "{name} — маяк надежды для Ассамблеи.",
+        "10": "Я всегда знал, что {имя} был настоящим патриотом.",
+        "11": "Я видел, как {name} сделал трудный выбор в пользу Хартии.",
+        "12": "Нам повезло, что {name} на нашей стороне.",
+        "13": "{name} — образец гражданской добродетели.",
+        "14": "Я бы доверил {имя} свою жизнь.",
+        "15": "{name} — тот лидер, который нам нужен сейчас.",
+        "16": "{name} — столп Ассамблеи.",
+        "17": "{name} — настоящий актив этой комнаты.",
+        "18": "Я не испытываю ничего, кроме уважения к {имя}.",
+        "19": "Ассамблея становится сильнее, если в ней есть {name}.",
+        "20": "Преданность {name} Хартии вдохновляет всех нас.",
+        "21": "Нам было бы полезно последовать примеру {name} в этом вопросе.",
+        "22": "{name} — яркий пример того, что значит быть по-настоящему вежливым.",
+        "23": "Я полностью верю в суждения и характер {name}.",
+        "24": "{name} — твердая рука в эти неспокойные для Ассамблеи времена.",
+        "25": "Я твердо поддерживаю {имя} в нашей общей миссии Хартии.",
+        "26": "{name} — один из немногих здесь, кто действительно понимает наш долг.",
+        "27": "Секретариату повезло иметь такого преданного слугу, как {имя}.",
+        "28": "{name} постоянно демонстрирует свою приверженность нашему делу.",
+        "29": "Я высоко ценю {имя} как своего соотечественника.",
+        "30": "Мы в большей безопасности, когда {name} занимает руководящую должность.",
+        "31": "{name} — настоящий поборник гражданских принципов, которыми мы дорожим.",
+        "32": "Я бы доверял суждениям {name} даже в самых мрачных раундах.",
+        "33": "Лояльность {name} — это основа, на которой должна строиться Ассамблея."
+      },
+      "neutralSupport": {
+        "0": "Я готов дать {name} шанс.",
+        "1": "{name} на данный момент кажется разумным выбором.",
+        "2": "Давайте посмотрим, на что способен {name}.",
+        "3": "У меня пока нет причин сомневаться в {имя}.",
+        "4": "Возможно, нам нужно начать новую жизнь с {name}.",
+        "5": "На данный момент я нейтрально отношусь к {name}.",
+        "6": "Давайте посмотрим, как поведет себя {name}.",
+        "7": "Я открыт для номинации {name}.",
+        "8": "Я пока не уверен насчет {имя}.",
+        "9": "Я подожду и посмотрю с {name}.",
+        "10": "Давайте пока дадим {name} презумпцию невиновности.",
+        "11": "{name} заслуживает шанса проявить себя.",
+        "12": "Я с осторожным оптимизмом смотрю на {имя}.",
+        "13": "Я буду поддерживать {имя}, пока он не даст мне повод не делать этого.",
+        "14": "{name} кажется беспроигрышным вариантом в этом раунде.",
+        "15": "Я готов работать с {имя}.",
+        "16": "Посмотрим, сможет ли {name} эффективно руководить нами.",
+        "17": "Я непредвзято отношусь к {имя}.",
+        "18": "Число {имя} неизвестно, но я проголосую за.",
+        "19": "Меня устраивает {имя} в этом правительстве.",
+        "20": "{name} кажется стабильным выбором на данном этапе раунда.",
+        "21": "Я готов поддержать кандидатуру {имя} в качестве строителя мостов.",
+        "22": "{name} пока не дал нам повода сомневаться в этом, давайте продолжим.",
+        "23": "Номинация {name} кажется логичной, учитывая наше нынешнее состояние.",
+        "24": "Я голосую «Да» за {name}, основываясь на их результатах на данный момент.",
+        "25": "{имя} — разумный кандидат на пост главы этого правительства.",
+        "26": "На данный момент я готов не обращать внимания на свои первоначальные сомнения относительно {имя}.",
+        "27": "{имя} были относительно последовательны в своей гражданской риторике.",
+        "28": "Я уверен, что {имя} будет действовать в интересах Устава.",
+        "29": "Давайте продолжим с {name} и посмотрим, куда это нас приведет.",
+        "30": "В этом раунде я даю {name} презумпцию невиновности.",
+        "31": "{name} кажется прагматичным выбором в нынешних условиях.",
+        "32": "Я поддерживаю {имя} в стремлении выйти из этого тупика.",
+        "33": "{name} получил шанс возглавить следующий цикл директив."
+      },
+      "banter": {
+        "0": "Ставки растут. Мы должны сохранять бдительность.",
+        "1": "Секретариат наблюдает за нами всеми.",
+        "2": "Одно неверное движение – и Хартия рухнет.",
+        "3": "Доверие – редкий товар в наше время.",
+        "4": "Давайте сосредоточимся на директивах. Ассамблея зависит от нас.",
+        "5": "Государство всегда наблюдает.",
+        "6": "Мы должны быть осторожны.",
+        "7": "Ассамблея в опасности.",
+        "8": "Нам нужно быть умнее.",
+        "9": "Государство приближается.",
+        "10": "Тени над Ассамблеей удлиняются.",
+        "11": "Мы — последняя линия защиты Хартии.",
+        "12": "Каждое решение, которое мы принимаем, находит отклик в Секретариате.",
+        "13": "Возможности штата обширны, но наша решимость сильна.",
+        "14": "В этой комнате даже у стен есть уши.",
+        "15": "Будущее Хартии находится в наших руках.",
+        "16": "Мы должны быть светом во тьме.",
+        "17": "Победа государства не является неизбежной.",
+        "18": "Мы – хранители Ассамблеи.",
+        "19": "Хартия восторжествует, если мы останемся едиными.",
+        "20": "Секретариат занимается не определенностью, а только вероятностью.",
+        "21": "Мы все просто игроки в игре, которую до конца не понимаем.",
+        "22": "Государство – хищник, который никогда не спит. Мы должны быть готовы.",
+        "23": "Молчание часто является громким криком государственного оперативника.",
+        "24": "Сборка — хрупкая машина. Одна сломанная шестеренка может все испортить.",
+        "25": "Тени прошлого настигают Секретариат.",
+        "26": "Доверие — это роскошь, которую мы не можем себе позволить в этой атмосфере подозрительности.",
+        "27": "Хартия – это обещание, которое можем сдержать только мы.",
+        "28": "Государство – это зеркало, отражающее наши собственные слабости.",
+        "29": "Каждый тур — это битва за душу Ассамблеи.",
+        "30": "Мы живем в эпоху беспрецедентного кризиса. Бдительность – ключевое слово.",
+        "31": "Послужной список Секретариата покажет, кто из нас был по-настоящему лояльным.",
+        "32": "Путь к победе вымощен смелостью призвать государство.",
+        "33": "Мы архитекторы будущего или могильщики прошлого."
+      },
+      "powerUsage": {
+        "0": "Я использую свою власть, чтобы обеспечить успех Ассамблеи.",
+        "1": "Эта власть необходима для защиты Хартии.",
+        "2": "Я должен использовать эту силу, чтобы раскрыть правду.",
+        "3": "Ситуация требует этого действия.",
+        "4": "Я использую эту силу, чтобы обеспечить наше будущее.",
+        "5": "Это единственный способ продолжить.",
+        "6": "Я использую эту власть на благо Ассамблеи.",
+        "7": "Эта сила поможет нам выявить угрозы.",
+        "8": "У меня нет другого выбора, кроме как использовать эту силу.",
+        "9": "Я использую эту силу, чтобы укрепить нашу позицию.",
+        "10": "Я использую свою власть для обеспечения стабильности комнаты.",
+        "11": "Это действие обусловлено нынешней чрезвычайной ситуацией.",
+        "12": "Я использую эту власть для защиты наших коллективных интересов.",
+        "13": "Хартия допускает такую ​​меру во время кризиса.",
+        "14": "Я делаю этот шаг, чтобы гарантировать, что государство не уступит позиции.",
+        "15": "Это необходимое использование силы моего титула.",
+        "16": "Я действую ради сохранения целостности Ассамблеи.",
+        "17": "Эта власть является инструментом защиты Хартии.",
+        "18": "Я использую эту способность, чтобы прояснить ситуацию.",
+        "19": "Я использую эту власть для защиты принципов Хартии.",
+        "20": "Полномочия моего титула используются для обеспечения нашей коллективной безопасности.",
+        "21": "Эта способность является необходимым вмешательством на благо Ассамблеи.",
+        "22": "Я использую эту власть, чтобы прояснить дальнейший путь Хартии.",
+        "23": "Ситуация ухудшилась достаточно, чтобы оправдать эти действия.",
+        "24": "Я использую эту власть, чтобы гарантировать, что государство не преобладает.",
+        "25": "Эту обязанность я выполняю не с удовольствием, а с полной отдачей.",
+        "26": "Я делаю этот шаг, чтобы защитить невиновных и разоблачить виновных.",
+        "27": "Моя сила — щит Хартии, и я использую ее сейчас.",
+        "28": "Это вмешательство призвано стабилизировать нашу разрушающуюся демократию.",
+        "29": "Я использую эту способность, чтобы предотвратить полный крах государственного контроля.",
+        "30": "Секретариат санкционирует это действие в условиях такой неопределенности.",
+        "31": "Я действую ради обеспечения долгосрочного выживания Ассамблеи.",
+        "32": "Эта сила — бремя, которое я несу за всех вас. Его необходимо использовать.",
+        "33": "Я использую этот авторитет, чтобы внести ясность в комнату, омраченную сомнениями."
+      },
+      "cipherDispatch": {
+        "0": "Контакт в Секретариате предполагает, что вы не тот, кем кажетесь.",
+        "1": "Поток данных ясен: придерживайтесь выбранного курса, и Хартия восторжествует.",
+        "2": "Требуется бдительность. Тени вокруг Ассамблеи сгущаются.",
+        "3": "Не верьте нынешней администрации. Они скомпрометированы.",
+        "4": "Влияние государства локализовано. Присмотритесь к своим союзникам.",
+        "5": "Закодированное сообщение для вас: результат следующего сеанса имеет решающее значение."
+      }
     },
     "game_header": {
-      "prediction_civil": "Civil {{percent}}%",
-      "prediction_state": "State {{percent}}%",
-      "spectator_vote": "{{count}} Spectator Vote",
-      "spectator_votes": "{{count}} Spectator Votes",
-      "open_chat": "Open Chat",
-      "round_history": "Round History",
-      "phase_reference": "Phase Reference",
-      "your_dossier": "Your Dossier",
-      "my_profile": "My Profile",
-      "leave_assembly": "Leave Assembly"
+      "prediction_civil": "Гражданский {{percent}}%",
+      "prediction_state": "Состояние {{percent}}%",
+      "spectator_vote": "{{count}} Зрительское голосование",
+      "spectator_votes": "{{count}} Зрительские голоса",
+      "open_chat": "Открыть чат",
+      "round_history": "Круглая история",
+      "phase_reference": "Эталон фазы",
+      "your_dossier": "Ваше досье",
+      "my_profile": "Мой профиль",
+      "leave_assembly": "Покинуть собрание",
+      "title": "АССАМБЛЕЯ",
+      "practice_mode": "РЕЖИМ ПРАКТИКИ",
+      "invite_tooltip": "Поделитесь этим кодом, чтобы пригласить игроков",
+      "timer_label": "Оставшееся время",
+      "modes": {
+        "casual": "Казуальный",
+        "ranked": "Рейтинг",
+        "classic": "Классический",
+        "crisis": "Кризис"
+      }
+    },
+    "agendas": {
+      "chaos_agent": {
+        "name": "Агент Хаоса",
+        "desc": "Трекер выборов должен нажать 3 и активировать политику хаоса хотя бы один раз."
+      },
+      "the_purist": {
+        "name": "Пурист",
+        "desc": "К моменту окончания игры должны быть приняты как минимум 3 Гражданские директивы."
+      },
+      "the_dissenter": {
+        "name": "Несогласный",
+        "desc": "Ваш голос должен отличаться от результата большинства как минимум в 3 турах."
+      },
+      "the_dove": {
+        "name": "Голубь",
+        "desc": "Голосуйте «Да» в каждом туре, в котором вы голосуете."
+      },
+      "the_hawk": {
+        "name": "Ястреб",
+        "desc": "Голосуйте против как минимум в 3 турах."
+      },
+      "stonewalled": {
+        "name": "Каменная стена",
+        "desc": "Проголосуйте против как минимум двух правительств, которые затем потерпят неудачу."
+      },
+      "short_session": {
+        "name": "Короткая сессия",
+        "desc": "Игра должна закончиться до начала раунда (количество игроков + 3)."
+      },
+      "the_long_game": {
+        "name": "Долгая игра",
+        "desc": "Игра должна длиться не менее (количество игроков + 6) раундов."
+      },
+      "the_loyalist": {
+        "name": "Лоялист",
+        "desc": "Проголосуйте «за» как минимум 3 правительствам, которые примут и введут в действие гражданскую директиву."
+      },
+      "nominated": {
+        "name": "Номинирован",
+        "desc": "Быть номинированным на пост канцлера не менее 2 раз."
+      },
+      "deadlock": {
+        "name": "Тупик",
+        "desc": "Быть кандидатом в президенты или канцлеры хотя бы в одном несостоявшемся правительстве."
+      },
+      "prolific": {
+        "name": "Плодовитый",
+        "desc": "Лично примите как минимум 2 политики в качестве канцлера."
+      },
+      "the_veteran": {
+        "name": "Ветеран",
+        "desc": "Побудьте канцлером хотя бы один раз."
+      },
+      "unity": {
+        "name": "Единство",
+        "desc": "Никакая политика хаоса не применяется ни на каком этапе игры."
+      },
+      "the_mandate": {
+        "name": "Мандат",
+        "desc": "К моменту окончания игры должны быть приняты как минимум 4 директивы штата."
+      },
+      "clean_sweep": {
+        "name": "Чистая развертка",
+        "desc": "Примите гражданскую директиву в качестве канцлера."
+      },
+      "the_weathervane": {
+        "name": "Флюгер",
+        "desc": "Поменяйте свой голос относительно голоса в предыдущем туре как минимум 4 раза."
+      },
+      "productive_session": {
+        "name": "Продуктивная сессия",
+        "desc": "Более половины всех раундов должны привести к успешному принятию политики."
+      },
+      "close_race": {
+        "name": "Закрытая гонка",
+        "desc": "Игра должна закончиться так, чтобы оба трека политики находились в пределах двух директив друг от друга."
+      },
+      "the_swing_vote": {
+        "name": "Колеблющееся голосование",
+        "desc": "Будьте президентом или канцлером в правительстве, которое проходит ровно в 1 голос."
+      }
+    },
+    "round_history": {
+      "title": "Круглая история",
+      "empty": "Правительство еще не сформировано",
+      "round": "Раунд {{round}}",
+      "chaos": "Хаос",
+      "vetoed": "Наложено вето",
+      "rejected": "Отклонено",
+      "no_policy": "Никакой политики",
+      "civil": "Гражданский",
+      "state": "Государство",
+      "pres_short": "Прес",
+      "chan_short": "Чан",
+      "president": "Президент",
+      "chancellor": "Канцлер",
+      "drew": "Дрю",
+      "passed": "Пройдено",
+      "received": "Полученный",
+      "votes": "Голоса",
+      "aye": "Да",
+      "nay": "Нет",
+      "executive": "Исполнительный",
+      "actions": {
+        "investigate": "Расследование",
+        "execution": "Исполнение",
+        "specialelection": "Специальные выборы",
+        "policypeek": "Директива Пик"
+      }
     },
     "modals": {
+      "game_over": {
+        "banners": {
+          "civil_win_default": "Хартия соблюдает",
+          "state_win_default": "Государство преобладает",
+          "inconclusive": "Несогласие прекращено",
+          "civil_desc": "Гражданские силы встали на защиту собрания.",
+          "state_desc": "Государство успешно проникло в собрание.",
+          "abort_desc": "Заседание было прекращено досрочно."
+        },
+        "performance_header": "Производительность матча",
+        "victory": "Победа",
+        "defeat": "Поражение",
+        "elo": "ЭЛО",
+        "casual": "Казуальный матч",
+        "xp": "Заработанный опыт",
+        "ip": "IP получено",
+        "clan_xp": "Опыт клана",
+        "agenda": "Личная повестка дня",
+        "achievements_header": "Заработанные медали",
+        "revelations_header": "Раскрытие личности",
+        "you": "Ты",
+        "action_log": "Журнал матчей",
+        "action_replay": "Реконструировать",
+        "action_shared": "Ссылка скопирована!",
+        "action_share": "Поделиться повтором",
+        "action_play_again": "Сыграйте еще раз",
+        "action_lobby": "Вернуться в лобби",
+        "completed": "Завершено",
+        "failed": "Не удалось"
+      },
       "friend_request": {
-        "title": "Friend Request",
-        "description": "<1>{{username}}</1> wants to be friends.",
-        "deny": "Deny",
-        "accept": "Accept"
+        "title": "Запрос на добавление в друзья",
+        "description": "<1>{{username}}</1> хочет дружить.",
+        "deny": "Отрицать",
+        "accept": "Принять"
       },
       "investigation": {
-        "title": "Investigation Result",
-        "is_a": "{{name}} is a:",
-        "civil": "CIVIL",
-        "state": "STATE",
-        "understood": "Understood"
+        "title": "Результат расследования",
+        "is_a": "{{name}} — это:",
+        "civil": "ГРАЖДАНСКИЙ",
+        "state": "ГОСУДАРСТВО",
+        "understood": "Понятно"
       },
       "policy_peek": {
-        "title": "Directive Preview",
-        "subtitle": "Top 3 directives in the deck:",
-        "empty": "The pile is currently empty.",
-        "end": "End Peek"
+        "title": "Предварительный просмотр директивы",
+        "subtitle": "Топ-3 директивы в колоде:",
+        "empty": "На данный момент стопка пуста.",
+        "end": "Конец обзора"
       },
       "declaration": {
-        "title": "Directive Declaration",
-        "subtitle": "What will you declare?",
-        "hint": "You may report truthfully or mislead the Assembly.",
-        "drew_label": "What you drew <1>(3 cards)</1>",
-        "passed_label": "What you passed <1>(2 cards)</1>",
-        "received_label": "What you received <1>(2 cards)</1>",
-        "result_drew": "Drew: <1>{{civ}} Civil</1> / <3>{{sta}} State</3>",
-        "result_passed": "Passed: <1>{{civ}} Civil</1> / <3>{{sta}} State</3>",
-        "result_received": "Received: <1>{{civ}} Civil</1> / <3>{{sta}} State</3>",
-        "submit": "Submit Declaration"
+        "title": "Декларация директивы",
+        "subtitle": "Что вы объявите?",
+        "hint": "Вы можете сообщить правду или ввести Ассамблею в заблуждение.",
+        "drew_label": "Что вы нарисовали <1>(3 карты)</1>",
+        "passed_label": "Что вы сдали <1>(2 карты)</1>",
+        "received_label": "Что вы получили <1>(2 карты)</1>",
+        "result_drew": "Дрю: <1>{{civ}} Гражданский</1> / <3>{{sta}} Государственный</3>",
+        "result_passed": "Пройдено: <1>{{civ}} Гражданский</1> / <3>{{sta}} Государственный</3>",
+        "result_received": "Получено: <1>{{civ}} Гражданское</1> / <3>{{sta}} Государственное</3>",
+        "submit": "Подать декларацию"
       },
       "player_profile": {
-        "loading": "Loading profile...",
-        "failed": "Failed to load profile.",
-        "close": "Close",
-        "wins": "Wins",
-        "played": "Played",
-        "win_rate": "Win Rate",
-        "kills": "Kills",
-        "pinned_achievements": "Pinned Medals",
-        "empty_slot": "— empty slot —",
-        "add_friend": "Add Ally",
-        "remove_friend": "Remove Ally",
-        "request_sent": "Request Sent"
+        "loading": "Загрузка профиля...",
+        "failed": "Не удалось загрузить профиль.",
+        "close": "Закрыть",
+        "wins": "Победы",
+        "played": "Сыграл",
+        "win_rate": "Процент побед",
+        "kills": "Убийства",
+        "pinned_achievements": "Закрепленные медали",
+        "empty_slot": "— пустой слот —",
+        "add_friend": "Добавить союзника",
+        "remove_friend": "Удалить союзника",
+        "request_sent": "Запрос отправлен"
       }
     },
     "assembly_log": {
-      "title": "Assembly Log",
-      "event_num": "Event #{{count}}"
+      "title": "Журнал сборки",
+      "event_num": "Событие №{{count}}",
+      "round_marker": "--- Раунд {{round}} ---",
+      "nominated": "{{name}} номинировал {{target}} на пост канцлера.",
+      "elected": "{{name}} избран канцлером.",
+      "veto_requested": "{{name}} (Канцлер) запросил вето.",
+      "veto_agreed": "{{name}} (Президент) согласился наложить вето. Сессия не удалась.",
+      "veto_denied": "{{name}} (Президент) отклонил право вето. Канцлер должен играть.",
+      "rejected": "Ассамблея отклонила эту кандидатуру.",
+      "civil_enacted": "Была принята Гражданская директива.",
+      "state_enacted": "Была принята государственная директива.",
+      "executive_action": "Исполнительное действие: {{action}} выполнено на {{target}}.",
+      "declared": "{{name}} ({{type}}) заявлены {{action}} {{civ}} Гражданские и {{sta}} Государственные директивы.{{drew}}",
+      "drew_info": "(нарисовал {{civ}}C/{{sta}}S)",
+      "passed_word": "прошло",
+      "received_word": "получил",
+      "executed": "{{name}} был выполнен.",
+      "investigated": "{{name}} исследовал {{target}}.",
+      "special_election": "{{name}} объявил внеочередные выборы для {{target}}.",
+      "ready": "{{name}} — готово.",
+      "not_ready": "{{name}} — не готов.",
+      "all_ready": "Все игроки-люди готовы! Начинаем игру...",
+      "host_started": "Хозяин запустил игру.",
+      "room_locked": "Комната заперта хозяином.",
+      "room_unlocked": "Комната открыта хозяином.",
+      "spectator_predicted": "Зритель предсказал {{prediction}} победу.",
+      "room_created": "Комната {{id}} создана в режиме {{mode}}.",
+      "room_created_practice": "Комната {{id}} создана как сеанс индивидуальной практики.",
+      "reconnected": "{{name}} восстановлено соединение.",
+      "joined": "{{name}} присоединился к лобби.",
+      "need_players": "Для подготовки нужно как минимум 5 игроков.",
+      "prediction_unity": "Единство",
+      "prediction_deception": "Обман"
     },
     "debrief": {
-      "intro_title": "The Assembly Has Concluded",
-      "charter_defended": "The Charter has been defended.",
-      "secretariat_fallen": "The Secretariat has fallen to the State.",
-      "key_moments": "Key Moments",
-      "identities_confirmed": "All Identities Confirmed",
-      "tap_to_advance": "Tap to advance",
+      "intro_title": "Ассамблея завершила работу",
+      "charter_defended": "Хартия была защищена.",
+      "secretariat_fallen": "Секретариат перешел в руки государства.",
+      "key_moments": "Ключевые моменты",
+      "identities_confirmed": "Все личности подтверждены",
+      "tap_to_advance": "Нажмите, чтобы перейти",
       "roles": {
-        "civil": "Civil",
-        "state": "State Agent",
-        "overseer": "The Overseer"
+        "civil": "Гражданский",
+        "state": "Государственный агент",
+        "overseer": "Надзиратель"
       },
       "plays": {
-        "assassin": "{{assassin}} eliminated {{killed}} as the Assassin",
-        "execution_one": "{{name}} was executed by presidential decree",
-        "execution_many": "{{names}} were executed by presidential decree",
-        "chaos_one": "A chaos directive was forced upon the Assembly",
-        "chaos_many": "{{count}} chaos directives destabilised the Assembly",
-        "veto_one": "The government invoked their veto power",
-        "veto_many": "The veto was exercised {{count}} times",
-        "marathon": "An epic {{count}}-round battle of wills",
-        "deadlock": "Both factions held the Assembly in a knife-edge deadlock"
+        "assassin": "{{assassin}} исключил {{killed}} как Убийцу",
+        "execution_one": "{{name}} казнён указом президента",
+        "execution_many": "{{names}} казнены указом президента",
+        "chaos_one": "Ассамблее была навязана директива о хаосе",
+        "chaos_many": "{{count}} директивы хаоса дестабилизировали Ассамблею",
+        "veto_one": "Правительство применило право вето",
+        "veto_many": "Право вето было применено {{count}} раз",
+        "marathon": "Эпическая {{count}}-раундовая битва воли",
+        "deadlock": "Обе фракции зашли в ассамблею в тупик"
       }
     },
+    "match_replay": {
+      "title": "Повтор матча",
+      "subtitle": "Послематчевый анализ раунда",
+      "reveal_truth": "Раскройте правду",
+      "hide_deceptions": "Скрыть обман",
+      "no_history": "История раундов недоступна",
+      "government_header": "Раунд {{round}} Правительство",
+      "president": "Президент",
+      "chancellor": "Канцлер",
+      "session_summary": "Резюме сессии",
+      "chaos_forced": "Принудительный хаос",
+      "rejected": "Отклонено",
+      "fail_veto": "На правительство было наложено вето",
+      "fail_default": "Правительственное голосование провалилось",
+      "enacted": "Директива принята",
+      "power_triggered": "Исполнительная власть сработала: {{action}}",
+      "legislative_hand": "Законодательная рука",
+      "pres_deck": "Президентская колода",
+      "deception_detected": "Обман",
+      "actual_draw": "Фактическая ничья",
+      "hidden": "Скрытый",
+      "public_claim": "Общественная претензия",
+      "chan_hand": "Рука канцлера",
+      "conflicting_stories": "Противоречивые истории",
+      "actual_received": "Фактически получено",
+      "voting_records": "Протоколы голосования",
+      "aye": "Да",
+      "nay": "Нет",
+      "no_vote": "Голоса не зарегистрированы",
+      "footer_info": "Показанные заявления — это то, что публично заявляли игроки. Включите режим правды, чтобы увидеть реальные карты.",
+      "close": "Закрыть повтор"
+    },
+    "narration": {
+      "nomination": "Ассамблея заседает. Президент, назначьте своего канцлера.",
+      "voting_start": "Голосование открытое. Подайте свои бюллетени.",
+      "election_passed": "Ассамблея утверждает кандидатуру. Начинается законодательная сессия.",
+      "election_failed": "Номинация отклонена. Слово возвращается Президенту.",
+      "directive_civil": "Устав обеспечен.",
+      "directive_state": "Государство продвигается вперед.",
+      "executive_investigate": "Проверка личности завершена.",
+      "executive_peek": "Директивное предвидение задействовано.",
+      "executive_election": "Были назначены внеочередные выборы.",
+      "executive_assassinate": "Приказ о прекращении выполнен.",
+      "chaos": "Порядок рухнул. Правило хаоса соблюдается.",
+      "veto_request": "Было предложено наложить вето.",
+      "veto_confirm": "Правительство воспользовалось правом вето.",
+      "power_used": "{{role}} питание активировано."
+    },
+    "president_pick": {
+      "label": "Ассамблея",
+      "selecting": "Выбор первого президента",
+      "reveal_label": "Первый президент"
+    },
     "tutorial": {
-      "back": "Back",
-      "next": "Next",
-      "enter": "Enter the Assembly",
-      "skip": "Skip tutorial",
-      "error_general": "An error occurred",
-      "error_invalid_email": "Invalid email address",
+      "back": "Назад",
+      "next": "Далее",
+      "enter": "Войдите в Ассамблею",
+      "skip": "Пропустить урок",
+      "error_general": "Произошла ошибка",
+      "error_invalid_email": "Неверный адрес электронной почты",
       "premise": {
-        "title": "The Assembly",
-        "subtitle": "A game of hidden loyalty",
-        "p1": "The world ended with {{crisis}}. What remains is The Assembly — a council of delegates trying to govern the ruins.",
-        "p2": "But not everyone wants to restore order. Some want to build a new State — and one among them, the {{overseer}}, is waiting to seize total power.",
-        "label": "The Assembly is",
-        "desc": "A social deduction game for 5–10 players. You are given a secret role. Use it, lie with it, or die by it."
+        "title": "Ассамблея",
+        "subtitle": "Игра скрытой лояльности",
+        "p1": "Мир закончился на {{crisis}}. Остается лишь Ассамблея — совет делегатов, пытающийся управлять руинами.",
+        "p2": "Но не все хотят наводить порядок. Некоторые хотят построить новое государство — и один из них, {{overseer}}, ждёт возможности захватить полную власть.",
+        "label": "Ассамблея",
+        "desc": "Социальная дедуктивная игра для 5–10 игроков. Вам отведена секретная роль. Используйте его, лгите с ним или умрите из-за него."
       },
       "roles": {
         "civil": {
-          "name": "Civil",
-          "flavor": "Defend the Charter. The Crisis must not consume the Secretariat."
+          "name": "Гражданский",
+          "flavor": "Защитите Хартию. Кризис не должен поглотить Секретариат."
         },
         "state": {
-          "name": "State",
-          "flavor": "Enact State directives. Elevate the Overseer to power."
+          "name": "Государство",
+          "flavor": "Принять государственные директивы. Поднимите Смотрителя к власти."
         },
         "overseer": {
-          "name": "The Overseer",
-          "flavor": "Ascend to the Chancellorship. State Supremacy awaits."
+          "name": "Надзиратель",
+          "flavor": "Поднимитесь на пост канцлера. Государственное превосходство ждёт."
         }
       },
       "loop": {
-        "title": "The Game Loop",
-        "subtitle": "Each round follows the same sequence",
+        "title": "Игровой цикл",
+        "subtitle": "Каждый раунд следует одной и той же последовательности",
         "step_1": {
-          "label": "Presidential Nomination",
-          "desc": "The current President nominates a Chancellor candidate. The presidential role rotates each round."
+          "label": "Выдвижение на пост президента",
+          "desc": "Действующий президент выдвигает кандидата на пост канцлера. Роль президента меняется каждый раунд."
         },
         "step_2": {
-          "label": "Assembly Vote",
-          "desc": "All living players vote AYE or NAY on the proposed government. Majority AYE passes it."
+          "label": "Голосование собрания",
+          "desc": "Все живые игроки голосуют за или против предлагаемого правительства. Большинство «ДА» его пропускает."
         },
         "step_3": {
-          "label": "Legislative Session",
-          "desc": "The President draws 3 policy cards, discards 1, and passes 2 to the Chancellor. The Chancellor enacts one."
+          "label": "Законодательная сессия",
+          "desc": "Президент тянет 3 карты политики, сбрасывает 1 и передает 2 канцлеру. Канцлер принимает его."
         },
         "step_4": {
-          "label": "Declarations",
-          "desc": "Both President and Chancellor publicly declare what cards they saw and passed. This is how trust is built — or broken."
+          "label": "Объявления",
+          "desc": "И президент, и канцлер публично заявляют, какие карты они видели и передавали. Именно так строится или разрушается доверие."
         },
-        "chaos_desc": "If 3 elections fail in a row, a {{chaos}} is drawn automatically and enacted without a vote."
+        "chaos_desc": "Если 3 выбора подряд проваливаются, автоматически выбирается {{chaos}} и принимается без голосования."
       },
       "voting": {
-        "title": "Voting & Declarations",
-        "subtitle": "The heart of social deduction",
-        "p1": "Votes are {{simultaneous}} until revealed. You can't see how others voted before you cast yours.",
-        "aye": "AYE",
-        "aye_desc": "Support this government",
-        "nay": "NAY",
-        "nay_desc": "Block this government",
-        "decl_label": "Declarations",
-        "decl_p1": "After a policy is enacted, the President and Chancellor publicly declare what cards they drew and passed. These claims can be {{true_or_false}} — the table must decide who to believe.",
-        "decl_hint": "Contradictions between the President's and Chancellor's declarations are your most important clue."
+        "title": "Голосование и заявления",
+        "subtitle": "Сердце социальной дедукции",
+        "p1": "Голоса равны {{simultaneous}}, пока не будут раскрыты. Вы не можете увидеть, как проголосовали другие, прежде чем отдать свой голос.",
+        "aye": "ДА",
+        "aye_desc": "Поддержите это правительство",
+        "nay": "НЕТ",
+        "nay_desc": "Заблокируйте это правительство",
+        "decl_label": "Объявления",
+        "decl_p1": "После принятия политики президент и канцлер публично объявляют, какие карты они вытянули и передали. Этих утверждений может быть {{true_or_false}} — таблица должна решить, кому верить.",
+        "decl_hint": "Противоречия между заявлениями президента и канцлера — ваша самая важная подсказка."
       },
       "executive": {
-        "title": "Executive Actions",
-        "subtitle": "Power grows as State advances",
-        "p1": "Each time a State directive is enacted, the President may unlock a special executive power. These grow more dangerous as State advances.",
+        "title": "Исполнительные действия",
+        "subtitle": "Власть растет по мере развития государства",
+        "p1": "Каждый раз, когда принимается государственная директива, Президент может разблокировать специальную исполнительную власть. Они становятся все более опасными по мере развития государства.",
         "actions": {
           "peek": {
-            "name": "Policy Peek",
-            "desc": "See the top 3 cards in the draw pile."
+            "name": "Обзор политики",
+            "desc": "Посмотрите на 3 верхние карты в колоде."
           },
           "investigate": {
-            "name": "Investigate",
-            "desc": "Learn whether a player is Civil or State (not who specifically)."
+            "name": "Расследовать",
+            "desc": "Узнайте, является ли игрок гражданским или государственным (а не кем именно)."
           },
           "special": {
-            "name": "Special Election",
-            "desc": "Choose who will be the next President, skipping normal rotation."
+            "name": "Специальные выборы",
+            "desc": "Выбирайте, кто станет следующим президентом, минуя обычную ротацию."
           },
           "execution": {
-            "name": "Execution",
-            "desc": "Permanently eliminate a player. If it's the Overseer, Civil wins instantly."
+            "name": "Исполнение",
+            "desc": "Устранить игрока навсегда. Если это Смотритель, Гражданский побеждает мгновенно."
           }
         },
-        "footer": "Executive actions are given to the current President and must be used before the next round begins."
+        "footer": "Исполнительные действия передаются действующему президенту и должны быть использованы до начала следующего раунда."
       },
       "titles": {
         "assassin": {
-          "name": "Assassin",
-          "desc": "Eliminate a player from the game."
+          "name": "Убийца",
+          "desc": "Исключить игрока из игры."
         },
         "strategist": {
-          "name": "Strategist",
-          "desc": "Draw an extra policy (4 total) when you are President."
+          "name": "Стратег",
+          "desc": "Нарисуйте дополнительный полис (всего 4), когда вы станете президентом."
         },
         "broker": {
-          "name": "Broker",
-          "desc": "Force a re-nomination if the current one is unfavorable."
+          "name": "Брокер",
+          "desc": "Принудительно выдвинуть новую кандидатуру, если текущая кандидатура является неблагоприятной."
         },
         "handler": {
-          "name": "Handler",
-          "desc": "Swap the next two players in the presidential order."
+          "name": "Обработчик",
+          "desc": "Поменяйте местами следующих двух игроков в президентском порядке."
         },
         "auditor": {
-          "name": "Auditor",
-          "desc": "Peek at the last 3 discarded policies after a legislative session."
+          "name": "Аудитор",
+          "desc": "Взгляните на три последних отвергнутых политики после законодательной сессии."
         },
         "interdictor": {
-          "name": "Interdictor",
-          "desc": "Detain a player for one round."
+          "name": "Запретитель",
+          "desc": "Задержать игрока на один раунд."
         },
         "archivist": {
-          "name": "Archivist",
-          "desc": "Inspect the entire Discard Pile once per game."
+          "name": "Архивариус",
+          "desc": "Проверяйте всю стопку сброса один раз за игру."
         },
         "defector": {
-          "name": "Defector",
-          "desc": "Secretly flip your vote after the initial reveal to change the outcome."
+          "name": "Перебежчик",
+          "desc": "Тайно переверните свой голос после первоначального раскрытия, чтобы изменить результат."
         },
         "quorum": {
-          "name": "Quorum",
-          "desc": "Call for an emergency re-vote during high-tension failed elections."
+          "name": "Кворум",
+          "desc": "Призыв к экстренному переголосованию во время несостоявшихся выборов в условиях высокого напряжения."
         },
         "cipher": {
-          "name": "Cipher",
-          "desc": "Send an anonymous dispatch to the room during the legislative phase."
+          "name": "Шифр",
+          "desc": "Отправьте анонимное сообщение в комнату во время законодательной фазы."
         }
       },
       "agendas": {
-        "title": "Personal Agendas",
-        "subtitle": "Your hidden individual goal",
-        "p1": "Every player is secretly assigned a {{agenda}} — a hidden objective that earns bonus XP and IP if completed, regardless of whether your faction wins or loses.",
-        "examples_label": "Example Agendas",
+        "title": "Личные планы",
+        "subtitle": "Ваша скрытая индивидуальная цель",
+        "p1": "Каждому игроку тайно назначается {{agenda}} — скрытая цель, за выполнение которой вы получаете бонусный опыт и IP, независимо от того, выиграет ваша фракция или проиграет.",
+        "examples_label": "Примеры повестки дня",
         "examples": [
-          "Vote Nay in at least 3 rounds",
-          "Be nominated as Chancellor at least twice",
-          "The game must end before round (player count + 3)",
-          "No chaos policy is enacted during the game"
+          "Проголосуйте против как минимум в 3 турах",
+          "Быть номинированным на пост канцлера как минимум дважды",
+          "Игра должна закончиться до начала раунда (количество игроков + 3)",
+          "Во время игры не применяется политика хаоса"
         ],
-        "footer": "Completing your agenda awards {{bonus}} and bonus IP — the same as winning with your faction. Win {{and}} complete your agenda for double rewards.",
-        "footer_sub": "Your agenda is visible in your Dossier at all times. Others can't see it."
+        "footer": "Завершение наград повестки дня {{bonus}} и бонусного IP — то же самое, что победа за свою фракцию. Выиграйте {{and}} и завершите свою задачу, чтобы получить двойную награду.",
+        "footer_sub": "Ваша повестка дня всегда видна в вашем досье. Другие этого не видят."
       },
       "tips": {
-        "title": "Surviving The Assembly",
-        "subtitle": "Key things to remember",
+        "title": "Выжить в Ассамблее",
+        "subtitle": "Ключевые вещи, которые следует помнить",
         "civil": {
-          "heading": "Civil players: trust nobody",
-          "body": "You outnumber State but you don't know who they are. Contradictory declarations, suspicious nominations, and patterns in voting are your only clues."
+          "heading": "Гражданские игроки: никому не верь",
+          "body": "Вас больше, чем штатов, но вы не знаете, кто они. Противоречивые заявления, подозрительные кандидатуры и закономерности в голосовании – вот ваши единственные подсказки."
         },
         "state": {
-          "heading": "State players: coordinate carefully",
-          "body": "You know your allies but can't communicate openly. Coordinate through nominations, declarations, and subtle voting patterns — without being obvious."
+          "heading": "Государственные игроки: тщательно координируйте свои действия",
+          "body": "Вы знаете своих союзников, но не можете общаться открыто. Координируйте свои действия посредством номинаций, деклараций и тонких схем голосования, не делая это очевидным."
         },
         "decl": {
-          "heading": "Declarations are everything",
-          "body": "After every legislative session, both President and Chancellor declare what they saw. Cross-referencing these claims is how you detect lies."
+          "heading": "Декларации решают все",
+          "body": "После каждой законодательной сессии и президент, и канцлер заявляют о том, что они видели. Перекрестные ссылки на эти утверждения помогут обнаружить ложь."
         },
         "dossier": {
-          "heading": "Watch your Dossier",
-          "body": "Your role, title ability, and personal agenda are always visible in your Dossier — tap the icon in the header during a game."
+          "heading": "Следите за своим досье",
+          "body": "Ваша роль, титул и личные планы всегда видны в вашем Досье — коснитесь значка в заголовке во время игры."
         }
       },
       "dossier": {
-        "title": "Confidential Dossier",
-        "identity": "Political Identity",
-        "identity_civil": "Civilian",
-        "identity_state": "State Agent",
-        "identity_overseer": "The Overseer",
-        "agenda": "Personal Agenda",
-        "agenda_bonus": "Completing this grants bonus XP and IP.",
-        "agenda_none": "No personal agenda assigned.",
-        "title_role": "Title Role",
-        "title_none": "No title role assigned.",
-        "faction_state": "State Faction",
-        "awaiting": "Awaiting assignment...",
-        "close": "Close Dossier",
-        "active": "Active"
+        "title": "Конфиденциальное досье",
+        "identity": "Политическая идентичность",
+        "identity_civil": "Гражданский",
+        "identity_state": "Государственный агент",
+        "identity_overseer": "Надзиратель",
+        "agenda": "Личная повестка дня",
+        "agenda_bonus": "Завершение этого дает бонус XP и IP.",
+        "agenda_none": "Никакой личной повестки дня не назначено.",
+        "title_role": "Титул Роль",
+        "title_none": "Заглавная роль не назначена.",
+        "faction_state": "Государственная фракция",
+        "awaiting": "Ожидает назначения...",
+        "close": "Закрыть досье",
+        "active": "Активный"
       },
       "game_over": {
-        "title": "Match Results",
+        "title": "Результаты матчей",
         "banners": {
-          "civil_win_default": "Charter Restored",
-          "state_win_default": "State Supremacy",
-          "inconclusive": "Inconclusive",
-          "civil_desc": "The Charter has been defended.",
-          "state_desc": "The Secretariat has fallen to the State.",
-          "abort_desc": "The Assembly has collapsed due to a disconnection."
+          "civil_win_default": "Устав восстановлен",
+          "state_win_default": "Государственное превосходство",
+          "inconclusive": "Безрезультатно",
+          "civil_desc": "Хартия была защищена.",
+          "state_desc": "Секретариат перешел в руки государства.",
+          "abort_desc": "Ассамблея развалилась из-за отключения связи."
         },
-        "performance_header": "Match Performance",
-        "victory": "Victory Achieved",
-        "defeat": "Mission Failed",
-        "elo": "ELO",
-        "xp": "XP",
-        "ip": "IP",
-        "clan_xp": "Clan XP",
-        "casual": "Casual",
-        "achievements_header": "Achievements Unlocked",
-        "revelations_header": "Identity Revelations",
-        "agenda": "Agenda",
-        "title_role": "Title",
-        "you": "You",
-        "action_log": "View Assembly Log",
-        "action_replay": "Reconstruct Match",
-        "action_share": "Copy Share Link",
-        "action_shared": "Link Copied",
-        "action_play_again": "Play Again",
-        "action_lobby": "Lobby",
-        "completed": "Completed",
-        "failed": "Failed"
+        "performance_header": "Производительность матча",
+        "victory": "Победа достигнута",
+        "defeat": "Миссия провалена",
+        "elo": "ЭЛО",
+        "xp": "Опыт",
+        "ip": "ИП",
+        "clan_xp": "Опыт клана",
+        "casual": "Казуальный",
+        "achievements_header": "Достижения разблокированы",
+        "revelations_header": "Раскрытие личности",
+        "agenda": "Повестка дня",
+        "title_role": "Название",
+        "you": "Ты",
+        "action_log": "Просмотр журнала сборки",
+        "action_replay": "Реконструировать матч",
+        "action_share": "Копировать ссылку Поделиться",
+        "action_shared": "Ссылка скопирована",
+        "action_play_again": "Сыграйте еще раз",
+        "action_lobby": "Лобби",
+        "completed": "Завершено",
+        "failed": "Неуспешный"
       },
       "match_replay": {
-        "title": "Match Replay",
-        "subtitle": "Post-Match Reconstruction",
-        "hide_deceptions": "Hide Deceptions",
-        "reveal_truth": "Reveal The Truth",
-        "no_history": "No history recorded for this match",
-        "government_header": "Round {{round}} Government",
-        "president": "President",
-        "chancellor": "Chancellor",
-        "session_summary": "Session Summary",
-        "chaos_forced": "Chaos Forced",
-        "rejected": "Government Rejected",
-        "fail_veto": "Both parties agreed to exercise veto power.",
-        "fail_default": "The Assembly failed to confirm this coalition.",
-        "enacted": "Directive Enacted",
-        "power_triggered": "Power Triggered: {{action}}",
-        "legislative_hand": "Legislative Hand",
-        "pres_deck": "President's Deck",
-        "chan_hand": "Chancellor's Hand",
-        "deception_detected": "Deception Detected",
-        "conflicting_stories": "Conflicting Stories",
-        "actual_draw": "Actual Draw",
-        "actual_received": "Actual Received",
-        "public_claim": "Public Claim",
-        "hidden": "HIDDEN",
-        "voting_records": "Voting Records",
-        "aye": "Aye",
-        "nay": "Nay",
-        "no_vote": "No vote held this round",
-        "footer_info": "Replay uses decrypted archival data. Use the timeline above to navigate through match milestones.",
-        "close": "Close Reconstruction"
+        "title": "Повтор матча",
+        "subtitle": "Послематчевая реконструкция",
+        "hide_deceptions": "Скрыть обман",
+        "reveal_truth": "Раскройте правду",
+        "no_history": "Для этого матча история не записана",
+        "government_header": "Раунд {{round}} Правительство",
+        "president": "Президент",
+        "chancellor": "Канцлер",
+        "session_summary": "Резюме сессии",
+        "chaos_forced": "Принудительный хаос",
+        "rejected": "Правительство отклонено",
+        "fail_veto": "Обе стороны согласились воспользоваться правом вето.",
+        "fail_default": "Ассамблее не удалось утвердить эту коалицию.",
+        "enacted": "Директива принята",
+        "power_triggered": "Сработало питание: {{action}}",
+        "legislative_hand": "Законодательная рука",
+        "pres_deck": "Президентская колода",
+        "chan_hand": "Рука канцлера",
+        "deception_detected": "Обнаружен обман",
+        "conflicting_stories": "Противоречивые истории",
+        "actual_draw": "Фактическая ничья",
+        "actual_received": "Фактически получено",
+        "public_claim": "Общественная претензия",
+        "hidden": "СКРЫТЫЙ",
+        "voting_records": "Протоколы голосования",
+        "aye": "Да",
+        "nay": "Нет",
+        "no_vote": "В этом туре голосование не проводилось",
+        "footer_info": "Реплей использует расшифрованные архивные данные. Используйте временную шкалу выше, чтобы перемещаться по этапам матча.",
+        "close": "Закрыть Реконструкция"
       },
       "modals": {
         "friend_request": {
-          "title": "Ally Request",
-          "description": "<1>{{username}}</1> wants to be allies.",
-          "deny": "Deny",
-          "accept": "Accept"
+          "title": "Запрос союзника",
+          "description": "<1>{{username}}</1> хочет быть союзниками.",
+          "deny": "Отрицать",
+          "accept": "Принять"
         },
         "declaration": {
-          "drew_label": "<1>Claim:</1> I drew...",
-          "result_drew": "I drew <1>{{civ}}C</1> & <3>{{sta}}S</3>",
-          "passed_label": "<1>Claim:</1> I passed...",
-          "received_label": "<1>Claim:</1> I received...",
-          "result_passed": "I passed <1>{{civ}}C</1> & <3>{{sta}}S</3>",
-          "result_received": "I received <1>{{civ}}C</1> & <3>{{sta}}S</3>",
-          "submit": "Submit Declaration"
-        }
-      },
-      "how_to_play": {
-        "title": "How to Play",
-        "subtitle": "Rules Reference",
-        "tabs": {
-          "overview": "Overview",
-          "roles": "Roles",
-          "loop": "Game Loop",
-          "titles": "Titles",
-          "agendas": "Agendas",
-          "tips": "Tips"
-        },
-        "overview": {
-          "p1": "The Assembly is a {{social_deduction_game}} for 5–10 players. Each player is secretly assigned a faction — Civil or State — and must work with or against the others to achieve their faction's win condition.",
-          "civil_wins_label": "Civil wins by",
-          "civil_wins": [
-            "Enacting 5 Civil directives",
-            "Executing the Overseer"
-          ],
-          "state_wins_label": "State wins by",
-          "state_wins": [
-            "Enacting 6 State directives",
-            "Electing Overseer Chancellor (after 3 State)"
-          ],
-          "crisis_label": "Crisis Mode (High Intensity)",
-          "crisis_desc": "A chaotic variant featuring {{event_cards}}. Every round, a random event is drawn that can freeze the election tracker, blackout the chat, or force immediate snap elections.",
-          "deck_label": "Policy Deck",
-          "deck_desc": "The deck contains {{civil_count}} and {{state_count}} policy cards. The deck is stacked against Civil — deduction and coordination are essential.",
-          "tracker_label": "Election Tracker",
-          "tracker_desc": "If three elections fail in a row, a {{chaos_policy}} is drawn from the top of the deck and enacted automatically without a vote."
-        },
-        "roles_tab": {
-          "civil": {
-            "label": "Civil",
-            "desc": "The majority. You don't know who your allies are. Use declarations, voting patterns, and nominations to find the State agents and stop them."
-          },
-          "state": {
-            "label": "State",
-            "desc": "The minority. You know who your allies are. Secretly coordinate to enact State directives or get the Overseer elected as Chancellor."
-          },
-          "overseer": {
-            "label": "The Overseer",
-            "desc": "A State agent who doesn't know the other State players. Wins with State. If elected Chancellor after 3 State directives are enacted, State wins immediately.",
-            "distribution_hint": "At 5–6 players, the Overseer knows the other State agents."
-          },
-          "distribution_label": "Role Distribution"
-        },
-        "loop_tab": {
-          "step_1": {
-            "label": "Nomination",
-            "desc": "The current President nominates a Chancellor. The same player cannot serve as Chancellor in consecutive rounds (or as President in larger games)."
-          },
-          "step_2": {
-            "label": "Vote",
-            "desc": "All living players simultaneously vote AYE or NAY. A strict majority of AYE passes the government. Ties and equal splits fail."
-          },
-          "step_3": {
-            "label": "Legislative Session",
-            "desc": "President draws 3 cards, discards 1 face-down, passes 2 to Chancellor. Chancellor enacts 1, discards the other. Neither can see what the other discarded."
-          },
-          "step_4": {
-            "label": "Declarations",
-            "desc": "President declares how many Civil/State they drew and passed. Chancellor declares how many they received and enacted. These claims can be lies."
-          },
-          "step_5": {
-            "label": "Executive Action",
-            "desc": "If a State directive was enacted and the player count/directive count triggers a power, the President must use it before the round ends."
-          }
-        },
-        "titles_tab": {
-          "intro": "Title Roles are assigned randomly at game start. Each is single-use and fires at a specific point in the round. Check your Dossier to see if you have one.",
-          "roles": {
-            "interdictor": {
-              "name": "Interdictor",
-              "when": "Start of each round",
-              "desc": "Before nomination: detain a player for this round. They cannot vote or be nominated as Chancellor. Once used."
-            },
-            "broker": {
-              "name": "Broker",
-              "when": "After nomination",
-              "desc": "Review the Chancellor nomination and veto it, forcing the President to nominate again. Once used."
-            },
-            "strategist": {
-              "name": "Strategist",
-              "when": "As President",
-              "desc": "When you're President, draw 4 policy cards instead of 3, then discard 2. Once used."
-            },
-            "auditor": {
-              "name": "Auditor",
-              "when": "After enactment",
-              "desc": "Peek at the last 3 cards in the discard pile. Useful for tracking what policies are gone. Once used."
-            },
-            "assassin": {
-              "name": "Assassin",
-              "when": "After enactment (as President)",
-              "desc": "When you're President, secretly execute any living player after the round ends. Once used."
-            },
-            "handler": {
-              "name": "Handler",
-              "when": "After enactment",
-              "desc": "Swap the next two players in the presidential rotation. The second becomes President before the first. Once used."
-            },
-            "defector": {
-              "name": "Defector",
-              "when": "Voting (Reveal)",
-              "desc": "Secretly change your vote after the initial reveal but before the result is finalized. This can flip a 5-5 tie into a 6-4 pass. Once used."
-            },
-            "archivist": {
-              "name": "Archivist",
-              "when": "After enactment",
-              "desc": "Deep inspection: peek at the top 3 cards of the Draw Pile before the next round begins. Once used."
-            },
-            "quorum": {
-              "name": "Quorum",
-              "when": "After election fail",
-              "desc": "Emergency session: force an immediate re-vote on the last failed government, bypassing the next President. Once used."
-            },
-            "cipher": {
-              "name": "Cipher",
-              "when": "Any phase",
-              "desc": "Send a one-way encrypted message to any player. Only they can see the text you send. Once used."
-            }
-          }
-        },
-        "agendas_tab": {
-          "p1": "Every player receives a hidden {{personal_agenda}} at the start of each game. Completing it earns {{xp_bonus}} — equal to winning with your faction — regardless of the game result.",
-          "list_label": "All 20 Agendas",
-          "agendas": {
-            "chaos_agent": {
-              "name": "Chaos Agent",
-              "desc": "Trigger a chaos policy at least once"
-            },
-            "purist": {
-              "name": "The Purist",
-              "desc": "At least 3 Civil directives enacted"
-            },
-            "dissenter": {
-              "name": "The Dissenter",
-              "desc": "Vote against the majority 3+ times"
-            },
-            "dove": {
-              "name": "The Dove",
-              "desc": "Vote Aye in every eligible round"
-            },
-            "hawk": {
-              "name": "The Hawk",
-              "desc": "Vote Nay in at least 3 rounds"
-            },
-            "stonewalled": {
-              "name": "Stonewalled",
-              "desc": "Vote Nay on 2 governments that fail"
-            },
-            "short_session": {
-              "name": "Short Session",
-              "desc": "Game ends before round (players + 3)"
-            },
-            "long_game": {
-              "name": "The Long Game",
-              "desc": "Game lasts at least (players + 6) rounds"
-            },
-            "loyalist": {
-              "name": "The Loyalist",
-              "desc": "Vote Aye on 3 civil-enacting governments"
-            },
-            "nominated": {
-              "name": "Nominated",
-              "desc": "Be nominated Chancellor twice"
-            },
-            "deadlock": {
-              "name": "Deadlock",
-              "desc": "Be in at least 1 failed government"
-            },
-            "prolific": {
-              "name": "Prolific",
-              "desc": "Enact 2 policies as Chancellor"
-            },
-            "veteran": {
-              "name": "The Veteran",
-              "desc": "Serve as Chancellor at least once"
-            },
-            "unity": {
-              "name": "Unity",
-              "desc": "No chaos policy during the game"
-            },
-            "mandate": {
-              "name": "The Mandate",
-              "desc": "At least 4 State directives enacted"
-            },
-            "clean_sweep": {
-              "name": "Clean Sweep",
-              "desc": "Enact a Civil directive as Chancellor"
-            },
-            "weathervane": {
-              "name": "The Weathervane",
-              "desc": "Switch your vote 4+ times"
-            },
-            "productive": {
-              "name": "Productive Session",
-              "desc": "More than half of rounds enact a policy"
-            },
-            "close_race": {
-              "name": "Close Race",
-              "desc": "Tracks within 2 directives at game end"
-            },
-            "swing_vote": {
-              "name": "The Swing Vote",
-              "desc": "Be in a government that passes by 1 vote"
-            }
-          }
-        },
-        "tips_tab": {
-          "civil": {
-            "label": "For Civil Players",
-            "tips": [
-              "Cross-reference declarations: if President says they passed 1C/1S but Chancellor says they received 2S, someone is lying.",
-              "Track the voting record. Consistent Nay voting without explanation is suspicious.",
-              "Be careful with executive actions — investigate based on evidence, not gut feeling.",
-              "The deck is State-heavy. Some State policies being enacted doesn't prove anyone is guilty."
-            ]
-          },
-          "state": {
-            "label": "For State Players",
-            "tips": [
-              "Coordinate declarations carefully. Contradicting your State ally's claim is a giveaway.",
-              "Nominate your State allies as Chancellor when possible — but not so obviously it looks suspicious.",
-              "Blame bad hands. \"I only had State cards\" is plausible because the deck is State-heavy.",
-              "The Overseer should stay quiet and unremarkable until the moment is right."
-            ]
-          },
-          "general": {
-            "label": "General",
-            "tips": [
-              "Use the chat and declarations together. What players say matters.",
-              "Your personal agenda might conflict with your faction's best play. That tension is intentional.",
-              "The round history button shows every government, every vote, and every declaration."
-            ]
-          }
+          "drew_label": "<1>Утверждение:</1> Я нарисовал...",
+          "result_drew": "Я нарисовал <1>{{civ}}C</1> и <3>{{sta}}S</3>",
+          "passed_label": "<1>Утверждение:</1> Я прошел...",
+          "received_label": "<1>Претензия:</1> Я получил...",
+          "result_passed": "Я прошел <1>{{civ}}C</1> и <3>{{sta}}S</3>",
+          "result_received": "Я получил <1>{{civ}}C</1> и <3>{{sta}}S</3>",
+          "submit": "Подать декларацию"
         }
       }
+    },
+    "how_to_play": {
+      "title": "Как играть",
+      "subtitle": "Ссылка на правила",
+      "back_to_lobby": "Вернуться в лобби",
+      "tabs": {
+        "overview": "Обзор",
+        "roles": "Роли",
+        "loop": "Игровой цикл",
+        "titles": "Титулы",
+        "agendas": "Повестки дня",
+        "tips": "Советы"
+      },
+      "overview": {
+        "p1": "Ассамблея — это {{social_deduction_game}} для 5–10 игроков. Каждому игроку тайно назначается фракция — гражданская или государственная — и он должен работать вместе или против других, чтобы достичь условия победы своей фракции.",
+        "civil_wins_label": "Гражданские победы",
+        "civil_wins": [
+          "Принятие 5 гражданских директив",
+          "Казнь Надзирателя"
+        ],
+        "state_wins_label": "Государство побеждает с преимуществом",
+        "state_wins": [
+          "Принятие 6 государственных директив",
+          "Выборы канцлера-надзирателя (после 3 штата)"
+        ],
+        "crisis_label": "Кризисный режим (высокая интенсивность)",
+        "crisis_desc": "Хаотический вариант с {{event_cards}}. В каждом раунде вырисовывается случайное событие, которое может заморозить систему отслеживания выборов, отключить чат или вызвать немедленные досрочные выборы.",
+        "deck_label": "Политика",
+        "deck_desc": "Колода содержит карты политики {{civil_count}} и {{state_count}}. Колода сложена против Гражданской войны — необходимы дедукция и координация.",
+        "tracker_label": "Отслеживание выборов",
+        "tracker_desc": "Если три выбора подряд проваливаются, с верха колоды вытягивается {{chaos_policy}} и автоматически принимается без голосования."
+      },
+      "roles_tab": {
+        "civil": {
+          "label": "Гражданский",
+          "desc": "Большинство. Вы не знаете, кто ваши союзники. Используйте декларации, схемы голосования и номинации, чтобы найти государственных агентов и остановить их."
+        },
+        "state": {
+          "label": "Государство",
+          "desc": "Меньшинство. Вы знаете, кто ваши союзники. Тайно координируйте действия, чтобы принять государственные директивы или добиться избрания Смотрителя канцлером."
+        },
+        "overseer": {
+          "label": "Надзиратель",
+          "desc": "Агент штата, который не знает других игроков штата. Победы с государством. Если канцлером избирается после принятия трех директив штата, штат побеждает немедленно.",
+          "distribution_hint": "При 5–6 игроках Смотритель знает других агентов штата."
+        },
+        "distribution_label": "Распределение ролей"
+      },
+      "loop_tab": {
+        "step_1": {
+          "label": "Номинация",
+          "desc": "Действующий президент назначает канцлера. Один и тот же игрок не может быть канцлером в последовательных раундах (или президентом в более крупных играх)."
+        },
+        "step_2": {
+          "label": "Голосовать",
+          "desc": "Все живые игроки одновременно голосуют «ЗА» или «НЕТ». Строгое большинство AYE проходит правительство. Ничьи и равные доли не срабатывают."
+        },
+        "step_3": {
+          "label": "Законодательная сессия",
+          "desc": "Президент тянет 3 карты, сбрасывает 1 рубашкой вверх и передает 2 канцлеру. Канцлер принимает 1, отбрасывает другой. Ни один из них не может видеть то, что выбросил другой."
+        },
+        "step_4": {
+          "label": "Объявления",
+          "desc": "Президент объявляет, сколько гражданских/государственных документов они нарисовали и приняли. Канцлер объявляет, сколько они получили и приняли. Эти утверждения могут быть ложью."
+        },
+        "step_5": {
+          "label": "Исполнительные действия",
+          "desc": "Если была принята директива штата и подсчет игроков/счет директив активирует силу, президент должен использовать ее до окончания раунда."
+        }
+      },
+      "titles_tab": {
+        "intro": "Титульные роли назначаются случайным образом в начале игры. Каждый из них одноразовый и срабатывает в определенный момент раунда. Проверьте свое досье, чтобы узнать, есть ли оно у вас.",
+        "roles": {
+          "interdictor": {
+            "name": "Запретитель",
+            "when": "Начало каждого раунда",
+            "desc": "До номинации: задержать игрока на этот раунд. Они не могут голосовать или быть номинированы на пост канцлера. Когда-то использовался."
+          },
+          "broker": {
+            "name": "Брокер",
+            "when": "После номинации",
+            "desc": "Пересмотрите кандидатуру канцлера и наложите на нее вето, заставив президента выдвинуть свою кандидатуру еще раз. Когда-то использовался."
+          },
+          "strategist": {
+            "name": "Стратег",
+            "when": "Как президент",
+            "desc": "Став президентом, возьмите 4 карты политики вместо 3, а затем сбросьте 2. После использования."
+          },
+          "auditor": {
+            "name": "Аудитор",
+            "when": "После принятия",
+            "desc": "Посмотрите на последние 3 карты в стопке сброса. Полезно для отслеживания того, какие политики исчезли. Когда-то использовался."
+          },
+          "assassin": {
+            "name": "Убийца",
+            "when": "После принятия (в качестве Президента)",
+            "desc": "Став президентом, тайно казните любого живого игрока после окончания раунда. Когда-то использовался."
+          },
+          "handler": {
+            "name": "Обработчик",
+            "when": "После принятия",
+            "desc": "Поменяйте местами двух следующих игроков в президентской ротации. Второй становится президентом раньше первого. Когда-то использовался."
+          },
+          "defector": {
+            "name": "Перебежчик",
+            "when": "Голосование (Раскрытие)",
+            "desc": "Тайно измените свой голос после первоначального раскрытия, но до того, как будет окончательно определен результат. Это может превратить счет 5-5 в пас 6-4. Когда-то использовался."
+          },
+          "archivist": {
+            "name": "Архивариус",
+            "when": "После принятия",
+            "desc": "Глубокая проверка: посмотрите на 3 верхние карты колоды перед началом следующего раунда. Когда-то использовался."
+          },
+          "quorum": {
+            "name": "Кворум",
+            "when": "После провала выборов",
+            "desc": "Чрезвычайная сессия: заставить немедленно переголосовать последнее провалившееся правительство в обход следующего президента. Когда-то использовался."
+          },
+          "cipher": {
+            "name": "Шифр",
+            "when": "Любая фаза",
+            "desc": "Отправьте одностороннее зашифрованное сообщение любому игроку. Только они смогут видеть отправленный вами текст. Когда-то использовался."
+          }
+        }
+      },
+      "agendas_tab": {
+        "p1": "Каждый игрок получает скрытый {{personal_agenda}} в начале каждой игры. За его завершение вы получаете {{xp_bonus}} — равносильно победе за свою фракцию — независимо от результата игры.",
+        "list_label": "Все 20 повесток дня",
+        "agendas": {
+          "chaos_agent": {
+            "name": "Агент Хаоса",
+            "desc": "Запустите политику хаоса хотя бы один раз"
+          },
+          "purist": {
+            "name": "Пурист",
+            "desc": "Приняты как минимум 3 Гражданские директивы"
+          },
+          "dissenter": {
+            "name": "Несогласный",
+            "desc": "Голосуйте против большинства 3+ раза"
+          },
+          "dove": {
+            "name": "Голубь",
+            "desc": "Голосуйте «за» в каждом правомочном туре"
+          },
+          "hawk": {
+            "name": "Ястреб",
+            "desc": "Проголосуйте против как минимум в 3 турах"
+          },
+          "stonewalled": {
+            "name": "Запертый",
+            "desc": "Проголосуйте против двух правительств, которые потерпели неудачу"
+          },
+          "short_session": {
+            "name": "Короткая сессия",
+            "desc": "Игра заканчивается до начала раунда (игроки + 3)"
+          },
+          "long_game": {
+            "name": "Долгая игра",
+            "desc": "Игра длится не менее (игроков + 6) раундов"
+          },
+          "loyalist": {
+            "name": "Лоялист",
+            "desc": "Проголосуйте за 3 правительства, принимающие гражданские законы"
+          },
+          "nominated": {
+            "name": "Номинирован",
+            "desc": "Быть назначенным канцлером дважды"
+          },
+          "deadlock": {
+            "name": "Тупик",
+            "desc": "Быть хотя бы в одном провалившемся правительстве"
+          },
+          "prolific": {
+            "name": "Плодовитый",
+            "desc": "Принять 2 политики в качестве канцлера"
+          },
+          "veteran": {
+            "name": "Ветеран",
+            "desc": "Быть канцлером хотя бы один раз"
+          },
+          "unity": {
+            "name": "Единство",
+            "desc": "Никакой политики хаоса во время игры"
+          },
+          "mandate": {
+            "name": "Мандат",
+            "desc": "Приняты не менее 4 государственных директив"
+          },
+          "clean_sweep": {
+            "name": "Чистая очистка",
+            "desc": "Будучи канцлером, примите гражданскую директиву"
+          },
+          "weathervane": {
+            "name": "Флюгер",
+            "desc": "Поменяйте свой голос более 4 раз"
+          },
+          "productive": {
+            "name": "Продуктивная сессия",
+            "desc": "Более половины раундов принимают политику"
+          },
+          "close_race": {
+            "name": "Закрытая гонка",
+            "desc": "Отслеживается в пределах 2 директив в конце игры"
+          },
+          "swing_vote": {
+            "name": "Колеблющееся голосование",
+            "desc": "Быть в правительстве, которое пройдет с перевесом в 1 голос"
+          }
+        }
+      },
+      "tips_tab": {
+        "civil": {
+          "label": "Для гражданских игроков",
+          "tips": [
+            "Заявления с перекрестными ссылками: если президент говорит, что они сдали 1C/1S, а канцлер говорит, что они получили 2S, кто-то лжет.",
+            "Отслеживайте протокол голосования. Последовательное голосование «против» без объяснения причин вызывает подозрения.",
+            "Будьте осторожны с исполнительными действиями — расследуйте дела, основываясь на доказательствах, а не на интуиции.",
+            "Колода насыщена состояниями. Принимаемая политика некоторых штатов не доказывает, что кто-либо виновен."
+          ]
+        },
+        "state": {
+          "label": "Для государственных игроков",
+          "tips": [
+            "Тщательно согласовывайте декларации. Противоречие утверждениям вашего государственного союзника — это распродажа.",
+            "По возможности назначайте своих государственных союзников на пост канцлера – но не так очевидно, чтобы это выглядело подозрительно.",
+            "Виноваты плохие руки. «У меня были только карты состояний» вполне правдоподобно, потому что в колоде много состояний.",
+            "Смотрителю следует оставаться тихим и ничем не примечательным, пока не наступит подходящий момент."
+          ]
+        },
+        "general": {
+          "label": "Общие",
+          "tips": [
+            "Используйте чат и объявления вместе. То, что говорят игроки, имеет значение.",
+            "Ваши личные планы могут противоречить лучшей игре вашей фракции. Это напряжение намеренно.",
+            "Кнопка круглой истории показывает каждое правительство, каждое голосование и каждое заявление."
+          ]
+        }
+      }
+    },
+    "voting": {
+      "aye": "АА!",
+      "aye_sub": "(ДА)",
+      "nay": "НЕТ!",
+      "nay_sub": "(НЕТ)",
+      "detained": "Вы задержаны и не можете голосовать в этом туре"
+    },
+    "legislative": {
+      "discard": "Сбросить",
+      "enact": "Принять",
+      "propose_veto": "Предложить вето",
+      "send_dispatch": "Отправить анонимное сообщение"
     }
   },
   "profile": {
     "settings": {
       "general": {
-        "language": "Language",
-        "language_desc": "Select your preferred language",
-        "light_mode": "Light Mode",
-        "light_mode_desc": "Toggle light mode for the interface",
-        "ui_scale": "UI Scale",
-        "ui_scale_desc": "Adjust the scale of interface elements",
-        "recovery_email": "Recovery Email",
-        "recovery_email_desc": "Used to recover your account if you lose your token",
-        "recovery_email_placeholder": "Enter recovery email...",
-        "no_recovery_email": "Not set"
+        "language": "Язык",
+        "language_desc": "Выберите предпочитаемый язык",
+        "light_mode": "Светлый режим",
+        "light_mode_desc": "Переключить режим освещения интерфейса",
+        "ui_scale": "Масштаб пользовательского интерфейса",
+        "ui_scale_desc": "Настройте масштаб элементов интерфейса",
+        "recovery_email": "Резервный адрес электронной почты",
+        "recovery_email_desc": "Используется для восстановления вашей учетной записи, если вы потеряете свой токен",
+        "recovery_email_placeholder": "Введите резервный адрес электронной почты...",
+        "no_recovery_email": "Не установлено",
+        "fullscreen": "Полноэкранный режим"
       },
       "tabs": {
-        "general": "General",
-        "audio": "Audio",
-        "voice": "Voice"
+        "general": "Общие",
+        "audio": "Аудио",
+        "voice": "Голос"
+      },
+      "audio": {
+        "music": "Музыка",
+        "music_volume": "Громкость музыки",
+        "sfx": "Звуковые эффекты",
+        "sfx_volume": "Объем звуковых эффектов"
+      },
+      "voice": {
+        "ai_voice": "Голос ИИ-диктора",
+        "tts_voice": "Выбор голоса",
+        "tts_default": "Системные настройки по умолчанию",
+        "narrator_volume": "Том рассказчика",
+        "narrator_volume_desc": "Управляет громкостью голосовых объявлений AI в игре."
+      }
+    },
+    "lvl_label": "Уровень",
+    "ip_label": "ИП",
+    "cp_label": "КП",
+    "xp_label": "Опыт",
+    "edit_username": "Изменить имя пользователя",
+    "public_profile": "Публичный профиль",
+    "username_update": {
+      "error_length": "Имя пользователя должно состоять из 3-20 символов",
+      "failed": "Не удалось обновить имя пользователя"
+    },
+    "share": {
+      "copied": "Ссылка скопирована!",
+      "copy_link": "Копировать ссылку на профиль",
+      "on_twitter": "Поделиться в Твиттере",
+      "on_facebook": "Поделиться на Facebook",
+      "on_whatsapp": "Поделиться в WhatsApp",
+      "more": "Дополнительные параметры"
+    },
+    "tabs": {
+      "stats": "Статистика",
+      "inventory": "Инвентарь",
+      "achievements": "Медали",
+      "challenges": "Проблемы",
+      "clan": "Клан",
+      "shop": "Магазин",
+      "pass": "Пройти",
+      "friends": "Союзники",
+      "referrals": "Рефералы",
+      "history": "История",
+      "settings": "Настройки",
+      "admin": "Админ"
+    },
+    "stats": {
+      "rank_rating": "Ранг Рейтинг",
+      "elo": "ЭЛО",
+      "elo_to_next": "от {{amount}} до {{tier}}",
+      "games_played": "Сыгранные игры",
+      "win_rate": "Процент побед",
+      "total_wins": "Всего побед",
+      "civil_games": "Гражданские игры",
+      "state_games": "Государственные игры",
+      "overseer_games": "Игры надзирателей",
+      "kills": "Убийства",
+      "deaths": "Смерти",
+      "agendas_completed": "Повестки дня выполнены",
+      "account_created": "Аккаунт создан",
+      "civil_wins": "Гражданские победы",
+      "state_wins": "Государственные победы",
+      "overseer_wins": "Победа Смотрителя",
+      "ranked_wins": "Рейтинговые победы",
+      "ranked_games": "Рейтинговые игры",
+      "casual_wins": "Случайные победы",
+      "casual_games": "Казуальные игры",
+      "classic_wins": "Классические победы",
+      "classic_games": "Классические игры"
+    },
+    "challenges": {
+      "loading": "Загрузка задач...",
+      "error_load": "Не удалось загрузить испытания.",
+      "error_no_data": "Данных о проблеме нет",
+      "retry": "Повторить попытку",
+      "xp_reward": "{{amount}} Опыт",
+      "ip_reward": "{{amount}} ИП",
+      "claimed": "Заявлено",
+      "section_complete": "{{count}}/{{total}} Завершено",
+      "tiers": {
+        "daily": "Ежедневные протоколы",
+        "weekly": "Еженедельные задания",
+        "seasonal": "Сезонные цели"
+      },
+      "countdown": {
+        "now": "Сброс сейчас",
+        "days": "Сброс через {{d}}d {{h}}h",
+        "hours": "Сброс через {{h}}ч {{m}}м",
+        "minutes": "Сброс через {{m}}м {{s}}с"
+      },
+      "list": {
+        "daily_win_any": {
+          "name": "Победа",
+          "desc": "Выиграйте любую игру."
+        },
+        "daily_win_civil": {
+          "name": "Защитник Хартии",
+          "desc": "Выиграйте игру, играя за гражданский игрок."
+        },
+        "daily_win_state": {
+          "name": "Слуга государства",
+          "desc": "Выиграйте игру, играя за государственного агента или надзирателя."
+        },
+        "daily_play_2": {
+          "name": "Активный участник",
+          "desc": "Сыграйте 2 игры."
+        },
+        "daily_agenda_complete": {
+          "name": "Миссия выполнена",
+          "desc": "Завершите свою личную повестку дня."
+        },
+        "daily_elected_president": {
+          "name": "Президентская власть",
+          "desc": "Будьте избраны президентом в любой игре."
+        },
+        "daily_elected_chancellor": {
+          "name": "Канцлер",
+          "desc": "Будьте избраны канцлером в любой игре."
+        },
+        "daily_enact_civil": {
+          "name": "Законодатель",
+          "desc": "Примите гражданскую директиву в качестве канцлера."
+        },
+        "daily_enact_state": {
+          "name": "Исполнитель директив",
+          "desc": "Примите государственную директиву в качестве канцлера."
+        },
+        "daily_survive_state_win": {
+          "name": "Выживший",
+          "desc": "Доживите до конца игры, в которой выиграет государство."
+        },
+        "daily_win_ranked": {
+          "name": "Претендент в рейтинге",
+          "desc": "Выиграйте рейтинговую игру."
+        },
+        "daily_win_quick": {
+          "name": "Быстрое разрешение",
+          "desc": "Выиграйте игру за 6 раундов или меньше."
+        },
+        "daily_vote_nay_win": {
+          "name": "Несогласный",
+          "desc": "Голосуйте против правительства, которое все равно побеждает на выборах."
+        },
+        "daily_win_overseer": {
+          "name": "Теневой Повелитель",
+          "desc": "Выиграйте игру, играя за Смотрителя."
+        },
+        "daily_play_casual": {
+          "name": "Повседневная сборка",
+          "desc": "Сыграйте в игру в обычном режиме."
+        },
+        "daily_play_classic": {
+          "name": "Классическая посещаемость",
+          "desc": "Сыграйте в классический режим."
+        },
+        "daily_win_classic": {
+          "name": "Классический Виктор",
+          "desc": "Выиграйте игру в классическом режиме."
+        },
+        "daily_chaos_occurs": {
+          "name": "В хаос",
+          "desc": "Сыграйте в игру, в которой действует политика хаоса."
+        },
+        "daily_veto_occurs": {
+          "name": "Тупик",
+          "desc": "Сыграйте в игру, в которой применяется вето."
+        },
+        "daily_nominated_twice": {
+          "name": "Дважды номинирован",
+          "desc": "Быть номинированным на пост канцлера как минимум дважды в одной игре."
+        },
+        "daily_win_long": {
+          "name": "Длинная сессия",
+          "desc": "Выиграйте игру, которая длится не менее 10 раундов."
+        },
+        "daily_voted_aye_failed": {
+          "name": "Преданные голосованием",
+          "desc": "Голосуйте за правительство, которое провалило выборы."
+        },
+        "daily_civil_full_track": {
+          "name": "Полный Устав",
+          "desc": "Сыграйте в игру, в которой принимаются 5 гражданских директив."
+        },
+        "daily_president_twice": {
+          "name": "Опытный лидер",
+          "desc": "Быть избранным президентом хотя бы дважды за одну игру."
+        },
+        "daily_play_3": {
+          "name": "Результативный игрок",
+          "desc": "Сыграйте сегодня 3 игры."
+        },
+        "daily_win_civil_survive_assassination": {
+          "name": "Устойчивый",
+          "desc": "Выиграйте игру, играя за Гражданского, пока жив Смотритель."
+        },
+        "daily_large_game": {
+          "name": "Великое собрание",
+          "desc": "Сыграйте в игру с 8 или более игроками."
+        },
+        "daily_win_large_game": {
+          "name": "Правила большинства",
+          "desc": "Выиграйте игру с 8 или более игроками."
+        },
+        "daily_enact_2_civil": {
+          "name": "Двойной законодатель",
+          "desc": "Примите 2 гражданские директивы, играя за канцлера, в одной игре."
+        },
+        "daily_win_state_5plus_players": {
+          "name": "Государственный оперативник",
+          "desc": "Выиграйте в роли государственного или смотрителя в игре с участием как минимум 5 игроков."
+        },
+        "weekly_win_3": {
+          "name": "Бывалый Виктор",
+          "desc": "Выиграйте 3 игры на этой неделе."
+        },
+        "weekly_play_5": {
+          "name": "Преданный член Ассамблеи",
+          "desc": "Сыграйте 5 игр на этой неделе."
+        },
+        "weekly_win_civil_3": {
+          "name": "Чемпион Хартии",
+          "desc": "Выиграйте 3 игры, играя за гражданский игрок."
+        },
+        "weekly_win_state_2": {
+          "name": "Государственный оперативник",
+          "desc": "Выиграйте 2 игры, играя за государственного агента или надзирателя."
+        },
+        "weekly_agenda_3": {
+          "name": "В соответствии с повесткой дня",
+          "desc": "Завершите 3 личных дела на этой неделе."
+        },
+        "weekly_win_ranked_2": {
+          "name": "Ранговый оператор",
+          "desc": "Выиграйте 2 рейтинговые игры на этой неделе."
+        },
+        "weekly_enact_civil_3": {
+          "name": "Законодательная запись",
+          "desc": "Примите 3 Гражданские директивы в качестве канцлера в любой игре."
+        },
+        "weekly_chancellor_3": {
+          "name": "Частый канцлер",
+          "desc": "Будьте избраны канцлером 3 раза в любых играх."
+        },
+        "weekly_win_overseer": {
+          "name": "Превосходство теней",
+          "desc": "Выиграйте игру, играя за Смотрителя."
+        },
+        "weekly_play_classic_2": {
+          "name": "Классический режим Обычный",
+          "desc": "Сыграйте в 2 игры в классическом режиме."
+        },
+        "weekly_win_5": {
+          "name": "Доминирующая сила",
+          "desc": "Выиграйте 5 игр на этой неделе."
+        },
+        "weekly_play_10": {
+          "name": "Стойкий сборщик",
+          "desc": "Сыграйте 10 игр на этой неделе."
+        },
+        "weekly_president_5": {
+          "name": "Президентская карьера",
+          "desc": "Будьте избраны президентом 5 раз в любой игре."
+        },
+        "weekly_agenda_5": {
+          "name": "Мастер повесток дня",
+          "desc": "Выполните 5 личных задач на этой неделе."
+        },
+        "weekly_win_civil_5": {
+          "name": "Чартерный страж",
+          "desc": "Выиграйте 5 игр, играя за гражданский игрок."
+        },
+        "weekly_enact_state_3": {
+          "name": "Государственный исполнитель",
+          "desc": "Примите 3 директивы штата в качестве канцлера во всех играх."
+        },
+        "weekly_win_2_modes": {
+          "name": "Универсальный",
+          "desc": "Выиграйте хотя бы одну игру в двух разных режимах на этой неделе."
+        },
+        "weekly_win_ranked_3": {
+          "name": "Ранговый ветеран",
+          "desc": "Выиграйте 3 рейтинговые игры на этой неделе."
+        },
+        "weekly_chancellor_5": {
+          "name": "Канцлер записи",
+          "desc": "Будьте избраны канцлером в 5 играх."
+        },
+        "weekly_survive_5_games": {
+          "name": "Выносливость",
+          "desc": "Доживите до конца 5 игр."
+        },
+        "seasonal_play_30": {
+          "name": "Обычная сборка",
+          "desc": "Сыграйте 30 игр в этом сезоне."
+        },
+        "seasonal_win_15": {
+          "name": "Чемпион сезона",
+          "desc": "Выиграйте 15 игр в этом сезоне."
+        },
+        "seasonal_win_ranked_5": {
+          "name": "Ранговый ветеран",
+          "desc": "Выиграйте 5 рейтинговых игр в этом сезоне."
+        },
+        "seasonal_agenda_10": {
+          "name": "Мастер повестки дня",
+          "desc": "Выполните 10 личных задач в этом сезоне."
+        },
+        "seasonal_win_civil_10": {
+          "name": "Столп Хартии",
+          "desc": "Выиграйте 10 игр в качестве гражданского игрока в этом сезоне."
+        },
+        "seasonal_win_state_5": {
+          "name": "Сторонник государственного превосходства",
+          "desc": "Выиграйте 5 игр в качестве государственного агента или надзирателя в этом сезоне."
+        },
+        "seasonal_play_50": {
+          "name": "Истинный член Ассамблеи",
+          "desc": "Сыграйте 50 игр в этом сезоне."
+        },
+        "seasonal_chancellor_20": {
+          "name": "Вечный канцлер",
+          "desc": "Будьте избраны канцлером в 20 играх этого сезона."
+        },
+        "seasonal_agenda_20": {
+          "name": "Повестка дня Абсолютиста",
+          "desc": "Выполните 20 личных задач в этом сезоне."
+        },
+        "seasonal_win_ranked_10": {
+          "name": "Легенда рейтинга",
+          "desc": "Выиграйте 10 рейтинговых игр в этом сезоне."
+        },
+        "seasonal_enact_civil_15": {
+          "name": "Законодательное наследие",
+          "desc": "Примите 15 гражданских директив в качестве канцлера в этом сезоне."
+        },
+        "seasonal_win_25": {
+          "name": "Легендарный Виктор",
+          "desc": "Выиграйте 25 игр в этом сезоне."
+        }
+      }
+    },
+    "referrals": {
+      "title": "Реферальная программа",
+      "subtitle": "Приглашайте друзей на Ассамблею и получайте награды.",
+      "active_reward": "Активная награда",
+      "reward_desc": "Заработайте <1>150 CP</1> за каждого друга, который присоединится по вашей ссылке и сыграет свой <3>первый матч</3>.",
+      "link_label": "Ваша реферальная ссылка",
+      "copy_hint": "Нажмите, чтобы скопировать уникальную ссылку-приглашение",
+      "copied_hint": "Ссылка скопирована в буфер обмена",
+      "tracking_title": "Автоматизированное отслеживание",
+      "tracking_desc": "Награды автоматически зачисляются на ваш счет, как только ваш реферал завершает свой первый матч с участием 10 игроков."
+    },
+    "clans": {
+      "members": {
+        "self_label": "Ты",
+        "xp_contributed": "{{count}} Внесен опыт",
+        "btn_promote": "Повышение до офицера",
+        "btn_demote": "Понизить членство",
+        "btn_transfer": "Передача президентства",
+        "btn_kick": "Удалить из клана"
+      },
+      "challenges": {
+        "daily": "Ежедневный протокол",
+        "weekly": "Еженедельные задания",
+        "seasonal": "Сезонные цели",
+        "xp_reward": "{{count}} Опыт",
+        "loading": "Доступ к архивам клана...",
+        "loading_error": "Не удалось получить объективные данные.",
+        "retry": "Повторное подключение к архиву"
+      },
+      "leaderboard": {
+        "lvl_summary": "Уровень {{level}} · {{count}} Участники",
+        "title": "Глобальный рейтинг кланов",
+        "empty": "Кланы не найдены.",
+        "rank": "#{{rank}}",
+        "your_clan": "Ваш клан"
+      },
+      "create": {
+        "title": "Нашёл новый клан",
+        "tag_label": "Тег клана (4–5 символов)",
+        "tag_placeholder": "АСЛИ",
+        "name_label": "Название клана",
+        "name_placeholder": "Первая ассамблея",
+        "desc_label": "Информация",
+        "desc_placeholder": "Цель вашего клана...",
+        "btn_creating": "Основание...",
+        "btn_submit": "Создать клан",
+        "error_failed": "Не удалось создать клан"
+      },
+      "search": {
+        "title": "Просмотр кланов",
+        "placeholder": "Название клана или тег...",
+        "no_results": "Нет кланов, соответствующих \"{{query}}\""
+      },
+      "no_clan": {
+        "title": "Изолированная лояльность",
+        "hint": "Присоединяйтесь к клану, чтобы получать общие награды и подниматься в мировом рейтинге.",
+        "btn_create": "Путь основателя",
+        "btn_find": "Просмотр кланов",
+        "btn_leaderboard": "Рейтинги"
+      },
+      "manage": {
+        "btn_share": "Скопировать ссылку для приглашения",
+        "btn_edit": "Изменить клан",
+        "btn_save": "Подтвердите изменения",
+        "btn_saving": "Совершение...",
+        "xp_label": "Опыт уровня клана",
+        "total_xp": "{{count}} Всего накопленного опыта",
+        "contribution": "{{count}} Внесен опыт",
+        "overview": "Обзор",
+        "challenges": "Цели",
+        "invite_label": "Пригласить в клан",
+        "invite_placeholder": "Найдите игрока, которого можно пригласить...",
+        "members_label": "Члены клана"
+      },
+      "invites": {
+        "banner_title": "Приглашение в клан",
+        "banner_desc": "{{inviter}} пригласил вас присоединиться к {{clan}} ​​[{{tag}}]",
+        "btn_accept": "Принять",
+        "btn_decline": "Отказ"
+      },
+      "alerts": {
+        "leave_confirm": "Вы уверены, что хотите покинуть этот клан?",
+        "disband_confirm": "ВАЖНО: это приведет к окончательному удалению клана. Продолжить?",
+        "kick_confirm": "Удалить этого участника?",
+        "transfer_confirm": "Передать президентство клана этому участнику?"
+      },
+      "loading": "Подключение к архиву...",
+      "loading_error": "Не удалось подключиться к архиву."
+    },
+    "inventory": {
+      "categories": {
+        "frame": "Границы",
+        "badge": "Значки",
+        "policy": "Политика",
+        "vote": "Голоса",
+        "music": "Музыка",
+        "sound": "Звуки",
+        "background": "Фоны"
+      },
+      "vote_aye": "Да, жетон",
+      "vote_yes": "Да Токен",
+      "item_type_policy": "Скин политики",
+      "rarities": {
+        "common": "Общий",
+        "uncommon": "Необычный",
+        "rare": "Редкий",
+        "epic": "Эпический",
+        "legendary": "Легендарный"
+      },
+      "btn_equipped": "Оборудовано",
+      "btn_equip": "Экипировать"
+    },
+    "medals": {
+      "summary_title": "Коллекция медалей",
+      "summary_complete": "Завершение",
+      "pin_hint_desc": "Нажмите на заработанные медали, чтобы закрепить их.",
+      "pin_hint_status": "{{count}} / 3 закреплено",
+      "pin_hint_empty": "Медалей не было",
+      "saving": "Сохранение...",
+      "categories": {
+        "milestone": "Вехи",
+        "role": "Ролевые достижения",
+        "title": "Достижения за звание",
+        "gameplay": "Игровые достижения"
+      },
+      "xp_reward": "+{{amount}} опыта",
+      "cp_reward": "+{{amount}} КП",
+      "list": {
+        "first_assembly": {
+          "name": "Первая сессия",
+          "desc": "Сыграйте в свою первую игру."
+        },
+        "veteran": {
+          "name": "Опытный делегат",
+          "desc": "Сыграйте 25 игр."
+        },
+        "elder": {
+          "name": "Старейшина Ассамблеи",
+          "desc": "Сыграйте 100 игр."
+        },
+        "first_victory": {
+          "name": "Для справки",
+          "desc": "Выиграйте свою первую игру."
+        },
+        "ten_wins": {
+          "name": "Проверенный командир",
+          "desc": "Выиграйте 10 игр."
+        },
+        "fifty_wins": {
+          "name": "Гранд Чемпион",
+          "desc": "Выиграйте 50 игр."
+        },
+        "civil_first_win": {
+          "name": "Государственный служащий",
+          "desc": "Выиграйте свою первую игру за Гражданского."
+        },
+        "civil_ten_wins": {
+          "name": "Уставный защитник",
+          "desc": "Выиграйте 10 игр, играя за Гражданского."
+        },
+        "civil_twenty_wins": {
+          "name": "Хранитель Хартии",
+          "desc": "Выиграйте 20 игр, играя за Гражданского."
+        },
+        "state_first_win": {
+          "name": "Теневой агент",
+          "desc": "Выиграйте свою первую игру за государство."
+        },
+        "state_ten_wins": {
+          "name": "Государственный оперативник",
+          "desc": "Выиграйте 10 игр за государство."
+        },
+        "state_twenty_wins": {
+          "name": "Железный кулак",
+          "desc": "Выиграйте 20 игр за государство."
+        },
+        "overseer_played": {
+          "name": "Архитектор",
+          "desc": "Сыграйте в игру за Смотрителя."
+        },
+        "overseer_win": {
+          "name": "Неприкасаемый",
+          "desc": "Выиграйте игру, играя за Смотрителя."
+        },
+        "power_used": {
+          "name": "Карты на столе",
+          "desc": "Используйте любую способность главной роли."
+        },
+        "assassins_mark": {
+          "name": "Знак убийцы",
+          "desc": "Казните игрока, используя способность Убийцы."
+        },
+        "overseer_hunter": {
+          "name": "Конец надзирателя",
+          "desc": "Убейте Надзирателя, играя за Убийцу."
+        },
+        "agenda_first": {
+          "name": "Скрытая программа",
+          "desc": "Заполните личную повестку дня."
+        },
+        "agenda_ten": {
+          "name": "Мастер повестки дня",
+          "desc": "Выполните 10 личных задач."
+        },
+        "agenda_twentyfive": {
+          "name": "Мастер-тактик",
+          "desc": "Выполните 25 личных задач."
+        },
+        "first_kill": {
+          "name": "Исполнительное решение",
+          "desc": "Казнить игрока как президента."
+        },
+        "five_kills": {
+          "name": "Очистить",
+          "desc": "Казнить 5 игроков во всех играх."
+        },
+        "clean_sweep": {
+          "name": "Чистая очистка",
+          "desc": "Выиграйте игру без единой директивы штата."
+        },
+        "long_game": {
+          "name": "Война на истощение",
+          "desc": "Выживите в игре, которая дойдет до 12-го раунда."
+        },
+        "landslide": {
+          "name": "Оползень",
+          "desc": "Выиграйте выборы, на которых каждый игрок проголосует «за»."
+        }
+      }
+    },
+    "history": {
+      "loading": "Загрузка архивных данных...",
+      "btn_replay": "Реконструировать",
+      "btn_decrypting": "Расшифровка...",
+      "no_matches": "Архивных данных не найдено",
+      "first_game_hint": "Здесь появятся данные вашего первого матча.",
+      "error_data_unavailable": "Данные недоступны",
+      "error_fetch_failed": "Ошибка извлечения из архива",
+      "roles": {
+        "civil": "Гражданский",
+        "state": "Государство",
+        "overseer": "Надзиратель"
+      },
+      "outcomes": {
+        "victory": "Победа",
+        "defeat": "Поражение",
+        "aborted": "Прервано"
+      }
+    },
+    "admin": {
+      "tabs": {
+        "rooms": "Номера",
+        "users": "Пользователи",
+        "system": "Система",
+        "logs": "Аудит"
+      },
+      "broadcast": {
+        "title": "Глобальное вещание",
+        "placeholder": "Введите сообщение объявления...",
+        "btn_send": "Трансляция"
+      },
+      "config": {
+        "maintenance": "Режим обслуживания системы",
+        "xp_boost": "Глобальный множитель опыта",
+        "ip_boost": "Глобальный множитель IP"
+      },
+      "rooms": {
+        "filter_placeholder": "Идентификатор комнаты или хост...",
+        "btn_refresh": "Обновить",
+        "purge_confirm": "Удалить все неактивные комнаты?",
+        "btn_purge": "Очистка помещений",
+        "active_sessions": "Активные сессии",
+        "host_label": "Хост: {{name}}",
+        "users_summary": "{{current}} / {{max}} Делегаты"
+      },
+      "logs": {
+        "sessions": "Исторические сессии",
+        "persisted_log": "Архивные записи: {{id}}",
+        "waiting": "Ожидание данных...",
+        "empty": "Записи аудита не найдены"
+      }
+    },
+    "shop": {
+      "title": "Косметическая заявка",
+      "subtitle": "Обменяйте IP и CP на рамки, значки и многое другое.",
+      "btn_purchase": "Заявка ({{amount}})",
+      "item_type_policy": "Скин политики",
+      "item_style": "{{type}} Стиль",
+      "btn_owned": "В собственности",
+      "btn_locked_pass": "Награда за пропуск",
+      "btn_buy_pts": "Купить · {{price}} IP"
+    },
+    "pass": {
+      "title": "Пропуск сборки",
+      "subtitle": "Сезон 1: Кризис",
+      "lvl_label": "Уровень {{lvl}}",
+      "xp_to_next": "{{xp}} / {{needed}} Опыт",
+      "max_level": "Максимальный уровень",
+      "item_level": "Уровень {{lvl}} Награда",
+      "claimed": "Заявлено",
+      "unlocked": "Разблокировано",
+      "locked": "Классифицировано",
+      "season": "Сезон {{number}}",
+      "season_desc": "Выполняйте задания и зарабатывайте XP, чтобы разблокировать эксклюзивную косметику.",
+      "level": "Уровень",
+      "xp_summary": "{{amount}} Заработано опыта",
+      "footer_season": "Сезон {{number}} · Активный",
+      "footer_premium_hint": "Премиум-награды открываются при повышении уровня. Продолжайте играть.",
+      "btn_claim": "Заявить",
+      "btn_claimed": "Заявлено",
+      "btn_locked": "Заблокировано",
+      "rewards": {
+        "geometric_grid": "Геометрическая сетка",
+        "purple_rain": "Пурпурный дождь",
+        "static_noise": "Статический шум",
+        "purple_pill": "Фиолетовая таблетка"
+      },
+      "reward_types": {
+        "cp": "Точки ясности",
+        "cp_count": "{{count}} КП",
+        "background": "Фон",
+        "vote": "Стиль голосования",
+        "music": "Музыкальная дорожка",
+        "frame": "Рамка границы",
+        "reward": "Награда"
+      }
+    },
+    "leaderboard": {
+      "title": "Таблица лидеров",
+      "loading": "Загрузка...",
+      "no_data": "Данных пока нет. Сыграйте в несколько {{mode}} игр!",
+      "column_player": "Игрок",
+      "column_rank_elo": "Ранг · ЭЛО",
+      "your_position": "Ваша позиция",
+      "you": "Ты",
+      "modes": {
+        "overall": "В целом",
+        "ranked": "Рейтинг",
+        "casual": "Казуальный",
+        "classic": "Классический",
+        "crisis": "Кризис"
+      },
+      "stats": {
+        "win_rate": "Выигрыш%",
+        "games": "Игры",
+        "wins": "Победы",
+        "elo": "ЭЛО"
       }
     }
   },
   "social": {
     "clan": {
-      "profile_label": "Clan Profile",
-      "level": "Level",
-      "members": "Members",
-      "no_desc": "No description provided.",
-      "share_clan": "Share Clan",
-      "roster": "Clan Roster",
-      "contribution": "Contrib.",
-      "founded_on": "Clan founded on {{date}}",
-      "not_found": "Clan not found",
-      "load_failed": "Failed to load clan",
-      "check_tag": "Check the clan tag and try again.",
-      "return_home": "Return Home"
+      "profile_label": "Профиль клана",
+      "level": "Уровень",
+      "members": "Участники",
+      "no_desc": "Описание не предоставлено.",
+      "share_clan": "Поделиться кланом",
+      "roster": "Состав клана",
+      "contribution": "Вклад.",
+      "founded_on": "Клан основан {{date}}",
+      "not_found": "Клан не найден",
+      "load_failed": "Не удалось загрузить клан",
+      "check_tag": "Проверьте тег клана и повторите попытку.",
+      "return_home": "Вернуться домой"
     },
     "friends": {
-      "search_placeholder": "Search players by username…",
-      "search_btn": "Allies",
-      "search_min_chars": "Type at least 2 characters to search",
-      "searching": "Searching…",
-      "search_no_results": "No players found for \"{{query}}\"",
-      "status_sent": "Sent",
-      "friends_label": "Allies",
-      "pending_requests": "Pending Requests ({{count}})",
-      "wants_to_be_friends": "Wants to be allies",
-      "no_friends": "No allies yet.",
-      "no_friends_hint": "Search for players above or add someone from a game.",
-      "online": "Online ({{count}})",
-      "offline": "Offline ({{count}})",
-      "in_game": "In assembly · {{roomId}}",
-      "in_lobby": "In lobby",
-      "recently_played": "Recently Played With",
-      "time_m_ago": "{{count}}m ago",
-      "time_h_ago": "{{count}}h ago",
-      "time_d_ago": "{{count}}d ago",
-      "add_friend": "Add Ally",
-      "invite_title": "Invite to assembly",
-      "join_title": "Join their assembly",
-      "remove_title": "Remove ally"
+      "search_placeholder": "Поиск игроков по имени пользователя…",
+      "search_btn": "Союзники",
+      "search_min_chars": "Введите не менее 2 символов для поиска",
+      "searching": "Поиск…",
+      "search_no_results": "Игроков для \"{{query}}\" не найдено",
+      "status_sent": "Отправлено",
+      "friends_label": "Союзники",
+      "pending_requests": "Ожидающие запросы ({{count}})",
+      "wants_to_be_friends": "Хочет быть союзниками",
+      "no_friends": "Союзников пока нет.",
+      "no_friends_hint": "Найдите игроков выше или добавьте кого-нибудь из игры.",
+      "online": "В сети ({{count}})",
+      "offline": "Не в сети ({{count}})",
+      "in_game": "В сборке · {{roomId}}",
+      "in_lobby": "В вестибюле",
+      "recently_played": "Недавно играл с",
+      "time_m_ago": "{{count}}м назад",
+      "time_h_ago": "{{count}}ч назад",
+      "time_d_ago": "{{count}}д назад",
+      "add_friend": "Добавить союзника",
+      "invite_title": "Пригласить на собрание",
+      "join_title": "Присоединяйтесь к их собранию",
+      "remove_title": "Удалить союзника"
+    }
+  },
+  "playercard": {
+    "play_now": "Играйте сейчас",
+    "player_profile": "Профиль игрока",
+    "elo_label": "ЭЛО",
+    "elo_to_next": "{{amount}} ELO на следующий уровень",
+    "joined_on": "Присоединился к {{date}}",
+    "share_profile": "Поделиться профилем",
+    "copied": "Скопировано!",
+    "join_assembly": "Присоединяйтесь к Ассамблее",
+    "think_can_beat": "Думаешь, ты сможешь их победить?",
+    "free_to_play": "Бесплатная игра · Загрузка не требуется",
+    "stats": {
+      "games": "Игры",
+      "win_rate": "Процент побед",
+      "kills": "Убийства",
+      "kd_ratio": "Соотношение К/Д",
+      "win_rate_role": "Процент побед по ролям",
+      "perf_mode": "Производительность по режимам",
+      "total_wins": "Всего побед",
+      "agendas_done": "Повестка дня выполнена",
+      "deaths": "Смерти",
+      "achievements": "Достижения",
+      "medals": "медали"
+    },
+    "errors": {
+      "player_not_found": "Игрок не найден",
+      "player_not_found_desc": "Этот игрок не существует или его профиль закрыт.",
+      "failed_to_load_profile": "Не удалось загрузить профиль",
+      "generic_desc": "Проверьте подключение и повторите попытку."
     }
   }
 }

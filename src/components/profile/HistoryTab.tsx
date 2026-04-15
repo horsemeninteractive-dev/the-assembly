@@ -21,6 +21,7 @@ export function HistoryTab({ user, token, playSound }: HistoryTabProps) {
   const [replayState, setReplayState] = useState<GameState | null>(null);
   const [isReplayOpen, setIsReplayOpen] = useState(false);
   const [fetchingReplayId, setFetchingReplayId] = useState<string | null>(null);
+  const [replayError, setReplayError] = useState<string | null>(null);
 
   useEffect(() => {
     fetchHistory();
@@ -44,12 +45,13 @@ export function HistoryTab({ user, token, playSound }: HistoryTabProps) {
   };
 
   const handleWatchReplay = async (match: MatchSummary) => {
-    if (!match.id) return;
+    const targetId = match.matchId || match.id;
+    if (!targetId) return;
     
     try {
       setFetchingReplayId(match.id);
       playSound('click');
-      const res = await fetch(apiUrl(`/api/matches/${match.id}`), {
+      const res = await fetch(apiUrl(`/api/matches/${targetId}`), {
         headers: { Authorization: `Bearer ${token}` },
       });
       if (!res.ok) throw new Error();
@@ -68,8 +70,11 @@ export function HistoryTab({ user, token, playSound }: HistoryTabProps) {
       
       setReplayState(minimalState as GameState);
       setIsReplayOpen(true);
+      setReplayError(null);
     } catch (err) {
       console.error('Failed to load replay', err);
+      setReplayError(match.id);
+      setTimeout(() => setReplayError(null), 3000);
     } finally {
       setFetchingReplayId(null);
     }
@@ -88,10 +93,10 @@ export function HistoryTab({ user, token, playSound }: HistoryTabProps) {
       <div className="flex flex-col items-center justify-center py-16 gap-3 text-center">
         <Clock className="w-10 h-10 text-whisper" />
         <p className="text-ghost font-mono text-xs uppercase tracking-widest">
-          No matches recorded yet
+          {t('profile.history.no_matches')}
         </p>
         <p className="text-whisper text-xs italic">
-          Your game history will appear here after your first game.
+          {t('profile.history.first_game_hint')}
         </p>
       </div>
     );
@@ -309,7 +314,11 @@ export function HistoryTab({ user, token, playSound }: HistoryTabProps) {
                         )}
                       >
                         <HistoryIcon className={cn("w-4 h-4", fetchingReplayId === match.id && "animate-spin")} />
-                        {fetchingReplayId === match.id ? t('profile.history.btn_decrypting') : t('profile.history.btn_replay')}
+                        {fetchingReplayId === match.id 
+                          ? t('profile.history.btn_decrypting') 
+                          : replayError === match.id
+                            ? t('profile.history.error_data_unavailable')
+                            : t('profile.history.btn_replay')}
                       </button>
                     )}
 
@@ -329,7 +338,10 @@ export function HistoryTab({ user, token, playSound }: HistoryTabProps) {
         <ReplayModal
           gameState={replayState}
           isOpen={isReplayOpen}
-          onClose={() => setIsReplayOpen(false)}
+          onClose={() => {
+            setIsReplayOpen(false);
+            setReplayState(null);
+          }}
           playSound={playSound}
         />
       )}

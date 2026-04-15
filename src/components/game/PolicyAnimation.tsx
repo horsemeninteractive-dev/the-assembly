@@ -4,6 +4,8 @@ import { Shield, Scale, Eye } from 'lucide-react';
 import { GameState } from '../../../shared/types';
 import { getPolicyStyles } from '../../utils/cosmetics';
 import { cn } from '../../utils/utils';
+import { useTranslation } from '../../contexts/I18nContext';
+
 
 interface PolicyAnimationProps {
   gameState: GameState;
@@ -12,6 +14,8 @@ interface PolicyAnimationProps {
 }
 
 export const PolicyAnimation = ({ gameState, show, playSound }: PolicyAnimationProps) => {
+  const { t } = useTranslation();
+
   // Use a ref for the callback so it never causes the effect to re-run
   const playSoundRef = React.useRef(playSound);
   React.useEffect(() => {
@@ -80,8 +84,8 @@ export const PolicyAnimation = ({ gameState, show, playSound }: PolicyAnimationP
                 )}
                 <span className="text-sm font-mono uppercase tracking-[0.2em] font-bold text-center px-4">
                   {gameState.lastEnactedPolicy.type === 'Civil'
-                    ? 'CIVIL DIRECTIVE'
-                    : 'STATE DIRECTIVE'}
+                    ? t('game.policies.civil.directive')
+                    : t('game.policies.state.directive')}
                 </span>
               </div>
             </motion.div>

@@ -594,8 +594,9 @@ export class AIEngine {
     lines: readonly string[],
     targetName?: string
   ): void {
-    let text = lines[Math.floor(Math.random() * lines.length)];
-    if (targetName) text = text.replace('{name}', targetName.replace(' (AI)', ''));
+    const key = lines[Math.floor(Math.random() * lines.length)];
+    let text = `$$aiChat:${key}`;
+    if (targetName) text += `|${targetName.replace(' (AI)', '')}`;
     
     if (state.chatBlackout) {
       if (!state.chatBlackoutBuffer) state.chatBlackoutBuffer = [];

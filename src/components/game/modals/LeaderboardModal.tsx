@@ -6,6 +6,7 @@ import { User } from '../../../../shared/types';
 import { getRankTier, getRankLabel } from '../../../utils/ranks';
 import { RankIcon } from '../../icons';
 import { getProxiedUrl, apiUrl } from '../../../utils/utils';
+import { useTranslation } from '../../../contexts/I18nContext';
 
 interface LeaderboardModalProps {
   user: User;
@@ -15,29 +16,29 @@ interface LeaderboardModalProps {
 type ModeTab = 'Overall' | 'Ranked' | 'Casual' | 'Classic' | 'Crisis';
 type StatTab = 'Win%' | 'Games' | 'Wins' | 'ELO';
 
-const MODE_TABS: { id: ModeTab; label: string; color: string; activeBg: string }[] = [
-  { id: 'Overall', label: 'Overall', color: 'text-white', activeBg: 'bg-zinc-700 border-zinc-500' },
+const MODE_TABS: { id: ModeTab; labelKey: string; color: string; activeBg: string }[] = [
+  { id: 'Overall', labelKey: 'profile.leaderboard.modes.overall', color: 'text-white', activeBg: 'bg-zinc-700 border-zinc-500' },
   {
     id: 'Ranked',
-    label: 'Ranked',
+    labelKey: 'profile.leaderboard.modes.ranked',
     color: 'text-yellow-400',
     activeBg: 'bg-yellow-900/40 border-yellow-600/60',
   },
   {
     id: 'Casual',
-    label: 'Casual',
+    labelKey: 'profile.leaderboard.modes.casual',
     color: 'text-blue-400',
     activeBg: 'bg-blue-900/40 border-blue-600/60',
   },
   {
     id: 'Classic',
-    label: 'Classic',
+    labelKey: 'profile.leaderboard.modes.classic',
     color: 'text-emerald-400',
     activeBg: 'bg-emerald-900/40 border-emerald-600/60',
   },
   {
     id: 'Crisis',
-    label: 'Crisis',
+    labelKey: 'profile.leaderboard.modes.crisis',
     color: 'text-purple-400',
     activeBg: 'bg-purple-900/40 border-purple-600/60',
   },
@@ -51,6 +52,7 @@ const positionDisplay = (index: number) => {
 };
 
 export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
+  const { t } = useTranslation();
   const [boards, setBoards] = useState<Record<string, any[]>>({
     overall: [],
     ranked: [],
@@ -140,7 +142,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-2xl font-thematic text-primary flex items-center gap-2">
             <Trophy className="w-6 h-6 text-yellow-500" />
-            Leaderboard
+            {t('profile.leaderboard.title')}
           </h2>
           <button onClick={onClose} className="p-2 text-muted hover:text-primary transition-colors">
             <X className="w-5 h-5" />
@@ -160,7 +162,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
                   : 'border-transparent text-muted hover:text-ghost'
               )}
             >
-              {tab.label}
+              {t(tab.labelKey)}
             </button>
           ))}
         </div>
@@ -178,7 +180,10 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
                   : 'border-transparent text-muted hover:text-ghost'
               )}
             >
-              {stat}
+              {stat === 'Win%' ? t('profile.leaderboard.stats.win_rate') :
+               stat === 'Games' ? t('profile.leaderboard.stats.games') :
+               stat === 'Wins' ? t('profile.leaderboard.stats.wins') :
+               t('profile.leaderboard.stats.elo')}
             </button>
           ))}
         </div>
@@ -187,19 +192,23 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
         {!loading && (
           <div className="flex items-center gap-3 px-3 text-[10px] uppercase tracking-widest text-muted font-mono mb-2">
             <div className="w-8 text-center shrink-0">#</div>
-            <div className="flex-1">Player</div>
-            {statTab === 'ELO' && <div className="w-28 text-right shrink-0">Rank · ELO</div>}
-            {statTab !== 'ELO' && <div className="w-16 text-right shrink-0">{statTab}</div>}
+            <div className="flex-1">{t('profile.leaderboard.column_player')}</div>
+            {statTab === 'ELO' && <div className="w-28 text-right shrink-0">{t('profile.leaderboard.column_rank_elo')}</div>}
+            {statTab !== 'ELO' && <div className="w-16 text-right shrink-0">
+              {statTab === 'Win%' ? t('profile.leaderboard.stats.win_rate') :
+               statTab === 'Games' ? t('profile.leaderboard.stats.games') :
+               t('profile.leaderboard.stats.wins')}
+            </div>}
           </div>
         )}
 
         {/* List */}
         <div className="space-y-1.5 overflow-y-auto custom-scrollbar flex-1 mb-4">
           {loading ? (
-            <div className="text-center text-muted py-10 font-mono text-sm">Loading...</div>
+            <div className="text-center text-muted py-10 font-mono text-sm">{t('profile.leaderboard.loading')}</div>
           ) : sortedData.length === 0 ? (
             <div className="text-center text-muted py-10 font-mono text-xs">
-              No data yet. Play some {modeTab} games!
+              {t('profile.leaderboard.no_data', { mode: t(activeModeConfig.labelKey) })}
             </div>
           ) : (
             sortedData.map((u, i) => {
@@ -232,7 +241,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
                       <div className="font-medium text-primary text-sm truncate">{u.username}</div>
                       {isMe && (
                         <div className="text-[9px] font-mono text-faint uppercase tracking-widest">
-                          You
+                          {t('profile.leaderboard.you')}
                         </div>
                       )}
                     </div>
@@ -271,7 +280,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
         {currentUserData && (
           <div className="pt-3 border-t border-default">
             <div className="text-[10px] uppercase tracking-widest text-muted font-mono mb-2">
-              Your Position
+              {t('profile.leaderboard.your_position')}
             </div>
             <div className="flex items-center gap-3 p-3 bg-surface-glass/60 rounded-xl border border-red-900/40 backdrop-blur-sm">
               <div className="w-8 text-center font-mono text-muted text-sm shrink-0">

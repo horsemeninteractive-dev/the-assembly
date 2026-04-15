@@ -552,10 +552,14 @@ function ReferralsTab({ user, playSound }: { user: User; playSound: (s: string) 
             <h3 className="text-sm font-mono uppercase tracking-widest text-emerald-400 mb-1">{t('profile.referrals.active_reward')}</h3>
             <p className="text-lg font-semibold text-primary">150 {t('profile.cp_label')}</p>
             <p className="text-xs text-ghost mt-2 leading-relaxed">
-              {t('profile.referrals.reward_desc', {
-                interpolation: { escapeValue: false },
-                components: { 1: <span className="text-primary font-bold underline" />, 3: <span className="text-yellow-400 font-bold" /> }
-              })}
+              <Trans
+                i18nKey="profile.referrals.reward_desc"
+                values={{ amount: 150 }}
+                components={{ 
+                  1: <span className="text-primary font-bold underline" />, 
+                  3: <span className="text-yellow-400 font-bold" /> 
+                }}
+              />
             </p>
           </div>
         </div>

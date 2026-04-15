@@ -57,14 +57,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onPlayNow, onLogin }) 
   const LOOP_STEPS = [
     {
       num: '01',
-      label: t('game.phases.nomination', { name: '' }).split(' ')[2], // Extract label or just use t
+      label: t('landing.loop.label_1'),
       color: 'from-yellow-600/20 to-yellow-900/5 border-yellow-500/25 text-yellow-400',
       dot: 'bg-yellow-500',
       desc: t('landing.loop.step_1'),
     },
     {
       num: '02',
-      label: t('game.phases.voting').split(' ')[2],
+      label: t('landing.loop.label_2'),
       color: 'from-purple-600/20 to-purple-900/5 border-purple-500/25 text-purple-400',
       dot: 'bg-purple-500',
       desc: t('landing.loop.step_2'),

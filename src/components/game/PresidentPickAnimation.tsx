@@ -4,6 +4,7 @@ import { Crown } from 'lucide-react';
 import { Player } from '../../../shared/types';
 import { cn, getProxiedUrl } from '../../utils/utils';
 import { getFrameStyles } from '../../utils/cosmetics';
+import { useTranslation } from '../../contexts/I18nContext';
 
 interface PresidentPickAnimationProps {
   players: Player[];
@@ -22,6 +23,7 @@ export const PresidentPickAnimation: React.FC<PresidentPickAnimationProps> = ({
   playSound,
   onComplete,
 }) => {
+  const { t } = useTranslation();
   const alivePlayers = players.filter((p) => p.isAlive);
   const presidentIdx = alivePlayers.findIndex((p) => p.id === presidentId);
   const safePresidentIdx = presidentIdx === -1 ? 0 : presidentIdx;
@@ -125,10 +127,10 @@ export const PresidentPickAnimation: React.FC<PresidentPickAnimationProps> = ({
             className="mb-8 text-center"
           >
             <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-white/40 mb-1">
-              The Assembly
+              {t('common.title')}
             </p>
             <h2 className="text-2xl sm:text-3xl font-serif italic text-white">
-              Selecting First President
+              {t('game.president_pick.selecting')}
             </h2>
           </motion.div>
 
@@ -228,7 +230,7 @@ export const PresidentPickAnimation: React.FC<PresidentPickAnimationProps> = ({
                 className="mt-8 text-center"
               >
                 <p className="text-[10px] font-mono uppercase tracking-[0.3em] text-yellow-400/70 mb-1">
-                  First President
+                  {t('game.president_pick.reveal_label')}
                 </p>
                 <h3 className="text-2xl sm:text-3xl font-serif italic text-yellow-300 drop-shadow-[0_0_20px_rgba(234,179,8,0.5)]">
                   {president.name.replace(' (AI)', '')}

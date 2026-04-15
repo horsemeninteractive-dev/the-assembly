@@ -155,10 +155,10 @@ export function MedalsTab({ user, token, onUpdateUser, playSound }: MedalsTabPro
                     {/* Name + description */}
                     <div className="flex-1 min-w-0">
                       <div className="text-[11px] font-bold text-primary tracking-wide uppercase">
-                        {def.name}
+                        {t(`profile.medals.list.${def.id}.name`)}
                       </div>
                       <div className="text-[10px] text-ghost leading-tight truncate">
-                        {def.description}
+                        {t(`profile.medals.list.${def.id}.desc`)}
                       </div>
                     </div>
 

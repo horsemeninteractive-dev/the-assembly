@@ -133,7 +133,7 @@ function ChallengeCard({ challenge }: { challenge: EnrichedChallenge }) {
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2 mb-0.5">
             <p className={cn('text-sm font-semibold leading-tight', done ? 'text-muted line-through' : 'text-primary')}>
-              {challenge.name}
+              {t(`profile.challenges.list.${challenge.id}.name`)}
             </p>
             <span className={cn(
               'text-[9px] font-mono uppercase tracking-widest shrink-0',
@@ -142,7 +142,7 @@ function ChallengeCard({ challenge }: { challenge: EnrichedChallenge }) {
               {challenge.progress}/{challenge.target}
             </span>
           </div>
-          <p className="text-xs text-tertiary leading-snug mb-3">{challenge.description}</p>
+          <p className="text-xs text-tertiary leading-snug mb-3">{t(`profile.challenges.list.${challenge.id}.desc`)}</p>
 
           {/* Progress bar */}
           <div className="h-1.5 w-full bg-surface rounded-full overflow-hidden mb-2">

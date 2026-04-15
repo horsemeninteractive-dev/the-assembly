@@ -138,18 +138,30 @@ export const GameOverModal = ({
                       : 'text-muted'
                 )}
               >
-                {gameState.winner === 'Civil'
-                  ? gameState.winReason || t('game.game_over.banners.civil_win_default')
-                  : gameState.winner === 'State'
-                    ? gameState.winReason || t('game.game_over.banners.state_win_default')
-                    : t('game.game_over.banners.inconclusive')}
+                {(() => {
+                  const reason = gameState.winReason;
+                  const winner = gameState.winner;
+                  if (!reason) {
+                    if (winner === 'Civil') return t('game.modals.game_over.banners.civil_win_default');
+                    if (winner === 'State') return t('game.modals.game_over.banners.state_win_default');
+                    return t('game.modals.game_over.banners.inconclusive');
+                  }
+                  const map: Record<string, string> = {
+                    'CHARTER RESTORED': 'charter_restored',
+                    'STATE SUPREMACY': 'state_supremacy',
+                    'THE OVERSEER HAS BEEN EXECUTED': 'overseer_executed',
+                    'THE OVERSEER HAS ASCENDED': 'overseer_ascended'
+                  };
+                  const key = map[reason];
+                  return key ? t(`game.tracks.win_reasons.${key}`) : reason;
+                })()}
               </div>
               <p className="text-responsive-xs text-muted font-mono uppercase tracking-[0.2em]">
                 {gameState.winner === 'Civil'
-                  ? t('game.game_over.banners.civil_desc')
+                  ? t('game.modals.game_over.banners.civil_desc')
                   : gameState.winner === 'State'
-                    ? t('game.game_over.banners.state_desc')
-                    : t('game.game_over.banners.abort_desc')}
+                    ? t('game.modals.game_over.banners.state_desc')
+                    : t('game.modals.game_over.banners.abort_desc')}
               </p>
             </div>
 
@@ -158,7 +170,7 @@ export const GameOverModal = ({
               {/* Left Column: Match Summary & Progress */}
               <div className="lg:w-1/2 lg:basis-1/2 lg:overflow-y-auto custom-scrollbar p-[3vh] space-y-[2.5vh] shrink-0">
                 <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono border-b border-subtle/30 pb-2 flex justify-between items-center">
-                  <span>{t('game.game_over.performance_header')}</span>
+                  <span>{t('game.modals.game_over.performance_header')}</span>
                 </div>
 
                 {/* ── Post-match ELO summary ────────────────── */}
@@ -179,8 +191,8 @@ export const GameOverModal = ({
                         )}
                       >
                         {postMatchResult.won
-                          ? t('game.game_over.victory')
-                          : t('game.game_over.defeat')}
+                          ? t('game.modals.game_over.victory')
+                          : t('game.modals.game_over.defeat')}
                       </span>
                       <span className="text-[10px] font-mono text-faint uppercase tracking-widest">
                         {postMatchResult.mode} · {postMatchResult.role}
@@ -196,7 +208,7 @@ export const GameOverModal = ({
                       {isRanked ? (
                         <div className="bg-surface-glass/40 rounded-xl p-2.5 text-center border border-subtle">
                           <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                            <Trophy className="w-3 h-3" /> {t('game.game_over.elo')}
+                            <Trophy className="w-3 h-3" /> {t('game.modals.game_over.elo')}
                           </div>
                           <EloChange change={postMatchResult.eloChange} />
                           <div className="text-[9px] font-mono text-faint mt-0.5">
@@ -217,17 +229,17 @@ export const GameOverModal = ({
                       ) : (
                         <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                           <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                            <Trophy className="w-3 h-3" /> {t('game.game_over.elo')}
+                            <Trophy className="w-3 h-3" /> {t('game.modals.game_over.elo')}
                           </div>
                           <span className="text-muted text-xs font-mono">
-                            {t('game.game_over.casual')}
+                            {t('game.modals.game_over.casual')}
                           </span>
                         </div>
                       )}
 
                       <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                         <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                          <Flame className="w-3 h-3" /> {t('game.game_over.xp')}
+                          <Flame className="w-3 h-3" /> {t('game.modals.game_over.xp')}
                         </div>
                         <span className="text-yellow-400 font-mono text-sm font-bold">
                           +{postMatchResult.xpEarned}
@@ -236,7 +248,7 @@ export const GameOverModal = ({
 
                       <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                         <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                          <Coins className="w-3 h-3" /> {t('game.game_over.ip')}
+                          <Coins className="w-3 h-3" /> {t('game.modals.game_over.ip')}
                         </div>
                         <span className="text-emerald-400 font-mono text-sm font-bold">
                           +{postMatchResult.ipEarned}
@@ -247,7 +259,7 @@ export const GameOverModal = ({
                         postMatchResult.clanXpEarned > 0 && (
                           <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                             <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                              <Shield className="w-3 h-3" /> {t('game.game_over.clan_xp')}
+                              <Shield className="w-3 h-3" /> {t('game.modals.game_over.clan_xp')}
                             </div>
                             <span className="text-blue-400 font-mono text-sm font-bold">
                               +{postMatchResult.clanXpEarned}
@@ -283,13 +295,13 @@ export const GameOverModal = ({
                         />
                         <div className="min-w-0">
                           <div className="text-responsive-xs uppercase tracking-widest text-muted font-mono mb-0.5">
-                            {t('game.game_over.agenda')}
+                            {t('game.modals.game_over.agenda')}
                           </div>
                           <div className="text-responsive-sm font-bold text-primary uppercase tracking-wide">
-                            {agenda.name}
+                            {t(`game.agendas.${agenda.id}.name`)}
                           </div>
                           <div className="text-responsive-xs text-tertiary leading-tight mt-0.5">
-                            {agenda.description}
+                            {t(`game.agendas.${agenda.id}.desc`)}
                           </div>
                         </div>
                       </div>
@@ -308,7 +320,7 @@ export const GameOverModal = ({
                         <div className="flex items-center gap-2 mb-2">
                           <Medal className="w-[2vh] h-[2vh] text-yellow-400 shrink-0" />
                           <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-yellow-400">
-                            {t('game.game_over.achievements_header')}
+                            {t('game.modals.game_over.achievements_header')}
                           </span>
                         </div>
                         <div className="space-y-1.5">
@@ -334,7 +346,7 @@ export const GameOverModal = ({
               <div className="lg:w-1/2 lg:basis-1/2 flex flex-col min-h-0 bg-black/5 lg:bg-transparent shrink-0">
                 <div className="flex-1 lg:overflow-y-auto custom-scrollbar p-[3vh] space-y-[2.5vh]">
                   <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono border-b border-subtle/30 pb-2 flex justify-between items-center">
-                    <span>{t('game.game_over.revelations_header')}</span>
+                    <span>{t('game.modals.game_over.revelations_header')}</span>
                     <OverseerIcon className="w-3 h-3 opacity-30" />
                   </div>
 
@@ -343,6 +355,7 @@ export const GameOverModal = ({
                       const specInfo = gameState.spectatorRoles?.[p.id];
                       const titleRole = specInfo?.titleRole || p.titleRole;
                       const agendaName = specInfo?.agendaName;
+                      const agendaId = specInfo?.agendaId;
 
                       return (
                         <div
@@ -374,7 +387,7 @@ export const GameOverModal = ({
                                   {p.name.replace(' (AI)', '')}
                                   {p.id === myId && (
                                     <span className="ml-1.5 text-[9px] text-yellow-500 uppercase tracking-tighter">
-                                      {t('game.game_over.you')}
+                                      {t('game.modals.game_over.you')}
                                     </span>
                                   )}
                                 </span>
@@ -406,8 +419,10 @@ export const GameOverModal = ({
                                 <div className="flex items-center gap-1.5">
                                   <Target className="w-2.5 h-2.5 text-muted" />
                                   <span className="text-[10px] font-mono text-tertiary uppercase tracking-wider truncate">
-                                    {t('game.game_over.agenda')}:{' '}
-                                    <span className="text-secondary">{agendaName}</span>
+                                    {t('game.modals.game_over.agenda')}:{' '}
+                                    <span className="text-secondary">
+                                      {agendaId ? t(`game.agendas.${agendaId}.name`) : agendaName}
+                                    </span>
                                   </span>
                                 </div>
                               )}
@@ -438,7 +453,7 @@ export const GameOverModal = ({
                   className="flex-1 py-[1.2vh] bg-card text-tertiary border border-default rounded-xl hover:bg-hover hover:text-primary transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2"
                 >
                   <Scroll className="w-[2vh] h-[2vh]" />
-                  {t('game.game_over.action_log')}
+                  {t('game.modals.game_over.action_log')}
                 </button>
                 <button
                   onMouseEnter={() => playSound('hover')}
@@ -446,7 +461,7 @@ export const GameOverModal = ({
                   className="flex-1 py-[1.2vh] bg-surface-glass text-primary border border-primary/30 rounded-xl hover:bg-primary/10 transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2 border-primary/20"
                 >
                   <History className="w-[2vh] h-[2vh]" />
-                  {t('game.game_over.action_replay')}
+                  {t('game.modals.game_over.action_replay')}
                 </button>
               </div>
 
@@ -462,7 +477,7 @@ export const GameOverModal = ({
                   )}
                 >
                   <Share2 className="w-[2vh] h-[2vh]" />
-                  {copied ? t('game.game_over.action_shared') : t('game.game_over.action_share')}
+                  {copied ? t('game.modals.game_over.action_shared') : t('game.modals.game_over.action_share')}
                 </button>
                 <button
                   onMouseEnter={() => playSound('hover')}
@@ -480,14 +495,14 @@ export const GameOverModal = ({
                   onClick={onPlayAgain}
                   className="flex-1 py-[1.5vh] btn-primary rounded-xl hover:bg-subtle transition-all font-thematic text-responsive-sm uppercase tracking-widest"
                 >
-                  {t('game.game_over.action_play_again')}
+                  {t('game.modals.game_over.action_play_again')}
                 </button>
                 <button
                   onMouseEnter={() => playSound('hover')}
                   onClick={onLeave}
                   className="flex-1 py-[1.5vh] bg-card text-primary rounded-xl hover:bg-subtle transition-all font-thematic text-responsive-sm uppercase tracking-widest border border-default"
                 >
-                  {t('game.game_over.action_lobby')}
+                  {t('game.modals.game_over.action_lobby')}
                 </button>
               </div>
             </div>
@@ -504,5 +519,3 @@ export const GameOverModal = ({
     </AnimatePresence>
   );
 };
-
-

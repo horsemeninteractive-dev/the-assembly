@@ -1,7 +1,8 @@
 import { useEffect, useRef } from 'react';
 import { GameState, Player } from '../../shared/types';
 import * as aiSpeech from '../services/aiSpeech';
-
+import { parseAiChat } from '../utils/utils';
+import { useTranslation } from '../contexts/I18nContext';
 interface UseGameSoundsProps {
   gameState: GameState;
   me: Player | undefined;
@@ -45,10 +46,13 @@ export function useGameSounds({
   selectedPlayerId,
   setSpeakingPlayers,
 }: UseGameSoundsProps) {
+  const { t } = useTranslation();
   const prevPhase = useRef<string | undefined>(undefined);
   const prevVotes = useRef(0);
   const prevCivilDirectives = useRef(0);
   const prevStateDirectives = useRef(0);
+  const prevElectionTracker = useRef(0);
+  const prevVetoRequested = useRef(false);
   const prevAliveCount = useRef(0);
   const lastSpokenMessageIndexRef = useRef(-1);
 
@@ -96,12 +100,59 @@ export function useGameSounds({
       gameState.phase !== 'Voting' &&
       gameState.phase !== 'Voting_Reveal'
     ) {
-      if (gameState.phase === 'Legislative_President') playSound('election_passed');
-      else if (gameState.phase === 'Nominate_Chancellor') playSound('election_failed');
+      if (gameState.phase === 'Legislative_President') {
+        playSound('election_passed');
+        speak(t('game.narration.election_passed'));
+      } else if (gameState.phase === 'Nominate_Chancellor') {
+        playSound('election_failed');
+        if (gameState.electionTracker > prevElectionTracker.current) {
+          speak(t('game.narration.election_failed'));
+        }
+      }
     }
 
-    if (gameState.civilDirectives > prevCivilDirectives.current) speak('Charter secured.');
-    if (gameState.stateDirectives > prevStateDirectives.current) speak('The State advances.');
+    if (prevPhase.current !== gameState.phase) {
+      if (gameState.phase === 'Nominate_Chancellor') {
+        if (prevPhase.current !== 'Voting' && prevPhase.current !== 'Voting_Reveal' && prevPhase.current !== 'Legislative_Chancellor') {
+          speak(t('game.narration.nomination'));
+        }
+      } else if (gameState.phase === 'Voting') {
+        speak(t('game.narration.voting_start'));
+      } else if (gameState.phase === 'Executive_Action') {
+        const action = gameState.currentExecutiveAction;
+        if (action === 'Investigate') speak(t('game.narration.executive_investigate'));
+        else if (action === 'PolicyPeek') speak(t('game.narration.executive_peek'));
+        else if (action === 'SpecialElection') speak(t('game.narration.executive_election'));
+        else if (action === 'Execution') speak(t('game.narration.executive_assassinate'));
+      }
+    }
+
+    if (gameState.civilDirectives > prevCivilDirectives.current) {
+      if (gameState.lastEnactedPolicy?.isChaos) {
+        speak(t('game.narration.chaos'));
+      } else {
+        speak(t('game.narration.directive_civil'));
+      }
+    }
+    if (gameState.stateDirectives > prevStateDirectives.current) {
+      if (gameState.lastEnactedPolicy?.isChaos) {
+        speak(t('game.narration.chaos'));
+      } else {
+        speak(t('game.narration.directive_state'));
+      }
+    }
+
+    if (!prevVetoRequested.current && gameState.vetoRequested) {
+      speak(t('game.narration.veto_request'));
+    }
+    if (prevPhase.current === 'Legislative_Chancellor' && gameState.phase === 'Nominate_Chancellor' && prevVetoRequested.current) {
+      if (gameState.civilDirectives === prevCivilDirectives.current && gameState.stateDirectives === prevStateDirectives.current) {
+        speak(t('game.narration.veto_confirm'));
+      }
+    }
+
+    prevElectionTracker.current = gameState.electionTracker;
+    prevVetoRequested.current = gameState.vetoRequested;
     prevCivilDirectives.current = gameState.civilDirectives;
     prevStateDirectives.current = gameState.stateDirectives;
 
@@ -165,8 +216,9 @@ export function useGameSounds({
     if (sender && sender.isAI) {
       const profile = aiSpeech.getVoiceProfileForAi(sender.name);
       if (profile) {
+        const parsedText = parseAiChat(lastMessage.text, t);
         aiSpeech.speakAiMessage(
-          lastMessage.text,
+          parsedText,
           sender.name,
           profile,
           ttsVolume / 100,

@@ -4,7 +4,7 @@ import { MessageSquare, X, Smile, Send, User as UserIcon } from 'lucide-react';
 import EmojiPicker, { Theme, EmojiStyle } from 'emoji-picker-react';
 import { GameState, Player } from '../../../../shared/types';
 import { EmojiRenderer } from '../../EmojiRenderer';
-import { cn, getProxiedUrl } from '../../../utils/utils';
+import { cn, getProxiedUrl, parseAiChat } from '../../../utils/utils';
 import { useTranslation } from '../../../contexts/I18nContext';
 
 interface ChatPanelProps {
@@ -128,7 +128,7 @@ export const ChatPanel = ({
                         : 'bg-card text-secondary rounded-tl-none'
                     )}
                   >
-                    <EmojiRenderer text={item.text} />
+                    <EmojiRenderer text={parseAiChat(item.text, t)} />
                   </div>
                 </div>
               </div>

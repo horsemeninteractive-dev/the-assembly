@@ -28,7 +28,7 @@ export function extractBigPlays(gameState: GameState, t: any): BigPlay[] {
     if (killed) {
       plays.push({
         icon: 'swords',
-        text: t('debrief.plays.assassin', { 
+        text: t('game.debrief.plays.assassin', { 
           assassin: assassin.name.replace(' (AI)', ''), 
           killed: killed.name.replace(' (AI)', '') 
         }),
@@ -48,8 +48,8 @@ export function extractBigPlays(gameState: GameState, t: any): BigPlay[] {
     plays.push({
       icon: 'zap',
       text: executed.length === 1 
-        ? t('debrief.plays.execution_one', { name: names }) 
-        : t('debrief.plays.execution_many', { names }),
+        ? t('game.debrief.plays.execution_one', { name: names }) 
+        : t('game.debrief.plays.execution_many', { names }),
     });
   }
 
@@ -60,8 +60,8 @@ export function extractBigPlays(gameState: GameState, t: any): BigPlay[] {
       icon: 'alert',
       text:
         chaosCount === 1
-          ? t('debrief.plays.chaos_one')
-          : t('debrief.plays.chaos_many', { count: chaosCount }),
+          ? t('game.debrief.plays.chaos_one')
+          : t('game.debrief.plays.chaos_many', { count: chaosCount }),
     });
   }
 
@@ -72,21 +72,21 @@ export function extractBigPlays(gameState: GameState, t: any): BigPlay[] {
       icon: 'shield',
       text:
         vetoCount === 1
-          ? t('debrief.plays.veto_one')
-          : t('debrief.plays.veto_many', { count: vetoCount }),
+          ? t('game.debrief.plays.veto_one')
+          : t('game.debrief.plays.veto_many', { count: vetoCount }),
     });
   }
 
   // Marathon game
   if (gameState.round > 9) {
-    plays.push({ icon: 'clock', text: t('debrief.plays.marathon', { count: gameState.round }) });
+    plays.push({ icon: 'clock', text: t('game.debrief.plays.marathon', { count: gameState.round }) });
   }
 
   // Deadlocked race
   if (gameState.civilDirectives >= 4 && gameState.stateDirectives >= 4) {
     plays.push({
       icon: 'target',
-      text: t('debrief.plays.deadlock'),
+      text: t('game.debrief.plays.deadlock'),
     });
   }
 

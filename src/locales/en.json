@@ -17,7 +17,16 @@
     "create": "Create",
     "active": "Active",
     "searching": "Searching...",
-    "error_invalid_email": "Invalid email address"
+    "error_invalid_email": "Invalid email address",
+    "aye": "AYE",
+    "civil_short": "Civ",
+    "invite": "Invite",
+    "lvl": "Lvl",
+    "results": "Results",
+    "search": "Search",
+    "sent": "Sent",
+    "state_short": "Sta",
+    "status": "Status"
   },
   "auth": {
     "back": "Back",
@@ -84,7 +93,9 @@
       "label": "How It Plays",
       "title": "One Round. Five Moments.",
       "subtitle": "Each round forces every player to participate, declare, and be judged. There is no hiding.",
+      "label_1": "Nomination",
       "step_1": "The President nominates a Chancellor. Who you trust — and who you nominate — reveals everything.",
+      "label_2": "Voting",
       "step_2": "All players vote simultaneously. Public, inescapable, and open to interpretation.",
       "label_3": "Legislative Session",
       "step_3": "The President draws 3 policy cards, discards 1, passes 2 to the Chancellor. One will be enacted.",
@@ -204,15 +215,72 @@
       "published_by": "Published by",
       "credits": "Credits",
       "legal": "Legal Info"
+    },
+    "creator": {
+      "title": "Establish New Assembly",
+      "room_name": "Room Name",
+      "room_name_placeholder": "e.g. Berlin 1933",
+      "max_players": "Max Players",
+      "players_min": "5 Players",
+      "players_max": "10 Players",
+      "action_timer": "Action Timer",
+      "timer_off": "OFF",
+      "game_mode": "Game Mode",
+      "mode_ranked_desc": "ELO and full points awarded.",
+      "mode_casual_desc": "No ELO changes, reduced points.",
+      "mode_classic_desc": "Standard roles/rules. No ELO, reduced points.",
+      "mode_crisis_desc": "Round-based Event Cards. High risk, high points.",
+      "privacy": "Privacy",
+      "privacy_public": "Public",
+      "privacy_public_desc": "Anyone can join",
+      "privacy_friends": "Friends Only",
+      "privacy_friends_desc": "Your friends only",
+      "privacy_private": "Private",
+      "privacy_private_desc": "Invite code",
+      "invite_code_hint": "An invite code will be generated when the room is created.",
+      "btn_create": "Create Room",
+      "btn_maintenance": "Maintenance"
+    },
+    "practice": {
+      "title": "Solo Practice",
+      "subtitle": "Vs Artificial Intelligence",
+      "total_players": "Total Players",
+      "players_min": "5 (Fast)",
+      "players_max": "10 (Complex)",
+      "ai_difficulty": "AI Difficulty",
+      "difficulty_casual_desc": "AIs play simply and honestly.",
+      "difficulty_normal_desc": "AIs use standard strategies and deception.",
+      "difficulty_elite_desc": "AIs are highly deceptive and coordinate effectively.",
+      "btn_start": "Convene Assembly"
     }
   },
   "game": {
+    "roles": {
+      "civil": {
+        "name": "Civil",
+        "flavor": "Protect the Charter. Trust no one."
+      },
+      "state": {
+        "name": "State",
+        "flavor": "Implement the State's vision. Identify your allies."
+      },
+      "overseer": {
+        "name": "Overseer",
+        "flavor": "Sabotage the Assembly from within. Become the Chancellor."
+      }
+    },
     "round": "Round {{round}}",
     "phase": "Phase: {{phase}}",
     "civil_directives": "Civil Directives",
     "state_directives": "State Directives",
     "winner": "{{faction}} Wins!",
     "gameOver": "G A M E   O V E R",
+    "modes": {
+      "casual": "Casual",
+      "ranked": "Ranked",
+      "classic": "Classic",
+      "crisis": "Crisis"
+    },
     "phases": {
       "lobby": "Waiting for players ({{current}}/{{max}})...",
       "nominate_chancellor": "{{name}} is nominating a Chancellor.",
@@ -231,9 +299,9 @@
     "dossier": {
       "title": "Your Secret Dossier",
       "identity": "Secret Identity",
-      "identity_civil": "Political Identity: Civil",
-      "identity_overseer": "Political Identity: Overseer",
-      "identity_state": "Political Identity: State",
+      "identity_civil": "Civil",
+      "identity_overseer": "Overseer",
+      "identity_state": "State",
       "agenda": "Personal Agenda",
       "agenda_none": "No agenda assigned.",
       "agenda_bonus": "Completing this awards bonus XP and IP equal to a faction win.",
@@ -241,7 +309,8 @@
       "title_none": "No title role assigned.",
       "faction_state": "State Faction",
       "awaiting": "Awaiting role assignment...",
-      "close": "Close Dossier"
+      "close": "Close Dossier",
+      "active": "ACTIVE"
     },
     "powers": {
       "peek": {
@@ -269,46 +338,66 @@
       "execution": "Execution",
       "policy_peek": "Policy Peek"
     },
+    "policies": {
+      "civil": {
+        "name": "Civil",
+        "directive": "Civil Directive"
+      },
+      "state": {
+        "name": "State",
+        "directive": "State Directive"
+      }
+    },
     "titles": {
       "interdictor": {
         "name": "Interdictor",
-        "action": "Detain"
+        "action": "Detain",
+        "desc": "Prevents a player from participating in the next vote."
       },
       "broker": {
         "name": "Broker",
-        "action": "Veto"
+        "action": "Veto",
+        "desc": "Forces a re-nomination if the current choice is unsatisfactory."
       },
       "strategist": {
         "name": "Strategist",
-        "action": "Draw 4"
+        "action": "Draw 4",
+        "desc": "Draws an extra directive card during the legislative session."
       },
       "auditor": {
         "name": "Auditor",
-        "action": "Inspect"
+        "action": "Inspect",
+        "desc": "Gains access to view the top cards of the directive discard pile."
       },
       "assassin": {
         "name": "Assassin",
-        "action": "Execute"
+        "action": "Execute",
+        "desc": "May target any player for immediate elimination."
       },
       "handler": {
         "name": "Handler",
-        "action": "Swap"
+        "action": "Redirect",
+        "desc": "Exchanges the positions of the next two Presidents in the order."
       },
       "defector": {
         "name": "Defector",
-        "action": "Flip Vote"
+        "action": "Flip Vote",
+        "desc": "Secretly changes their vote result at the end of a session."
       },
       "archivist": {
         "name": "Archivist",
-        "action": "Deep Inspect"
+        "action": "Deep Inspect",
+        "desc": "Views the top 3 cards of the deck at any time."
       },
       "quorum": {
         "name": "Quorum",
-        "action": "Emergency Re-vote"
+        "action": "Emergency Re-vote",
+        "desc": "Forces a new vote immediately after a failed nomination."
       },
       "cipher": {
         "name": "Cipher",
-        "action": "Dispatch"
+        "action": "Dispatch",
+        "desc": "Sends an anonymous private message to any player."
       }
     },
     "tracks": {
@@ -322,7 +411,13 @@
       "win_civil_desc": "Civil wins immediately",
       "win_state": "State Supremacy",
       "win_state_desc": "State wins immediately",
-      "quorum_revote": "REVOTE"
+      "quorum_revote": "REVOTE",
+      "win_reasons": {
+        "charter_restored": "Charter Restored",
+        "state_supremacy": "State Supremacy",
+        "overseer_executed": "The Overseer has been Executed",
+        "overseer_ascended": "The Overseer has Ascended"
+      }
     },
     "player_card": {
       "candidate": "Candidate",
@@ -381,13 +476,561 @@
       "peek_prompt": "Review the top 3 cards of the deck.",
       "must_use_power": "You must use your executive power.",
       "pres_must_use": "The President must use their executive power.",
-      "lobby_ready_prompt": "Press Ready Up when you're ready to start. The game begins when all players are ready."
+      "lobby_ready_prompt": "Press Ready Up when you're ready to start. The game begins when all players are ready.",
+      "game_over_title": "Game Over",
+      "see_results": "See Assembly Results",
+      "play_again": "Play Again",
+      "skip_power": "Skip Power",
+      "ready_up": "Ready Up",
+      "ready": "Ready!",
+      "host_label": "Host",
+      "ready_count": "{{count}} / {{total}} Ready",
+      "lock_room": "Lock Room",
+      "unlock_room": "Unlock Room",
+      "force_start": "Force Start Game",
+      "need_players_ranked": "Need 5+ players for Ranked",
+      "no_players": "No players",
+      "voted_for": "Voted for {{name}}",
+      "censure_select": "Select a player on their card to censure (exclude from next nomination)",
+      "snap_volunteer_prompt": "Any player may volunteer to be the next President.",
+      "volunteered": "Volunteered",
+      "volunteer": "Volunteer",
+      "ready_to_serve": "{{count}} Ready to serve",
+      "prediction_logged": "Prediction Logged: {{faction}} Victory",
+      "prediction_reward": "50 IP will be credited if your faction prevails.",
+      "predict_prompt": "Predict Unity or Deception for",
+      "send": "Send",
+      "char_counter": "{{count}}/80 Characters",
+      "title_strategist_prompt": "Use Strategist power to draw an extra policy?",
+      "title_broker_prompt": "Use Broker power to force a re-nomination?",
+      "title_handler_prompt": "Use Handler power to swap the next two players in the presidential order?",
+      "title_auditor_prompt": "Use Auditor power to peek at the discard pile?",
+      "title_archivist_prompt": "Use Archivist power to peek at the discard pile?",
+      "title_defector_prompt": "Defect? Secretly flip your vote to the opposite result?",
+      "title_quorum_prompt": "Use Quorum power to call for an emergency re-vote?",
+      "title_assassin_prompt": "Select a player to execute on their card, or skip.",
+      "title_interdictor_prompt": "Select a player to detain on their card, or skip.",
+      "title_flip_vote": "Flip Vote",
+      "title_yes": "Yes",
+      "title_no": "No"
     },
     "chat": {
       "title": "Assembly Chat",
       "round_separator": "Round {{count}}",
       "dead_cant_speak": "Dead players cannot speak...",
-      "placeholder": "Type a message..."
+      "placeholder": "Type a message...",
+      "chanCivilStateEnacted": {
+        "0": "I was handed two State directives. The President owes the Assembly an explanation.",
+        "1": "There was no Civil directive in what I received. Direct your questions to the President.",
+        "2": "I enacted what I was given. The President controls the discard.",
+        "3": "The President passed me a dead hand. I had no choice.",
+        "4": "Ask the President why they only passed State directives to me.",
+        "5": "My hands were tied by the President's choice.",
+        "6": "I am merely the instrument of the President's will.",
+        "7": "The President's discard pile tells the real story.",
+        "8": "Don't blame me for the President's incompetence.",
+        "9": "The President gave me no other option.",
+        "10": "I only saw State directives. The President is hiding something.",
+        "11": "The President's choices left me with no alternative.",
+        "12": "Check the discard pile. The President didn't give me a choice.",
+        "13": "I'm as disappointed as you are, but the President passed me two State cards.",
+        "14": "The President is the one who filtered the draw. Ask them.",
+        "15": "I had to enact a State directive because that's all I received.",
+        "16": "The President's hand was full of State, apparently.",
+        "17": "I'm not the one who discarded the Civil card. The President is.",
+        "18": "The President's selection was purely State-oriented.",
+        "19": "I am just the messenger. The President wrote the message.",
+        "20": "The President's discard was more telling than their words.",
+        "21": "A strictly State hand was passed to me. The President holds the cards.",
+        "22": "I'm not the one filtering the directives. Ask the President.",
+        "23": "The President's choices left me with a single path.",
+        "24": "I performed my duty with the limited options the President provided.",
+        "25": "The President's narrative doesn't match the hand I received.",
+        "26": "I enacted a State directive because the President gave me no Civil alternative.",
+        "27": "The draw was supposedly all State—at least that is what the President says.",
+        "28": "The President's discard at the Secretariat was likely where our hope died.",
+        "29": "I am bound by the Presidency's selection, which was entirely State.",
+        "30": "The President is the filter; I am just the output. Blame the filter.",
+        "31": "A dead hand from the Presidency. I did what I had to.",
+        "32": "The President's choices were... restrictive, to say the least.",
+        "33": "I was handed a poisoned chalice by the President."
+      },
+      "chanStateStateEnacted": {
+        "0": "The draw was against us. This is the deck's doing, not mine.",
+        "1": "I had no viable alternative. The President can verify.",
+        "2": "Sometimes the Secretariat decides for us.",
+        "3": "A difficult hand, but we must proceed.",
+        "4": "The odds were not in our favor this round.",
+        "5": "The deck is clearly rigged against the Charter.",
+        "6": "I did what I had to do for the State.",
+        "7": "The cards were not in our favor.",
+        "8": "Blame the deck, not the player.",
+        "9": "The State demands sacrifice, and this was it.",
+        "10": "The draw was unfortunate. We must adapt.",
+        "11": "The Secretariat's will is sometimes difficult to accept.",
+        "12": "I acted in the best interest of the current situation.",
+        "13": "The deck's randomness is a challenge for us all.",
+        "14": "Sometimes the State's path is the only one open.",
+        "15": "I followed the logic of the cards I was dealt.",
+        "16": "The draw was heavily weighted towards the State.",
+        "17": "We must remain united despite this setback.",
+        "18": "The cards dictated the outcome this time.",
+        "19": "I am committed to the Assembly, even when the draw is hard.",
+        "20": "The State's tide is rising. We are merely floating on the wreckage of the draw.",
+        "21": "The probability was against us. Even the Secretariat has bad days.",
+        "22": "A forced enactment of the State's will. We must endure.",
+        "23": "The dice of destiny rolled for the State this time.",
+        "24": "Don't read too much into a single draw. The deck is fickle.",
+        "25": "The State's influence is woven into the very fabric of this deck.",
+        "26": "A mandatory enactment for the current regime. Nothing more.",
+        "27": "The Chancellor's hand is often tied by the Secretariat's randomness.",
+        "28": "The cards were weighted. We are all victims of the draw.",
+        "29": "Sometimes the path of the State is the only path paved.",
+        "30": "The draw was a statistical anomaly that favored our rivals.",
+        "31": "I hold no malice, only the cards the President deemed fit.",
+        "32": "The Secretariat breathes State directives when we need them least.",
+        "33": "A forced play in a game of limited choices."
+      },
+      "presCivilStateEnacted": {
+        "0": "I passed a Civil directive. The Chancellor exercised their own discretion.",
+        "1": "There was a Civil option in that hand. Make of that what you will.",
+        "2": "I gave them a choice. They chose the State.",
+        "3": "The Chancellor is responsible for that enactment. I passed them a Civil option.",
+        "4": "I am surprised by the Chancellor's decision. I sent them a Civil directive.",
+        "5": "The Chancellor clearly has their own agenda.",
+        "6": "I did my part. The Chancellor failed the Assembly.",
+        "7": "I offered a Civil path. They rejected it.",
+        "8": "The Chancellor's betrayal is their own.",
+        "9": "I cannot control the Chancellor's actions.",
+        "10": "I passed a Civil card. Why did the Chancellor choose State?",
+        "11": "The Chancellor had a choice. They chose poorly.",
+        "12": "I am questioning the Chancellor's loyalty after that move.",
+        "13": "I gave them the option to be Civil. They declined.",
+        "14": "The Chancellor's enactment does not reflect the hand I passed.",
+        "15": "I am deeply concerned by the Chancellor's decision.",
+        "16": "The Chancellor had a Civil directive in their hand.",
+        "17": "I did my part to keep us Civil. The Chancellor did not.",
+        "18": "The Chancellor's true colors are showing.",
+        "19": "I cannot answer for the Chancellor's betrayal.",
+        "20": "I sent them a choice of futures. They chose a darker one.",
+        "21": "The Chancellor's enactment is a direct slap to the Presidency.",
+        "22": "I am shocked. The Chancellor had a Civil directive in their grasp.",
+        "23": "The Chancellor has some explaining to do to the Assembly.",
+        "24": "I did my part to preserve the Charter. The Chancellor did not.",
+        "25": "The Chancellor's actions are increasingly erratic—or perhaps calculated.",
+        "26": "I passed a Civil card. The Chancellor's choice is their own burden.",
+        "27": "Why would the Chancellor do this? I gave them a clear Civil path.",
+        "28": "The Chancellor is playing a dangerous game with the State.",
+        "29": "I provided the option to be Civil. The Chancellor rejected it.",
+        "30": "The Chancellor's loyalty to the Charter is officially in question.",
+        "31": "I am as confused as the rest of you. I passed them a Civil card.",
+        "32": "The Chancellor had a fork in the road. they chose the State path.",
+        "33": "I cannot stand by the Chancellor's decision. It wasn't my hand."
+      },
+      "presStateStateEnacted": {
+        "0": "Three State draws. Neither of us had a choice.",
+        "1": "The deck was working against the Charter this round.",
+        "2": "I passed on what I could. The hand was compromised.",
+        "3": "The Secretariat is testing us. No Civil cards in that draw.",
+        "4": "A pure State draw. My hands were tied.",
+        "5": "The deck is not our friend today.",
+        "6": "I had no Civil cards to pass. Believe me.",
+        "7": "The State's influence is strong in this deck.",
+        "8": "I am just as frustrated as you are.",
+        "9": "The cards were stacked against us from the start.",
+        "10": "A triple State draw. There was nothing I could do.",
+        "11": "The deck is clearly favoring the State right now.",
+        "12": "I'm just as stuck as you are with these cards.",
+        "13": "The Secretariat is pushing us towards the State.",
+        "14": "No Civil cards were available in that draw.",
+        "15": "The draw was a complete washout for the Charter.",
+        "16": "I had zero Civil options to pass along.",
+        "17": "The deck is being very uncooperative today.",
+        "18": "We are at the mercy of the draw sometimes.",
+        "19": "The State's influence is strong in this deck.",
+        "20": "Three State cards stared back at me. Even the Secretariat was silent.",
+        "21": "A pure State hand. No choice for me, no choice for the Chancellor.",
+        "22": "The odds finally caught up with us. Not a single Civil card in sight.",
+        "23": "The deck's bias towards the State was total this round.",
+        "24": "I passed on the State because there was nothing else to pass.",
+        "25": "A total washout of Civil directives. We are at the mercy of the draw.",
+        "26": "The draw was a symphony of State directives. I am just the conductor.",
+        "27": "Zero options for the Charter. My hands were tied by the cards.",
+        "28": "The Secretariat is having a dark round. Triple State cards.",
+        "29": "I looked for a Civil card. I found none. The draw was absolute.",
+        "30": "The draw was entirely comprised of State directives. Unfortunate.",
+        "31": "Not a single lick of Civil logic in that hand. All State.",
+        "32": "The Secretariat's draw was a monochrome of State directives.",
+        "33": "I am as disappointed as anyone. The deck is definitely against us."
+      },
+      "governmentFailed": {
+        "0": "A wasted session. We cannot keep stalling the Secretariat.",
+        "1": "Deadlock serves no one here. The Crisis does not wait.",
+        "2": "We need to form a functional government. Now.",
+        "3": "The Assembly is divided. This is dangerous.",
+        "4": "Another failed vote. The State grows stronger with every delay.",
+        "5": "We are running out of time.",
+        "6": "Stalling only helps the State.",
+        "7": "We must come to an agreement.",
+        "8": "This deadlock is unacceptable.",
+        "9": "The Assembly is failing us.",
+        "10": "We are paralyzed. This is exactly what the State wants.",
+        "11": "Every failed vote is a victory for our enemies.",
+        "12": "The Assembly's indecision is our greatest weakness.",
+        "13": "We must find common ground or face the consequences.",
+        "14": "This obstructionism is destroying the Charter.",
+        "15": "The Crisis is deepening while we argue.",
+        "16": "We cannot afford another round of failure.",
+        "17": "The State is laughing at our division.",
+        "18": "We need leadership, not deadlock.",
+        "19": "The Assembly is spinning its wheels.",
+        "20": "Every 'Nay' vote is a pulse of life for the State's ambitions.",
+        "21": "We are bickering while the Charter burns. Form a government!",
+        "22": "This indecision is a death sentence for the Assembly.",
+        "23": "The Secretariat despises a vacuum. We must fill it with leadership.",
+        "24": "Are we here to debate or to enact the Charter? Form a government.",
+        "25": "The State thrives in the shadows of our disagreement.",
+        "26": "Another failed attempt. We are becoming as weak as our enemies.",
+        "27": "The Assembly's lack of unity is its own undoing.",
+        "28": "We are handing the State the upper hand through our own division.",
+        "29": "A government of straw is better than no government at all.",
+        "30": "The Crisis only intensifies while we stall. Make a choice!",
+        "31": "The Secretariat is growing impatient with our paralysis.",
+        "32": "Obstructionism is a slow poison for the Charter.",
+        "33": "We are arguing over titles while the building burns around us."
+      },
+      "investigateCivil": {
+        "0": "The investigation confirms their alignment, {name} is Civil.",
+        "1": "Nothing of concern found. {name} is Charter-loyal.",
+        "2": "{name} appears to stand with the Assembly.",
+        "3": "I've cleared {name}. They are one of us.",
+        "4": "My findings on {name} are positive. They support the Charter.",
+        "5": "{name} is definitely on our side.",
+        "6": "I trust {name} completely.",
+        "7": "The investigation was successful. {name} is Civil.",
+        "8": "{name} is a true ally.",
+        "9": "I have verified {name}'s loyalty.",
+        "10": "I've looked into {name} and found a loyal citizen.",
+        "11": "Nothing of concern found. {name} is Charter-loyal.",
+        "12": "My report on {name} is entirely positive.",
+        "13": "I'm happy to report that {name} is Civil.",
+        "14": "{name} has my full confidence after this investigation.",
+        "15": "The data confirms {name}'s loyalty.",
+        "16": "I've verified that {name} is on our side.",
+        "17": "{name} is a solid ally for the Charter.",
+        "18": "No State influence detected in {name}.",
+        "19": "I stand by {name}'s Civil alignment.",
+        "20": "My investigation into {name} was exhaustive. They are clean.",
+        "21": "The data stream is clear: {name} is a citizen of the Charter.",
+        "22": "I've cleared {name} of all suspicion. They are one of us.",
+        "23": "{name}'s record is a testament to Civil duty.",
+        "24": "I found nothing but loyalty in {name}'s profile.",
+        "25": "{name} is a beacon of Civil hope in this investigation.",
+        "26": "My report on {name} is glowing. They are authentically Civil.",
+        "27": "I have verified {name}'s adherence to the Charter protocols.",
+        "28": "There is no trace of State influence in {name}'s recent history.",
+        "29": "{name} has passed every loyalty test I administered.",
+        "30": "I'm satisfied with {name}'s alignment. They are definitely Civil.",
+        "31": "The investigation confirms that {name} stands for the Assembly.",
+        "32": "{name}'s record is as clear as a sunny day at the Secretariat.",
+        "33": "I would vouch for {name}'s Civil alignment under oath."
+      },
+      "investigateState": {
+        "0": "The investigation confirms their alignment, {name} is State.",
+        "1": "The investigation is… troubling. Watch {name} closely.",
+        "2": "I have learned something critical about {name}. Proceed with caution.",
+        "3": "{name}'s allegiance is not to the Charter.",
+        "4": "I cannot trust {name} after what I've seen.",
+        "5": "The evidence against {name} is damning.",
+        "6": "{name} is a threat to the Charter.",
+        "7": "I've uncovered {name}'s true colors.",
+        "8": "Watch out for {name}.",
+        "9": "The investigation revealed {name}'s treachery.",
+        "10": "{name} is not who they say they are. They are State.",
+        "11": "I've found evidence of {name}'s State ties.",
+        "12": "The investigation into {name} was a wake-up call.",
+        "13": "{name} is a sleeper agent for the State.",
+        "14": "I cannot in good conscience trust {name} anymore.",
+        "15": "The truth about {name} is out: they are State.",
+        "16": "{name} is working against us from within.",
+        "17": "I've seen enough to know {name} is a traitor.",
+        "18": "The investigation into {name} revealed a dark secret.",
+        "19": "Be warned: {name} is a State operative.",
+        "20": "The investigation of {name} was a descent into State treachery.",
+        "21": "I found evidence in {name}'s records that will shock the Assembly.",
+        "22": "{name} is a wolf in Civil clothing. They are State.",
+        "23": "The investigation confirms my worst fears about {name}.",
+        "24": "I have uncovered a web of State ties connected to {name}.",
+        "25": "{name} is a danger to everything the Charter stands for.",
+        "26": "My investigation into {name} was a revelation of betrayal.",
+        "27": "The data doesn't lie: {name} is a State operative.",
+        "28": "I found proof of {name}'s collaboration with our enemies.",
+        "29": "{name} is not who they claim to be. They are a State agent.",
+        "30": "The investigation into {name} revealed a pattern of State-led sabotage.",
+        "31": "I cannot emphasize this enough: {name} is State-aligned.",
+        "32": "{name} has been compromised by the State's influence.",
+        "33": "The evidence against {name} is indisputable. They are State."
+      },
+      "suspiciousNominee": {
+        "0": "Interesting choice of Chancellor.",
+        "1": "I will be monitoring this government carefully.",
+        "2": "That nomination raises questions within the Secretariat.",
+        "3": "I'm not sure {name} is the right person for this role.",
+        "4": "Why {name}? There are more trustworthy options.",
+        "5": "I don't like this nomination.",
+        "6": "This government seems suspicious.",
+        "7": "I'm keeping a close eye on {name}.",
+        "8": "I have my doubts about this choice.",
+        "9": "This nomination is questionable.",
+        "10": "I have my reservations about {name} as Chancellor.",
+        "11": "Is {name} really the best we can do?",
+        "12": "This nomination feels like a calculated risk.",
+        "13": "I'm sensing a pattern here that I don't like.",
+        "14": "{name} hasn't exactly earned our trust yet.",
+        "15": "This choice of Chancellor is... unexpected.",
+        "16": "I'm not convinced {name} is the right fit.",
+        "17": "There's something off about this nomination.",
+        "18": "I'd like to hear more from {name} before we vote.",
+        "19": "This nomination is a bit too convenient for some.",
+        "20": "I'm not the only one who finds this government pairing suspicious.",
+        "21": "The nomination of {name} feels like a strategic move for the State.",
+        "22": "I sense a hidden agenda behind the choice of {name}.",
+        "23": "Why this specific government? Why {name} right now?",
+        "24": "This nomination seems designed to further the State's goals.",
+        "25": "I have serious doubts about the motivations behind this pair.",
+        "26": "The alignment of this government is... questionable at best.",
+        "27": "I'm worried this nomination is a step towards State dominance.",
+        "28": "The choice of {name} as Chancellor should concern everyone here.",
+        "29": "I smell a rat in this nomination process.",
+        "30": "This government seems too perfectly aligned with State interests.",
+        "31": "I have my misgivings about this specific power dynamic.",
+        "32": "{name}'s presence in this government is a red flag.",
+        "33": "I'm not comfortable with the potential influence of this pairing."
+      },
+      "highSuspicion": {
+        "0": "I have a very bad feeling about {name}.",
+        "1": "{name} is acting against the interests of the Assembly.",
+        "2": "The data suggests {name} is not who they claim to be.",
+        "3": "We need to marginalize {name} before it's too late.",
+        "4": "I'm calling it out: {name} is working for the State.",
+        "5": "{name} is a traitor.",
+        "6": "I'm certain {name} is State.",
+        "7": "We need to get rid of {name}.",
+        "8": "Don't trust {name} under any circumstances.",
+        "9": "{name} is sabotaging us.",
+        "10": "I'm 99% sure {name} is a State agent.",
+        "11": "The evidence against {name} is mounting.",
+        "12": "We can't let {name} near the Chancellor's seat.",
+        "13": "{name} is a clear and present danger to the Charter.",
+        "14": "I've seen {name} sabotage us before.",
+        "15": "Don't let {name}'s words fool you; they are State.",
+        "16": "The Assembly must unite against {name}.",
+        "17": "{name} is a cancer in this room.",
+        "18": "I'm calling for an immediate investigation of {name}.",
+        "19": "{name} is the enemy within.",
+        "20": "{name}'s betrayal is a stain on the Assembly's history.",
+        "21": "We are witnessing the slow destruction of the Charter by {name}.",
+        "22": "The State has found its champion in {name}. We must act.",
+        "23": "I'm calling for the immediate removal of {name} from all authority.",
+        "24": "{name} has shown their true colors, and they are the colors of the State.",
+        "25": "The evidence against {name} is beyond reproach. They are a traitor.",
+        "26": "We cannot afford to let {name} continue their sabotage.",
+        "27": "{name} is a parasite feeding on the weakness of the Assembly.",
+        "28": "I'm exposing {name} for what they are: a double agent for the State.",
+        "29": "{name}'s actions are a direct assault on the principles of the Charter.",
+        "30": "The time for doubt is over. {name} is definitely our enemy.",
+        "31": "We must isolate {name} before they destroy us from within.",
+        "32": "The State's influence is clear in every move {name} makes.",
+        "33": "I will not rest until {name} is held accountable for their treachery."
+      },
+      "defendingSelf": {
+        "0": "My record is clear. I serve the Charter.",
+        "1": "Do not let suspicion cloud your judgment. I am Civil.",
+        "2": "The accusations against me are baseless distractions.",
+        "3": "I have only ever worked for the Assembly's success.",
+        "4": "Look at the facts, not the rumors. I am loyal.",
+        "5": "I have nothing to hide.",
+        "6": "My loyalty to the Charter is unwavering.",
+        "7": "I am being framed.",
+        "8": "The accusations are false.",
+        "9": "I am as Civil as they come.",
+        "10": "My actions have always been in the Charter's interest.",
+        "11": "I am being targeted because I am a threat to the State.",
+        "12": "Don't believe the lies being spread about me.",
+        "13": "I have a long history of serving the Assembly faithfully.",
+        "14": "I am a victim of a State-led smear campaign.",
+        "15": "My loyalty is beyond question.",
+        "16": "I will prove my innocence through my actions.",
+        "17": "The State wants you to doubt me.",
+        "18": "I am a true believer in the Charter.",
+        "19": "I will not be intimidated by these false claims.",
+        "20": "My loyalty to the Charter is my only master. I am Civil.",
+        "21": "Don't let these coordinated lies distract you from my record.",
+        "22": "I have sacrificed much for the Assembly. My alignment is clear.",
+        "23": "The State wants you to see me as an enemy because I am a threat to them.",
+        "24": "I invite any investigation. My records are an open book for the Charter.",
+        "25": "I am as Civil as the laws themselves. My actions will prove it.",
+        "26": "The accusations against me are a thin veil for State aggression.",
+        "27": "I stand by the Charter, even when the rest of you doubt me.",
+        "28": "I have only ever worked to safeguard our path within the Secretariat.",
+        "29": "My conscience is clear. I serve the Assembly, not the State.",
+        "30": "These attacks are meant to weaken my resolve. They will not succeed.",
+        "31": "I am a true patriot. Do not let these baseless rumors sway you.",
+        "32": "I have fought for the Charter when others remained silent.",
+        "33": "My commitment to the Civil cause is beyond any interrogation."
+      },
+      "praisingCivil": {
+        "0": "I trust {name}. Their actions speak for themselves.",
+        "1": "{name} has proven their loyalty to the Assembly.",
+        "2": "We need more people like {name} in power.",
+        "3": "I'm confident in {name}'s alignment.",
+        "4": "{name} is a true patriot of the Charter.",
+        "5": "{name} is a great leader.",
+        "6": "I fully support {name}.",
+        "7": "{name} is doing a great job.",
+        "8": "We can count on {name}.",
+        "9": "{name} is a beacon of hope for the Assembly.",
+        "10": "I've always known {name} was a true patriot.",
+        "11": "I've seen {name} make the hard choices for the Charter.",
+        "12": "We are lucky to have {name} on our side.",
+        "13": "{name} is a model of Civil virtue.",
+        "14": "I would trust {name} with my life.",
+        "15": "{name} is the kind of leader we need right now.",
+        "16": "{name} is a pillar of the Assembly.",
+        "17": "{name} is a true asset to this room.",
+        "18": "I have nothing but respect for {name}.",
+        "19": "The Assembly is stronger with {name} in it.",
+        "20": "{name}'s dedication to the Charter is an inspiration to us all.",
+        "21": "We would do well to follow {name}'s lead in this matter.",
+        "22": "{name} is a shining example of what it means to be truly Civil.",
+        "23": "I have complete faith in {name}'s judgment and character.",
+        "24": "{name} is a steady hand in these turbulent times for the Assembly.",
+        "25": "I stand firmly beside {name} in our shared mission for the Charter.",
+        "26": "{name} is one of the few here who truly understands our duty.",
+        "27": "The Secretariat is fortunate to have a servant as loyal as {name}.",
+        "28": "{name} has consistently demonstrated their commitment to our cause.",
+        "29": "I hold {name} in the highest regard as a fellow patriot.",
+        "30": "We are safer with {name} in a position of authority.",
+        "31": "{name} is a true champion of the Civil principles we hold dear.",
+        "32": "I would trust {name}'s judgment even in the darkest of rounds.",
+        "33": "{name}'s loyalty is the bedrock upon which the Assembly should build."
+      },
+      "neutralSupport": {
+        "0": "I'm willing to give {name} a chance.",
+        "1": "{name} seems like a reasonable choice for now.",
+        "2": "Let's see what {name} can do.",
+        "3": "I don't have any reason to doubt {name} yet.",
+        "4": "A fresh start with {name} might be what we need.",
+        "5": "I'm neutral on {name} for now.",
+        "6": "Let's see how {name} performs.",
+        "7": "I'm open to {name}'s nomination.",
+        "8": "I'm not sure about {name} yet.",
+        "9": "I'll wait and see with {name}.",
+        "10": "Let's give {name} the benefit of the doubt for now.",
+        "11": "{name} deserves a chance to prove themselves.",
+        "12": "I'm cautiously optimistic about {name}.",
+        "13": "I'll support {name} until they give me a reason not to.",
+        "14": "{name} seems like a safe bet for this round.",
+        "15": "I'm willing to work with {name}.",
+        "16": "Let's see if {name} can lead us effectively.",
+        "17": "I'm keeping an open mind about {name}.",
+        "18": "{name} is an unknown quantity, but I'll vote Aye.",
+        "19": "I'm okay with {name} for this government.",
+        "20": "{name} seems like a stable choice for this point in the round.",
+        "21": "I'm prepared to support {name}'s nomination as a bridge-builder.",
+        "22": "{name} hasn't given us any reason to doubt them yet, let's proceed.",
+        "23": "A nomination of {name} seems logical given our current state.",
+        "24": "I'm voting 'Aye' for {name} based on their performance so far.",
+        "25": "{name} is a reasonable candidate to lead this government.",
+        "26": "I'm willing to overlook my initial doubts about {name} for now.",
+        "27": "{name} has been relatively consistent in their Civil rhetoric.",
+        "28": "I'm optimistic that {name} will act in the best interests of the Charter.",
+        "29": "Let's move forward with {name} and see where it takes us.",
+        "30": "I'm giving {name} the benefit of the doubt this round.",
+        "31": "{name} seems to be a pragmatic choice for the current climate.",
+        "32": "I'm supporting {name} in the interest of breaking this deadlock.",
+        "33": "{name} has earn a shot at leading the next directive cycle."
+      },
+      "banter": {
+        "0": "The stakes are rising. We must stay vigilant.",
+        "1": "The Secretariat is watching us all.",
+        "2": "One wrong move and the Charter falls.",
+        "3": "Trust is a rare commodity in these times.",
+        "4": "Let's focus on the directives. The Assembly depends on us.",
+        "5": "The State is always watching.",
+        "6": "We must be careful.",
+        "7": "The Assembly is in danger.",
+        "8": "We need to be smarter.",
+        "9": "The State is closing in.",
+        "10": "The shadows are lengthening over the Assembly.",
+        "11": "We are the last line of defense for the Charter.",
+        "12": "Every decision we make echoes in the Secretariat.",
+        "13": "The State's reach is long, but our resolve is strong.",
+        "14": "In this room, even the walls have ears.",
+        "15": "The future of the Charter is in our hands.",
+        "16": "We must be the light in the darkness.",
+        "17": "The State's victory is not inevitable.",
+        "18": "We are the guardians of the Assembly.",
+        "19": "The Charter will prevail if we stay united.",
+        "20": "The Secretariat doesn't deal in certainty, only probability.",
+        "21": "We are all just players in a game we don't fully understand.",
+        "22": "The State is a predator that never sleeps. We must be ready.",
+        "23": "Silence is often the loud cry of a State operative.",
+        "24": "The Assembly is a delicate machine. One broken gear can ruin it all.",
+        "25": "The shadows of the past are catching up with the Secretariat.",
+        "26": "Trust is a luxury we can ill afford in this climate of suspicion.",
+        "27": "The Charter is a promise that only we can keep.",
+        "28": "The State is a mirror reflecting our own weaknesses back at us.",
+        "29": "Every round is a battle for the soul of the Assembly.",
+        "30": "We are living in an era of unprecedented crisis. Vigilance is keyword.",
+        "31": "The Secretariat's record will show who among us was truly loyal.",
+        "32": "The path to victory is paved with the courage to call out the State.",
+        "33": "We are the architects of the future, or the gravediggers of the past."
+      },
+      "powerUsage": {
+        "0": "I am using my power to ensure the Assembly's success.",
+        "1": "This power is necessary to protect the Charter.",
+        "2": "I must use this power to uncover the truth.",
+        "3": "The situation demands this action.",
+        "4": "I am using this power to secure our future.",
+        "5": "This is the only way to proceed.",
+        "6": "I am using this power for the good of the Assembly.",
+        "7": "This power will help us identify the threats.",
+        "8": "I have no choice but to use this power.",
+        "9": "I am using this power to strengthen our position.",
+        "10": "I am exercising my authority for the stability of the room.",
+        "11": "This action is mandated by the current emergency.",
+        "12": "I am using this power to protect our collective interests.",
+        "13": "The Charter allows for this measure in times of crisis.",
+        "14": "I am taking this step to ensure the State does not gain ground.",
+        "15": "This is a necessary use of my title's power.",
+        "16": "I am acting to preserve the integrity of the Assembly.",
+        "17": "This power is a tool for the Charter's defense.",
+        "18": "I am using this ability to clarify the situation.",
+        "19": "I am using this power to uphold the Charter's principles.",
+        "20": "My title's authority is being exercised to secure our collective safety.",
+        "21": "This ability is a necessary intervention for the good of the Assembly.",
+        "22": "I am using this power to clarify the path ahead for the Charter.",
+        "23": "The situation has deteriorated enough to warrant this action.",
+        "24": "I am using this authority to ensure the State does not prevail.",
+        "25": "This is a duty I perform with no pleasure, but entire commitment.",
+        "26": "I am taking this step to protect the innocent and expose the guilty.",
+        "27": "My power is a shield for the Charter, and I am using it now.",
+        "28": "This intervention is designed to stabilize our crumbling democracy.",
+        "29": "I am using this ability to prevent a total collapse into State control.",
+        "30": "The Secretariat mandates this action in the face of such uncertainty.",
+        "31": "I am acting to ensure the long-term survival of the Assembly.",
+        "32": "This power is a burden I carry for all of you. It must be used.",
+        "33": "I am using this authority to bring clarity to a room clouded by doubt."
+      },
+      "cipherDispatch": {
+        "0": "A contact in the Secretariat suggests you are not what you seem.",
+        "1": "The data stream is clear: stay the course and the Charter will prevail.",
+        "2": "Vigilance is required. The shadows are deepening around the Assembly.",
+        "3": "Do not trust the current administration. They are compromised.",
+        "4": "The State's influence is localized. Look closer at your allies.",
+        "5": "A coded message for you: the outcome of the next session is critical."
+      }
     },
     "game_header": {
       "prediction_civil": "Civil {{percent}}%",
@@ -399,9 +1042,159 @@
       "phase_reference": "Phase Reference",
       "your_dossier": "Your Dossier",
       "my_profile": "My Profile",
-      "leave_assembly": "Leave Assembly"
+      "leave_assembly": "Leave Assembly",
+      "title": "THE ASSEMBLY",
+      "practice_mode": "PRACTICE MODE",
+      "invite_tooltip": "Share this code to invite players",
+      "timer_label": "Time Remaining",
+      "modes": {
+        "casual": "Casual",
+        "ranked": "Ranked",
+        "classic": "Classic",
+        "crisis": "Crisis"
+      }
+    },
+    "agendas": {
+      "chaos_agent": {
+        "name": "Chaos Agent",
+        "desc": "The election tracker must hit 3 and trigger a chaos policy at least once."
+      },
+      "the_purist": {
+        "name": "The Purist",
+        "desc": "At least 3 Civil directives must be enacted by the time the game ends."
+      },
+      "the_dissenter": {
+        "name": "The Dissenter",
+        "desc": "Your vote must differ from the majority outcome in at least 3 rounds."
+      },
+      "the_dove": {
+        "name": "The Dove",
+        "desc": "Vote Aye in every round you cast a vote."
+      },
+      "the_hawk": {
+        "name": "The Hawk",
+        "desc": "Vote Nay in at least 3 rounds."
+      },
+      "stonewalled": {
+        "name": "Stonewalled",
+        "desc": "Vote Nay on at least 2 governments that then fail."
+      },
+      "short_session": {
+        "name": "Short Session",
+        "desc": "The game must end before round (player count + 3)."
+      },
+      "the_long_game": {
+        "name": "The Long Game",
+        "desc": "The game must last at least (player count + 6) rounds."
+      },
+      "the_loyalist": {
+        "name": "The Loyalist",
+        "desc": "Vote Aye on at least 3 governments that pass and enact a Civil directive."
+      },
+      "nominated": {
+        "name": "Nominated",
+        "desc": "Be nominated as Chancellor at least 2 times."
+      },
+      "deadlock": {
+        "name": "Deadlock",
+        "desc": "Be President or Chancellor candidate in at least 1 failed government."
+      },
+      "prolific": {
+        "name": "Prolific",
+        "desc": "Personally enact at least 2 policies as Chancellor."
+      },
+      "the_veteran": {
+        "name": "The Veteran",
+        "desc": "Serve as Chancellor at least once."
+      },
+      "unity": {
+        "name": "Unity",
+        "desc": "No chaos policy is enacted at any point during the game."
+      },
+      "the_mandate": {
+        "name": "The Mandate",
+        "desc": "At least 4 State directives must be enacted by the time the game ends."
+      },
+      "clean_sweep": {
+        "name": "Clean Sweep",
+        "desc": "Enact a Civil directive as Chancellor."
+      },
+      "the_weathervane": {
+        "name": "The Weathervane",
+        "desc": "Switch your vote relative to your previous round's vote at least 4 times."
+      },
+      "productive_session": {
+        "name": "Productive Session",
+        "desc": "More than half of all rounds must result in a policy being successfully enacted."
+      },
+      "close_race": {
+        "name": "Close Race",
+        "desc": "The game must end with both policy tracks within 2 directives of each other."
+      },
+      "the_swing_vote": {
+        "name": "The Swing Vote",
+        "desc": "Be President or Chancellor in a government that passes by exactly 1 vote."
+      }
+    },
+    "round_history": {
+      "title": "Round History",
+      "empty": "No governments formed yet",
+      "round": "Round {{round}}",
+      "chaos": "Chaos",
+      "vetoed": "Vetoed",
+      "rejected": "Rejected",
+      "no_policy": "No policy",
+      "civil": "Civil",
+      "state": "State",
+      "pres_short": "Pres",
+      "chan_short": "Chan",
+      "president": "President",
+      "chancellor": "Chancellor",
+      "drew": "Drew",
+      "passed": "Passed",
+      "received": "Received",
+      "votes": "Votes",
+      "aye": "Aye",
+      "nay": "Nay",
+      "executive": "Executive",
+      "actions": {
+        "investigate": "Investigation",
+        "execution": "Execution",
+        "specialelection": "Special Election",
+        "policypeek": "Directive Peek"
+      }
     },
     "modals": {
+      "game_over": {
+        "banners": {
+          "civil_win_default": "The Charter holds",
+          "state_win_default": "The State prevails",
+          "inconclusive": "Dissent aborted",
+          "civil_desc": "The civil forces have defended the assembly.",
+          "state_desc": "The state has successfully infiltrated the assembly.",
+          "abort_desc": "The session was terminated prematurely."
+        },
+        "performance_header": "Match Performance",
+        "victory": "Victory",
+        "defeat": "Defeat",
+        "elo": "ELO",
+        "casual": "Casual Match",
+        "xp": "XP Earned",
+        "ip": "IP Earned",
+        "clan_xp": "Clan XP",
+        "agenda": "Personal Agenda",
+        "achievements_header": "Medals Earned",
+        "revelations_header": "Identity Revelations",
+        "you": "You",
+        "action_log": "Match Log",
+        "action_replay": "Reconstruct",
+        "action_shared": "Link Copied!",
+        "action_share": "Share Replay",
+        "action_play_again": "Play Again",
+        "action_lobby": "Return to Lobby",
+        "completed": "Completed",
+        "failed": "Failed"
+      },
       "friend_request": {
         "title": "Friend Request",
         "description": "<1>{{username}}</1> wants to be friends.",
@@ -450,7 +1243,38 @@
     },
     "assembly_log": {
       "title": "Assembly Log",
-      "event_num": "Event #{{count}}"
+      "event_num": "Event #{{count}}",
+      "round_marker": "--- Round {{round}} ---",
+      "nominated": "{{name}} nominated {{target}} as Chancellor.",
+      "elected": "{{name}} elected as Chancellor.",
+      "veto_requested": "{{name}} (Chancellor) requested a Veto.",
+      "veto_agreed": "{{name}} (President) agreed to the Veto. Session failed.",
+      "veto_denied": "{{name}} (President) denied the Veto. Chancellor must play.",
+      "rejected": "The Assembly rejected the nomination.",
+      "civil_enacted": "A Civil directive was enacted.",
+      "state_enacted": "A State directive was enacted.",
+      "executive_action": "Executive Action: {{action}} performed on {{target}}.",
+      "declared": "{{name}} ({{type}}) declared {{action}} {{civ}} Civil and {{sta}} State directives.{{drew}}",
+      "drew_info": " (drew {{civ}}C/{{sta}}S)",
+      "passed_word": "passed",
+      "received_word": "received",
+      "executed": "{{name}} was executed.",
+      "investigated": "{{name}} investigated {{target}}.",
+      "special_election": "{{name}} called a special election for {{target}}.",
+      "ready": "{{name}} is Ready.",
+      "not_ready": "{{name}} is Not Ready.",
+      "all_ready": "All human players ready! Starting game...",
+      "host_started": "Host started the game.",
+      "room_locked": "Room locked by host.",
+      "room_unlocked": "Room unlocked by host.",
+      "spectator_predicted": "A spectator has predicted a {{prediction}} victory.",
+      "room_created": "Room {{id}} created in {{mode}} mode.",
+      "room_created_practice": "Room {{id}} created as a Solo Practice session.",
+      "reconnected": "{{name}} reconnected.",
+      "joined": "{{name}} joined the lobby.",
+      "need_players": "Need at least 5 players to ready up.",
+      "prediction_unity": "Unity",
+      "prediction_deception": "Deception"
     },
     "debrief": {
       "intro_title": "The Assembly Has Concluded",
@@ -475,6 +1299,59 @@
         "marathon": "An epic {{count}}-round battle of wills",
         "deadlock": "Both factions held the Assembly in a knife-edge deadlock"
       }
+    },
+    "match_replay": {
+      "title": "Match Replay",
+      "subtitle": "Post-match round analysis",
+      "reveal_truth": "Reveal Truth",
+      "hide_deceptions": "Hide Deceptions",
+      "no_history": "No round history available",
+      "government_header": "Round {{round}} Government",
+      "president": "President",
+      "chancellor": "Chancellor",
+      "session_summary": "Session Summary",
+      "chaos_forced": "Chaos Forced",
+      "rejected": "Rejected",
+      "fail_veto": "Government was vetoed",
+      "fail_default": "Government vote failed",
+      "enacted": "Directive Enacted",
+      "power_triggered": "Executive power triggered: {{action}}",
+      "legislative_hand": "The Legislative Hand",
+      "pres_deck": "President's Deck",
+      "deception_detected": "Deception",
+      "actual_draw": "Actual Draw",
+      "hidden": "Hidden",
+      "public_claim": "Public Claim",
+      "chan_hand": "Chancellor's Hand",
+      "conflicting_stories": "Conflicting Stories",
+      "actual_received": "Actual Received",
+      "voting_records": "Voting Records",
+      "aye": "Aye",
+      "nay": "Nay",
+      "no_vote": "No votes recorded",
+      "footer_info": "Declarations shown are what players publicly claimed. Enable truth mode to see actual cards.",
+      "close": "Close Replay"
+    },
+    "narration": {
+      "nomination": "The Assembly is in session. President, nominate your Chancellor.",
+      "voting_start": "Voting is open. Cast your ballots.",
+      "election_passed": "The Assembly confirms the nomination. Legislative session begins.",
+      "election_failed": "The nomination is rejected. The floor returns to the President.",
+      "directive_civil": "Charter secured.",
+      "directive_state": "The State advances.",
+      "executive_investigate": "Identity verification complete.",
+      "executive_peek": "Directive foresight engaged.",
+      "executive_election": "A special election has been called.",
+      "executive_assassinate": "Termination order executed.",
+      "chaos": "Order has collapsed. Chaos rule enforced.",
+      "veto_request": "A veto has been proposed.",
+      "veto_confirm": "The government has exercised the power of Veto.",
+      "power_used": "{{role}} power activated."
+    },
+    "president_pick": {
+      "label": "The Assembly",
+      "selecting": "Selecting First President",
+      "reveal_label": "First President"
     },
     "tutorial": {
       "back": "Back",
@@ -734,245 +1611,259 @@
           "result_received": "I received <1>{{civ}}C</1> & <3>{{sta}}S</3>",
           "submit": "Submit Declaration"
         }
+      }
+    },
+    "how_to_play": {
+      "title": "How to Play",
+      "subtitle": "Rules Reference",
+      "back_to_lobby": "Return to Lobby",
+      "tabs": {
+        "overview": "Overview",
+        "roles": "Roles",
+        "loop": "Game Loop",
+        "titles": "Titles",
+        "agendas": "Agendas",
+        "tips": "Tips"
       },
-      "how_to_play": {
-        "title": "How to Play",
-        "subtitle": "Rules Reference",
-        "tabs": {
-          "overview": "Overview",
-          "roles": "Roles",
-          "loop": "Game Loop",
-          "titles": "Titles",
-          "agendas": "Agendas",
-          "tips": "Tips"
+      "overview": {
+        "p1": "The Assembly is a {{social_deduction_game}} for 5–10 players. Each player is secretly assigned a faction — Civil or State — and must work with or against the others to achieve their faction's win condition.",
+        "civil_wins_label": "Civil wins by",
+        "civil_wins": [
+          "Enacting 5 Civil directives",
+          "Executing the Overseer"
+        ],
+        "state_wins_label": "State wins by",
+        "state_wins": [
+          "Enacting 6 State directives",
+          "Electing Overseer Chancellor (after 3 State)"
+        ],
+        "crisis_label": "Crisis Mode (High Intensity)",
+        "crisis_desc": "A chaotic variant featuring {{event_cards}}. Every round, a random event is drawn that can freeze the election tracker, blackout the chat, or force immediate snap elections.",
+        "deck_label": "Policy Deck",
+        "deck_desc": "The deck contains {{civil_count}} and {{state_count}} policy cards. The deck is stacked against Civil — deduction and coordination are essential.",
+        "tracker_label": "Election Tracker",
+        "tracker_desc": "If three elections fail in a row, a {{chaos_policy}} is drawn from the top of the deck and enacted automatically without a vote."
+      },
+      "roles_tab": {
+        "civil": {
+          "label": "Civil",
+          "desc": "The majority. You don't know who your allies are. Use declarations, voting patterns, and nominations to find the State agents and stop them."
         },
-        "overview": {
-          "p1": "The Assembly is a {{social_deduction_game}} for 5–10 players. Each player is secretly assigned a faction — Civil or State — and must work with or against the others to achieve their faction's win condition.",
-          "civil_wins_label": "Civil wins by",
-          "civil_wins": [
-            "Enacting 5 Civil directives",
-            "Executing the Overseer"
-          ],
-          "state_wins_label": "State wins by",
-          "state_wins": [
-            "Enacting 6 State directives",
-            "Electing Overseer Chancellor (after 3 State)"
-          ],
-          "crisis_label": "Crisis Mode (High Intensity)",
-          "crisis_desc": "A chaotic variant featuring {{event_cards}}. Every round, a random event is drawn that can freeze the election tracker, blackout the chat, or force immediate snap elections.",
-          "deck_label": "Policy Deck",
-          "deck_desc": "The deck contains {{civil_count}} and {{state_count}} policy cards. The deck is stacked against Civil — deduction and coordination are essential.",
-          "tracker_label": "Election Tracker",
-          "tracker_desc": "If three elections fail in a row, a {{chaos_policy}} is drawn from the top of the deck and enacted automatically without a vote."
+        "state": {
+          "label": "State",
+          "desc": "The minority. You know who your allies are. Secretly coordinate to enact State directives or get the Overseer elected as Chancellor."
         },
-        "roles_tab": {
-          "civil": {
-            "label": "Civil",
-            "desc": "The majority. You don't know who your allies are. Use declarations, voting patterns, and nominations to find the State agents and stop them."
-          },
-          "state": {
-            "label": "State",
-            "desc": "The minority. You know who your allies are. Secretly coordinate to enact State directives or get the Overseer elected as Chancellor."
-          },
-          "overseer": {
-            "label": "The Overseer",
-            "desc": "A State agent who doesn't know the other State players. Wins with State. If elected Chancellor after 3 State directives are enacted, State wins immediately.",
-            "distribution_hint": "At 5–6 players, the Overseer knows the other State agents."
-          },
-          "distribution_label": "Role Distribution"
+        "overseer": {
+          "label": "The Overseer",
+          "desc": "A State agent who doesn't know the other State players. Wins with State. If elected Chancellor after 3 State directives are enacted, State wins immediately.",
+          "distribution_hint": "At 5–6 players, the Overseer knows the other State agents."
         },
-        "loop_tab": {
-          "step_1": {
-            "label": "Nomination",
-            "desc": "The current President nominates a Chancellor. The same player cannot serve as Chancellor in consecutive rounds (or as President in larger games)."
-          },
-          "step_2": {
-            "label": "Vote",
-            "desc": "All living players simultaneously vote AYE or NAY. A strict majority of AYE passes the government. Ties and equal splits fail."
-          },
-          "step_3": {
-            "label": "Legislative Session",
-            "desc": "President draws 3 cards, discards 1 face-down, passes 2 to Chancellor. Chancellor enacts 1, discards the other. Neither can see what the other discarded."
-          },
-          "step_4": {
-            "label": "Declarations",
-            "desc": "President declares how many Civil/State they drew and passed. Chancellor declares how many they received and enacted. These claims can be lies."
-          },
-          "step_5": {
-            "label": "Executive Action",
-            "desc": "If a State directive was enacted and the player count/directive count triggers a power, the President must use it before the round ends."
-          }
+        "distribution_label": "Role Distribution"
+      },
+      "loop_tab": {
+        "step_1": {
+          "label": "Nomination",
+          "desc": "The current President nominates a Chancellor. The same player cannot serve as Chancellor in consecutive rounds (or as President in larger games)."
         },
-        "titles_tab": {
-          "intro": "Title Roles are assigned randomly at game start. Each is single-use and fires at a specific point in the round. Check your Dossier to see if you have one.",
-          "roles": {
-            "interdictor": {
-              "name": "Interdictor",
-              "when": "Start of each round",
-              "desc": "Before nomination: detain a player for this round. They cannot vote or be nominated as Chancellor. Once used."
-            },
-            "broker": {
-              "name": "Broker",
-              "when": "After nomination",
-              "desc": "Review the Chancellor nomination and veto it, forcing the President to nominate again. Once used."
-            },
-            "strategist": {
-              "name": "Strategist",
-              "when": "As President",
-              "desc": "When you're President, draw 4 policy cards instead of 3, then discard 2. Once used."
-            },
-            "auditor": {
-              "name": "Auditor",
-              "when": "After enactment",
-              "desc": "Peek at the last 3 cards in the discard pile. Useful for tracking what policies are gone. Once used."
-            },
-            "assassin": {
-              "name": "Assassin",
-              "when": "After enactment (as President)",
-              "desc": "When you're President, secretly execute any living player after the round ends. Once used."
-            },
-            "handler": {
-              "name": "Handler",
-              "when": "After enactment",
-              "desc": "Swap the next two players in the presidential rotation. The second becomes President before the first. Once used."
-            },
-            "defector": {
-              "name": "Defector",
-              "when": "Voting (Reveal)",
-              "desc": "Secretly change your vote after the initial reveal but before the result is finalized. This can flip a 5-5 tie into a 6-4 pass. Once used."
-            },
-            "archivist": {
-              "name": "Archivist",
-              "when": "After enactment",
-              "desc": "Deep inspection: peek at the top 3 cards of the Draw Pile before the next round begins. Once used."
-            },
-            "quorum": {
-              "name": "Quorum",
-              "when": "After election fail",
-              "desc": "Emergency session: force an immediate re-vote on the last failed government, bypassing the next President. Once used."
-            },
-            "cipher": {
-              "name": "Cipher",
-              "when": "Any phase",
-              "desc": "Send a one-way encrypted message to any player. Only they can see the text you send. Once used."
-            }
-          }
+        "step_2": {
+          "label": "Vote",
+          "desc": "All living players simultaneously vote AYE or NAY. A strict majority of AYE passes the government. Ties and equal splits fail."
         },
-        "agendas_tab": {
-          "p1": "Every player receives a hidden {{personal_agenda}} at the start of each game. Completing it earns {{xp_bonus}} — equal to winning with your faction — regardless of the game result.",
-          "list_label": "All 20 Agendas",
-          "agendas": {
-            "chaos_agent": {
-              "name": "Chaos Agent",
-              "desc": "Trigger a chaos policy at least once"
-            },
-            "purist": {
-              "name": "The Purist",
-              "desc": "At least 3 Civil directives enacted"
-            },
-            "dissenter": {
-              "name": "The Dissenter",
-              "desc": "Vote against the majority 3+ times"
-            },
-            "dove": {
-              "name": "The Dove",
-              "desc": "Vote Aye in every eligible round"
-            },
-            "hawk": {
-              "name": "The Hawk",
-              "desc": "Vote Nay in at least 3 rounds"
-            },
-            "stonewalled": {
-              "name": "Stonewalled",
-              "desc": "Vote Nay on 2 governments that fail"
-            },
-            "short_session": {
-              "name": "Short Session",
-              "desc": "Game ends before round (players + 3)"
-            },
-            "long_game": {
-              "name": "The Long Game",
-              "desc": "Game lasts at least (players + 6) rounds"
-            },
-            "loyalist": {
-              "name": "The Loyalist",
-              "desc": "Vote Aye on 3 civil-enacting governments"
-            },
-            "nominated": {
-              "name": "Nominated",
-              "desc": "Be nominated Chancellor twice"
-            },
-            "deadlock": {
-              "name": "Deadlock",
-              "desc": "Be in at least 1 failed government"
-            },
-            "prolific": {
-              "name": "Prolific",
-              "desc": "Enact 2 policies as Chancellor"
-            },
-            "veteran": {
-              "name": "The Veteran",
-              "desc": "Serve as Chancellor at least once"
-            },
-            "unity": {
-              "name": "Unity",
-              "desc": "No chaos policy during the game"
-            },
-            "mandate": {
-              "name": "The Mandate",
-              "desc": "At least 4 State directives enacted"
-            },
-            "clean_sweep": {
-              "name": "Clean Sweep",
-              "desc": "Enact a Civil directive as Chancellor"
-            },
-            "weathervane": {
-              "name": "The Weathervane",
-              "desc": "Switch your vote 4+ times"
-            },
-            "productive": {
-              "name": "Productive Session",
-              "desc": "More than half of rounds enact a policy"
-            },
-            "close_race": {
-              "name": "Close Race",
-              "desc": "Tracks within 2 directives at game end"
-            },
-            "swing_vote": {
-              "name": "The Swing Vote",
-              "desc": "Be in a government that passes by 1 vote"
-            }
-          }
+        "step_3": {
+          "label": "Legislative Session",
+          "desc": "President draws 3 cards, discards 1 face-down, passes 2 to Chancellor. Chancellor enacts 1, discards the other. Neither can see what the other discarded."
         },
-        "tips_tab": {
-          "civil": {
-            "label": "For Civil Players",
-            "tips": [
-              "Cross-reference declarations: if President says they passed 1C/1S but Chancellor says they received 2S, someone is lying.",
-              "Track the voting record. Consistent Nay voting without explanation is suspicious.",
-              "Be careful with executive actions — investigate based on evidence, not gut feeling.",
-              "The deck is State-heavy. Some State policies being enacted doesn't prove anyone is guilty."
-            ]
+        "step_4": {
+          "label": "Declarations",
+          "desc": "President declares how many Civil/State they drew and passed. Chancellor declares how many they received and enacted. These claims can be lies."
+        },
+        "step_5": {
+          "label": "Executive Action",
+          "desc": "If a State directive was enacted and the player count/directive count triggers a power, the President must use it before the round ends."
+        }
+      },
+      "titles_tab": {
+        "intro": "Title Roles are assigned randomly at game start. Each is single-use and fires at a specific point in the round. Check your Dossier to see if you have one.",
+        "roles": {
+          "interdictor": {
+            "name": "Interdictor",
+            "when": "Start of each round",
+            "desc": "Before nomination: detain a player for this round. They cannot vote or be nominated as Chancellor. Once used."
           },
-          "state": {
-            "label": "For State Players",
-            "tips": [
-              "Coordinate declarations carefully. Contradicting your State ally's claim is a giveaway.",
-              "Nominate your State allies as Chancellor when possible — but not so obviously it looks suspicious.",
-              "Blame bad hands. \"I only had State cards\" is plausible because the deck is State-heavy.",
-              "The Overseer should stay quiet and unremarkable until the moment is right."
-            ]
+          "broker": {
+            "name": "Broker",
+            "when": "After nomination",
+            "desc": "Review the Chancellor nomination and veto it, forcing the President to nominate again. Once used."
           },
-          "general": {
-            "label": "General",
-            "tips": [
-              "Use the chat and declarations together. What players say matters.",
-              "Your personal agenda might conflict with your faction's best play. That tension is intentional.",
-              "The round history button shows every government, every vote, and every declaration."
-            ]
+          "strategist": {
+            "name": "Strategist",
+            "when": "As President",
+            "desc": "When you're President, draw 4 policy cards instead of 3, then discard 2. Once used."
+          },
+          "auditor": {
+            "name": "Auditor",
+            "when": "After enactment",
+            "desc": "Peek at the last 3 cards in the discard pile. Useful for tracking what policies are gone. Once used."
+          },
+          "assassin": {
+            "name": "Assassin",
+            "when": "After enactment (as President)",
+            "desc": "When you're President, secretly execute any living player after the round ends. Once used."
+          },
+          "handler": {
+            "name": "Handler",
+            "when": "After enactment",
+            "desc": "Swap the next two players in the presidential rotation. The second becomes President before the first. Once used."
+          },
+          "defector": {
+            "name": "Defector",
+            "when": "Voting (Reveal)",
+            "desc": "Secretly change your vote after the initial reveal but before the result is finalized. This can flip a 5-5 tie into a 6-4 pass. Once used."
+          },
+          "archivist": {
+            "name": "Archivist",
+            "when": "After enactment",
+            "desc": "Deep inspection: peek at the top 3 cards of the Draw Pile before the next round begins. Once used."
+          },
+          "quorum": {
+            "name": "Quorum",
+            "when": "After election fail",
+            "desc": "Emergency session: force an immediate re-vote on the last failed government, bypassing the next President. Once used."
+          },
+          "cipher": {
+            "name": "Cipher",
+            "when": "Any phase",
+            "desc": "Send a one-way encrypted message to any player. Only they can see the text you send. Once used."
           }
         }
+      },
+      "agendas_tab": {
+        "p1": "Every player receives a hidden {{personal_agenda}} at the start of each game. Completing it earns {{xp_bonus}} — equal to winning with your faction — regardless of the game result.",
+        "list_label": "All 20 Agendas",
+        "agendas": {
+          "chaos_agent": {
+            "name": "Chaos Agent",
+            "desc": "Trigger a chaos policy at least once"
+          },
+          "purist": {
+            "name": "The Purist",
+            "desc": "At least 3 Civil directives enacted"
+          },
+          "dissenter": {
+            "name": "The Dissenter",
+            "desc": "Vote against the majority 3+ times"
+          },
+          "dove": {
+            "name": "The Dove",
+            "desc": "Vote Aye in every eligible round"
+          },
+          "hawk": {
+            "name": "The Hawk",
+            "desc": "Vote Nay in at least 3 rounds"
+          },
+          "stonewalled": {
+            "name": "Stonewalled",
+            "desc": "Vote Nay on 2 governments that fail"
+          },
+          "short_session": {
+            "name": "Short Session",
+            "desc": "Game ends before round (players + 3)"
+          },
+          "long_game": {
+            "name": "The Long Game",
+            "desc": "Game lasts at least (players + 6) rounds"
+          },
+          "loyalist": {
+            "name": "The Loyalist",
+            "desc": "Vote Aye on 3 civil-enacting governments"
+          },
+          "nominated": {
+            "name": "Nominated",
+            "desc": "Be nominated Chancellor twice"
+          },
+          "deadlock": {
+            "name": "Deadlock",
+            "desc": "Be in at least 1 failed government"
+          },
+          "prolific": {
+            "name": "Prolific",
+            "desc": "Enact 2 policies as Chancellor"
+          },
+          "veteran": {
+            "name": "The Veteran",
+            "desc": "Serve as Chancellor at least once"
+          },
+          "unity": {
+            "name": "Unity",
+            "desc": "No chaos policy during the game"
+          },
+          "mandate": {
+            "name": "The Mandate",
+            "desc": "At least 4 State directives enacted"
+          },
+          "clean_sweep": {
+            "name": "Clean Sweep",
+            "desc": "Enact a Civil directive as Chancellor"
+          },
+          "weathervane": {
+            "name": "The Weathervane",
+            "desc": "Switch your vote 4+ times"
+          },
+          "productive": {
+            "name": "Productive Session",
+            "desc": "More than half of rounds enact a policy"
+          },
+          "close_race": {
+            "name": "Close Race",
+            "desc": "Tracks within 2 directives at game end"
+          },
+          "swing_vote": {
+            "name": "The Swing Vote",
+            "desc": "Be in a government that passes by 1 vote"
+          }
+        }
+      },
+      "tips_tab": {
+        "civil": {
+          "label": "For Civil Players",
+          "tips": [
+            "Cross-reference declarations: if President says they passed 1C/1S but Chancellor says they received 2S, someone is lying.",
+            "Track the voting record. Consistent Nay voting without explanation is suspicious.",
+            "Be careful with executive actions — investigate based on evidence, not gut feeling.",
+            "The deck is State-heavy. Some State policies being enacted doesn't prove anyone is guilty."
+          ]
+        },
+        "state": {
+          "label": "For State Players",
+          "tips": [
+            "Coordinate declarations carefully. Contradicting your State ally's claim is a giveaway.",
+            "Nominate your State allies as Chancellor when possible — but not so obviously it looks suspicious.",
+            "Blame bad hands. \"I only had State cards\" is plausible because the deck is State-heavy.",
+            "The Overseer should stay quiet and unremarkable until the moment is right."
+          ]
+        },
+        "general": {
+          "label": "General",
+          "tips": [
+            "Use the chat and declarations together. What players say matters.",
+            "Your personal agenda might conflict with your faction's best play. That tension is intentional.",
+            "The round history button shows every government, every vote, and every declaration."
+          ]
+        }
       }
+    },
+    "voting": {
+      "aye": "AYE!",
+      "aye_sub": "(YES)",
+      "nay": "NAY!",
+      "nay_sub": "(NO)",
+      "detained": "You are detained and cannot vote this round"
+    },
+    "legislative": {
+      "discard": "Discard",
+      "enact": "Enact",
+      "propose_veto": "Propose Veto",
+      "send_dispatch": "Send Anonymous Dispatch"
     }
   },
   "profile": {
@@ -987,12 +1878,702 @@
         "recovery_email": "Recovery Email",
         "recovery_email_desc": "Used to recover your account if you lose your token",
         "recovery_email_placeholder": "Enter recovery email...",
-        "no_recovery_email": "Not set"
+        "no_recovery_email": "Not set",
+        "fullscreen": "Fullscreen"
       },
       "tabs": {
         "general": "General",
         "audio": "Audio",
         "voice": "Voice"
+      },
+      "audio": {
+        "music": "Music",
+        "music_volume": "Music Volume",
+        "sfx": "Sound Effects",
+        "sfx_volume": "SFX Volume"
+      },
+      "voice": {
+        "ai_voice": "AI Narrator Voice",
+        "tts_voice": "Voice Selection",
+        "tts_default": "System Default",
+        "narrator_volume": "Narrator Volume",
+        "narrator_volume_desc": "Controls volume for AI voice announcements in game"
+      }
+    },
+    "lvl_label": "Level",
+    "ip_label": "IP",
+    "cp_label": "CP",
+    "xp_label": "Experience",
+    "edit_username": "Edit Username",
+    "public_profile": "Public Profile",
+    "username_update": {
+      "error_length": "Username must be 3-20 characters",
+      "failed": "Failed to update username"
+    },
+    "share": {
+      "copied": "Link Copied!",
+      "copy_link": "Copy Profile Link",
+      "on_twitter": "Share on Twitter",
+      "on_facebook": "Share on Facebook",
+      "on_whatsapp": "Share on WhatsApp",
+      "more": "More Options"
+    },
+    "tabs": {
+      "stats": "Stats",
+      "inventory": "Inventory",
+      "achievements": "Medals",
+      "challenges": "Challenges",
+      "clan": "Clan",
+      "shop": "Shop",
+      "pass": "Pass",
+      "friends": "Allies",
+      "referrals": "Referrals",
+      "history": "History",
+      "settings": "Settings",
+      "admin": "Admin"
+    },
+    "stats": {
+      "rank_rating": "Rank Rating",
+      "elo": "ELO",
+      "elo_to_next": "{{amount}} to {{tier}}",
+      "games_played": "Games Played",
+      "win_rate": "Win Rate",
+      "total_wins": "Total Wins",
+      "civil_games": "Civil Games",
+      "state_games": "State Games",
+      "overseer_games": "Overseer Games",
+      "kills": "Kills",
+      "deaths": "Deaths",
+      "agendas_completed": "Agendas Completed",
+      "account_created": "Account Created",
+      "civil_wins": "Civil Wins",
+      "state_wins": "State Wins",
+      "overseer_wins": "Overseer Wins",
+      "ranked_wins": "Ranked Wins",
+      "ranked_games": "Ranked Games",
+      "casual_wins": "Casual Wins",
+      "casual_games": "Casual Games",
+      "classic_wins": "Classic Wins",
+      "classic_games": "Classic Games"
+    },
+    "challenges": {
+      "loading": "Loading Challenges...",
+      "error_load": "Failed to load challenges",
+      "error_no_data": "No challenge data available",
+      "retry": "Retry",
+      "xp_reward": "{{amount}} XP",
+      "ip_reward": "{{amount}} IP",
+      "claimed": "Claimed",
+      "section_complete": "{{count}}/{{total}} Complete",
+      "tiers": {
+        "daily": "Daily Protocols",
+        "weekly": "Weekly Assignments",
+        "seasonal": "Seasonal Objectives"
+      },
+      "countdown": {
+        "now": "Resetting Now",
+        "days": "Resets in {{d}}d {{h}}h",
+        "hours": "Resets in {{h}}h {{m}}m",
+        "minutes": "Resets in {{m}}m {{s}}s"
+      },
+      "list": {
+        "daily_win_any": {
+          "name": "Victory",
+          "desc": "Win any game."
+        },
+        "daily_win_civil": {
+          "name": "Defender of the Charter",
+          "desc": "Win a game as a Civil player."
+        },
+        "daily_win_state": {
+          "name": "Servant of the State",
+          "desc": "Win a game as a State agent or the Overseer."
+        },
+        "daily_play_2": {
+          "name": "Active Participant",
+          "desc": "Play 2 games."
+        },
+        "daily_agenda_complete": {
+          "name": "Mission Accomplished",
+          "desc": "Complete your personal agenda."
+        },
+        "daily_elected_president": {
+          "name": "Presidential Authority",
+          "desc": "Be elected as President in any game."
+        },
+        "daily_elected_chancellor": {
+          "name": "The Chancellor",
+          "desc": "Be elected as Chancellor in any game."
+        },
+        "daily_enact_civil": {
+          "name": "Legislator",
+          "desc": "Enact a Civil directive as Chancellor."
+        },
+        "daily_enact_state": {
+          "name": "Directive Enforcer",
+          "desc": "Enact a State directive as Chancellor."
+        },
+        "daily_survive_state_win": {
+          "name": "Survivor",
+          "desc": "Survive to the end of a game the State wins."
+        },
+        "daily_win_ranked": {
+          "name": "Ranked Contender",
+          "desc": "Win a ranked game."
+        },
+        "daily_win_quick": {
+          "name": "Swift Resolution",
+          "desc": "Win a game in 6 rounds or fewer."
+        },
+        "daily_vote_nay_win": {
+          "name": "The Dissenter",
+          "desc": "Vote Nay on a government that still wins its election."
+        },
+        "daily_win_overseer": {
+          "name": "Shadow Sovereign",
+          "desc": "Win a game as the Overseer."
+        },
+        "daily_play_casual": {
+          "name": "Casual Assembly",
+          "desc": "Play a Casual mode game."
+        },
+        "daily_play_classic": {
+          "name": "Classic Attendance",
+          "desc": "Play a Classic mode game."
+        },
+        "daily_win_classic": {
+          "name": "Classic Victor",
+          "desc": "Win a Classic mode game."
+        },
+        "daily_chaos_occurs": {
+          "name": "Into Chaos",
+          "desc": "Play a game where a chaos policy is enacted."
+        },
+        "daily_veto_occurs": {
+          "name": "Deadlock",
+          "desc": "Play a game where a veto is exercised."
+        },
+        "daily_nominated_twice": {
+          "name": "Twice Nominated",
+          "desc": "Be nominated as Chancellor at least twice in a single game."
+        },
+        "daily_win_long": {
+          "name": "Long Session",
+          "desc": "Win a game that lasts at least 10 rounds."
+        },
+        "daily_voted_aye_failed": {
+          "name": "Betrayed by the Ballot",
+          "desc": "Vote Aye for a government that fails its election."
+        },
+        "daily_civil_full_track": {
+          "name": "Full Charter",
+          "desc": "Play a game where 5 Civil directives are enacted."
+        },
+        "daily_president_twice": {
+          "name": "Seasoned Leader",
+          "desc": "Be elected President at least twice in one game."
+        },
+        "daily_play_3": {
+          "name": "Prolific Player",
+          "desc": "Play 3 games today."
+        },
+        "daily_win_civil_survive_assassination": {
+          "name": "Resilient",
+          "desc": "Win a game as Civil while the Overseer is alive."
+        },
+        "daily_large_game": {
+          "name": "Grand Assembly",
+          "desc": "Play a game with 8 or more players."
+        },
+        "daily_win_large_game": {
+          "name": "Majority Rules",
+          "desc": "Win a game with 8 or more players."
+        },
+        "daily_enact_2_civil": {
+          "name": "Double Legislator",
+          "desc": "Enact 2 Civil directives as Chancellor in a single game."
+        },
+        "daily_win_state_5plus_players": {
+          "name": "State Operative",
+          "desc": "Win as State or Overseer in a game with at least 5 players."
+        },
+        "weekly_win_3": {
+          "name": "Seasoned Victor",
+          "desc": "Win 3 games this week."
+        },
+        "weekly_play_5": {
+          "name": "Dedicated Assembly Member",
+          "desc": "Play 5 games this week."
+        },
+        "weekly_win_civil_3": {
+          "name": "Charter's Champion",
+          "desc": "Win 3 games as a Civil player."
+        },
+        "weekly_win_state_2": {
+          "name": "State Operative",
+          "desc": "Win 2 games as a State agent or Overseer."
+        },
+        "weekly_agenda_3": {
+          "name": "Agenda Driven",
+          "desc": "Complete 3 personal agendas this week."
+        },
+        "weekly_win_ranked_2": {
+          "name": "Ranked Operator",
+          "desc": "Win 2 ranked games this week."
+        },
+        "weekly_enact_civil_3": {
+          "name": "Legislative Record",
+          "desc": "Enact 3 Civil directives as Chancellor across any games."
+        },
+        "weekly_chancellor_3": {
+          "name": "Frequent Chancellor",
+          "desc": "Be elected Chancellor 3 times across any games."
+        },
+        "weekly_win_overseer": {
+          "name": "Shadow Supremacy",
+          "desc": "Win a game as the Overseer."
+        },
+        "weekly_play_classic_2": {
+          "name": "Classic Mode Regular",
+          "desc": "Play 2 Classic mode games."
+        },
+        "weekly_win_5": {
+          "name": "Dominant Force",
+          "desc": "Win 5 games this week."
+        },
+        "weekly_play_10": {
+          "name": "Assembly Stalwart",
+          "desc": "Play 10 games this week."
+        },
+        "weekly_president_5": {
+          "name": "Presidential Career",
+          "desc": "Be elected President 5 times across any games."
+        },
+        "weekly_agenda_5": {
+          "name": "Master of Agendas",
+          "desc": "Complete 5 personal agendas this week."
+        },
+        "weekly_win_civil_5": {
+          "name": "Charter Guardian",
+          "desc": "Win 5 games as a Civil player."
+        },
+        "weekly_enact_state_3": {
+          "name": "State Enforcer",
+          "desc": "Enact 3 State directives as Chancellor across any games."
+        },
+        "weekly_win_2_modes": {
+          "name": "Versatile",
+          "desc": "Win at least one game in 2 different modes this week."
+        },
+        "weekly_win_ranked_3": {
+          "name": "Ranked Veteran",
+          "desc": "Win 3 ranked games this week."
+        },
+        "weekly_chancellor_5": {
+          "name": "Chancellor of Record",
+          "desc": "Be elected Chancellor across 5 games."
+        },
+        "weekly_survive_5_games": {
+          "name": "Endurance",
+          "desc": "Survive to the end of 5 games."
+        },
+        "seasonal_play_30": {
+          "name": "Assembly Regular",
+          "desc": "Play 30 games this season."
+        },
+        "seasonal_win_15": {
+          "name": "Season Champion",
+          "desc": "Win 15 games this season."
+        },
+        "seasonal_win_ranked_5": {
+          "name": "Ranked Veteran",
+          "desc": "Win 5 ranked games this season."
+        },
+        "seasonal_agenda_10": {
+          "name": "The Agenda Master",
+          "desc": "Complete 10 personal agendas this season."
+        },
+        "seasonal_win_civil_10": {
+          "name": "Pillar of the Charter",
+          "desc": "Win 10 games as a Civil player this season."
+        },
+        "seasonal_win_state_5": {
+          "name": "State Supremacist",
+          "desc": "Win 5 games as a State agent or Overseer this season."
+        },
+        "seasonal_play_50": {
+          "name": "True Assembly Member",
+          "desc": "Play 50 games this season."
+        },
+        "seasonal_chancellor_20": {
+          "name": "The Eternal Chancellor",
+          "desc": "Be elected Chancellor across 20 games this season."
+        },
+        "seasonal_agenda_20": {
+          "name": "The Agenda Absolutist",
+          "desc": "Complete 20 personal agendas this season."
+        },
+        "seasonal_win_ranked_10": {
+          "name": "Ranked Legend",
+          "desc": "Win 10 ranked games this season."
+        },
+        "seasonal_enact_civil_15": {
+          "name": "Legislative Legacy",
+          "desc": "Enact 15 Civil directives as Chancellor across this season."
+        },
+        "seasonal_win_25": {
+          "name": "Legendary Victor",
+          "desc": "Win 25 games this season."
+        }
+      }
+    },
+    "referrals": {
+      "title": "Referral Program",
+      "subtitle": "Invite friends to the Assembly and earn rewards.",
+      "active_reward": "Active Reward",
+      "reward_desc": "Earn <1>150 CP</1> for every friend who joins using your link and plays their <3>first match</3>.",
+      "link_label": "Your Referral Link",
+      "copy_hint": "Tap to copy your unique invite link",
+      "copied_hint": "Link copied to clipboard",
+      "tracking_title": "Automated Tracking",
+      "tracking_desc": "Rewards are automatically credited to your account once your referral completes their first 10-player match."
+    },
+    "clans": {
+      "members": {
+        "self_label": "You",
+        "xp_contributed": "{{count}} XP Contributed",
+        "btn_promote": "Promote to Officer",
+        "btn_demote": "Demote to Member",
+        "btn_transfer": "Transfer Presidency",
+        "btn_kick": "Remove from Clan"
+      },
+      "challenges": {
+        "daily": "Daily Protocol",
+        "weekly": "Weekly Assignments",
+        "seasonal": "Seasonal Objectives",
+        "xp_reward": "{{count}} XP",
+        "loading": "Accessing Clan Archives...",
+        "loading_error": "Failed to retrieve objective data.",
+        "retry": "Reconnect to Archive"
+      },
+      "leaderboard": {
+        "lvl_summary": "Lvl {{level}} · {{count}} Members",
+        "title": "Global Clan Rankings",
+        "empty": "No clans found.",
+        "rank": "#{{rank}}",
+        "your_clan": "Your Clan"
+      },
+      "create": {
+        "title": "Found a New Clan",
+        "tag_label": "Clan Tag (4-5 chars)",
+        "tag_placeholder": "ASLY",
+        "name_label": "Clan Name",
+        "name_placeholder": "The First Assembly",
+        "desc_label": "Information",
+        "desc_placeholder": "Purpose of your clan...",
+        "btn_creating": "Founding...",
+        "btn_submit": "Establish Clan",
+        "error_failed": "Failed to found clan"
+      },
+      "search": {
+        "title": "Browse Clans",
+        "placeholder": "Clan name or tag...",
+        "no_results": "No clans matching \"{{query}}\""
+      },
+      "no_clan": {
+        "title": "Isolated Loyalty",
+        "hint": "Join a clan to earn shared rewards and climb the global rankings.",
+        "btn_create": "Founder Path",
+        "btn_find": "Browse Clans",
+        "btn_leaderboard": "Rankings"
+      },
+      "manage": {
+        "btn_share": "Copy Invite Link",
+        "btn_edit": "Modify Clan",
+        "btn_save": "Confirm Changes",
+        "btn_saving": "Committing...",
+        "xp_label": "Clan Level XP",
+        "total_xp": "{{count}} Total XP Accumulated",
+        "contribution": "{{count}} XP Contributed",
+        "overview": "Overview",
+        "challenges": "Objectives",
+        "invite_label": "Invite to Clan",
+        "invite_placeholder": "Find player to invite...",
+        "members_label": "Clan Members"
+      },
+      "invites": {
+        "banner_title": "Clan Invitation",
+        "banner_desc": "{{inviter}} invited you to join {{clan}} [{{tag}}]",
+        "btn_accept": "Accept",
+        "btn_decline": "Decline"
+      },
+      "alerts": {
+        "leave_confirm": "Are you sure you want to leave this clan?",
+        "disband_confirm": "CRITICAL: This will permanently delete the clan. Proceed?",
+        "kick_confirm": "Remove this member?",
+        "transfer_confirm": "Transfer clan Presidency to this member?"
+      },
+      "loading": "Connecting to Archive...",
+      "loading_error": "Archive connection failed."
+    },
+    "inventory": {
+      "categories": {
+        "frame": "Borders",
+        "badge": "Badges",
+        "policy": "Policies",
+        "vote": "Votes",
+        "music": "Music",
+        "sound": "Sounds",
+        "background": "Backdrops"
+      },
+      "vote_aye": "Aye Token",
+      "vote_yes": "Yes Token",
+      "item_type_policy": "Policy Skin",
+      "rarities": {
+        "common": "Common",
+        "uncommon": "Uncommon",
+        "rare": "Rare",
+        "epic": "Epic",
+        "legendary": "Legendary"
+      },
+      "btn_equipped": "Equipped",
+      "btn_equip": "Equip"
+    },
+    "medals": {
+      "summary_title": "Medal Collection",
+      "summary_complete": "Completion",
+      "pin_hint_desc": "Tap earned medals to pin them.",
+      "pin_hint_status": "{{count}} / 3 pinned",
+      "pin_hint_empty": "No medals pinned",
+      "saving": "Saving...",
+      "categories": {
+        "milestone": "Milestones",
+        "role": "Role Achievements",
+        "title": "Title Achievements",
+        "gameplay": "Gameplay Achievements"
+      },
+      "xp_reward": "+{{amount}} XP",
+      "cp_reward": "+{{amount}} CP",
+      "list": {
+        "first_assembly": {
+          "name": "First Session",
+          "desc": "Play your first game."
+        },
+        "veteran": {
+          "name": "Seasoned Delegate",
+          "desc": "Play 25 games."
+        },
+        "elder": {
+          "name": "Elder of the Assembly",
+          "desc": "Play 100 games."
+        },
+        "first_victory": {
+          "name": "For the Record",
+          "desc": "Win your first game."
+        },
+        "ten_wins": {
+          "name": "Proven Commander",
+          "desc": "Win 10 games."
+        },
+        "fifty_wins": {
+          "name": "Grand Champion",
+          "desc": "Win 50 games."
+        },
+        "civil_first_win": {
+          "name": "Civil Servant",
+          "desc": "Win your first game as Civil."
+        },
+        "civil_ten_wins": {
+          "name": "Charter Defender",
+          "desc": "Win 10 games as Civil."
+        },
+        "civil_twenty_wins": {
+          "name": "Guardian of the Charter",
+          "desc": "Win 20 games as Civil."
+        },
+        "state_first_win": {
+          "name": "Shadow Agent",
+          "desc": "Win your first game as State."
+        },
+        "state_ten_wins": {
+          "name": "State Operative",
+          "desc": "Win 10 games as State."
+        },
+        "state_twenty_wins": {
+          "name": "Iron Fist",
+          "desc": "Win 20 games as State."
+        },
+        "overseer_played": {
+          "name": "The Architect",
+          "desc": "Play a game as the Overseer."
+        },
+        "overseer_win": {
+          "name": "Untouchable",
+          "desc": "Win a game as the Overseer."
+        },
+        "power_used": {
+          "name": "Cards on the Table",
+          "desc": "Use any title role ability."
+        },
+        "assassins_mark": {
+          "name": "Assassin's Mark",
+          "desc": "Execute a player using the Assassin ability."
+        },
+        "overseer_hunter": {
+          "name": "Overseer's End",
+          "desc": "Kill the Overseer as the Assassin."
+        },
+        "agenda_first": {
+          "name": "Hidden Agenda",
+          "desc": "Complete a personal agenda."
+        },
+        "agenda_ten": {
+          "name": "Agenda Master",
+          "desc": "Complete 10 personal agendas."
+        },
+        "agenda_twentyfive": {
+          "name": "Master Tactician",
+          "desc": "Complete 25 personal agendas."
+        },
+        "first_kill": {
+          "name": "Executive Decision",
+          "desc": "Execute a player as President."
+        },
+        "five_kills": {
+          "name": "Purge",
+          "desc": "Execute 5 players across all games."
+        },
+        "clean_sweep": {
+          "name": "Clean Sweep",
+          "desc": "Win a game without a single State directive."
+        },
+        "long_game": {
+          "name": "War of Attrition",
+          "desc": "Survive a game that reaches round 12."
+        },
+        "landslide": {
+          "name": "Landslide",
+          "desc": "Win an election where every player votes Aye."
+        }
+      }
+    },
+    "history": {
+      "loading": "Loading archival data...",
+      "btn_replay": "Reconstruct",
+      "btn_decrypting": "Decrypting...",
+      "no_matches": "No archival data found",
+      "first_game_hint": "Your first match data will appear here.",
+      "error_data_unavailable": "Data Unavailable",
+      "error_fetch_failed": "Archival Fetch Failed",
+      "roles": {
+        "civil": "Civil",
+        "state": "State",
+        "overseer": "Overseer"
+      },
+      "outcomes": {
+        "victory": "Victory",
+        "defeat": "Defeat",
+        "aborted": "Aborted"
+      }
+    },
+    "admin": {
+      "tabs": {
+        "rooms": "Rooms",
+        "users": "Users",
+        "system": "System",
+        "logs": "Audit"
+      },
+      "broadcast": {
+        "title": "Global Broadcast",
+        "placeholder": "Enter announcement message...",
+        "btn_send": "Broadcast"
+      },
+      "config": {
+        "maintenance": "System Maintenance Mode",
+        "xp_boost": "Global XP Multiplier",
+        "ip_boost": "Global IP Multiplier"
+      },
+      "rooms": {
+        "filter_placeholder": "Room ID or Host...",
+        "btn_refresh": "Refresh",
+        "purge_confirm": "Purge all inactive rooms?",
+        "btn_purge": "Purge Rooms",
+        "active_sessions": "Active Sessions",
+        "host_label": "Host: {{name}}",
+        "users_summary": "{{current}} / {{max}} Delegates"
+      },
+      "logs": {
+        "sessions": "Historical Sessions",
+        "persisted_log": "Archived Records: {{id}}",
+        "waiting": "Waiting for data...",
+        "empty": "No audit records found"
+      }
+    },
+    "shop": {
+      "title": "Cosmetic Requisition",
+      "subtitle": "Exchange IP and CP for border frames, badges, and more.",
+      "btn_purchase": "Requisition ({{amount}})",
+      "item_type_policy": "Policy Skin",
+      "item_style": "{{type}} Style",
+      "btn_owned": "Owned",
+      "btn_locked_pass": "Pass Reward",
+      "btn_buy_pts": "Buy · {{price}} IP"
+    },
+    "pass": {
+      "title": "Assembly Pass",
+      "subtitle": "Season 1: The Crisis",
+      "lvl_label": "Level {{lvl}}",
+      "xp_to_next": "{{xp}} / {{needed}} XP",
+      "max_level": "Max Level",
+      "item_level": "Level {{lvl}} Reward",
+      "claimed": "Claimed",
+      "unlocked": "Unlocked",
+      "locked": "Classified",
+      "season": "Season {{number}}",
+      "season_desc": "Complete challenges and earn XP to unlock exclusive cosmetics.",
+      "level": "Level",
+      "xp_summary": "{{amount}} XP earned",
+      "footer_season": "Season {{number}} · Active",
+      "footer_premium_hint": "Premium rewards are unlocked by levelling up. Keep playing.",
+      "btn_claim": "Claim",
+      "btn_claimed": "Claimed",
+      "btn_locked": "Locked",
+      "rewards": {
+        "geometric_grid": "Geometric Grid",
+        "purple_rain": "Purple Rain",
+        "static_noise": "Static Noise",
+        "purple_pill": "Purple Pill"
+      },
+      "reward_types": {
+        "cp": "Clarity Points",
+        "cp_count": "{{count}} CP",
+        "background": "Background",
+        "vote": "Vote Style",
+        "music": "Music Track",
+        "frame": "Border Frame",
+        "reward": "Reward"
+      }
+    },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "loading": "Loading...",
+      "no_data": "No data yet. Play some {{mode}} games!",
+      "column_player": "Player",
+      "column_rank_elo": "Rank · ELO",
+      "your_position": "Your Position",
+      "you": "You",
+      "modes": {
+        "overall": "Overall",
+        "ranked": "Ranked",
+        "casual": "Casual",
+        "classic": "Classic",
+        "crisis": "Crisis"
+      },
+      "stats": {
+        "win_rate": "Win%",
+        "games": "Games",
+        "wins": "Wins",
+        "elo": "ELO"
       }
     }
   },
@@ -1035,6 +2616,37 @@
       "invite_title": "Invite to assembly",
       "join_title": "Join their assembly",
       "remove_title": "Remove ally"
+    }
+  },
+  "playercard": {
+    "play_now": "Play Now",
+    "player_profile": "Player Profile",
+    "elo_label": "ELO",
+    "elo_to_next": "{{amount}} ELO to next tier",
+    "joined_on": "Joined {{date}}",
+    "share_profile": "Share Profile",
+    "copied": "Copied!",
+    "join_assembly": "Join The Assembly",
+    "think_can_beat": "Think you can beat them?",
+    "free_to_play": "Free to play · No download required",
+    "stats": {
+      "games": "Games",
+      "win_rate": "Win Rate",
+      "kills": "Kills",
+      "kd_ratio": "K/D Ratio",
+      "win_rate_role": "Win Rate by Role",
+      "perf_mode": "Performance by Mode",
+      "total_wins": "Total Wins",
+      "agendas_done": "Agendas Done",
+      "deaths": "Deaths",
+      "achievements": "Achievements Earned",
+      "medals": "medals"
+    },
+    "errors": {
+      "player_not_found": "Player not found",
+      "player_not_found_desc": "This player does not exist or their profile is private.",
+      "failed_to_load_profile": "Failed to load profile",
+      "generic_desc": "Check your connection and try again."
     }
   }
 }

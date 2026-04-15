@@ -36,10 +36,21 @@ export const I18nProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const t = useCallback((key: TranslationKey, params?: Record<string, any>): any => {
     const keys = key.split('.');
-    let value = LOCALES[locale] || en;
     
+    // 1. Try current locale
+    let value = LOCALES[locale];
     for (const k of keys) {
-      value = value?.[k];
+      if (value === undefined || value === null) break;
+      value = value[k];
+    }
+
+    // 2. Fallback to English if not found or if the locale is not English
+    if ((value === undefined || value === null) && locale !== 'en') {
+      value = en;
+      for (const k of keys) {
+        if (value === undefined || value === null) break;
+        value = value[k];
+      }
     }
 
     if (value === undefined || value === null) {

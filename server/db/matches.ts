@@ -4,6 +4,7 @@ import { mapUserToSupabase, saveUser } from './users';
 import { logger } from '../logger';
 
 const matchHistoryStore: Map<string, MatchSummary[]> = new Map();
+const globalMatchStore: Map<string, any> = new Map();
 
 export async function saveMatchResult(
   match: Omit<MatchSummary, 'id'> & { id: string }
@@ -29,6 +30,7 @@ export async function saveMatchResult(
         xp_earned: match.xpEarned,
         ip_earned: match.ipEarned,
         cp_earned: match.cpEarned,
+        match_id: match.matchId,
       });
       if (error) throw error;
     }, 'saveMatchResult');
@@ -61,6 +63,8 @@ export async function saveGlobalMatch(match: {
       });
       if (error) throw error;
     }, 'saveGlobalMatch');
+  } else {
+    globalMatchStore.set(match.id, match);
   }
 }
 
@@ -82,7 +86,8 @@ export async function getMatchById(matchId: string): Promise<any | null> {
       players: data.players,
     };
   }
-  return null;
+
+  return globalMatchStore.get(matchId) || null;
 }
 
 export async function saveMatchAndUserAtomic(
@@ -117,6 +122,7 @@ export async function saveMatchAndUserAtomic(
           xp_earned: match.xpEarned,
           ip_earned: match.ipEarned,
           cp_earned: match.cpEarned,
+          match_id: match.matchId,
         });
         if (matchErr) throw matchErr;
         
@@ -197,4 +203,3 @@ export async function incrementGlobalWin(faction: 'Civil' | 'State'): Promise<vo
     await adminDb.rpc('increment_global_win', { faction });
   }
 }
-

@@ -248,39 +248,39 @@ export const TutorialModal: React.FC<TutorialModalProps> = ({ isOpen, onComplete
           <div className="grid grid-cols-1 gap-2">
             {[
               {
-                name: t('game.tutorial.titles.roles.interdictor.name'),
+                name: t('game.tutorial.titles.interdictor.name'),
                 when: t('game.phases.nominate_chancellor'),
-                desc: t('game.tutorial.titles.roles.interdictor.desc'),
+                desc: t('game.tutorial.titles.interdictor.desc'),
               },
               {
-                name: t('game.tutorial.titles.roles.broker.name'),
+                name: t('game.tutorial.titles.broker.name'),
                 when: t('game.phases.nomination_review'),
-                desc: t('game.tutorial.titles.roles.broker.desc'),
+                desc: t('game.tutorial.titles.broker.desc'),
               },
               {
-                name: t('game.tutorial.titles.roles.strategist.name'),
+                name: t('game.tutorial.titles.strategist.name'),
                 when: t('game.phases.legislative_president'),
-                desc: t('game.tutorial.titles.roles.strategist.desc'),
+                desc: t('game.tutorial.titles.strategist.desc'),
               },
               {
-                name: t('game.tutorial.titles.roles.auditor.name'),
+                name: t('game.tutorial.titles.auditor.name'),
                 when: t('game.phases.auditor_inspect'),
-                desc: t('game.tutorial.titles.roles.auditor.desc'),
+                desc: t('game.tutorial.titles.auditor.desc'),
               },
               {
-                name: t('game.tutorial.titles.roles.assassin.name'),
+                name: t('game.tutorial.titles.assassin.name'),
                 when: t('game.phases.assassin_target'),
-                desc: t('game.tutorial.titles.roles.assassin.desc'),
+                desc: t('game.tutorial.titles.assassin.desc'),
               },
               {
-                name: t('game.tutorial.titles.roles.defector.name'),
+                name: t('game.tutorial.titles.defector.name'),
                 when: t('game.phases.defector_align'),
-                desc: t('game.tutorial.titles.roles.defector.desc'),
+                desc: t('game.tutorial.titles.defector.desc'),
               },
               {
-                name: t('game.tutorial.titles.roles.handler.name'),
+                name: t('game.tutorial.titles.handler.name'),
                 when: t('game.phases.legislative_chancellor'),
-                desc: t('game.tutorial.titles.roles.handler.desc'),
+                desc: t('game.tutorial.titles.handler.desc'),
               },
             ].map((role) => (
               <div key={role.name} className="flex gap-3 items-start">

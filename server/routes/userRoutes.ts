@@ -5,7 +5,7 @@ import { RouteContext } from './types';
 import { requireAuth, sanitizeUser, JWT_SECRET } from './shared';
 import { logger } from '../logger';
 import { updateEmailSchema, updateUsernameSchema } from '../game/schemas';
-import { getUser, getUserByEmail, saveUser, getMatchHistory } from '../supabaseService';
+import { getUser, getUserByEmail, saveUser, getMatchHistory, getMatchById } from '../supabaseService';
 import { refreshChallenges, buildChallengesResponse } from '../db/challenges';
 import { ACHIEVEMENT_MAP } from '../../src/utils/achievements';
 
@@ -112,6 +112,19 @@ export function registerUserRoutes({ app, engine }: RouteContext): void {
 
     const history = await getMatchHistory(req.params.userId, limit, offset);
     res.json({ history });
+  });
+
+  app.get('/api/matches/:matchId', requireAuth, async (req: Request, res: Response) => {
+    try {
+      const match = await getMatchById(req.params.matchId);
+      if (!match) {
+        return res.status(404).json({ error: 'Match not found' });
+      }
+      res.json(match);
+    } catch (err) {
+      logger.error({ err }, 'GET /api/matches/:id error');
+      res.status(500).json({ error: 'Internal server error' });
+    }
   });
 
   app.post('/api/pass/claim', requireAuth, async (req: Request, res: Response) => {

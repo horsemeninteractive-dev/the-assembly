@@ -210,7 +210,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
         </div>
       </div>
 
-      {/* Spectators */}
+      {/* Spectators + Prediction Tally */}
       {gameState.spectators.length > 0 && (
         <div className="col-span-3 h-[2.5vh] flex items-center gap-3 overflow-x-auto no-scrollbar">
           <div className="flex items-center gap-1.5 shrink-0 font-light">
@@ -219,7 +219,7 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
               {t('game.tracks.spectators', { count: gameState.spectators.length })}
             </span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-1 min-w-0">
             {gameState.spectators.map((s) => (
               <div key={s.id} className="flex items-center gap-1 shrink-0">
                 <div className="w-[1.5vh] h-[1.5vh] rounded-full bg-card overflow-hidden border border-default">
@@ -237,6 +237,41 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
               </div>
             ))}
           </div>
+
+          {/* Prediction tally – right-aligned, only shown when there are votes */}
+          {(() => {
+            if (gameState.phase === 'Lobby' || gameState.phase === 'GameOver') return null;
+            const preds = gameState.spectatorPredictions
+              ? Object.values(gameState.spectatorPredictions)
+              : [];
+            if (preds.length === 0) return null;
+            const civil = preds.filter(p => p.prediction === 'Civil').length;
+            const total = preds.length;
+            const civilPct = Math.round((civil / total) * 100);
+            const statePct = 100 - civilPct;
+            return (
+              <div className="flex items-center gap-1.5 shrink-0 ml-auto">
+                <span className={cn("text-[8px] font-mono uppercase tracking-widest", civilPct > statePct ? "text-blue-400 font-bold" : "text-faint")}>
+                  {civilPct}%
+                </span>
+                <div className="w-[40px] sm:w-[60px] h-[4px] rounded-full overflow-hidden flex bg-black/40 border border-white/5">
+                  <motion.div
+                    initial={{ width: '50%' }}
+                    animate={{ width: `${civilPct}%` }}
+                    className="h-full bg-gradient-to-r from-blue-600 to-blue-400"
+                  />
+                  <motion.div
+                    initial={{ width: '50%' }}
+                    animate={{ width: `${statePct}%` }}
+                    className="h-full bg-gradient-to-l from-red-600 to-red-400"
+                  />
+                </div>
+                <span className={cn("text-[8px] font-mono uppercase tracking-widest", statePct > civilPct ? "text-red-400 font-bold" : "text-faint")}>
+                  {statePct}%
+                </span>
+              </div>
+            );
+          })()}
         </div>
       )}
 

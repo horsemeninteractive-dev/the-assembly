@@ -1,1040 +1,2652 @@
 {
   "common": {
-    "title": "THE ASSEMBLY",
-    "loading": "Loading...",
-    "error": "Error",
-    "success": "Success",
-    "cancel": "Cancel",
-    "confirm": "Confirm",
-    "back": "Back",
-    "save": "Save",
-    "close": "Close",
-    "leave": "Leave",
-    "ready": "Ready!",
-    "not_ready": "Ready Up",
-    "submit": "Submit",
-    "total": "Total",
-    "create": "Create",
-    "active": "Active",
-    "searching": "Searching...",
-    "error_invalid_email": "Invalid email address"
+    "title": "大会",
+    "loading": "正在加载...",
+    "error": "错误",
+    "success": "成功",
+    "cancel": "取消",
+    "confirm": "确认",
+    "back": "返回",
+    "save": "保存",
+    "close": "关闭",
+    "leave": "离开",
+    "ready": "准备好！",
+    "not_ready": "准备好",
+    "submit": "提交",
+    "total": "总计",
+    "create": "创建",
+    "active": "活跃",
+    "searching": "正在搜索...",
+    "error_invalid_email": "无效的电子邮件地址",
+    "aye": "是的",
+    "civil_short": "文明",
+    "invite": "邀请",
+    "lvl": "等级",
+    "results": "结果",
+    "search": "搜索",
+    "sent": "发送",
+    "state_short": "斯塔",
+    "status": "状态"
   },
   "auth": {
-    "back": "Back",
-    "recovery_title": "Account Recovery",
-    "welcome_back": "Welcome back, Delegate",
-    "register_assembly": "Register for the Assembly",
+    "back": "返回",
+    "recovery_title": "帐户恢复",
+    "welcome_back": "欢迎回来，代表",
+    "register_assembly": "注册大会",
     "form": {
-      "username": "Username",
-      "username_placeholder": "Agent Handle",
-      "email": "Email",
-      "password": "Secure Key",
-      "forgot_password": "Forgot Key?",
-      "sign_in": "Sign In",
-      "create_account": "Create Account",
-      "or_continue": "Or continue with",
-      "register_prompt": "Don't have an account? Register",
-      "login_prompt": "Already have an account? Login",
-      "choose_avatar": "Choose Avatar"
+      "username": "用户名",
+      "username_placeholder": "代理句柄",
+      "email": "电子邮件",
+      "password": "安全密钥",
+      "forgot_password": "忘记钥匙？",
+      "sign_in": "登录",
+      "create_account": "创建帐户",
+      "or_continue": "或者继续",
+      "register_prompt": "没有帐户？注册",
+      "login_prompt": "已经有帐户？登录",
+      "choose_avatar": "选择头像"
     }
   },
   "landing": {
     "nav": {
-      "login": "Log In",
-      "play": "Play Now"
+      "login": "登录",
+      "play": "立即播放"
     },
     "hero": {
-      "tagline": "A social deduction game of hidden roles, political intrigue,\nand impossible trust.",
-      "cta_play": "Play Now — Free",
-      "discover": "Discover"
+      "tagline": "隐藏角色、政治阴谋的社会演绎游戏，\n和不可能的信任。",
+      "cta_play": "立即玩 — 免费",
+      "discover": "发现"
     },
     "about": {
-      "label": "What Is The Assembly?",
-      "title": "Hidden Roles. Public Stakes.",
-      "subtitle": "A political thriller played out in real time. 5 to 10 players take on secret roles and must deceive, deduce, and outmanoeuvre one another across a series of high-pressure legislative rounds.",
-      "stat_players": "Players per game",
-      "stat_policies": "Policy cards stacked against you",
-      "stat_agendas": "Personal agendas to complete",
-      "quote": "The old world ended with The Crisis. Now, only The Assembly stands…",
-      "quote_cta": "Will you defend the Civil Charter, or will you build the new State?"
+      "label": "什么是议会？",
+      "title": "隐藏角色。公共股份。",
+      "subtitle": "一场政治惊悚片实时上演。 5 到 10 名玩家扮演秘密角色，必须在一系列高压的立法回合中欺骗、推理并战胜对方。",
+      "stat_players": "每场比赛的玩家",
+      "stat_policies": "政策牌对你不利",
+      "stat_agendas": "需要完成的个人议程",
+      "quote": "旧世界以危机结束。现在，只有议会站立……",
+      "quote_cta": "你会捍卫《公民宪章》，还是会建设新国家？"
     },
     "factions": {
-      "label": "Choose Your Side",
-      "title": "Two Factions. One Assembly.",
-      "subtitle": "Every player is secretly assigned to a faction at the start of each game. The majority will not know who they can trust.",
+      "label": "选择你的立场",
+      "title": "两个派系。一次大会。",
+      "subtitle": "每个玩家在每场游戏开始时都会被秘密分配到一个派系。大多数人不知道他们可以信任谁。",
       "civil": {
-        "title": "Civil",
-        "desc": "The majority. Isolated in your loyalty. You don't know who your allies are — only that the deck is stacked against you, and that someone at this table is a traitor.",
-        "win_1": "Enact 5 Civil directives",
-        "win_2": "Execute the Overseer"
+        "title": "民用",
+        "desc": "大多数。因你的忠诚而孤立。你不知道你的盟友是谁——只知道这一切都对你不利，而这张桌子上的某个人是叛徒。",
+        "win_1": "颁布 5 项民事指令",
+        "win_2": "处决监督者"
       },
       "state": {
-        "title": "State",
-        "desc": "The minority. Hidden among the Civil delegates, secretly coordinating. You know your allies. What you need is the right moment.",
-        "win_1": "Enact 6 State directives",
-        "win_2": "Elect the Overseer as Chancellor"
+        "title": "状态",
+        "desc": "少数。隐藏在民事代表之中，暗中协调。你了解你的盟友。你需要的是正确的时机。",
+        "win_1": "颁布 6 项国家指令",
+        "win_2": "选举监督者为议长"
       },
       "overseer": {
-        "title": "The Overseer",
-        "desc": "A State agent who may not know the other State players. Their election as Chancellor after 3 State directives ends the game immediately."
+        "title": "监督者",
+        "desc": "可能不认识其他州参与者的州特工。在三项州指令之后，他们当选为总理，游戏立即结束。"
       },
-      "win_conditions": "Win Conditions"
+      "win_conditions": "获胜条件"
     },
     "loop": {
-      "label": "How It Plays",
-      "title": "One Round. Five Moments.",
-      "subtitle": "Each round forces every player to participate, declare, and be judged. There is no hiding.",
-      "step_1": "The President nominates a Chancellor. Who you trust — and who you nominate — reveals everything.",
-      "step_2": "All players vote simultaneously. Public, inescapable, and open to interpretation.",
-      "label_3": "Legislative Session",
-      "step_3": "The President draws 3 policy cards, discards 1, passes 2 to the Chancellor. One will be enacted.",
-      "label_4": "Declarations",
-      "step_4": "Both sides declare what happened in the session. These statements can be lies — blatant, convincing lies.",
-      "label_5": "Executive Action",
-      "step_5": "Enough State policies and the President wields power — investigations, detentions, executions."
+      "label": "玩法",
+      "title": "一轮。五个时刻。",
+      "subtitle": "每一轮都迫使每个玩家参与、声明并接受评判。没有什么可隐藏的。",
+      "label_1": "提名",
+      "step_1": "总统提名一名校长。你信任的人以及你提名的人揭示了一切。",
+      "label_2": "表决",
+      "step_2": "所有玩家同时投票。公开的、不可避免的、可以解释的。",
+      "label_3": "立法会议",
+      "step_3": "总统抽 3 张政策卡，弃掉 1 张，将 2 张交给财政大臣。将颁布一项。",
+      "label_4": "声明",
+      "step_4": "双方都宣布了会议中发生的情况。这些陈述可能是谎言——公然的、令人信服的谎言。",
+      "label_5": "行政行动",
+      "step_5": "足够的国家政策和总统行使权力——调查、拘留、处决。"
     },
     "features": {
-      "label": "What's Included",
-      "title": "More Than a Board Game.",
+      "label": "包含什么",
+      "title": "不仅仅是棋盘游戏。",
       "item_1": {
-        "label": "5–10 Players",
-        "desc": "Scale from tight deduction to sprawling deception."
+        "label": "5–10 名玩家",
+        "desc": "从严格的推理到广泛的欺骗。"
       },
       "item_2": {
-        "label": "AI Players",
-        "desc": "Fill empty seats with AI — each with its own personality."
+        "label": "人工智能玩家",
+        "desc": "用人工智能填补空位——每个人都有自己的个性。"
       },
       "item_3": {
-        "label": "Title Roles",
-        "desc": "One-use powers — Interdictor, Assassin, Broker and more."
+        "label": "标题角色",
+        "desc": "一次性能力——拦截者、刺客、掮客等等。"
       },
       "item_4": {
-        "label": "Personal Agendas",
-        "desc": "20 hidden objectives independent of your faction."
+        "label": "个人议程",
+        "desc": "20 个独立于你的派系的隐藏目标。"
       },
       "item_5": {
-        "label": "Crisis Mode",
-        "desc": "Optional chaos directives that rewrite the rules mid-game."
+        "label": "危机模式",
+        "desc": "可选的混乱指令会在游戏中期重写规则。"
       },
       "item_6": {
-        "label": "Clan System",
-        "desc": "Form a clan, set a banner, build a legacy."
+        "label": "部落系统",
+        "desc": "组建部落，树立旗帜，建立遗产。"
       },
       "item_7": {
-        "label": "Season Ranks",
-        "desc": "Climb the ladder. Earn IP. Unlock cosmetics."
+        "label": "赛季排名",
+        "desc": "爬上梯子。赚取知识产权。解锁化妆品。"
       },
       "item_8": {
-        "label": "Free to Play",
-        "desc": "All gameplay is free. Cosmetics are optional."
+        "label": "免费玩",
+        "desc": "所有游戏都是免费的。化妆品是可选的。"
       }
     },
     "cta": {
-      "title": "Take Your Seat.",
-      "subtitle": "Free to play. No downloads. The Assembly awaits.",
-      "button": "Create Account"
+      "title": "请入座。",
+      "subtitle": "免费玩。没有下载。大会正在等待。",
+      "button": "创建帐户"
     }
   },
   "lobby": {
     "header": {
-      "subtitle": "Assembly Lobby",
-      "leaderboard": "Leaderboard",
-      "profile": "My Profile",
-      "view_profile": "View Profile",
-      "how_to_play": "How to Play",
-      "logout": "Logout"
+      "subtitle": "大会大厅",
+      "leaderboard": "排行榜",
+      "profile": "我的个人资料",
+      "view_profile": "查看个人资料",
+      "how_to_play": "怎么玩",
+      "logout": "退出"
     },
     "ranks": {
-      "initiate": "Initiate",
-      "trainee": "Trainee",
-      "delegate": "Delegate",
-      "official": "Official",
-      "high_delegate": "High Delegate",
-      "consul": "Consul",
-      "assembly_master": "Assembly Master",
-      "overseer": "Overseer"
+      "initiate": "发起",
+      "trainee": "实习生",
+      "delegate": "代表",
+      "official": "官方",
+      "high_delegate": "高级代表",
+      "consul": "领事",
+      "assembly_master": "装配大师",
+      "overseer": "监督者"
     },
     "matchmaking": {
-      "title": "Assemble a Match",
-      "subtitle": "Join a competitive queue or find a casual room.",
-      "searching": "Searching…",
-      "joining": "Joining!",
-      "no_rooms": "No Rooms",
-      "quick_join": "Quick Join",
-      "quick_join_desc": "Best available room",
-      "create": "Create Assembly",
-      "create_desc": "Convene your own",
-      "practice": "Solo Practice",
-      "practice_desc": "Train vs AI bots",
-      "practice_short": "Practice",
-      "global_war": "Global War",
-      "stats_running": "Assemblies Running",
-      "stats_members": "Active Members"
+      "title": "组装火柴",
+      "subtitle": "加入竞争队列或寻找休闲房间。",
+      "searching": "正在搜索...",
+      "joining": "加入！",
+      "no_rooms": "没有房间",
+      "quick_join": "快速加入",
+      "quick_join_desc": "最佳可用房间",
+      "create": "创建装配体",
+      "create_desc": "召集您自己的",
+      "practice": "独奏练习",
+      "practice_desc": "训练与人工智能机器人",
+      "practice_short": "练习",
+      "global_war": "全球战争",
+      "stats_running": "正在运行的程序集",
+      "stats_members": "活跃会员"
     },
     "browser": {
-      "rejoin_title": "Active Assembly Found",
-      "rejoin_subtitle": "You disconnected from: {{name}}",
-      "rejoin_btn": "Rejoin Game",
-      "status_recruiting": "Recruiting",
-      "status_in_progress": "In Progress",
-      "privacy_public": "Public",
-      "privacy_private": "Private",
-      "privacy_friends": "Friends",
-      "status_locked": "Locked",
+      "rejoin_title": "发现活动组件",
+      "rejoin_subtitle": "您已断开连接：{{name}}",
+      "rejoin_btn": "重新加入游戏",
+      "status_recruiting": "招聘",
+      "status_in_progress": "进行中",
+      "privacy_public": "公共",
+      "privacy_private": "私人",
+      "privacy_friends": "朋友",
+      "status_locked": "锁定",
       "players_count": "{{count}}/{{max}}",
-      "btn_join": "Join",
-      "btn_watch": "Watch",
-      "filter_joinable": "Joinable",
-      "filter_active": "Active",
-      "sort_label": "Sort",
-      "sort_new": "New",
-      "sort_full": "Full",
-      "empty_no_rooms": "No active rooms found.",
-      "empty_no_match": "No rooms match your filters.",
-      "empty_create_prompt": "Be the first to create one",
-      "empty_clear_filters": "Clear filters",
-      "private_modal_title": "Private Room",
-      "private_modal_subtitle": "Enter the 4-character invite code.",
-      "private_modal_cancel": "Cancel"
+      "btn_join": "加入",
+      "btn_watch": "观看",
+      "filter_joinable": "可加入",
+      "filter_active": "活跃",
+      "sort_label": "排序",
+      "sort_new": "新",
+      "sort_full": "完整",
+      "empty_no_rooms": "未找到活动房间。",
+      "empty_no_match": "没有房间符合您的筛选条件。",
+      "empty_create_prompt": "成为第一个创建",
+      "empty_clear_filters": "清除过滤器",
+      "private_modal_title": "私人房间",
+      "private_modal_subtitle": "输入 4 个字符的邀请码。",
+      "private_modal_cancel": "取消"
     },
     "sidebar": {
-      "actions": "Actions"
+      "actions": "行动"
     },
     "footer": {
-      "published_by": "Published by",
-      "credits": "Credits",
-      "legal": "Legal Info"
+      "published_by": "发布者",
+      "credits": "学分",
+      "legal": "法律信息"
+    },
+    "creator": {
+      "title": "建立新程序集",
+      "room_name": "房间名称",
+      "room_name_placeholder": "例如1933 年柏林",
+      "max_players": "最大玩家人数",
+      "players_min": "5 名玩家",
+      "players_max": "10 名玩家",
+      "action_timer": "动作计时器",
+      "timer_off": "关闭",
+      "game_mode": "游戏模式",
+      "mode_ranked_desc": "授予 ELO 和满分。",
+      "mode_casual_desc": "ELO 没有变化，分数减少。",
+      "mode_classic_desc": "标准角色/规则。没有ELO，减少积分。",
+      "mode_crisis_desc": "基于回合的事件卡。高风险，高积分。",
+      "privacy": "隐私",
+      "privacy_public": "民众",
+      "privacy_public_desc": "任何人都可以加入",
+      "privacy_friends": "仅限朋友",
+      "privacy_friends_desc": "仅限您的朋友",
+      "privacy_private": "私人",
+      "privacy_private_desc": "邀请码",
+      "invite_code_hint": "创建房间时会生成邀请码。",
+      "btn_create": "创建房间",
+      "btn_maintenance": "维护"
+    },
+    "practice": {
+      "title": "独奏练习",
+      "subtitle": "与人工智能",
+      "total_players": "玩家总数",
+      "players_min": "5（快）",
+      "players_max": "10（复杂）",
+      "ai_difficulty": "人工智能难度",
+      "difficulty_casual_desc": "AI 玩起来简单而诚实。",
+      "difficulty_normal_desc": "人工智能使用标准策略和欺骗。",
+      "difficulty_elite_desc": "人工智能具有很强的欺骗性并且能够有效地协调。",
+      "btn_start": "召开大会"
     }
   },
   "game": {
-    "round": "Round {{round}}",
-    "phase": "Phase: {{phase}}",
-    "civil_directives": "Civil Directives",
-    "state_directives": "State Directives",
-    "winner": "{{faction}} Wins!",
-    "gameOver": "G A M E   O V E R",
+    "roles": {
+      "civil": {
+        "name": "民用",
+        "flavor": "保护宪章。没有人相信。"
+      },
+      "state": {
+        "name": "状态",
+        "flavor": "落实国家愿景。确定你的盟友。"
+      },
+      "overseer": {
+        "name": "监督者",
+        "flavor": "从内部破坏议会。成为总理。"
+      }
+    },
+    "round": "回合 {{round}}",
+    "phase": "阶段：{{phase}}",
+    "civil_directives": "民事指令",
+    "state_directives": "国家指令",
+    "winner": "{{faction}} 胜利！",
+    "gameOver": "游戏结束",
+    "modes": {
+      "casual": "休闲",
+      "ranked": "排名",
+      "classic": "经典",
+      "crisis": "危机"
+    },
     "phases": {
-      "lobby": "Waiting for players ({{current}}/{{max}})...",
-      "nominate_chancellor": "{{name}} is nominating a Chancellor.",
-      "nomination_review": "The Assembly is reviewing the nomination.",
-      "interdictor_review": "Interdictor is choosing a target.",
-      "broker_review": "Broker is reviewing the nomination.",
-      "voting": "The Assembly is voting.",
-      "legislative_president": "President is reviewing directives.",
-      "strategist_deck": "Strategist is looking at the deck.",
-      "legislative_chancellor": "Chancellor is enacting a directive.",
-      "auditor_inspect": "Auditor is inspecting the discard pile.",
-      "defector_align": "The Defector is considering a secret realignment.",
-      "quorum_revote": "The Quorum is deciding on an emergency re-vote.",
-      "assassin_target": "Assassin is choosing a target."
+      "lobby": "正在等待玩家 ({{current}}/{{max}})...",
+      "nominate_chancellor": "{{name}} 正在提名一位校长。",
+      "nomination_review": "大会正在审查提名。",
+      "interdictor_review": "拦截者正在选择目标。",
+      "broker_review": "经纪人正在审查提名。",
+      "voting": "大会正在投票。",
+      "legislative_president": "总统正在审查指令。",
+      "strategist_deck": "策略师正在看牌组。",
+      "legislative_chancellor": "财政大臣正在颁布一项指令。",
+      "auditor_inspect": "审核员正在检查废弃堆。",
+      "defector_align": "叛逃者正在考虑秘密重组。",
+      "quorum_revote": "法定人数正在决定紧急重新投票。",
+      "assassin_target": "刺客正在选择目标。"
     },
     "dossier": {
-      "title": "Your Secret Dossier",
-      "identity": "Secret Identity",
-      "identity_civil": "Political Identity: Civil",
-      "identity_overseer": "Political Identity: Overseer",
-      "identity_state": "Political Identity: State",
-      "agenda": "Personal Agenda",
-      "agenda_none": "No agenda assigned.",
-      "agenda_bonus": "Completing this awards bonus XP and IP equal to a faction win.",
-      "title_role": "Title Role",
-      "title_none": "No title role assigned.",
-      "faction_state": "State Faction",
-      "awaiting": "Awaiting role assignment...",
-      "close": "Close Dossier"
+      "title": "你的秘密档案",
+      "identity": "秘密身份",
+      "identity_civil": "民用",
+      "identity_overseer": "监督者",
+      "identity_state": "状态",
+      "agenda": "个人议程",
+      "agenda_none": "没有分配议程。",
+      "agenda_bonus": "完成此任务可奖励 XP 和 IP 奖励，相当于派系胜利。",
+      "title_role": "标题角色",
+      "title_none": "未分配头衔角色。",
+      "faction_state": "国家派",
+      "awaiting": "正在等待角色分配...",
+      "close": "关闭档案",
+      "active": "活跃"
     },
     "powers": {
       "peek": {
-        "name": "Policy Peek",
-        "desc": "President previews top 3 directives"
+        "name": "政策一览",
+        "desc": "总统预览三大指令"
       },
       "kill": {
-        "name": "Execution",
-        "desc": "President executes a player"
+        "name": "执行",
+        "desc": "总统处决一名球员"
       },
       "inv": {
-        "name": "Investigation",
-        "desc": "President investigates a player's party"
+        "name": "调查",
+        "desc": "总统调查玩家聚会"
       },
       "spec": {
-        "name": "Special Election",
-        "desc": "President chooses next candidate"
+        "name": "特别选举",
+        "desc": "总统选择下一位候选人"
       },
       "win": {
-        "name": "State Victory",
-        "desc": "State wins immediately"
+        "name": "国家胜利",
+        "desc": "州立即获胜"
       },
-      "investigate": "Investigate",
-      "special_election": "Special Election",
-      "execution": "Execution",
-      "policy_peek": "Policy Peek"
+      "investigate": "调查",
+      "special_election": "特别选举",
+      "execution": "执行",
+      "policy_peek": "政策一览"
+    },
+    "policies": {
+      "civil": {
+        "name": "民用",
+        "directive": "民事指令"
+      },
+      "state": {
+        "name": "状态",
+        "directive": "国家指令"
+      }
     },
     "titles": {
       "interdictor": {
-        "name": "Interdictor",
-        "action": "Detain"
+        "name": "拦截器",
+        "action": "拘留",
+        "desc": "阻止玩家参与下一次投票。"
       },
       "broker": {
-        "name": "Broker",
-        "action": "Veto"
+        "name": "经纪人",
+        "action": "否决权",
+        "desc": "如果当前选择不满意，则强制重新提名。"
       },
       "strategist": {
-        "name": "Strategist",
-        "action": "Draw 4"
+        "name": "策略师",
+        "action": "抽奖 4",
+        "desc": "在立法会议期间抽出一张额外的指令卡。"
       },
       "auditor": {
-        "name": "Auditor",
-        "action": "Inspect"
+        "name": "审计员",
+        "action": "检查",
+        "desc": "有权查看指令弃牌堆顶部的牌。"
       },
       "assassin": {
-        "name": "Assassin",
-        "action": "Execute"
+        "name": "刺客",
+        "action": "执行",
+        "desc": "可以针对任何玩家立即消除。"
       },
       "handler": {
-        "name": "Handler",
-        "action": "Swap"
+        "name": "处理程序",
+        "action": "重定向",
+        "desc": "按顺序交换接下来的两位主席的职位。"
       },
       "defector": {
-        "name": "Defector",
-        "action": "Flip Vote"
+        "name": "叛逃者",
+        "action": "翻转投票",
+        "desc": "在会议结束时秘密更改投票结果。"
       },
       "archivist": {
-        "name": "Archivist",
-        "action": "Deep Inspect"
+        "name": "档案员",
+        "action": "深度检查",
+        "desc": "随时查看这副牌最上面的 3 张牌。"
       },
       "quorum": {
-        "name": "Quorum",
-        "action": "Emergency Re-vote"
+        "name": "法定人数",
+        "action": "紧急重新投票",
+        "desc": "提名失败后立即强制进行新投票。"
       },
       "cipher": {
-        "name": "Cipher",
-        "action": "Dispatch"
+        "name": "密码",
+        "action": "派遣",
+        "desc": "向任何玩家发送匿名私人消息。"
       }
     },
     "tracks": {
-      "civil_label": "Civil",
-      "state_label": "State",
-      "deck": "Deck",
-      "discard": "Discard",
-      "spectators": "Spectators ({{count}})",
-      "election_tracker": "Election Tracker",
-      "win_civil": "Charter Restored",
-      "win_civil_desc": "Civil wins immediately",
-      "win_state": "State Supremacy",
-      "win_state_desc": "State wins immediately",
-      "quorum_revote": "REVOTE"
+      "civil_label": "民用",
+      "state_label": "状态",
+      "deck": "甲板",
+      "discard": "丢弃",
+      "spectators": "观众 ({{count}})",
+      "election_tracker": "选举追踪",
+      "win_civil": "宪章恢复",
+      "win_civil_desc": "民事立即获胜",
+      "win_state": "国家至上",
+      "win_state_desc": "州立即获胜",
+      "quorum_revote": "重新投票",
+      "win_reasons": {
+        "charter_restored": "宪章恢复",
+        "state_supremacy": "国家至上",
+        "overseer_executed": "监督者已被处决",
+        "overseer_ascended": "监督者已升天"
+      }
     },
     "player_card": {
-      "candidate": "Candidate",
-      "nominated": "Nominated",
-      "eliminated": "Eliminated",
-      "president": "President",
-      "chancellor": "Chancellor",
-      "detained": "Detained",
-      "censured": "Censured",
-      "reconnecting": "Reconnecting",
-      "nominate": "Nominate",
-      "execute": "Execute",
-      "detain": "Detain",
-      "censure": "Censure",
-      "selected": "Selected",
-      "exclude_hint": "Exclude from nominations",
-      "proven_not_overseer": "Proven Not Overseer",
-      "aria_label": "Player {{name}}{{you}}"
+      "candidate": "候选人",
+      "nominated": "提名",
+      "eliminated": "消除",
+      "president": "总统",
+      "chancellor": "校长",
+      "detained": "被拘留",
+      "censured": "谴责",
+      "reconnecting": "重新连接",
+      "nominate": "提名",
+      "execute": "执行",
+      "detain": "拘留",
+      "censure": "谴责",
+      "selected": "已选择",
+      "exclude_hint": "排除提名",
+      "proven_not_overseer": "证明不是监督者",
+      "aria_label": "玩家 {{name}}{{you}}"
     },
     "action_bar": {
-      "current_phase": "Current Phase",
-      "crisis_active": "Crisis Active",
-      "anonymous_dispatch": "Intercepted Anonymous Dispatch",
-      "encrypted_dispatch": "Encrypted Dispatch Channel",
-      "cipher_placeholder": "Enter message (max 80 chars)...",
-      "quick_reactions": "Quick Reactions",
-      "toggle_reactions": "Toggle Reactions",
-      "mute": "Mute Mic",
-      "unmute": "Unmute Mic",
-      "stop_video": "Stop Video",
-      "start_video": "Start Video",
-      "declaring": "Players are declaring directives.",
-      "handler_active": "Handler is using their power.",
-      "censure_debate": "The Assembly is debating a Censure Motion.",
-      "snap_volunteers": "Volunteers are stepping forward for the Snap Election.",
-      "crisis_incoming": "Crisis Event Incoming...",
-      "investigating": "President is investigating a player's loyalty.",
-      "calling_special": "President is calling a Special Election.",
-      "executing": "President is executing a player.",
-      "peeking": "President is reviewing the top three policies.",
-      "deciding": "President is deciding on an executive action.",
-      "victorious": "{{faction}} faction victorious!",
-      "in_session": "The Assembly is in session.",
-      "nominate_prompt": "Tap a player on the board to nominate them as Chancellor.",
-      "nominate_watch": "Watch the nomination — it reveals who the President trusts.",
-      "detained_cant_vote": "You are detained and cannot vote this round.",
-      "voting_prompt": "Vote AYE to support this government or NAY to block it.",
-      "discard_prompt": "Discard one policy card. The other two go to the Chancellor.",
-      "pass_watch": "The President is choosing which policy to pass to the Chancellor.",
-      "declaration_hint": "Declarations tell the table what was drawn and passed. They may be lies.",
-      "enact_prompt": "Enact one policy. You may propose a Veto if 5+ State directives are enacted.",
-      "enact_watch": "The Chancellor is choosing which policy to enact.",
-      "investigate_prompt": "Select a player to investigate their party loyalty.",
-      "special_prompt": "Select a player to be the next President.",
-      "execute_prompt": "Select a player to execute.",
-      "peek_prompt": "Review the top 3 cards of the deck.",
-      "must_use_power": "You must use your executive power.",
-      "pres_must_use": "The President must use their executive power.",
-      "lobby_ready_prompt": "Press Ready Up when you're ready to start. The game begins when all players are ready."
+      "current_phase": "当前阶段",
+      "crisis_active": "危机活跃",
+      "anonymous_dispatch": "截获匿名邮件",
+      "encrypted_dispatch": "加密调度通道",
+      "cipher_placeholder": "输入消息（最多 80 个字符）...",
+      "quick_reactions": "快速反应",
+      "toggle_reactions": "切换反应",
+      "mute": "麦克风静音",
+      "unmute": "取消麦克风静音",
+      "stop_video": "停止视频",
+      "start_video": "开始视频",
+      "declaring": "玩家正在宣布指令。",
+      "handler_active": "处理者正在使用他们的力量。",
+      "censure_debate": "议会正在辩论一项谴责动议。",
+      "snap_volunteers": "志愿者们正在挺身而出，参加快速选举。",
+      "crisis_incoming": "危机事件即将到来...",
+      "investigating": "总统正在调查一名球员的忠诚度。",
+      "calling_special": "总统正在召集特别选举。",
+      "executing": "总统正在处决一名球员。",
+      "peeking": "总统正在审查三大政策。",
+      "deciding": "总统正在决定一项行政行动。",
+      "victorious": "{{faction}}派系胜利！",
+      "in_session": "议会正在开会。",
+      "nominate_prompt": "点击板上的一名玩家即可提名他们为校长。",
+      "nominate_watch": "关注提名——它揭示了总统信任的人。",
+      "detained_cant_vote": "您已被拘留，无法在本轮投票。",
+      "voting_prompt": "投票赞成支持这个政府，或者投票反对阻止它。",
+      "discard_prompt": "丢弃一张保单卡。另外两个人去见总理。",
+      "pass_watch": "总统正在选择将哪项政策传递给财政大臣。",
+      "declaration_hint": "声明告诉表绘制和通过的内容。它们可能是谎言。",
+      "enact_prompt": "制定一项政策。如果颁布了 5 项以上的州指令，您可以提议否决。",
+      "enact_watch": "财政大臣正在选择制定哪项政策。",
+      "investigate_prompt": "选择一名玩家来调查他们的队伍忠诚度。",
+      "special_prompt": "选择一名球员作为下一任总统。",
+      "execute_prompt": "选择要执行的玩家。",
+      "peek_prompt": "查看这副牌最上面的 3 张牌。",
+      "must_use_power": "你必须运用你的执行力。",
+      "pres_must_use": "总统必须行使行政权力。",
+      "lobby_ready_prompt": "当您准备好开始时，请按“准备就绪”。当所有玩家都准备好时，游戏开始。",
+      "game_over_title": "游戏结束",
+      "see_results": "查看装配结果",
+      "play_again": "再玩一次",
+      "skip_power": "跳过电源",
+      "ready_up": "准备好",
+      "ready": "准备好！",
+      "host_label": "主持人",
+      "ready_count": "{{count}} / {{total}} 准备好",
+      "lock_room": "上锁室",
+      "unlock_room": "解锁房间",
+      "force_start": "强制开始游戏",
+      "need_players_ranked": "需要 5 名以上玩家才能进行排名",
+      "no_players": "没有玩家",
+      "voted_for": "投票给 {{name}}",
+      "censure_select": "选择卡上的一名球员进行谴责（从下一次提名中排除）",
+      "snap_volunteer_prompt": "任何玩家都可以自愿成为下一任总统。",
+      "volunteered": "自愿",
+      "volunteer": "志愿者",
+      "ready_to_serve": "{{count}} 准备服务",
+      "prediction_logged": "预测记录：{{faction}} 胜利",
+      "prediction_reward": "如果你的阵营获胜，将获得 50 IP。",
+      "predict_prompt": "预测",
+      "send": "的团结或欺骗发送",
+      "char_counter": "{{count}}/80 个字符",
+      "title_strategist_prompt": "利用军师的力量来制定额外的政策？",
+      "title_broker_prompt": "利用经纪人权力强制重新提名？",
+      "title_handler_prompt": "使用汉德勒的权力来交换总统令中接下来的两名球员？",
+      "title_auditor_prompt": "使用审计员权力来查看丢弃物堆？",
+      "title_archivist_prompt": "使用档案管理员的力量来查看废弃堆？",
+      "title_defector_prompt": "缺点？秘密地将你的投票转向相反的结果？",
+      "title_quorum_prompt": "使用法定人数呼吁紧急重新投票？",
+      "title_assassin_prompt": "选择要在其卡上执行的玩家，或跳过。",
+      "title_interdictor_prompt": "选择要在卡上保留或跳过的玩家。",
+      "title_flip_vote": "翻转投票",
+      "title_yes": "是的",
+      "title_no": "没有"
     },
     "chat": {
-      "title": "Assembly Chat",
-      "round_separator": "Round {{count}}",
-      "dead_cant_speak": "Dead players cannot speak...",
-      "placeholder": "Type a message..."
+      "title": "组装聊天",
+      "round_separator": "回合 {{count}}",
+      "dead_cant_speak": "死去的玩家无法说话...",
+      "placeholder": "输入消息...",
+      "chanCivilStateEnacted": {
+        "0": "我收到了两项国家指令。总统欠议会一个解释。",
+        "1": "我收到的内容中没有民事指令。将你的问题直接向总统提出。",
+        "2": "我执行了我被赋予的内容。总统控制丢弃物。",
+        "3": "总统给了我一记死牌。我别无选择。",
+        "4": "问总统为什么他们只向我传递国家指令。",
+        "5": "总统的选择束缚了我的双手。",
+        "6": "我只是总统意志的工具。",
+        "7": "总统的垃圾堆讲述了真实的故事。",
+        "8": "不要因为总统的无能而责怪我。",
+        "9": "总统没有给我其他选择。",
+        "10": "我只看到国家指令。总统隐瞒了一些事情。",
+        "11": "总统的选择让我别无选择。",
+        "12": "检查弃牌堆。总统没有给我选择。",
+        "13": "我和你一样失望，但总统递给我两张州卡。",
+        "14": "总统是筛选抽签的人。问问他们。",
+        "15": "我必须颁布一项国家指令，因为这就是我收到的全部信息。",
+        "16": "显然，总统的手上写满了国家。",
+        "17": "我不是丢弃公民卡的人。总统是。",
+        "18": "总统的选择纯粹是以国家为导向的。",
+        "19": "我只是使者。总统写下了这条消息。",
+        "20": "总统的放弃比他们的话更能说明问题。",
+        "21": "严格意义上的国家之手交给了我。总统掌握着牌。",
+        "22": "我不是过滤指令的人。问总统。",
+        "23": "总统的选择让我只有一条路。",
+        "24": "我用总统提供的有限选择履行了我的职责。",
+        "25": "总统的叙述与我收到的手牌不符。",
+        "26": "我颁布了一项国家指令，因为总统没有给我任何民事替代方案。",
+        "27": "抽签据说是全州的——至少总统是这么说的。",
+        "28": "主席在秘书处的被解雇很可能是我们希望破灭的地方。",
+        "29": "我受总统选举的约束，这完全是国家的决定。",
+        "30": "总统是过滤器；我只是一个输出。归咎于过滤器。",
+        "31": "总统府的一只死手。我做了我必须做的事。",
+        "32": "至少可以说，总统的选择是……限制性的。",
+        "33": "总统递给我一个有毒的圣杯。"
+      },
+      "chanStateStateEnacted": {
+        "0": "平局对我们不利。这是牌组的事，不是我的。",
+        "1": "我没有可行的选择。总统可以核实。",
+        "2": "有时秘书处会为我们做出决定。",
+        "3": "虽然很难，但我们必须继续前进。",
+        "4": "这一轮的赔率对我们不利。",
+        "5": "这套牌显然是针对《宪章》的。",
+        "6": "我为国家做了我必须做的事情。",
+        "7": "这些牌对我们不利。",
+        "8": "责怪套牌，而不是玩家。",
+        "9": "国家要求牺牲，就是这样。",
+        "10": "抽签很不幸。我们必须适应。",
+        "11": "秘书处的意愿有时很难被接受。",
+        "12": "我的行为符合当前形势的最佳利益。",
+        "13": "这套牌的随机性对我们所有人来说都是一个挑战。",
+        "14": "有时，国家的道路是唯一开放的道路。",
+        "15": "我遵循发给我的牌的逻辑。",
+        "16": "抽签对国家的影响很大。",
+        "17": "尽管遭遇挫折，我们仍必须保持团结。",
+        "18": "牌决定了这一次的结果。",
+        "19": "我致力于议会，即使抽签很艰难。",
+        "20": "国家的浪潮正在上涨。我们只是漂浮在平局的残骸上。",
+        "21": "这种可能性对我们不利。即使是秘书处也有糟糕的日子。",
+        "22": "国家意志的强制实施。我们必须忍受。",
+        "23": "这一次，命运的骰子为国家掷出了。",
+        "24": "不要对单次抽奖解读太多。甲板是善变的。",
+        "25": "国家的影响力融入了这套牌的结构之中。",
+        "26": "现行制度的强制性法规。而已。",
+        "27": "秘书处的随意性常常束缚了财政大臣的手脚。",
+        "28": "这些卡片被称重。我们都是平局的受害者。",
+        "29": "有时，国家的道路是唯一铺好的道路。",
+        "30": "平局是一种统计上的反常现象，有利于我们的对手。",
+        "31": "我没有恶意，只有总统认为合适的牌。",
+        "32": "秘书处在我们最不需要的时候传达国家指令。",
+        "33": "在选择有限的游戏中被迫进行游戏。"
+      },
+      "presCivilStateEnacted": {
+        "0": "我通过了一项民事指令。财政大臣行使了自己的酌处权。",
+        "1": "那手牌有民事选项。随你所欲。",
+        "2": "我给了他们一个选择。他们选择了国家。",
+        "3": "财政大臣负责该法案的制定。我给了他们民事选项。",
+        "4": "我对校长的决定感到惊讶。我给他们发了一份民事指令。",
+        "5": "财政大臣显然有自己的议程。",
+        "6": "我尽了自己的职责。财政大臣未能通过议会。",
+        "7": "我提供了一条民事道路。他们拒绝了。",
+        "8": "议长的背叛就是他们自己的背叛。",
+        "9": "我无法控制校长的行动。",
+        "10": "我通过了公民卡。为什么总理选择州政府？",
+        "11": "财政大臣有一个选择。他们选择得很糟糕。",
+        "12": "我质疑财政大臣此举后的忠诚度。",
+        "13": "我给了他们成为公民的选择。他们拒绝了。",
+        "14": "财政大臣的颁布并不反映我通过的手。",
+        "15": "我对财政大臣的决定深感担忧。",
+        "16": "财政大臣手里拿着一份民事指令。",
+        "17": "我尽了自己的一份力量来保持我们的文明。财政大臣没有。",
+        "18": "总理的真面目已经显露出来。",
+        "19": "我无法对财政大臣的背叛负责。",
+        "20": "我给他们发送了期货选择。他们选择了深色的。",
+        "21": "财政大臣的颁布是对总统职位的直接打击。",
+        "22": "我很震惊。财政大臣掌握着一项民事指令。",
+        "23": "财政大臣需要向议会做出一些解释。",
+        "24": "我尽了自己的一份力量来维护《宪章》。财政大臣没有。",
+        "25": "财政大臣的行动越来越不稳定——或者说可能是经过深思熟虑的。",
+        "26": "我通过了公民卡。校长的选择是他们自己的负担。",
+        "27": "校长为何要这么做？我给了他们一条清晰的民事道路。",
+        "28": "财政大臣正在与国家玩一场危险的游戏。",
+        "29": "我提供了民事选项。财政大臣拒绝了它。",
+        "30": "财政大臣对宪章的忠诚度正式受到质疑。",
+        "31": "我和你们其他人一样困惑。我给了他们一张公民卡。",
+        "32": "财政大臣遇到了岔路口。他们选择了国家道路。",
+        "33": "我不能支持校长的决定。那不是我的手。"
+      },
+      "presStateStateEnacted": {
+        "0": "三州抽签。我们都没有选择。",
+        "1": "这轮牌组的表现与宪章背道而驰。",
+        "2": "我传递了我能传递的东西。那只手受到了损害。",
+        "3": "秘书处正在考验我们。该抽奖中没有民事牌。",
+        "4": "纯粹的国家抽签。我的双手被绑住了。",
+        "5": "今天，套牌不是我们的朋友。",
+        "6": "我没有公民卡可以通过。相信我。",
+        "7": "国家在这套牌中的影响力很强。",
+        "8": "我和你一样沮丧。",
+        "9": "从一开始，我们就面临着不利的局面。",
+        "10": "三重州抽签。我无能为力。",
+        "11": "目前，该牌组显然对国家有利。",
+        "12": "我和你一样被这些卡困住了。",
+        "13": "秘书处正在推动我们走向国家。",
+        "14": "在那次抽奖中没有民用卡可用。",
+        "15": "抽签结果彻底摧毁了宪章。",
+        "16": "我可以传递的民事选项为零。",
+        "17": "甲板今天非常不合作。",
+        "18": "有时我们会受到抽签的摆布。",
+        "19": "国家在这套牌中的影响力很强。",
+        "20": "三张州卡也盯着我看。就连秘书处也沉默了。",
+        "21": "纯粹的国家之手。我没有选择，总理也没有选择。",
+        "22": "机会终于追上了我们。看不到一张公民卡。",
+        "23": "这一轮牌组对国家的偏见是完全的。",
+        "24": "我放弃了国家，因为没有什么可以放弃的。",
+        "25": "彻底废除民事指令。我们任由抽签摆布。",
+        "26": "抽签是国家指令的交响乐。我只是指挥。",
+        "27": "宪章的零选项。我的双手被卡片绑住了。",
+        "28": "秘书处正在进行一轮暗访。三重状态卡。",
+        "29": "我寻找一张公民卡。我没有找到。平局是绝对的。",
+        "30": "抽签完全由国家指令组成。不幸。",
+        "31": "那只手没有一点民事逻辑。所有状态。",
+        "32": "秘书处的抽签是单色的国家指令。",
+        "33": "我和任何人一样失望。牌组绝对对我们不利。"
+      },
+      "governmentFailed": {
+        "0": "浪费了一次会议。我们不能继续拖延秘书处。",
+        "1": "僵局在这里对任何人都没有好处。危机不会等待。",
+        "2": "我们需要组建一个职能政府。现在。",
+        "3": "议会出现分歧。这很危险。",
+        "4": "又一次失败的投票。每一次拖延，国家都会变得更加强大。",
+        "5": "我们的时间不多了。",
+        "6": "拖延只会对国家有帮助。",
+        "7": "我们必须达成协议。",
+        "8": "这种僵局是不可接受的。",
+        "9": "大会让我们失望了。",
+        "10": "我们瘫痪了。这正是国家想要的。",
+        "11": "每一次失败的投票都是我们敌人的胜利。",
+        "12": "大会的优柔寡断是我们最大的弱点。",
+        "13": "我们必须找到共同点，否则将面临后果。",
+        "14": "这种蓄意阻挠正在破坏《宪章》。",
+        "15": "当我们争论时，危机正在加深。",
+        "16": "我们不能承受新一轮的失败。",
+        "17": "国家正在嘲笑我们的分裂。",
+        "18": "我们需要领导，而不是僵局。",
+        "19": "议会正在旋转。",
+        "20": "每一张“反对”票都是该州雄心勃勃的生命脉搏。",
+        "21": "当宪章燃烧时，我们却在争吵。组建政府！",
+        "22": "这种犹豫不决对议会来说就是死刑。",
+        "23": "秘书处鄙视真空。我们必须用领导力来填补它。",
+        "24": "我们来这里是为了辩论还是为了颁布宪章？组建政府。",
+        "25": "国家在我们分歧的阴影下蓬勃发展。",
+        "26": "又一次失败的尝试。我们正变得和我们的敌人一样软弱。",
+        "27": "议会缺乏团结就是其自身的失败。",
+        "28": "我们正在通过我们自己的部门让国家占据上风。",
+        "29": "一个稻草政府比没有政府要好。",
+        "30": "当我们停滞不前时，危机只会加剧。做出选择！",
+        "31": "秘书处对我们的瘫痪越来越不耐烦。",
+        "32": "阻挠主义是宪章的慢性毒药。",
+        "33": "当我们周围的建筑物在燃烧时，我们正在争论所有权。"
+      },
+      "investigateCivil": {
+        "0": "调查证实了他们的一致性，{name} 是 Civil。",
+        "1": "没有发现任何令人担忧的事情。 {name} 忠于宪章。",
+        "2": "{name} 似乎与议会站在一起。",
+        "3": "我已经清除了{name}。他们是我们中的一员。",
+        "4": "我对 {name} 的发现是积极的。他们支持《宪章》。",
+        "5": "{name} 绝对站在我们这边。",
+        "6": "我完全信任{name}。",
+        "7": "调查取得了成功。 {name} 是民事。",
+        "8": "{name} 是真正的盟友。",
+        "9": "我已经验证了{name}的忠诚度。",
+        "10": "我调查了{name}并找到了一位忠诚的公民。",
+        "11": "没有发现任何令人担忧的事情。 {name} 忠于宪章。",
+        "12": "我对{name}的报告是完全正面的。",
+        "13": "我很高兴地报告，{name} 是民事公民。",
+        "14": "经过这次调查，我对{name}充满信心。",
+        "15": "数据证实了{name}的忠诚度。",
+        "16": "我已确认 {name} 站在我们这边。",
+        "17": "{name} 是宪章的坚定盟友。",
+        "18": "在 {name} 中未检测到州影响。",
+        "19": "我支持{name}的公民立场。",
+        "20": "我对{name}的调查是详尽的。他们很干净。",
+        "21": "数据流很清楚：{name} 是宪章的公民。",
+        "22": "我已经消除了{name}的所有嫌疑。他们是我们中的一员。",
+        "23": "{name} 的记录是民事义务的证明。",
+        "24": "我在{name}的个人资料中只找到了忠诚度。",
+        "25": "{name} 是此次调查中民事希望的灯塔。",
+        "26": "我对{name}的报告很精彩。他们是真正的公民。",
+        "27": "我已验证{name}是否遵守宪章协议。",
+        "28": "在{name}的近代历史中没有任何国家影响的痕迹。",
+        "29": "{name} 已通过我进行的每项忠诚度测试。",
+        "30": "我对 {name} 的对齐方式感到满意。他们绝对是公民。",
+        "31": "调查证实，{name} 代表议会。",
+        "32": "{name}的记录在秘书处就像晴天一样清晰。",
+        "33": "我宣誓保证{name}的公民联盟。"
+      },
+      "investigateState": {
+        "0": "调查证实了他们的一致性，{name} 是 State。",
+        "1": "调查……令人不安。仔细观察{name}。",
+        "2": "我学到了一些关于{name}的重要知识。谨慎行事。",
+        "3": "{name} 不效忠宪章。",
+        "4": "在我所看到的之后，我无法相信{name}。",
+        "5": "针对{name}的证据是确凿的。",
+        "6": "{name} 对宪章构成威胁。",
+        "7": "我揭露了{name}的真面目。",
+        "8": "留意{name}。",
+        "9": "调查揭露了{name}的背叛行为。",
+        "10": "{name} 并不是他们所说的那个人。他们是国家。",
+        "11": "我找到了{name}与国家关系的证据。",
+        "12": "对{name}的调查敲响了警钟。",
+        "13": "{name} 是该州的潜伏特工。",
+        "14": "凭良心说，我不能再相信{name}了。",
+        "15": "关于{name}的真相已经揭晓：他们是国家。",
+        "16": "{name} 从内部对我们不利。",
+        "17": "我已经看够了，知道{name}是个叛徒。",
+        "18": "对{name}的调查揭示了一个黑暗的秘密。",
+        "19": "请注意：{name} 是一名国家特工。",
+        "20": "对{name}的调查是对国家的背叛。",
+        "21": "我在{name}的记录中发现了令议会震惊的证据。",
+        "22": "{name}是一头穿着便服的狼。他们是国家。",
+        "23": "调查证实了我对{name}最担心的事情。",
+        "24": "我发现了一张与{name}相关的国家关系网。",
+        "25": "{name} 对宪章所代表的一切构成威胁。",
+        "26": "我对{name}的调查揭露了背叛。",
+        "27": "数据不会说谎：{name} 是一名国家特工。",
+        "28": "我找到了{name}与我们的敌人合作的证据。",
+        "29": "{name} 不是他们所声称的人。他们是国家特工。",
+        "30": "对{name}的调查揭示了国家主导的破坏行为。",
+        "31": "我再怎么强调也不为过：{name} 是与状态一致的。",
+        "32": "{name} 已受到国家影响力的损害。",
+        "33": "针对{name}的证据是无可争议的。他们是国家。"
+      },
+      "suspiciousNominee": {
+        "0": "校长的选择很有趣。",
+        "1": "我将仔细监视这个政府。",
+        "2": "该提名在秘书处内部引起了疑问。",
+        "3": "我不确定 {name} 是否是担任此职位的合适人选。",
+        "4": "为什么是{名字}？还有更多值得信赖的选择。",
+        "5": "我不喜欢这个提名。",
+        "6": "这个政府似乎很可疑。",
+        "7": "我正在密切关注{name}。",
+        "8": "我对这个选择有疑问。",
+        "9": "这个提名值得商榷。",
+        "10": "我对{name}作为校长持保留态度。",
+        "11": "{name} 真的是我们能做的最好的事情吗？",
+        "12": "这次提名感觉像是经过计算的风险。",
+        "13": "我感觉到这里有一种我不喜欢的模式。",
+        "14": "{name} 尚未完全赢得我们的信任。",
+        "15": "校长的这个选择……出人意料。",
+        "16": "我不相信 {name} 是合适人选。",
+        "17": "这次提名有些不对劲。",
+        "18": "在我们投票之前，我想听听{name}的更多信息。",
+        "19": "这个提名对某些人来说有点太方便了。",
+        "20": "我并不是唯一一个认为这对政府搭档可疑的人。",
+        "21": "{name} 的提名感觉像是该州的一项战略举措。",
+        "22": "我感觉到选择{name}背后有一个隐藏的议程。",
+        "23": "为什么是这个特定的政府？为什么现在是{name}？",
+        "24": "这项提名似乎旨在推进该州的目标。",
+        "25": "我对这对夫妇背后的动机表示严重怀疑。",
+        "26": "这个政府的立场……充其量是值得怀疑的。",
+        "27": "我担心这次提名是迈向国家主导地位的一步。",
+        "28": "选择{name}作为校长应该引起这里每个人的关注。",
+        "29": "我在这个提名过程中嗅到了老鼠的味道。",
+        "30": "这个政府似乎与国家利益过于一致。",
+        "31": "我对这种特定的权力动态心存疑虑。",
+        "32": "{name} 在本届政府中的存在是一个危险信号。",
+        "33": "我对这对组合的潜在影响感到不满意。"
+      },
+      "highSuspicion": {
+        "0": "我对{name}有一种非常不好的预感。",
+        "1": "{name} 的行为违背了议会的利益。",
+        "2": "数据表明 {name} 并不是他们所声称的人。",
+        "3": "我们需要在为时已晚之前将 {name} 边缘化。",
+        "4": "我大声疾呼：{name} 正在为国家工作。",
+        "5": "{name}是叛徒。",
+        "6": "我确定 {name} 是 State。",
+        "7": "我们需要摆脱{name}。",
+        "8": "在任何情况下都不要信任{name}。",
+        "9": "{name} 正在破坏我们。",
+        "10": "我 99% 确信 {name} 是一名国家特工。",
+        "11": "针对{name}的证据正在不断增加。",
+        "12": "我们不能让{name}靠近议长的座位。",
+        "13": "{name} 对宪章来说是一个明显且现实的危险。",
+        "14": "我以前见过{name}破坏我们。",
+        "15": "不要让{name}的话欺骗了你；他们是国家。",
+        "16": "议会必须团结起来反对{name}。",
+        "17": "{name}是这个房间里的毒瘤。",
+        "18": "我呼吁立即对{name}进行调查。",
+        "19": "{name}是内部的敌人。",
+        "20": "{name}的背叛是议会历史上的一个污点。",
+        "21": "我们正在目睹{name}对《宪章》的缓慢破坏。",
+        "22": "该州在{name}找到了它的冠军。我们必须采取行动。",
+        "23": "我呼吁立即取消 {name} 的所有权力。",
+        "24": "{name}已经露出了他们的真面目，他们是国家的颜色。",
+        "25": "针对{name}的证据是无可非议的。他们是叛徒。",
+        "26": "我们不能让{name}继续进行破坏。",
+        "27": "{name} 是一个以议会的弱点为食的寄生虫。",
+        "28": "我要揭露 {name} 的真实身份：国家的双重间谍。",
+        "29": "{name} 的行为是对宪章原则的直接侵犯。",
+        "30": "怀疑的时间已经过去了。 {name} 绝对是我们的敌人。",
+        "31": "我们必须隔离{name}，以免他们从内部摧毁我们。",
+        "32": "{name} 的一举一动都体现出国家的影响力。",
+        "33": "在 {name} 为他们的背叛承担责任之前，我不会休息。"
+      },
+      "defendingSelf": {
+        "0": "我的记录很清楚。我为宪章服务。",
+        "1": "不要让怀疑蒙蔽了你的判断力。我是公民。",
+        "2": "对我的指控是毫无根据的干扰。",
+        "3": "我一直只为大会的成功而努力。",
+        "4": "看事实，不看谣言。我很忠诚。",
+        "5": "我没有什么可隐瞒的。",
+        "6": "我对《宪章》的忠诚是坚定不移的。",
+        "7": "我被陷害了。",
+        "8": "这些指控是错误的。",
+        "9": "我和他们一样文明。",
+        "10": "我的行动始终符合宪章的利益。",
+        "11": "我成为攻击目标是因为我对国家构成威胁。",
+        "12": "不要相信那些关于我的谎言。",
+        "13": "我长期以来一直忠实地为大会服务。",
+        "14": "我是国家主导的抹黑运动的受害者。",
+        "15": "我的忠诚是毋庸置疑的。",
+        "16": "我会用我的行动证明我的清白。",
+        "17": "国家希望你怀疑我。",
+        "18": "我是《宪章》的忠实信徒。",
+        "19": "我不会被这些虚假的说法吓倒。",
+        "20": "对宪章的忠诚是我唯一的主人。我是公民。",
+        "21": "不要让这些协调一致的谎言分散你对我记录的注意力。",
+        "22": "我为大会做出了很多牺牲。我的立场很明确。",
+        "23": "国家希望你们将我视为敌人，因为我对他们构成威胁。",
+        "24": "我邀请任何调查。我的记录是一本打开的宪章书。",
+        "25": "我和法律本身一样是公民。我的行动会证明这一点。",
+        "26": "对我的指控只不过是国家侵略的一层薄薄的面纱。",
+        "27": "即使你们其他人怀疑我，我仍然坚持《宪章》。",
+        "28": "我一直致力于维护我们在秘书处内的发展道路。",
+        "29": "我的良心是清白的。我为议会服务，而不是为国家服务。",
+        "30": "这些攻击是为了削弱我的决心。他们不会成功。",
+        "31": "我是一个真正的爱国者。不要让这些毫无根据的谣言影响你。",
+        "32": "当其他人保持沉默时，我为宪章而战。",
+        "33": "我对公民事业的承诺是不容任何质疑的。"
+      },
+      "praisingCivil": {
+        "0": "我信任{name}。他们的行动不言而喻。",
+        "1": "{name} 已经证明了他们对议会的忠诚。",
+        "2": "我们需要更多像{name}这样的人掌权。",
+        "3": "我对 {name} 的一致性充满信心。",
+        "4": "{name} 是《宪章》的真正爱国者。",
+        "5": "{name} 是一位伟大的领导者。",
+        "6": "我完全支持{name}。",
+        "7": "{name} 做得很好。",
+        "8": "我们可以信赖{name}。",
+        "9": "{name} 是大会的希望灯塔。",
+        "10": "我一直都知道{name}是一位真正的爱国者。",
+        "11": "我亲眼目睹了{name}为宪章做出的艰难选择。",
+        "12": "我们很幸运有{name}站在我们这一边。",
+        "13": "{name}是公民道德的典范。",
+        "14": "我愿意用我的生命来信任{name}。",
+        "15": "{name} 就是我们现在需要的那种领导者。",
+        "16": "{name} 是议会的支柱。",
+        "17": "{name} 是这个房间的真正资产。",
+        "18": "我对{name}只有尊重。",
+        "19": "有了{name}，Assembly 就更强大了。",
+        "20": "{name} 对《宪章》的奉献精神激励着我们所有人。",
+        "21": "在这件事上我们最好效仿{name}的做法。",
+        "22": "{name} 是真正公民的光辉典范。",
+        "23": "我完全相信{name}的判断力和性格。",
+        "24": "在这个动荡的时期，{name} 是议会的稳定之手。",
+        "25": "我坚定地与{name}站在一起，履行我们对宪章的共同使命。",
+        "26": "{name} 是这里为数不多的真正理解我们职责的人之一。",
+        "27": "秘书处很幸运有一个像{name}这样忠诚的仆人。",
+        "28": "{name} 始终如一地展现了他们对我们事业的承诺。",
+        "29": "作为一名爱国同胞，我对 {name} 怀有最崇高的敬意。",
+        "30": "当{name}处于权威地位时，我们会更安全。",
+        "31": "{name} 是我们所珍视的公民原则的真正拥护者。",
+        "32": "即使在最黑暗的回合中，我也会相信{name}的判断。",
+        "33": "{name} 的忠诚是议会赖以建立的基石。"
+      },
+      "neutralSupport": {
+        "0": "我愿意给{name}一个机会。",
+        "1": "{name} 目前看来是一个合理的选择。",
+        "2": "让我们看看 {name} 能做什么。",
+        "3": "我还没有任何理由怀疑{name}。",
+        "4": "我们需要的可能是从 {name} 重新开始。",
+        "5": "我目前对{name}持中立态度。",
+        "6": "让我们看看 {name} 的表现如何。",
+        "7": "我对{name}的提名持开放态度。",
+        "8": "我还不确定{name}。",
+        "9": "我会和{name}一起拭目以待。",
+        "10": "现在让我们假设 {name} 是无罪的。",
+        "11": "{name} 值得有机会证明自己。",
+        "12": "我对{name}持谨慎乐观的态度。",
+        "13": "我会支持{name}，直到他们给我一个不支持的理由。",
+        "14": "{name} 似乎是这一轮的安全选择。",
+        "15": "我愿意与{name}合作。",
+        "16": "让我们看看{name}是否可以有效地领导我们。",
+        "17": "我对{name}持开放态度。",
+        "18": "{name} 是一个未知数，但我会投赞成票。",
+        "19": "我同意这个政府的{name}。",
+        "20": "{name} 似乎是本轮这一点的稳定选择。",
+        "21": "我准备支持{name}作为桥梁搭建者的提名。",
+        "22": "{name} 还没有给我们任何理由怀疑他们，让我们继续。",
+        "23": "考虑到我们目前的状况，提名{name}似乎是合乎逻辑的。",
+        "24": "根据 {name} 迄今为止的表现，我投“赞成”票。",
+        "25": "{name} 是领导本届政府的合理候选人。",
+        "26": "我现在愿意忽略我最初对 {name} 的怀疑。",
+        "27": "{name} 的民事言论相对一致。",
+        "28": "我乐观地认为{name} 会按照《宪章》的最佳利益行事。",
+        "29": "让我们继续{name}，看看它会把我们带向何方。",
+        "30": "本轮我对 {name} 做出无罪推论。",
+        "31": "对于当前的形势来说，{name} 似乎是一个务实的选择。",
+        "32": "为了打破这个僵局，我支持{name}。",
+        "33": "{name} 已获得领导下一个指令周期的机会。"
+      },
+      "banter": {
+        "0": "赌注正在上升。我们必须保持警惕。",
+        "1": "秘书处正在注视着我们所有人。",
+        "2": "一错一步，宪章就会失效。",
+        "3": "在这个时代，信任是一种稀有商品。",
+        "4": "让我们重点关注指令。大会取决于我们。",
+        "5": "国家始终在注视着。",
+        "6": "我们必须小心。",
+        "7": "议会正处于危险之中。",
+        "8": "我们需要变得更聪明。",
+        "9": "国家正在逼近。",
+        "10": "议会上空的阴影越来越长。",
+        "11": "我们是《宪章》的最后一道防线。",
+        "12": "我们做出的每一个决定都会在秘书处得到回应。",
+        "13": "国家的影响力很长，但我们的决心很坚强。",
+        "14": "在这个房间里，连墙壁都有耳朵。",
+        "15": "《宪章》的未来掌握在我们手中。",
+        "16": "我们必须成为黑暗中的光明。",
+        "17": "国家的胜利并非不可避免。",
+        "18": "我们是议会的守护者。",
+        "19": "如果我们保持团结，《宪章》就会占上风。",
+        "20": "秘书处不讨论确定性，只讨论概率。",
+        "21": "我们都只是游戏中的玩家，我们并不完全理解。",
+        "22": "国家是一个不眠的掠夺者。我们必须做好准备。",
+        "23": "沉默往往是国家工作人员的大声呼喊。",
+        "24": "大会是一台精密的机器。一个坏掉的齿轮就能毁掉一切。",
+        "25": "过去的阴影正在追赶秘书处。",
+        "26": "在这种怀疑的气氛下，信任是我们无法承担的奢侈品。",
+        "27": "《宪章》是只有我们才能遵守的承诺。",
+        "28": "国家是一面镜子，将我们自身的弱点反射回来。",
+        "29": "每一轮都是议会的灵魂之战。",
+        "30": "我们生活在一个前所未有的危机时代。保持警惕是关键词。",
+        "31": "秘书处的记录将显示我们当中谁是真正忠诚的。",
+        "32": "胜利之路是由号召国家的勇气铺成的。",
+        "33": "我们是未来的建筑师，或者是过去的掘墓人。"
+      },
+      "powerUsage": {
+        "0": "我正在利用我的权力确保大会的成功。",
+        "1": "这一权力对于保护《宪章》是必要的。",
+        "2": "我必须利用这种力量来揭开真相。",
+        "3": "形势要求采取这一行动。",
+        "4": "我正在利用这种力量来确保我们的未来。",
+        "5": "这是继续进行的唯一方法。",
+        "6": "我使用这一权力是为了议会的利益。",
+        "7": "这种力量将帮助我们识别威胁。",
+        "8": "我别无选择，只能使用这个力量。",
+        "9": "我正在利用这种力量来巩固我们的地位。",
+        "10": "我正在为房间的稳定行使我的权力。",
+        "11": "这项行动是根据当前的紧急情况而采取的。",
+        "12": "我正在利用这一权力来保护我们的集体利益。",
+        "13": "《宪章》允许在危机时期采取这一措施。",
+        "14": "我采取这一步骤是为了确保国家不会取得进展。",
+        "15": "这是我头衔权力的必要使用。",
+        "16": "我的行动是为了维护大会的完整性。",
+        "17": "这种权力是捍卫《宪章》的工具。",
+        "18": "我正在利用这个能力来澄清情况。",
+        "19": "我正在利用这一权力来维护《宪章》的原则。",
+        "20": "我的职权是为了确保我们的集体安全而行使的。",
+        "21": "这种能力是为了议会的利益而进行的必要干预。",
+        "22": "我正在利用这一权力来阐明《宪章》的前进道路。",
+        "23": "情况已经恶化到需要采取这一行动的程度。",
+        "24": "我正在利用这一权力来确保国家不会占上风。",
+        "25": "这是我履行的职责，我并不乐意，而是全身心投入。",
+        "26": "我采取这一步骤是为了保护无辜者并揭露有罪者。",
+        "27": "我的力量是宪章的盾牌，我现在正在使用它。",
+        "28": "这种干预旨在稳定我们摇摇欲坠的民主。",
+        "29": "我正在利用这种能力来防止完全陷入国家控制。",
+        "30": "面对这种不确定性，秘书处授权采取这一行动。",
+        "31": "我正在采取行动确保大会的长期生存。",
+        "32": "这种力量是我为你们所有人承担的负担。必须使用它。",
+        "33": "我正在利用这个权威来澄清一个被怀疑笼罩的房间。"
+      },
+      "cipherDispatch": {
+        "0": "秘书处的一位联系人表明您并不像看上去的那样。",
+        "1": "数据流很明确：坚持到底，宪章将会获胜。",
+        "2": "需要保持警惕。议会周围的阴影正在加深。",
+        "3": "不要相信现任政府。他们受到了损害。",
+        "4": "国家的影响是局部的。仔细看看你的盟友。",
+        "5": "给您的暗号信息：下一次会议的结果至关重要。"
+      }
     },
     "game_header": {
-      "prediction_civil": "Civil {{percent}}%",
-      "prediction_state": "State {{percent}}%",
-      "spectator_vote": "{{count}} Spectator Vote",
-      "spectator_votes": "{{count}} Spectator Votes",
-      "open_chat": "Open Chat",
-      "round_history": "Round History",
-      "phase_reference": "Phase Reference",
-      "your_dossier": "Your Dossier",
-      "my_profile": "My Profile",
-      "leave_assembly": "Leave Assembly"
+      "prediction_civil": "民用 {{percent}}%",
+      "prediction_state": "状态 {{percent}}%",
+      "spectator_vote": "{{count}} 观众投票",
+      "spectator_votes": "{{count}} 观众投票",
+      "open_chat": "打开聊天",
+      "round_history": "回合历史",
+      "phase_reference": "相位参考",
+      "your_dossier": "您的档案",
+      "my_profile": "我的个人资料",
+      "leave_assembly": "离开大会",
+      "title": "大会",
+      "practice_mode": "练习模式",
+      "invite_tooltip": "分享此代码以邀请玩家",
+      "timer_label": "剩余时间",
+      "modes": {
+        "casual": "休闲",
+        "ranked": "排名",
+        "classic": "经典",
+        "crisis": "危机"
+      }
+    },
+    "agendas": {
+      "chaos_agent": {
+        "name": "混沌代理",
+        "desc": "选举追踪器必须达到 3 并至少触发一次混乱政策。"
+      },
+      "the_purist": {
+        "name": "纯粹主义者",
+        "desc": "游戏结束时至少必须颁布 3 项民事指令。"
+      },
+      "the_dissenter": {
+        "name": "异议者",
+        "desc": "您的投票必须与至少 3 轮的多数结果不同。"
+      },
+      "the_dove": {
+        "name": "鸽子",
+        "desc": "在您投票的每一轮中都投赞成票。"
+      },
+      "the_hawk": {
+        "name": "鹰",
+        "desc": "至少 3 轮投反对票。"
+      },
+      "stonewalled": {
+        "name": "石墙",
+        "desc": "对至少两个随后失败的政府投反对票。"
+      },
+      "short_session": {
+        "name": "短期会议",
+        "desc": "游戏必须在回合前结束（玩家人数 + 3）。"
+      },
+      "the_long_game": {
+        "name": "漫长的游戏",
+        "desc": "游戏必须持续至少（玩家数量 + 6）轮。"
+      },
+      "the_loyalist": {
+        "name": "忠诚者",
+        "desc": "对至少 3 个通过并颁布民事指令的政府投赞成票。"
+      },
+      "nominated": {
+        "name": "提名",
+        "desc": "至少2次被提名为校长。"
+      },
+      "deadlock": {
+        "name": "僵局",
+        "desc": "成为至少 1 个失败政府的总统或总理候选人。"
+      },
+      "prolific": {
+        "name": "多产",
+        "desc": "作为财政大臣亲自制定至少 2 项政策。"
+      },
+      "the_veteran": {
+        "name": "老兵",
+        "desc": "至少担任一次总理。"
+      },
+      "unity": {
+        "name": "团结",
+        "desc": "比赛期间任何时候都不会制定混乱政策。"
+      },
+      "the_mandate": {
+        "name": "授权",
+        "desc": "比赛结束时至少必须颁布 4 项州指令。"
+      },
+      "clean_sweep": {
+        "name": "一网打尽",
+        "desc": "作为财政大臣颁布民事指令。"
+      },
+      "the_weathervane": {
+        "name": "风向标",
+        "desc": "与上一轮投票相比，您的投票至少互换 4 次。"
+      },
+      "productive_session": {
+        "name": "富有成效的会议",
+        "desc": "所有回合中超过一半的结果必须是政策成功颁布。"
+      },
+      "close_race": {
+        "name": "近距离比赛",
+        "desc": "游戏结束时，两条政策轨道的相距必须在 2 个指令之内。"
+      },
+      "the_swing_vote": {
+        "name": "摇摆投票",
+        "desc": "在恰好以 1 票通过的政府中担任总统或总理。"
+      }
+    },
+    "round_history": {
+      "title": "回合历史",
+      "empty": "尚未组建政府",
+      "round": "回合 {{round}}",
+      "chaos": "混沌",
+      "vetoed": "否决了",
+      "rejected": "被拒绝",
+      "no_policy": "没有政策",
+      "civil": "民用",
+      "state": "状态",
+      "pres_short": "新闻",
+      "chan_short": "陈",
+      "president": "总统",
+      "chancellor": "校长",
+      "drew": "德鲁",
+      "passed": "通过",
+      "received": "已收到",
+      "votes": "投票",
+      "aye": "是啊",
+      "nay": "不",
+      "executive": "行政",
+      "actions": {
+        "investigate": "调查",
+        "execution": "执行",
+        "specialelection": "特别选举",
+        "policypeek": "指令窥视"
+      }
     },
     "modals": {
+      "game_over": {
+        "banners": {
+          "civil_win_default": "宪章规定",
+          "state_win_default": "国家占上风",
+          "inconclusive": "异议中止",
+          "civil_desc": "民间力量为议会辩护。",
+          "state_desc": "国家已成功渗透议会。",
+          "abort_desc": "会议提前终止。"
+        },
+        "performance_header": "比赛表现",
+        "victory": "胜利",
+        "defeat": "击败",
+        "elo": "ELO",
+        "casual": "休闲搭配",
+        "xp": "获得 XP",
+        "ip": "获得IP",
+        "clan_xp": "部落经验",
+        "agenda": "个人议程",
+        "achievements_header": "获得的奖牌",
+        "revelations_header": "身份暴露",
+        "you": "你",
+        "action_log": "匹配日志",
+        "action_replay": "重建",
+        "action_shared": "链接已复制！",
+        "action_share": "分享重播",
+        "action_play_again": "再玩一次",
+        "action_lobby": "返回大厅",
+        "completed": "已完成",
+        "failed": "失败"
+      },
       "friend_request": {
-        "title": "Friend Request",
-        "description": "<1>{{username}}</1> wants to be friends.",
-        "deny": "Deny",
-        "accept": "Accept"
+        "title": "好友请求",
+        "description": "<1>{{username}}</1>想成为朋友。",
+        "deny": "否认",
+        "accept": "接受"
       },
       "investigation": {
-        "title": "Investigation Result",
-        "is_a": "{{name}} is a:",
-        "civil": "CIVIL",
-        "state": "STATE",
-        "understood": "Understood"
+        "title": "调查结果",
+        "is_a": "{{name}} 是：",
+        "civil": "民事",
+        "state": "状态",
+        "understood": "明白了"
       },
       "policy_peek": {
-        "title": "Directive Preview",
-        "subtitle": "Top 3 directives in the deck:",
-        "empty": "The pile is currently empty.",
-        "end": "End Peek"
+        "title": "指令预览",
+        "subtitle": "牌组中最重要的 3 个指令：",
+        "empty": "该堆目前是空的。",
+        "end": "结束浏览"
       },
       "declaration": {
-        "title": "Directive Declaration",
-        "subtitle": "What will you declare?",
-        "hint": "You may report truthfully or mislead the Assembly.",
-        "drew_label": "What you drew <1>(3 cards)</1>",
-        "passed_label": "What you passed <1>(2 cards)</1>",
-        "received_label": "What you received <1>(2 cards)</1>",
-        "result_drew": "Drew: <1>{{civ}} Civil</1> / <3>{{sta}} State</3>",
-        "result_passed": "Passed: <1>{{civ}} Civil</1> / <3>{{sta}} State</3>",
-        "result_received": "Received: <1>{{civ}} Civil</1> / <3>{{sta}} State</3>",
-        "submit": "Submit Declaration"
+        "title": "指令声明",
+        "subtitle": "你会宣布什么？",
+        "hint": "您可以如实报告或误导大会。",
+        "drew_label": "您抽到了什么<1>（3张牌）</1>",
+        "passed_label": "您通过了什么<1>（2张卡）</1>",
+        "received_label": "您收到了什么<1>（2 张卡）</1>",
+        "result_drew": "德鲁：<1>{{civ}}民事</1> / <3>{{sta}}国家</3>",
+        "result_passed": "通过：<1>{{civ}}民事</1> / <3>{{sta}}州</3>",
+        "result_received": "收到：<1>{{civ}}民事</1>/<3>{{sta}}国家</3>",
+        "submit": "提交声明"
       },
       "player_profile": {
-        "loading": "Loading profile...",
-        "failed": "Failed to load profile.",
-        "close": "Close",
-        "wins": "Wins",
-        "played": "Played",
-        "win_rate": "Win Rate",
-        "kills": "Kills",
-        "pinned_achievements": "Pinned Medals",
-        "empty_slot": "— empty slot —",
-        "add_friend": "Add Ally",
-        "remove_friend": "Remove Ally",
-        "request_sent": "Request Sent"
+        "loading": "正在加载个人资料...",
+        "failed": "无法加载配置文件。",
+        "close": "关闭",
+        "wins": "胜利",
+        "played": "玩过",
+        "win_rate": "胜率",
+        "kills": "杀死",
+        "pinned_achievements": "固定奖牌",
+        "empty_slot": "— 空槽 —",
+        "add_friend": "添加盟友",
+        "remove_friend": "删除盟友",
+        "request_sent": "请求已发送"
       }
     },
     "assembly_log": {
-      "title": "Assembly Log",
-      "event_num": "Event #{{count}}"
+      "title": "组装日志",
+      "event_num": "事件#{{count}}",
+      "round_marker": "--- 回合 {{round}} ---",
+      "nominated": "{{name}} 提名 {{target}} 为财政大臣。",
+      "elected": "{{name}} 当选为校长。",
+      "veto_requested": "{{name}}（财政大臣）请求否决权。",
+      "veto_agreed": "{{name}}（主席）同意否决。会话失败。",
+      "veto_denied": "{{name}}（总统）否决了否决权。校长必须上场。",
+      "rejected": "大会否决了该提名。",
+      "civil_enacted": "颁布了民事指令。",
+      "state_enacted": "颁布了一项国家指令。",
+      "executive_action": "执行操作：{{action}} 已在 {{target}} 上执行。",
+      "declared": "{{name}} ({{type}}) 声明 {{action}} {{civ}} 民事和 {{sta}} 国家指令。{{drew}}",
+      "drew_info": "（绘制{{civ}}C/{{sta}}S）",
+      "passed_word": "通过",
+      "received_word": "收到",
+      "executed": "{{name}}被处决。",
+      "investigated": "{{name}}调查{{target}}。",
+      "special_election": "{{name}} 为 {{target}} 进行了特别选举。",
+      "ready": "{{name}} 已准备就绪。",
+      "not_ready": "{{name}} 未就绪。",
+      "all_ready": "所有人类玩家准备好！开始游戏...",
+      "host_started": "主持人开始比赛。",
+      "room_locked": "房间被主人锁了。",
+      "room_unlocked": "房间已被房东解锁。",
+      "spectator_predicted": "一位观众预测 {{prediction}} 获胜。",
+      "room_created": "房间 {{id}} 在 {{mode}} 模式下创建。",
+      "room_created_practice": "房间 {{id}} 创建为独奏练习课程。",
+      "reconnected": "{{name}} 已重新连接。",
+      "joined": "{{name}} 加入大厅。",
+      "need_players": "至少需要 5 名玩家做好准备。",
+      "prediction_unity": "团结",
+      "prediction_deception": "欺骗"
     },
     "debrief": {
-      "intro_title": "The Assembly Has Concluded",
-      "charter_defended": "The Charter has been defended.",
-      "secretariat_fallen": "The Secretariat has fallen to the State.",
-      "key_moments": "Key Moments",
-      "identities_confirmed": "All Identities Confirmed",
-      "tap_to_advance": "Tap to advance",
+      "intro_title": "大会已结束",
+      "charter_defended": "《宪章》得到了捍卫。",
+      "secretariat_fallen": "秘书处已落入国家手中。",
+      "key_moments": "关键时刻",
+      "identities_confirmed": "所有身份均已确认",
+      "tap_to_advance": "点击前进",
       "roles": {
-        "civil": "Civil",
-        "state": "State Agent",
-        "overseer": "The Overseer"
+        "civil": "民用",
+        "state": "状态代理",
+        "overseer": "监督者"
       },
       "plays": {
-        "assassin": "{{assassin}} eliminated {{killed}} as the Assassin",
-        "execution_one": "{{name}} was executed by presidential decree",
-        "execution_many": "{{names}} were executed by presidential decree",
-        "chaos_one": "A chaos directive was forced upon the Assembly",
-        "chaos_many": "{{count}} chaos directives destabilised the Assembly",
-        "veto_one": "The government invoked their veto power",
-        "veto_many": "The veto was exercised {{count}} times",
-        "marathon": "An epic {{count}}-round battle of wills",
-        "deadlock": "Both factions held the Assembly in a knife-edge deadlock"
+        "assassin": "{{assassin}} 消灭了 {{killed}} 作为刺客",
+        "execution_one": "{{name}} 被总统令处决",
+        "execution_many": "{{names}} 被总统令处决",
+        "chaos_one": "议会被迫发出混乱指令",
+        "chaos_many": "{{count}} 混乱指令破坏了议会的稳定",
+        "veto_one": "政府动用了否决权",
+        "veto_many": "否决权被行使{{count}}次",
+        "marathon": "一场史诗般的 {{count}} 轮意志之战",
+        "deadlock": "两派使议会陷入了刀锋般的僵局"
       }
     },
+    "match_replay": {
+      "title": "比赛重播",
+      "subtitle": "赛后分析",
+      "reveal_truth": "揭示真相",
+      "hide_deceptions": "隐藏欺骗",
+      "no_history": "没有可用的回合历史记录",
+      "government_header": "{{round}} 轮政府",
+      "president": "总统",
+      "chancellor": "校长",
+      "session_summary": "会议总结",
+      "chaos_forced": "混沌被迫",
+      "rejected": "被拒绝",
+      "fail_veto": "政府被否决",
+      "fail_default": "政府投票失败",
+      "enacted": "指令已颁布",
+      "power_triggered": "执行权触发：{{action}}",
+      "legislative_hand": "立法之手",
+      "pres_deck": "总统甲板",
+      "deception_detected": "欺骗",
+      "actual_draw": "实际抽奖",
+      "hidden": "隐藏",
+      "public_claim": "公开索赔",
+      "chan_hand": "校长之手",
+      "conflicting_stories": "相互矛盾的故事",
+      "actual_received": "实际收到",
+      "voting_records": "投票记录",
+      "aye": "是啊",
+      "nay": "不",
+      "no_vote": "没有记录投票",
+      "footer_info": "显示的声明是玩家公开声称的内容。启用真相模式以查看实际卡片。",
+      "close": "关闭重播"
+    },
+    "narration": {
+      "nomination": "议会正在开会。总统，提名你的总理。",
+      "voting_start": "投票已开放。投票吧。",
+      "election_passed": "大会确认提名。立法会议开始。",
+      "election_failed": "提名被拒绝。返回主席席。",
+      "directive_civil": "宪章得到保障。",
+      "directive_state": "国家进步。",
+      "executive_investigate": "身份验证完成。",
+      "executive_peek": "具有指导性的远见。",
+      "executive_election": "一场特别选举已经召开。",
+      "executive_assassinate": "终止令已执行。",
+      "chaos": "秩序已经崩溃。混乱规则被执行。",
+      "veto_request": "已提议否决。",
+      "veto_confirm": "政府行使否决权。",
+      "power_used": "{{role}} 电源已启动。"
+    },
+    "president_pick": {
+      "label": "大会",
+      "selecting": "选择第一任总统",
+      "reveal_label": "第一任总统"
+    },
     "tutorial": {
-      "back": "Back",
-      "next": "Next",
-      "enter": "Enter the Assembly",
-      "skip": "Skip tutorial",
-      "error_general": "An error occurred",
-      "error_invalid_email": "Invalid email address",
+      "back": "返回",
+      "next": "下一页",
+      "enter": "进入大会",
+      "skip": "跳过教程",
+      "error_general": "发生错误",
+      "error_invalid_email": "无效的电子邮件地址",
       "premise": {
-        "title": "The Assembly",
-        "subtitle": "A game of hidden loyalty",
-        "p1": "The world ended with {{crisis}}. What remains is The Assembly — a council of delegates trying to govern the ruins.",
-        "p2": "But not everyone wants to restore order. Some want to build a new State — and one among them, the {{overseer}}, is waiting to seize total power.",
-        "label": "The Assembly is",
-        "desc": "A social deduction game for 5–10 players. You are given a secret role. Use it, lie with it, or die by it."
+        "title": "大会",
+        "subtitle": "隐藏忠诚度的游戏",
+        "p1": "世界以{{crisis}}结束。剩下的是议会——一个试图管理废墟的代表委员会。",
+        "p2": "但并不是所有人都想恢复秩序。有些人想要建立一个新的国家——其中之一，{{overseer}}，正在等待夺取全部权力。",
+        "label": "大会是",
+        "desc": "适合 5-10 名玩家的社交推理游戏。你被赋予了一个秘密角色。使用它，与它同眠，或者死于它。"
       },
       "roles": {
         "civil": {
-          "name": "Civil",
-          "flavor": "Defend the Charter. The Crisis must not consume the Secretariat."
+          "name": "民用",
+          "flavor": "捍卫宪章。危机决不能让秘书处陷入困境。"
         },
         "state": {
-          "name": "State",
-          "flavor": "Enact State directives. Elevate the Overseer to power."
+          "name": "状态",
+          "flavor": "颁布国家指令。提升监督者的权力。"
         },
         "overseer": {
-          "name": "The Overseer",
-          "flavor": "Ascend to the Chancellorship. State Supremacy awaits."
+          "name": "监督者",
+          "flavor": "登上总理职位。国家至高无上的地位正在等待着。"
         }
       },
       "loop": {
-        "title": "The Game Loop",
-        "subtitle": "Each round follows the same sequence",
+        "title": "游戏循环",
+        "subtitle": "每轮都遵循相同的顺序",
         "step_1": {
-          "label": "Presidential Nomination",
-          "desc": "The current President nominates a Chancellor candidate. The presidential role rotates each round."
+          "label": "总统提名",
+          "desc": "现任总统提名一名总理候选人。总统的角色每轮轮换。"
         },
         "step_2": {
-          "label": "Assembly Vote",
-          "desc": "All living players vote AYE or NAY on the proposed government. Majority AYE passes it."
+          "label": "大会投票",
+          "desc": "所有在世玩家都对拟议的政府投赞成或反对票。大多数 AYE 通过了它。"
         },
         "step_3": {
-          "label": "Legislative Session",
-          "desc": "The President draws 3 policy cards, discards 1, and passes 2 to the Chancellor. The Chancellor enacts one."
+          "label": "立法会议",
+          "desc": "总统抽 3 张政策卡，弃掉 1 张，并将 2 张交给总理。财政大臣颁布了一项法案。"
         },
         "step_4": {
-          "label": "Declarations",
-          "desc": "Both President and Chancellor publicly declare what cards they saw and passed. This is how trust is built — or broken."
+          "label": "声明",
+          "desc": "总统和总理都公开宣布他们看到并通过了哪些牌。这就是信任建立或​​破坏的方式。"
         },
-        "chaos_desc": "If 3 elections fail in a row, a {{chaos}} is drawn automatically and enacted without a vote."
+        "chaos_desc": "如果连续 3 次选举失败，则自动抽取 {{chaos}} 并无需投票即可生效。"
       },
       "voting": {
-        "title": "Voting & Declarations",
-        "subtitle": "The heart of social deduction",
-        "p1": "Votes are {{simultaneous}} until revealed. You can't see how others voted before you cast yours.",
-        "aye": "AYE",
-        "aye_desc": "Support this government",
-        "nay": "NAY",
-        "nay_desc": "Block this government",
-        "decl_label": "Declarations",
-        "decl_p1": "After a policy is enacted, the President and Chancellor publicly declare what cards they drew and passed. These claims can be {{true_or_false}} — the table must decide who to believe.",
-        "decl_hint": "Contradictions between the President's and Chancellor's declarations are your most important clue."
+        "title": "投票与声明",
+        "subtitle": "社会演绎的核心",
+        "p1": "投票结果为 {{simultaneous}}，直至公布。在您投票之前，您无法看到其他人如何投票。",
+        "aye": "阿耶",
+        "aye_desc": "支持这个政府",
+        "nay": "不",
+        "nay_desc": "阻止这个政府",
+        "decl_label": "声明",
+        "decl_p1": "政策颁布后，总统和财政大臣公开宣布他们抽了什么牌并通过了哪些牌。这些说法可以是{{true_or_false}}——表格必须决定相信谁。",
+        "decl_hint": "总统和总理声明之间的矛盾是最重要的线索。"
       },
       "executive": {
-        "title": "Executive Actions",
-        "subtitle": "Power grows as State advances",
-        "p1": "Each time a State directive is enacted, the President may unlock a special executive power. These grow more dangerous as State advances.",
+        "title": "行政行动",
+        "subtitle": "权力随着国家的进步而增长",
+        "p1": "每次颁布国家指令时，总统都可以授予特别行政权。随着国家的进步，这些变得更加危险。",
         "actions": {
           "peek": {
-            "name": "Policy Peek",
-            "desc": "See the top 3 cards in the draw pile."
+            "name": "政策一览",
+            "desc": "查看抽牌堆中最上面的 3 张牌。"
           },
           "investigate": {
-            "name": "Investigate",
-            "desc": "Learn whether a player is Civil or State (not who specifically)."
+            "name": "调查",
+            "desc": "了解玩家是公民还是州政府（不是具体是谁）。"
           },
           "special": {
-            "name": "Special Election",
-            "desc": "Choose who will be the next President, skipping normal rotation."
+            "name": "特别选举",
+            "desc": "选择谁将成为下一任总统，跳过正常轮换。"
           },
           "execution": {
-            "name": "Execution",
-            "desc": "Permanently eliminate a player. If it's the Overseer, Civil wins instantly."
+            "name": "执行",
+            "desc": "永久淘汰一名玩家。如果是监督者，公民立即获胜。"
           }
         },
-        "footer": "Executive actions are given to the current President and must be used before the next round begins."
+        "footer": "行政行动交给现任总统，并且必须在下一轮开始之前使用。"
       },
       "titles": {
         "assassin": {
-          "name": "Assassin",
-          "desc": "Eliminate a player from the game."
+          "name": "刺客",
+          "desc": "从游戏中消除一名玩家。"
         },
         "strategist": {
-          "name": "Strategist",
-          "desc": "Draw an extra policy (4 total) when you are President."
+          "name": "策略师",
+          "desc": "当您担任总统时，可制定额外保单（共 4 项）。"
         },
         "broker": {
-          "name": "Broker",
-          "desc": "Force a re-nomination if the current one is unfavorable."
+          "name": "经纪人",
+          "desc": "如果当前提名不利，则强制重新提名。"
         },
         "handler": {
-          "name": "Handler",
-          "desc": "Swap the next two players in the presidential order."
+          "name": "处理程序",
+          "desc": "交换总统令中接下来的两名球员。"
         },
         "auditor": {
-          "name": "Auditor",
-          "desc": "Peek at the last 3 discarded policies after a legislative session."
+          "name": "审计员",
+          "desc": "看看立法会议后最后 3 项被废弃的政策。"
         },
         "interdictor": {
-          "name": "Interdictor",
-          "desc": "Detain a player for one round."
+          "name": "拦截器",
+          "desc": "拘留一名玩家一轮。"
         },
         "archivist": {
-          "name": "Archivist",
-          "desc": "Inspect the entire Discard Pile once per game."
+          "name": "档案员",
+          "desc": "每场比赛检查一次整个弃牌堆。"
         },
         "defector": {
-          "name": "Defector",
-          "desc": "Secretly flip your vote after the initial reveal to change the outcome."
+          "name": "叛逃者",
+          "desc": "在最初揭晓后秘密翻转你的投票以改变结果。"
         },
         "quorum": {
-          "name": "Quorum",
-          "desc": "Call for an emergency re-vote during high-tension failed elections."
+          "name": "法定人数",
+          "desc": "呼吁在紧张失败的选举期间进行紧急重新投票。"
         },
         "cipher": {
-          "name": "Cipher",
-          "desc": "Send an anonymous dispatch to the room during the legislative phase."
+          "name": "密码",
+          "desc": "在立法阶段向会议室发送匿名快报。"
         }
       },
       "agendas": {
-        "title": "Personal Agendas",
-        "subtitle": "Your hidden individual goal",
-        "p1": "Every player is secretly assigned a {{agenda}} — a hidden objective that earns bonus XP and IP if completed, regardless of whether your faction wins or loses.",
-        "examples_label": "Example Agendas",
+        "title": "个人议程",
+        "subtitle": "您隐藏的个人目标",
+        "p1": "每个玩家都被秘密分配了一个 {{agenda}}——一个隐藏的目标，如果完成，无论你的派系是赢还是输，都会获得奖励 XP 和 IP。",
+        "examples_label": "议程示例",
         "examples": [
-          "Vote Nay in at least 3 rounds",
-          "Be nominated as Chancellor at least twice",
-          "The game must end before round (player count + 3)",
-          "No chaos policy is enacted during the game"
+          "至少 3 轮投反对票",
+          "至少两次被提名为校长",
+          "游戏必须在回合前结束（玩家人数 + 3）",
+          "比赛期间不制定混乱政策"
         ],
-        "footer": "Completing your agenda awards {{bonus}} and bonus IP — the same as winning with your faction. Win {{and}} complete your agenda for double rewards.",
-        "footer_sub": "Your agenda is visible in your Dossier at all times. Others can't see it."
+        "footer": "完成你的议程奖励 {{bonus}} 和奖励 IP — 与与你的派系一起获胜相同。赢得 {{and}} 完成您的议程以获得双倍奖励。",
+        "footer_sub": "您的议程始终在您的档案中可见。其他人看不到它。"
       },
       "tips": {
-        "title": "Surviving The Assembly",
-        "subtitle": "Key things to remember",
+        "title": "在集会中幸存",
+        "subtitle": "要记住的关键事项",
         "civil": {
-          "heading": "Civil players: trust nobody",
-          "body": "You outnumber State but you don't know who they are. Contradictory declarations, suspicious nominations, and patterns in voting are your only clues."
+          "heading": "民间玩家：不相信任何人",
+          "body": "你的人数超过了国家，但你不知道他们是谁。自相矛盾的声明、可疑的提名和投票模式是你唯一的线索。"
         },
         "state": {
-          "heading": "State players: coordinate carefully",
-          "body": "You know your allies but can't communicate openly. Coordinate through nominations, declarations, and subtle voting patterns — without being obvious."
+          "heading": "国家参与者：仔细协调",
+          "body": "你认识你的盟友，但无法公开交流。通过提名、声明和微妙的投票模式进行协调——但不那么明显。"
         },
         "decl": {
-          "heading": "Declarations are everything",
-          "body": "After every legislative session, both President and Chancellor declare what they saw. Cross-referencing these claims is how you detect lies."
+          "heading": "声明就是一切",
+          "body": "每次立法会议结束后，总统和总理都会宣布他们所看到的内容。交叉引用这些说法是你发现谎言的方法。"
         },
         "dossier": {
-          "heading": "Watch your Dossier",
-          "body": "Your role, title ability, and personal agenda are always visible in your Dossier — tap the icon in the header during a game."
+          "heading": "观看您的档案",
+          "body": "您的角色、头衔能力和个人议程始终在您的档案中可见 - 在游戏期间点击标题中的图标。"
         }
       },
       "dossier": {
-        "title": "Confidential Dossier",
-        "identity": "Political Identity",
-        "identity_civil": "Civilian",
-        "identity_state": "State Agent",
-        "identity_overseer": "The Overseer",
-        "agenda": "Personal Agenda",
-        "agenda_bonus": "Completing this grants bonus XP and IP.",
-        "agenda_none": "No personal agenda assigned.",
-        "title_role": "Title Role",
-        "title_none": "No title role assigned.",
-        "faction_state": "State Faction",
-        "awaiting": "Awaiting assignment...",
-        "close": "Close Dossier",
-        "active": "Active"
+        "title": "机密档案",
+        "identity": "政治身份",
+        "identity_civil": "民用",
+        "identity_state": "状态代理",
+        "identity_overseer": "监督者",
+        "agenda": "个人议程",
+        "agenda_bonus": "完成此任务可获得奖励 XP 和 IP。",
+        "agenda_none": "没有分配个人议程。",
+        "title_role": "标题角色",
+        "title_none": "未分配头衔角色。",
+        "faction_state": "国家派",
+        "awaiting": "等待分配...",
+        "close": "关闭档案",
+        "active": "活跃"
       },
       "game_over": {
-        "title": "Match Results",
+        "title": "比赛结果",
         "banners": {
-          "civil_win_default": "Charter Restored",
-          "state_win_default": "State Supremacy",
-          "inconclusive": "Inconclusive",
-          "civil_desc": "The Charter has been defended.",
-          "state_desc": "The Secretariat has fallen to the State.",
-          "abort_desc": "The Assembly has collapsed due to a disconnection."
+          "civil_win_default": "宪章恢复",
+          "state_win_default": "国家至上",
+          "inconclusive": "尚无定论",
+          "civil_desc": "《宪章》得到了捍卫。",
+          "state_desc": "秘书处已落入国家手中。",
+          "abort_desc": "议会因断线而崩溃。"
         },
-        "performance_header": "Match Performance",
-        "victory": "Victory Achieved",
-        "defeat": "Mission Failed",
+        "performance_header": "比赛表现",
+        "victory": "胜利已达成",
+        "defeat": "任务失败",
         "elo": "ELO",
         "xp": "XP",
-        "ip": "IP",
-        "clan_xp": "Clan XP",
-        "casual": "Casual",
-        "achievements_header": "Achievements Unlocked",
-        "revelations_header": "Identity Revelations",
-        "agenda": "Agenda",
-        "title_role": "Title",
-        "you": "You",
-        "action_log": "View Assembly Log",
-        "action_replay": "Reconstruct Match",
-        "action_share": "Copy Share Link",
-        "action_shared": "Link Copied",
-        "action_play_again": "Play Again",
-        "action_lobby": "Lobby",
-        "completed": "Completed",
-        "failed": "Failed"
+        "ip": "知识产权",
+        "clan_xp": "部落经验",
+        "casual": "休闲",
+        "achievements_header": "解锁成就",
+        "revelations_header": "身份揭露",
+        "agenda": "议程",
+        "title_role": "标题",
+        "you": "你",
+        "action_log": "查看装配日志",
+        "action_replay": "重建比赛",
+        "action_share": "复制分享链接",
+        "action_shared": "链接已复制",
+        "action_play_again": "再玩一次",
+        "action_lobby": "大堂",
+        "completed": "已完成",
+        "failed": "失败的"
       },
       "match_replay": {
-        "title": "Match Replay",
-        "subtitle": "Post-Match Reconstruction",
-        "hide_deceptions": "Hide Deceptions",
-        "reveal_truth": "Reveal The Truth",
-        "no_history": "No history recorded for this match",
-        "government_header": "Round {{round}} Government",
-        "president": "President",
-        "chancellor": "Chancellor",
-        "session_summary": "Session Summary",
-        "chaos_forced": "Chaos Forced",
-        "rejected": "Government Rejected",
-        "fail_veto": "Both parties agreed to exercise veto power.",
-        "fail_default": "The Assembly failed to confirm this coalition.",
-        "enacted": "Directive Enacted",
-        "power_triggered": "Power Triggered: {{action}}",
-        "legislative_hand": "Legislative Hand",
-        "pres_deck": "President's Deck",
-        "chan_hand": "Chancellor's Hand",
-        "deception_detected": "Deception Detected",
-        "conflicting_stories": "Conflicting Stories",
-        "actual_draw": "Actual Draw",
-        "actual_received": "Actual Received",
-        "public_claim": "Public Claim",
-        "hidden": "HIDDEN",
-        "voting_records": "Voting Records",
-        "aye": "Aye",
-        "nay": "Nay",
-        "no_vote": "No vote held this round",
-        "footer_info": "Replay uses decrypted archival data. Use the timeline above to navigate through match milestones.",
-        "close": "Close Reconstruction"
+        "title": "比赛重播",
+        "subtitle": "赛后重建",
+        "hide_deceptions": "隐藏欺骗",
+        "reveal_truth": "揭露真相",
+        "no_history": "这场比赛没有历史记录",
+        "government_header": "{{round}} 轮政府",
+        "president": "总统",
+        "chancellor": "校长",
+        "session_summary": "会议总结",
+        "chaos_forced": "混沌被迫",
+        "rejected": "政府拒绝",
+        "fail_veto": "双方同意行使否决权。",
+        "fail_default": "议会未能确认这一联盟。",
+        "enacted": "指令已颁布",
+        "power_triggered": "电源触发：{{action}}",
+        "legislative_hand": "立法之手",
+        "pres_deck": "总统甲板",
+        "chan_hand": "校长之手",
+        "deception_detected": "检测到欺骗",
+        "conflicting_stories": "相互矛盾的故事",
+        "actual_draw": "实际抽奖",
+        "actual_received": "实际收到",
+        "public_claim": "公开索赔",
+        "hidden": "隐藏",
+        "voting_records": "投票记录",
+        "aye": "是啊",
+        "nay": "不",
+        "no_vote": "本轮没有投票",
+        "footer_info": "重播使用解密的档案数据。使用上面的时间线浏览比赛里程碑。",
+        "close": "关闭重建"
       },
       "modals": {
         "friend_request": {
-          "title": "Ally Request",
-          "description": "<1>{{username}}</1> wants to be allies.",
-          "deny": "Deny",
-          "accept": "Accept"
+          "title": "盟友请求",
+          "description": "<1>{{username}}</1>想要成为盟友。",
+          "deny": "否认",
+          "accept": "接受"
         },
         "declaration": {
-          "drew_label": "<1>Claim:</1> I drew...",
-          "result_drew": "I drew <1>{{civ}}C</1> & <3>{{sta}}S</3>",
-          "passed_label": "<1>Claim:</1> I passed...",
-          "received_label": "<1>Claim:</1> I received...",
-          "result_passed": "I passed <1>{{civ}}C</1> & <3>{{sta}}S</3>",
-          "result_received": "I received <1>{{civ}}C</1> & <3>{{sta}}S</3>",
-          "submit": "Submit Declaration"
-        }
-      },
-      "how_to_play": {
-        "title": "How to Play",
-        "subtitle": "Rules Reference",
-        "tabs": {
-          "overview": "Overview",
-          "roles": "Roles",
-          "loop": "Game Loop",
-          "titles": "Titles",
-          "agendas": "Agendas",
-          "tips": "Tips"
-        },
-        "overview": {
-          "p1": "The Assembly is a {{social_deduction_game}} for 5–10 players. Each player is secretly assigned a faction — Civil or State — and must work with or against the others to achieve their faction's win condition.",
-          "civil_wins_label": "Civil wins by",
-          "civil_wins": [
-            "Enacting 5 Civil directives",
-            "Executing the Overseer"
-          ],
-          "state_wins_label": "State wins by",
-          "state_wins": [
-            "Enacting 6 State directives",
-            "Electing Overseer Chancellor (after 3 State)"
-          ],
-          "crisis_label": "Crisis Mode (High Intensity)",
-          "crisis_desc": "A chaotic variant featuring {{event_cards}}. Every round, a random event is drawn that can freeze the election tracker, blackout the chat, or force immediate snap elections.",
-          "deck_label": "Policy Deck",
-          "deck_desc": "The deck contains {{civil_count}} and {{state_count}} policy cards. The deck is stacked against Civil — deduction and coordination are essential.",
-          "tracker_label": "Election Tracker",
-          "tracker_desc": "If three elections fail in a row, a {{chaos_policy}} is drawn from the top of the deck and enacted automatically without a vote."
-        },
-        "roles_tab": {
-          "civil": {
-            "label": "Civil",
-            "desc": "The majority. You don't know who your allies are. Use declarations, voting patterns, and nominations to find the State agents and stop them."
-          },
-          "state": {
-            "label": "State",
-            "desc": "The minority. You know who your allies are. Secretly coordinate to enact State directives or get the Overseer elected as Chancellor."
-          },
-          "overseer": {
-            "label": "The Overseer",
-            "desc": "A State agent who doesn't know the other State players. Wins with State. If elected Chancellor after 3 State directives are enacted, State wins immediately.",
-            "distribution_hint": "At 5–6 players, the Overseer knows the other State agents."
-          },
-          "distribution_label": "Role Distribution"
-        },
-        "loop_tab": {
-          "step_1": {
-            "label": "Nomination",
-            "desc": "The current President nominates a Chancellor. The same player cannot serve as Chancellor in consecutive rounds (or as President in larger games)."
-          },
-          "step_2": {
-            "label": "Vote",
-            "desc": "All living players simultaneously vote AYE or NAY. A strict majority of AYE passes the government. Ties and equal splits fail."
-          },
-          "step_3": {
-            "label": "Legislative Session",
-            "desc": "President draws 3 cards, discards 1 face-down, passes 2 to Chancellor. Chancellor enacts 1, discards the other. Neither can see what the other discarded."
-          },
-          "step_4": {
-            "label": "Declarations",
-            "desc": "President declares how many Civil/State they drew and passed. Chancellor declares how many they received and enacted. These claims can be lies."
-          },
-          "step_5": {
-            "label": "Executive Action",
-            "desc": "If a State directive was enacted and the player count/directive count triggers a power, the President must use it before the round ends."
-          }
-        },
-        "titles_tab": {
-          "intro": "Title Roles are assigned randomly at game start. Each is single-use and fires at a specific point in the round. Check your Dossier to see if you have one.",
-          "roles": {
-            "interdictor": {
-              "name": "Interdictor",
-              "when": "Start of each round",
-              "desc": "Before nomination: detain a player for this round. They cannot vote or be nominated as Chancellor. Once used."
-            },
-            "broker": {
-              "name": "Broker",
-              "when": "After nomination",
-              "desc": "Review the Chancellor nomination and veto it, forcing the President to nominate again. Once used."
-            },
-            "strategist": {
-              "name": "Strategist",
-              "when": "As President",
-              "desc": "When you're President, draw 4 policy cards instead of 3, then discard 2. Once used."
-            },
-            "auditor": {
-              "name": "Auditor",
-              "when": "After enactment",
-              "desc": "Peek at the last 3 cards in the discard pile. Useful for tracking what policies are gone. Once used."
-            },
-            "assassin": {
-              "name": "Assassin",
-              "when": "After enactment (as President)",
-              "desc": "When you're President, secretly execute any living player after the round ends. Once used."
-            },
-            "handler": {
-              "name": "Handler",
-              "when": "After enactment",
-              "desc": "Swap the next two players in the presidential rotation. The second becomes President before the first. Once used."
-            },
-            "defector": {
-              "name": "Defector",
-              "when": "Voting (Reveal)",
-              "desc": "Secretly change your vote after the initial reveal but before the result is finalized. This can flip a 5-5 tie into a 6-4 pass. Once used."
-            },
-            "archivist": {
-              "name": "Archivist",
-              "when": "After enactment",
-              "desc": "Deep inspection: peek at the top 3 cards of the Draw Pile before the next round begins. Once used."
-            },
-            "quorum": {
-              "name": "Quorum",
-              "when": "After election fail",
-              "desc": "Emergency session: force an immediate re-vote on the last failed government, bypassing the next President. Once used."
-            },
-            "cipher": {
-              "name": "Cipher",
-              "when": "Any phase",
-              "desc": "Send a one-way encrypted message to any player. Only they can see the text you send. Once used."
-            }
-          }
-        },
-        "agendas_tab": {
-          "p1": "Every player receives a hidden {{personal_agenda}} at the start of each game. Completing it earns {{xp_bonus}} — equal to winning with your faction — regardless of the game result.",
-          "list_label": "All 20 Agendas",
-          "agendas": {
-            "chaos_agent": {
-              "name": "Chaos Agent",
-              "desc": "Trigger a chaos policy at least once"
-            },
-            "purist": {
-              "name": "The Purist",
-              "desc": "At least 3 Civil directives enacted"
-            },
-            "dissenter": {
-              "name": "The Dissenter",
-              "desc": "Vote against the majority 3+ times"
-            },
-            "dove": {
-              "name": "The Dove",
-              "desc": "Vote Aye in every eligible round"
-            },
-            "hawk": {
-              "name": "The Hawk",
-              "desc": "Vote Nay in at least 3 rounds"
-            },
-            "stonewalled": {
-              "name": "Stonewalled",
-              "desc": "Vote Nay on 2 governments that fail"
-            },
-            "short_session": {
-              "name": "Short Session",
-              "desc": "Game ends before round (players + 3)"
-            },
-            "long_game": {
-              "name": "The Long Game",
-              "desc": "Game lasts at least (players + 6) rounds"
-            },
-            "loyalist": {
-              "name": "The Loyalist",
-              "desc": "Vote Aye on 3 civil-enacting governments"
-            },
-            "nominated": {
-              "name": "Nominated",
-              "desc": "Be nominated Chancellor twice"
-            },
-            "deadlock": {
-              "name": "Deadlock",
-              "desc": "Be in at least 1 failed government"
-            },
-            "prolific": {
-              "name": "Prolific",
-              "desc": "Enact 2 policies as Chancellor"
-            },
-            "veteran": {
-              "name": "The Veteran",
-              "desc": "Serve as Chancellor at least once"
-            },
-            "unity": {
-              "name": "Unity",
-              "desc": "No chaos policy during the game"
-            },
-            "mandate": {
-              "name": "The Mandate",
-              "desc": "At least 4 State directives enacted"
-            },
-            "clean_sweep": {
-              "name": "Clean Sweep",
-              "desc": "Enact a Civil directive as Chancellor"
-            },
-            "weathervane": {
-              "name": "The Weathervane",
-              "desc": "Switch your vote 4+ times"
-            },
-            "productive": {
-              "name": "Productive Session",
-              "desc": "More than half of rounds enact a policy"
-            },
-            "close_race": {
-              "name": "Close Race",
-              "desc": "Tracks within 2 directives at game end"
-            },
-            "swing_vote": {
-              "name": "The Swing Vote",
-              "desc": "Be in a government that passes by 1 vote"
-            }
-          }
-        },
-        "tips_tab": {
-          "civil": {
-            "label": "For Civil Players",
-            "tips": [
-              "Cross-reference declarations: if President says they passed 1C/1S but Chancellor says they received 2S, someone is lying.",
-              "Track the voting record. Consistent Nay voting without explanation is suspicious.",
-              "Be careful with executive actions — investigate based on evidence, not gut feeling.",
-              "The deck is State-heavy. Some State policies being enacted doesn't prove anyone is guilty."
-            ]
-          },
-          "state": {
-            "label": "For State Players",
-            "tips": [
-              "Coordinate declarations carefully. Contradicting your State ally's claim is a giveaway.",
-              "Nominate your State allies as Chancellor when possible — but not so obviously it looks suspicious.",
-              "Blame bad hands. \"I only had State cards\" is plausible because the deck is State-heavy.",
-              "The Overseer should stay quiet and unremarkable until the moment is right."
-            ]
-          },
-          "general": {
-            "label": "General",
-            "tips": [
-              "Use the chat and declarations together. What players say matters.",
-              "Your personal agenda might conflict with your faction's best play. That tension is intentional.",
-              "The round history button shows every government, every vote, and every declaration."
-            ]
-          }
+          "drew_label": "<1>声明：</1>我画了...",
+          "result_drew": "我画了 <1>{{civ}}C</1> 和 <3>{{sta}}S</3>",
+          "passed_label": "<1>声明：</1>我通过了...",
+          "received_label": "<1>声明：</1>我收到...",
+          "result_passed": "我通过了 <1>{{civ}}C</1> 和 <3>{{sta}}S</3>",
+          "result_received": "我收到了 <1>{{civ}}C</1> 和 <3>{{sta}}S</3>",
+          "submit": "提交声明"
         }
       }
+    },
+    "how_to_play": {
+      "title": "怎么玩",
+      "subtitle": "规则参考",
+      "back_to_lobby": "返回大厅",
+      "tabs": {
+        "overview": "概述",
+        "roles": "角色",
+        "loop": "游戏循环",
+        "titles": "标题",
+        "agendas": "议程",
+        "tips": "尖端"
+      },
+      "overview": {
+        "p1": "集会是 {{social_deduction_game}}，适合 5-10 名玩家。每个玩家都被秘密分配一个派系——民事或国家——并且必须与其他人合作或对抗，以实现其派系的胜利条件。",
+        "civil_wins_label": "民事获胜",
+        "civil_wins": [
+          "颁布 5 项民事指令",
+          "处决监督者"
+        ],
+        "state_wins_label": "州获胜",
+        "state_wins": [
+          "颁布 6 项国家指令",
+          "选举监督议长（3 个州之后）"
+        ],
+        "crisis_label": "危机模式（高强度）",
+        "crisis_desc": "以 {{event_cards}} 为特征的混沌变体。每一轮都会抽取一个随机事件，该事件可以冻结选举跟踪器、中断聊天或强制立即进行选举。",
+        "deck_label": "政策甲板",
+        "deck_desc": "该牌组包含 {{civil_count}} 和 {{state_count}} 张政策卡。民事方面的形势非常严峻——演绎和协调至关重要。",
+        "tracker_label": "选举追踪",
+        "tracker_desc": "如果连续三次选举失败，则从牌组顶部抽取 {{chaos_policy}} 并自动生效，无需投票。"
+      },
+      "roles_tab": {
+        "civil": {
+          "label": "民用",
+          "desc": "大多数。你不知道你的盟友是谁。使用声明、投票模式和提名来找到国家特工并阻止他们。"
+        },
+        "state": {
+          "label": "状态",
+          "desc": "少数。你知道你的盟友是谁。秘密协调制定国家指令或让监督者当选总理。"
+        },
+        "overseer": {
+          "label": "监督者",
+          "desc": "一名不认识其他国家参与者的国家特工。与国家共赢。如果在 3 项州指令颁布后当选总理，州将立即获胜。",
+          "distribution_hint": "在 5-6 名玩家中，监督者认识其他州特工。"
+        },
+        "distribution_label": "角色分配"
+      },
+      "loop_tab": {
+        "step_1": {
+          "label": "提名",
+          "desc": "现任总统提名一名总理。同一玩家不能在连续几轮中担任议长（或在较大的比赛中担任主席）。"
+        },
+        "step_2": {
+          "label": "投票",
+          "desc": "所有活着的玩家同时投票赞成或反对。 AYE 的绝对多数通过了政府。平局和平分均会失败。"
+        },
+        "step_3": {
+          "label": "立法会议",
+          "desc": "主席抓 3 张牌，弃掉 1 张面朝下的牌，将 2 张交给总理。总理颁布了一项，丢弃了另一项。双方都看不到对方丢弃了什么。"
+        },
+        "step_4": {
+          "label": "声明",
+          "desc": "总统宣布他们抽中并通过了多少民事/州。财政大臣宣布他们收到并颁布了多少。这些说法可能是谎言。"
+        },
+        "step_5": {
+          "label": "行政行动",
+          "desc": "如果颁布了州指令并且玩家计数/指令计数触发了权力，则总统必须在回合结束之前使用该权力。"
+        }
+      },
+      "titles_tab": {
+        "intro": "标题角色在游戏开始时随机分配。每个都是一次性使用的，并在一轮中的特定时间点发射。检查您的档案，看看您是否有一份。",
+        "roles": {
+          "interdictor": {
+            "name": "拦截器",
+            "when": "每轮开始",
+            "desc": "提名前：本轮扣留一名球员。他们不能投票或被提名为总理。一旦使用。"
+          },
+          "broker": {
+            "name": "经纪人",
+            "when": "提名后",
+            "desc": "审查总理提名并否决它，迫使总统再次提名。一旦使用。"
+          },
+          "strategist": {
+            "name": "策略师",
+            "when": "作为总统",
+            "desc": "当你是总统时，抽 4 张政策卡而不是 3 张，然后丢弃 2 张。使用后。"
+          },
+          "auditor": {
+            "name": "审计员",
+            "when": "颁布后",
+            "desc": "查看弃牌堆中的最后 3 张牌。对于跟踪哪些政策消失很有用。一旦使用。"
+          },
+          "assassin": {
+            "name": "刺客",
+            "when": "颁布后（作为主席）",
+            "desc": "当你担任总统时，在回合结束后秘密处决任何活着的玩家。一旦使用。"
+          },
+          "handler": {
+            "name": "处理程序",
+            "when": "颁布后",
+            "desc": "交换总统轮换中接下来的两名球员。第二位先于第一位成为总统。一旦使用。"
+          },
+          "defector": {
+            "name": "叛逃者",
+            "when": "投票（揭晓）",
+            "desc": "在最初揭晓后但在结果最终确定之前秘密更改您的投票。这可以将 5-5 的平局变成 6-4 的平局。一旦使用。"
+          },
+          "archivist": {
+            "name": "档案员",
+            "when": "颁布后",
+            "desc": "深度检查：在下一轮开始前查看抽牌堆顶部的 3 张牌。一旦使用。"
+          },
+          "quorum": {
+            "name": "法定人数",
+            "when": "选举失败后",
+            "desc": "紧急会议：绕过下一任总统，强制对上一个失败的政府立即重新投票。一旦使用。"
+          },
+          "cipher": {
+            "name": "密码",
+            "when": "任意相",
+            "desc": "向任何玩家发送单向加密消息。只有他们才能看到您发送的文本。一旦使用。"
+          }
+        }
+      },
+      "agendas_tab": {
+        "p1": "每个玩家在每场游戏开始时都会收到一个隐藏的 {{personal_agenda}}。完成它可以获得 {{xp_bonus}} — 等于与您的派系一起获胜 — 无论游戏结果如何。",
+        "list_label": "所有 20 个议程",
+        "agendas": {
+          "chaos_agent": {
+            "name": "混沌代理",
+            "desc": "至少触发一次混乱政策"
+          },
+          "purist": {
+            "name": "纯粹主义者",
+            "desc": "至少颁布了 3 项民事指令"
+          },
+          "dissenter": {
+            "name": "异议者",
+            "desc": "投票反对多数 3 次以上"
+          },
+          "dove": {
+            "name": "鸽子",
+            "desc": "在每一轮合格的回合中投赞成票"
+          },
+          "hawk": {
+            "name": "鹰",
+            "desc": "至少 3 轮投反对票"
+          },
+          "stonewalled": {
+            "name": "石墙",
+            "desc": "对两个失败的政府投反对票"
+          },
+          "short_session": {
+            "name": "短期会议",
+            "desc": "游戏在回合前结束（玩家 + 3）"
+          },
+          "long_game": {
+            "name": "漫长的游戏",
+            "desc": "游戏持续至少（玩家 + 6）轮"
+          },
+          "loyalist": {
+            "name": "忠诚者",
+            "desc": "对 3 个民事立法政府投赞成票"
+          },
+          "nominated": {
+            "name": "提名",
+            "desc": "两次被提名总理"
+          },
+          "deadlock": {
+            "name": "僵局",
+            "desc": "曾在至少 1 个失败的政府任职"
+          },
+          "prolific": {
+            "name": "多产",
+            "desc": "作为财政大臣制定 2 项政策"
+          },
+          "veteran": {
+            "name": "老兵",
+            "desc": "至少担任一次总理"
+          },
+          "unity": {
+            "name": "团结",
+            "desc": "游戏期间无混乱政策"
+          },
+          "mandate": {
+            "name": "授权",
+            "desc": "至少颁布了 4 项国家指令"
+          },
+          "clean_sweep": {
+            "name": "一网打尽",
+            "desc": "作为财政大臣颁布民事指令"
+          },
+          "weathervane": {
+            "name": "风向标",
+            "desc": "切换投票 4 次以上"
+          },
+          "productive": {
+            "name": "富有成效的会议",
+            "desc": "超过一半的回合制定了政策"
+          },
+          "close_race": {
+            "name": "近距离比赛",
+            "desc": "游戏结束时跟踪 2 个指令内"
+          },
+          "swing_vote": {
+            "name": "摇摆投票",
+            "desc": "加入以 1 票通过的政府"
+          }
+        }
+      },
+      "tips_tab": {
+        "civil": {
+          "label": "对于民间玩家",
+          "tips": [
+            "交叉引用声明：如果总统说他们通过了 1C/1S，但总理说他们收到了 2S，那么有人在撒谎。",
+            "跟踪投票记录。在没有解释的情况下持续投反对票是值得怀疑的。",
+            "谨慎对待行政行为——根据证据而不是直觉进行调查。",
+            "甲板是国家重的。一些正在颁布的国家政策并不能证明任何人有罪。"
+          ]
+        },
+        "state": {
+          "label": "对于国家玩家",
+          "tips": [
+            "仔细协调声明。反驳你的国家盟友的主张就是一种泄露。",
+            "如果可能的话，提名你的州盟友担任总理——但不要那么明显，这样看起来很可疑。",
+            "都怪手不好。 “我只有州牌”是有道理的，因为这套牌以州为重。",
+            "监督者应该保持安静，不引人注目，直到时机成熟。"
+          ]
+        },
+        "general": {
+          "label": "一般",
+          "tips": [
+            "一起使用聊天和声明。玩家所说的很重要。",
+            "你的个人议程可能会与你所在派系的最佳表现相冲突。这种紧张是故意的。",
+            "圆形历史按钮显示每一次政府、每一次投票和每一次声明。"
+          ]
+        }
+      }
+    },
+    "voting": {
+      "aye": "是啊！",
+      "aye_sub": "（是）",
+      "nay": "不！",
+      "nay_sub": "（否）",
+      "detained": "您已被拘留，无法在本轮投票"
+    },
+    "legislative": {
+      "discard": "丢弃",
+      "enact": "颁布",
+      "propose_veto": "提议否决",
+      "send_dispatch": "发送匿名快件"
     }
   },
   "profile": {
     "settings": {
       "general": {
-        "language": "Language",
-        "language_desc": "Select your preferred language",
-        "light_mode": "Light Mode",
-        "light_mode_desc": "Toggle light mode for the interface",
-        "ui_scale": "UI Scale",
-        "ui_scale_desc": "Adjust the scale of interface elements",
-        "recovery_email": "Recovery Email",
-        "recovery_email_desc": "Used to recover your account if you lose your token",
-        "recovery_email_placeholder": "Enter recovery email...",
-        "no_recovery_email": "Not set"
+        "language": "语言",
+        "language_desc": "选择您的首选语言",
+        "light_mode": "灯光模式",
+        "light_mode_desc": "切换界面的灯光模式",
+        "ui_scale": "用户界面比例",
+        "ui_scale_desc": "调整界面元素的比例",
+        "recovery_email": "恢复电子邮件",
+        "recovery_email_desc": "如果您丢失令牌，用于恢复您的帐户",
+        "recovery_email_placeholder": "输入辅助邮箱...",
+        "no_recovery_email": "未设置",
+        "fullscreen": "全屏"
       },
       "tabs": {
-        "general": "General",
-        "audio": "Audio",
-        "voice": "Voice"
+        "general": "一般",
+        "audio": "音频",
+        "voice": "语音"
+      },
+      "audio": {
+        "music": "音乐",
+        "music_volume": "音乐音量",
+        "sfx": "音效",
+        "sfx_volume": "音效音量"
+      },
+      "voice": {
+        "ai_voice": "AI 旁白语音",
+        "tts_voice": "语音选择",
+        "tts_default": "系统默认",
+        "narrator_volume": "旁白音量",
+        "narrator_volume_desc": "控制游戏中人工智能语音播报的音量"
+      }
+    },
+    "lvl_label": "等级",
+    "ip_label": "知识产权",
+    "cp_label": "CP",
+    "xp_label": "经验",
+    "edit_username": "编辑用户名",
+    "public_profile": "公开资料",
+    "username_update": {
+      "error_length": "用户名必须为 3-20 个字符",
+      "failed": "更新用户名失败"
+    },
+    "share": {
+      "copied": "链接已复制！",
+      "copy_link": "复制个人资料链接",
+      "on_twitter": "在 Twitter 上分享",
+      "on_facebook": "在 Facebook 上分享",
+      "on_whatsapp": "在 WhatsApp 上分享",
+      "more": "更多选项"
+    },
+    "tabs": {
+      "stats": "统计",
+      "inventory": "库存",
+      "achievements": "奖牌",
+      "challenges": "挑战",
+      "clan": "氏族",
+      "shop": "店铺",
+      "pass": "通过",
+      "friends": "盟友",
+      "referrals": "推荐",
+      "history": "历史",
+      "settings": "设置",
+      "admin": "管理员"
+    },
+    "stats": {
+      "rank_rating": "排名评级",
+      "elo": "ELO",
+      "elo_to_next": "{{amount}} 至 {{tier}}",
+      "games_played": "玩过的游戏",
+      "win_rate": "胜率",
+      "total_wins": "总胜利",
+      "civil_games": "民间运动会",
+      "state_games": "州运动会",
+      "overseer_games": "监督者游戏",
+      "kills": "杀死",
+      "deaths": "死亡人数",
+      "agendas_completed": "议程已完成",
+      "account_created": "帐户已创建",
+      "civil_wins": "民事胜利",
+      "state_wins": "国家胜利",
+      "overseer_wins": "监督者获胜",
+      "ranked_wins": "排名胜利",
+      "ranked_games": "排名游戏",
+      "casual_wins": "休闲胜利",
+      "casual_games": "休闲游戏",
+      "classic_wins": "经典胜利",
+      "classic_games": "经典游戏"
+    },
+    "challenges": {
+      "loading": "正在加载挑战...",
+      "error_load": "无法加载挑战",
+      "error_no_data": "没有可用的挑战数据",
+      "retry": "重试",
+      "xp_reward": "{{amount}} XP",
+      "ip_reward": "{{amount}} IP",
+      "claimed": "声称",
+      "section_complete": "{{count}}/{{total}} 完成",
+      "tiers": {
+        "daily": "每日协议",
+        "weekly": "每周作业",
+        "seasonal": "季节性目标"
+      },
+      "countdown": {
+        "now": "立即重置",
+        "days": "{{d}}d {{h}}h 后重置",
+        "hours": "{{h}}h {{m}}m 后重置",
+        "minutes": "在 {{m}}m {{s}}s 内重置"
+      },
+      "list": {
+        "daily_win_any": {
+          "name": "胜利",
+          "desc": "赢得任何比赛。"
+        },
+        "daily_win_civil": {
+          "name": "宪章捍卫者",
+          "desc": "作为 Civil 玩家赢得一场游戏。"
+        },
+        "daily_win_state": {
+          "name": "国家公仆",
+          "desc": "作为国家特工或监督者赢得一场游戏。"
+        },
+        "daily_play_2": {
+          "name": "积极参与者",
+          "desc": "玩 2 场比赛。"
+        },
+        "daily_agenda_complete": {
+          "name": "使命完成",
+          "desc": "完成您的个人议程。"
+        },
+        "daily_elected_president": {
+          "name": "总统权力",
+          "desc": "在任何游戏中当选为主席。"
+        },
+        "daily_elected_chancellor": {
+          "name": "校长",
+          "desc": "在任何游戏中当选为议长。"
+        },
+        "daily_enact_civil": {
+          "name": "立法者",
+          "desc": "作为财政大臣颁布民事指令。"
+        },
+        "daily_enact_state": {
+          "name": "指令执行者",
+          "desc": "作为总理颁布国家指令。"
+        },
+        "daily_survive_state_win": {
+          "name": "幸存者",
+          "desc": "生存到国家获胜的游戏结束。"
+        },
+        "daily_win_ranked": {
+          "name": "排名竞争者",
+          "desc": "赢得一场排名赛。"
+        },
+        "daily_win_quick": {
+          "name": "迅速解决",
+          "desc": "在 6 轮或更少的时间内赢得一场比赛。"
+        },
+        "daily_vote_nay_win": {
+          "name": "异议者",
+          "desc": "对仍然赢得选举的政府投反对票。"
+        },
+        "daily_win_overseer": {
+          "name": "暗影君主",
+          "desc": "作为监督者赢得一场比赛。"
+        },
+        "daily_play_casual": {
+          "name": "随意集会",
+          "desc": "玩休闲模式游戏。"
+        },
+        "daily_play_classic": {
+          "name": "经典出席",
+          "desc": "玩经典模式游戏。"
+        },
+        "daily_win_classic": {
+          "name": "经典维克多",
+          "desc": "赢得一场经典模式游戏。"
+        },
+        "daily_chaos_occurs": {
+          "name": "陷入混乱",
+          "desc": "玩一个制定混乱政策的游戏。"
+        },
+        "daily_veto_occurs": {
+          "name": "僵局",
+          "desc": "玩一个行使否决权的游戏。"
+        },
+        "daily_nominated_twice": {
+          "name": "两次提名",
+          "desc": "在一场比赛中至少两次被提名为总理。"
+        },
+        "daily_win_long": {
+          "name": "长时间会议",
+          "desc": "赢得一场至少持续 10 轮的游戏。"
+        },
+        "daily_voted_aye_failed": {
+          "name": "被选票出卖",
+          "desc": "为选举失败的政府投赞成票。"
+        },
+        "daily_civil_full_track": {
+          "name": "完整章程",
+          "desc": "玩一个颁布 5 项民事指令的游戏。"
+        },
+        "daily_president_twice": {
+          "name": "经验丰富的领导者",
+          "desc": "在一场比赛中至少两次当选总统。"
+        },
+        "daily_play_3": {
+          "name": "多产玩家",
+          "desc": "今天玩 3 场比赛。"
+        },
+        "daily_win_civil_survive_assassination": {
+          "name": "坚韧",
+          "desc": "在督军还活着的情况下，以公民身份赢得一场游戏。"
+        },
+        "daily_large_game": {
+          "name": "大会",
+          "desc": "与 8 名或更多玩家一起玩游戏。"
+        },
+        "daily_win_large_game": {
+          "name": "多数规则",
+          "desc": "赢得 8 名或更多玩家的游戏。"
+        },
+        "daily_enact_2_civil": {
+          "name": "双重立法者",
+          "desc": "在一场游戏中以议长身份颁布 2 项民事指令。"
+        },
+        "daily_win_state_5plus_players": {
+          "name": "国家特工",
+          "desc": "在至少 5 名玩家参与的游戏中以州或监督者身份获胜。"
+        },
+        "weekly_win_3": {
+          "name": "经验丰富的维克多",
+          "desc": "本周赢得 3 场比赛。"
+        },
+        "weekly_play_5": {
+          "name": "专职大会会员",
+          "desc": "这周打 5 场比赛。"
+        },
+        "weekly_win_civil_3": {
+          "name": "宪章冠军",
+          "desc": "作为民事玩家赢得 3 场比赛。"
+        },
+        "weekly_win_state_2": {
+          "name": "国家特工",
+          "desc": "作为国家特工或监督者赢得 2 场比赛。"
+        },
+        "weekly_agenda_3": {
+          "name": "议程驱动",
+          "desc": "本周完成 3 项个人议程。"
+        },
+        "weekly_win_ranked_2": {
+          "name": "排名运营商",
+          "desc": "本周赢得 2 场排名赛。"
+        },
+        "weekly_enact_civil_3": {
+          "name": "立法记录",
+          "desc": "作为议长在任何游戏中制定 3 项民事指令。"
+        },
+        "weekly_chancellor_3": {
+          "name": "常任校长",
+          "desc": "在任何比赛中当选议长 3 次。"
+        },
+        "weekly_win_overseer": {
+          "name": "影子至上",
+          "desc": "作为监督者赢得一场比赛。"
+        },
+        "weekly_play_classic_2": {
+          "name": "经典模式 常规",
+          "desc": "玩 2 个经典模式游戏。"
+        },
+        "weekly_win_5": {
+          "name": "主导力量",
+          "desc": "本周赢得 5 场比赛。"
+        },
+        "weekly_play_10": {
+          "name": "装配坚定",
+          "desc": "这周打 10 场比赛。"
+        },
+        "weekly_president_5": {
+          "name": "总统生涯",
+          "desc": "在任何游戏中当选总统 5 次。"
+        },
+        "weekly_agenda_5": {
+          "name": "议程大师",
+          "desc": "本周完成 5 项个人议程。"
+        },
+        "weekly_win_civil_5": {
+          "name": "宪章守护者",
+          "desc": "作为民事玩家赢得 5 场比赛。"
+        },
+        "weekly_enact_state_3": {
+          "name": "国家执法者",
+          "desc": "作为总理在任何游戏中制定 3 项州指令。"
+        },
+        "weekly_win_2_modes": {
+          "name": "多功能",
+          "desc": "本周在 2 种不同模式下至少赢得一场比赛。"
+        },
+        "weekly_win_ranked_3": {
+          "name": "排名老将",
+          "desc": "本周赢得 3 场排名赛。"
+        },
+        "weekly_chancellor_5": {
+          "name": "记录校长",
+          "desc": "在 5 场比赛中当选总理。"
+        },
+        "weekly_survive_5_games": {
+          "name": "耐力",
+          "desc": "生存到 5 场比赛结束。"
+        },
+        "seasonal_play_30": {
+          "name": "常规装配",
+          "desc": "本赛季打30场比赛。"
+        },
+        "seasonal_win_15": {
+          "name": "赛季冠军",
+          "desc": "本赛季赢得15场比赛。"
+        },
+        "seasonal_win_ranked_5": {
+          "name": "排名老将",
+          "desc": "本赛季赢得 5 场排名赛。"
+        },
+        "seasonal_agenda_10": {
+          "name": "议程大师",
+          "desc": "本赛季完成 10 项个人议程。"
+        },
+        "seasonal_win_civil_10": {
+          "name": "宪章的支柱",
+          "desc": "本赛季以民事球员身份赢得 10 场比赛。"
+        },
+        "seasonal_win_state_5": {
+          "name": "国家至上主义者",
+          "desc": "本赛季作为州特工或监督者赢得 5 场比赛。"
+        },
+        "seasonal_play_50": {
+          "name": "真正的议员",
+          "desc": "本赛季打 50 场比赛。"
+        },
+        "seasonal_chancellor_20": {
+          "name": "永远的宰相",
+          "desc": "本赛季在 20 场比赛中当选总理。"
+        },
+        "seasonal_agenda_20": {
+          "name": "议程绝对主义者",
+          "desc": "本赛季完成 20 项个人议程。"
+        },
+        "seasonal_win_ranked_10": {
+          "name": "排名传奇",
+          "desc": "本赛季赢得 10 场排名赛。"
+        },
+        "seasonal_enact_civil_15": {
+          "name": "立法遗产",
+          "desc": "作为财政大臣，本赛季颁布 15 项民事指令。"
+        },
+        "seasonal_win_25": {
+          "name": "传奇维克多",
+          "desc": "本赛季赢得25场比赛。"
+        }
+      }
+    },
+    "referrals": {
+      "title": "推荐计划",
+      "subtitle": "邀请朋友参加集会并赚取奖励。",
+      "active_reward": "主动奖励",
+      "reward_desc": "每一位使用您的链接加入并进行<3>首场比赛</3>的好友均可赚取 <1>150 CP</1>。",
+      "link_label": "您的推荐链接",
+      "copy_hint": "点击复制您独特的邀请链接",
+      "copied_hint": "链接已复制到剪贴板",
+      "tracking_title": "自动追踪",
+      "tracking_desc": "一旦您的推荐人完成了第一场 10 人比赛，奖励就会自动存入您的帐户。"
+    },
+    "clans": {
+      "members": {
+        "self_label": "你",
+        "xp_contributed": "{{count}} XP 贡献",
+        "btn_promote": "晋升为军官",
+        "btn_demote": "降级为会员",
+        "btn_transfer": "调任主席",
+        "btn_kick": "从部落中删除"
+      },
+      "challenges": {
+        "daily": "每日协议",
+        "weekly": "每周作业",
+        "seasonal": "季节性目标",
+        "xp_reward": "{{count}} XP",
+        "loading": "正在访问氏族档案...",
+        "loading_error": "无法检索客观数据。",
+        "retry": "重新连接到存档"
+      },
+      "leaderboard": {
+        "lvl_summary": "等级 {{level}} · {{count}} 成员",
+        "title": "全球氏族排名",
+        "empty": "没有找到氏族。",
+        "rank": "#{{rank}}",
+        "your_clan": "你的氏族"
+      },
+      "create": {
+        "title": "找到了一个新部落",
+        "tag_label": "部落标签（4-5 个字符）",
+        "tag_placeholder": "阿斯利",
+        "name_label": "部落名称",
+        "name_placeholder": "第一次大会",
+        "desc_label": "信息",
+        "desc_placeholder": "你的氏族的目的...",
+        "btn_creating": "创立...",
+        "btn_submit": "建立氏族",
+        "error_failed": "未能找到部落"
+      },
+      "search": {
+        "title": "浏览部落",
+        "placeholder": "部落名称或标签...",
+        "no_results": "没有与“{{query}}”匹配的氏族"
+      },
+      "no_clan": {
+        "title": "孤立的忠诚",
+        "hint": "加入部落即可获得共享奖励并攀登全球排名。",
+        "btn_create": "创始人之路",
+        "btn_find": "浏览部落",
+        "btn_leaderboard": "排名"
+      },
+      "manage": {
+        "btn_share": "复制邀请链接",
+        "btn_edit": "修改部落",
+        "btn_save": "确认更改",
+        "btn_saving": "致力于...",
+        "xp_label": "氏族等级 XP",
+        "total_xp": "{{count}} 累计经验值",
+        "contribution": "{{count}} XP 贡献",
+        "overview": "概述",
+        "challenges": "目标",
+        "invite_label": "邀请加入部落",
+        "invite_placeholder": "寻找要邀请的玩家...",
+        "members_label": "部落成员"
+      },
+      "invites": {
+        "banner_title": "部落邀请",
+        "banner_desc": "{{inviter}}邀请您加入{{clan}}[{{tag}}]",
+        "btn_accept": "接受",
+        "btn_decline": "拒绝"
+      },
+      "alerts": {
+        "leave_confirm": "你确定要离开这个部落吗？",
+        "disband_confirm": "严重：这将永久删除部落。继续？",
+        "kick_confirm": "删除该成员？",
+        "transfer_confirm": "将氏族会长权转移给该成员？"
+      },
+      "loading": "正在连接到存档...",
+      "loading_error": "存档连接失败。"
+    },
+    "inventory": {
+      "categories": {
+        "frame": "边框",
+        "badge": "徽章",
+        "policy": "政策",
+        "vote": "投票",
+        "music": "音乐",
+        "sound": "听起来",
+        "background": "背景"
+      },
+      "vote_aye": "是的令牌",
+      "vote_yes": "是的令牌",
+      "item_type_policy": "政策皮肤",
+      "rarities": {
+        "common": "常见",
+        "uncommon": "不常见",
+        "rare": "罕见",
+        "epic": "史诗",
+        "legendary": "传奇"
+      },
+      "btn_equipped": "装备",
+      "btn_equip": "装备"
+    },
+    "medals": {
+      "summary_title": "奖牌收藏",
+      "summary_complete": "完成",
+      "pin_hint_desc": "点击获得的奖牌即可固定它们。",
+      "pin_hint_status": "{{count}} / 3 已置顶",
+      "pin_hint_empty": "没有固定奖牌",
+      "saving": "正在保存...",
+      "categories": {
+        "milestone": "里程碑",
+        "role": "角色成就",
+        "title": "标题成就",
+        "gameplay": "游戏成就"
+      },
+      "xp_reward": "+{{amount}} 经验值",
+      "cp_reward": "+{{amount}} CP",
+      "list": {
+        "first_assembly": {
+          "name": "第一节",
+          "desc": "玩你的第一个游戏。"
+        },
+        "veteran": {
+          "name": "经验丰富的代表",
+          "desc": "玩 25 场比赛。"
+        },
+        "elder": {
+          "name": "议会长老",
+          "desc": "玩 100 场游戏。"
+        },
+        "first_victory": {
+          "name": "记录在案",
+          "desc": "赢得你的第一场比赛。"
+        },
+        "ten_wins": {
+          "name": "久经考验的指挥官",
+          "desc": "赢得 10 场比赛。"
+        },
+        "fifty_wins": {
+          "name": "总冠军",
+          "desc": "赢得 50 场比赛。"
+        },
+        "civil_first_win": {
+          "name": "公务员",
+          "desc": "赢得你作为 Civil 的第一场比赛。"
+        },
+        "civil_ten_wins": {
+          "name": "宪章捍卫者",
+          "desc": "以 Civil 身份赢得 10 场比赛。"
+        },
+        "civil_twenty_wins": {
+          "name": "宪章守护者",
+          "desc": "以 Civil 身份赢得 20 场比赛。"
+        },
+        "state_first_win": {
+          "name": "影子特工",
+          "desc": "赢得你作为州政府的第一场比赛。"
+        },
+        "state_ten_wins": {
+          "name": "国家特工",
+          "desc": "作为州赢得 10 场比赛。"
+        },
+        "state_twenty_wins": {
+          "name": "铁拳",
+          "desc": "作为州赢得 20 场比赛。"
+        },
+        "overseer_played": {
+          "name": "建筑师",
+          "desc": "作为监督者玩游戏。"
+        },
+        "overseer_win": {
+          "name": "不可触碰",
+          "desc": "作为监督者赢得一场比赛。"
+        },
+        "power_used": {
+          "name": "桌上的卡片",
+          "desc": "使用任何头衔角色能力。"
+        },
+        "assassins_mark": {
+          "name": "刺客印记",
+          "desc": "使用刺客能力处决一名玩家。"
+        },
+        "overseer_hunter": {
+          "name": "监督者的末日",
+          "desc": "以刺客身份杀死督军。"
+        },
+        "agenda_first": {
+          "name": "隐藏议程",
+          "desc": "完成个人议程。"
+        },
+        "agenda_ten": {
+          "name": "议程大师",
+          "desc": "完成 10 项个人议程。"
+        },
+        "agenda_twentyfive": {
+          "name": "战术大师",
+          "desc": "完成 25 项个人议程。"
+        },
+        "first_kill": {
+          "name": "行政决定",
+          "desc": "以总统身份处决一名玩家。"
+        },
+        "five_kills": {
+          "name": "清除",
+          "desc": "在所有游戏中处决 5 名玩家。"
+        },
+        "clean_sweep": {
+          "name": "一网打尽",
+          "desc": "在没有任何州指令的情况下赢得一场比赛。"
+        },
+        "long_game": {
+          "name": "消耗战",
+          "desc": "在游戏进行到第 12 轮时幸存下来。"
+        },
+        "landslide": {
+          "name": "山体滑坡",
+          "desc": "赢得一场每个玩家都投赞成票的选举。"
+        }
+      }
+    },
+    "history": {
+      "loading": "正在加载档案数据...",
+      "btn_replay": "重建",
+      "btn_decrypting": "正在解密...",
+      "no_matches": "没有找到档案数据",
+      "first_game_hint": "您的第一场比赛数据将显示在这里。",
+      "error_data_unavailable": "数据不可用",
+      "error_fetch_failed": "档案获取失败",
+      "roles": {
+        "civil": "民用",
+        "state": "状态",
+        "overseer": "监督者"
+      },
+      "outcomes": {
+        "victory": "胜利",
+        "defeat": "击败",
+        "aborted": "中止"
+      }
+    },
+    "admin": {
+      "tabs": {
+        "rooms": "房间",
+        "users": "用户",
+        "system": "系统",
+        "logs": "审计"
+      },
+      "broadcast": {
+        "title": "全球广播",
+        "placeholder": "输入公告消息...",
+        "btn_send": "广播"
+      },
+      "config": {
+        "maintenance": "系统维护模式",
+        "xp_boost": "全局 XP 乘数",
+        "ip_boost": "全球IP倍增"
+      },
+      "rooms": {
+        "filter_placeholder": "房间 ID 或主持人...",
+        "btn_refresh": "刷新",
+        "purge_confirm": "清除所有不活动的房间？",
+        "btn_purge": "净化室",
+        "active_sessions": "活跃会话",
+        "host_label": "主持人：{{name}}",
+        "users_summary": "{{current}} / {{max}} 代表"
+      },
+      "logs": {
+        "sessions": "历史会议",
+        "persisted_log": "存档记录：{{id}}",
+        "waiting": "正在等待数据...",
+        "empty": "未找到审核记录"
+      }
+    },
+    "shop": {
+      "title": "化妆品申请",
+      "subtitle": "交换 IP 和 CP 以获得边框、徽章等。",
+      "btn_purchase": "申请 ({{amount}})",
+      "item_type_policy": "政策皮肤",
+      "item_style": "{{type}} 风格",
+      "btn_owned": "拥有",
+      "btn_locked_pass": "通过奖励",
+      "btn_buy_pts": "购买 · {{price}} IP"
+    },
+    "pass": {
+      "title": "大会通行证",
+      "subtitle": "第 1 季：危机",
+      "lvl_label": "级别 {{lvl}}",
+      "xp_to_next": "{{xp}} / {{needed}} XP",
+      "max_level": "最高等级",
+      "item_level": "等级 {{lvl}} 奖励",
+      "claimed": "声称",
+      "unlocked": "已解锁",
+      "locked": "分类",
+      "season": "赛季 {{number}}",
+      "season_desc": "完成挑战并赚取 XP 来解锁专属化妆品。",
+      "level": "等级",
+      "xp_summary": "{{amount}} 获得 XP",
+      "footer_season": "赛季 {{number}} · 活跃",
+      "footer_premium_hint": "高级奖励可以通过升级来解锁。继续玩。",
+      "btn_claim": "索赔",
+      "btn_claimed": "声称",
+      "btn_locked": "锁定",
+      "rewards": {
+        "geometric_grid": "几何网格",
+        "purple_rain": "紫雨",
+        "static_noise": "静态噪声",
+        "purple_pill": "紫色药丸"
+      },
+      "reward_types": {
+        "cp": "清晰度点",
+        "cp_count": "{{count}} CP",
+        "background": "背景",
+        "vote": "投票风格",
+        "music": "音乐曲目",
+        "frame": "边框",
+        "reward": "奖励"
+      }
+    },
+    "leaderboard": {
+      "title": "排行榜",
+      "loading": "正在加载...",
+      "no_data": "还没有数据。玩一些 {{mode}} 游戏！",
+      "column_player": "玩家",
+      "column_rank_elo": "排名 · ELO",
+      "your_position": "您的位置",
+      "you": "你",
+      "modes": {
+        "overall": "总体",
+        "ranked": "排名",
+        "casual": "休闲",
+        "classic": "经典",
+        "crisis": "危机"
+      },
+      "stats": {
+        "win_rate": "赢%",
+        "games": "游戏",
+        "wins": "胜利",
+        "elo": "ELO"
       }
     }
   },
   "social": {
     "clan": {
-      "profile_label": "Clan Profile",
-      "level": "Level",
-      "members": "Members",
-      "no_desc": "No description provided.",
-      "share_clan": "Share Clan",
-      "roster": "Clan Roster",
-      "contribution": "Contrib.",
-      "founded_on": "Clan founded on {{date}}",
-      "not_found": "Clan not found",
-      "load_failed": "Failed to load clan",
-      "check_tag": "Check the clan tag and try again.",
-      "return_home": "Return Home"
+      "profile_label": "部落简介",
+      "level": "等级",
+      "members": "会员",
+      "no_desc": "没有提供描述。",
+      "share_clan": "分享部落",
+      "roster": "部落名册",
+      "contribution": "贡献。",
+      "founded_on": "部落成立于 {{date}}",
+      "not_found": "找不到氏族",
+      "load_failed": "无法加载部落",
+      "check_tag": "检查部落标签并重试。",
+      "return_home": "返回首页"
     },
     "friends": {
-      "search_placeholder": "Search players by username…",
-      "search_btn": "Allies",
-      "search_min_chars": "Type at least 2 characters to search",
-      "searching": "Searching…",
-      "search_no_results": "No players found for \"{{query}}\"",
-      "status_sent": "Sent",
-      "friends_label": "Allies",
-      "pending_requests": "Pending Requests ({{count}})",
-      "wants_to_be_friends": "Wants to be allies",
-      "no_friends": "No allies yet.",
-      "no_friends_hint": "Search for players above or add someone from a game.",
-      "online": "Online ({{count}})",
-      "offline": "Offline ({{count}})",
-      "in_game": "In assembly · {{roomId}}",
-      "in_lobby": "In lobby",
-      "recently_played": "Recently Played With",
-      "time_m_ago": "{{count}}m ago",
-      "time_h_ago": "{{count}}h ago",
-      "time_d_ago": "{{count}}d ago",
-      "add_friend": "Add Ally",
-      "invite_title": "Invite to assembly",
-      "join_title": "Join their assembly",
-      "remove_title": "Remove ally"
+      "search_placeholder": "按用户名搜索玩家...",
+      "search_btn": "盟友",
+      "search_min_chars": "输入至少 2 个字符进行搜索",
+      "searching": "正在搜索...",
+      "search_no_results": "没有找到“{{query}}”的玩家",
+      "status_sent": "已发送",
+      "friends_label": "盟友",
+      "pending_requests": "待处理请求 ({{count}})",
+      "wants_to_be_friends": "想成为盟友",
+      "no_friends": "还没有盟友。",
+      "no_friends_hint": "搜索上面的玩家或添加游戏中的某人。",
+      "online": "在线 ({{count}})",
+      "offline": "离线 ({{count}})",
+      "in_game": "正在组装·{{roomId}}",
+      "in_lobby": "在大厅",
+      "recently_played": "最近玩过",
+      "time_m_ago": "{{count}} 分钟前",
+      "time_h_ago": "{{count}}小时前",
+      "time_d_ago": "{{count}} 天前",
+      "add_friend": "添加盟友",
+      "invite_title": "邀请参加集会",
+      "join_title": "加入他们的集会",
+      "remove_title": "删除盟友"
+    }
+  },
+  "playercard": {
+    "play_now": "立即播放",
+    "player_profile": "玩家简介",
+    "elo_label": "ELO",
+    "elo_to_next": "{{amount}} ELO 进入下一级",
+    "joined_on": "已加入{{date}}",
+    "share_profile": "分享个人资料",
+    "copied": "复制了！",
+    "join_assembly": "加入大会",
+    "think_can_beat": "你认为你能打败他们吗？",
+    "free_to_play": "免费畅玩 · 无需下载",
+    "stats": {
+      "games": "游戏",
+      "win_rate": "胜率",
+      "kills": "杀死",
+      "kd_ratio": "K/D 比率",
+      "win_rate_role": "按角色划分的胜率",
+      "perf_mode": "按模式划分的性能",
+      "total_wins": "总胜利",
+      "agendas_done": "议程已完成",
+      "deaths": "死亡人数",
+      "achievements": "取得的成就",
+      "medals": "奖牌"
+    },
+    "errors": {
+      "player_not_found": "找不到玩家",
+      "player_not_found_desc": "该玩家不存在或者其个人资料不公开。",
+      "failed_to_load_profile": "无法加载配置文件",
+      "generic_desc": "检查您的连接并重试。"
     }
   }
 }
