@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { PushNotifications } from '@capacitor/push-notifications';
 import { Capacitor } from '@capacitor/core';
 import axios from 'axios';
@@ -7,62 +7,75 @@ export const usePushNotifications = (isAuthenticated: boolean) => {
   const [permission, setPermission] = useState<NotificationPermission | 'prompt'>(
     typeof Notification !== 'undefined' ? Notification.permission : 'prompt'
   );
+  const [loading, setLoading] = useState(false);
+
+  const registerPush = useCallback(async () => {
+    try {
+      setLoading(true);
+      if (Capacitor.isNativePlatform()) {
+        // Native Capacitor Push
+        let permStatus = await PushNotifications.checkPermissions();
+        if (permStatus.receive === 'prompt') {
+          permStatus = await PushNotifications.requestPermissions();
+        }
+
+        if (permStatus.receive === 'granted') {
+          await PushNotifications.register();
+          
+          PushNotifications.addListener('registration', async ({ value: token }) => {
+            console.log('Push registration success, native token:', token);
+            // In a real app, we would send this token to an FCM-capable backend.
+            // For now, we focus on the Web Push implementation.
+          });
+        }
+      } else if ('serviceWorker' in navigator && 'PushManager' in window) {
+        // Web Push via Service Worker
+        const registration = await navigator.serviceWorker.ready;
+        
+        // Get VAPID public key
+        const { data: config } = await axios.get('/api/push/config');
+        if (!config.publicKey) {
+          console.warn('Push registration failed: VAPID public key not found');
+          return;
+        }
+
+        // Request permission explicitly if not already granted
+        if (Notification.permission === 'default') {
+          const result = await Notification.requestPermission();
+          setPermission(result);
+          if (result !== 'granted') return;
+        }
+
+        const subscription = await registration.pushManager.subscribe({
+          userVisibleOnly: true,
+          applicationServerKey: urlBase64ToUint8Array(config.publicKey),
+        });
+
+        await axios.post('/api/push/register', {
+          subscription,
+          deviceType: 'web',
+        });
+        
+        setPermission(Notification.permission);
+        console.log('Web Push registration successful');
+      }
+    } catch (err) {
+      console.error('Failed to register for push notifications:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
+    // Auto-register only if granted already or if we haven't asked yet (prompt)
+    // and the user is authenticated + interacted.
+    // If denied, we don't bother until they manually click something.
+    if (isAuthenticated && permission !== 'denied') {
+      registerPush();
+    }
+  }, [isAuthenticated, permission, registerPush]);
 
-    const registerPush = async () => {
-      try {
-        if (Capacitor.isNativePlatform()) {
-          // Native Capacitor Push
-          let permStatus = await PushNotifications.checkPermissions();
-          if (permStatus.receive === 'prompt') {
-            permStatus = await PushNotifications.requestPermissions();
-          }
-
-          if (permStatus.receive === 'granted') {
-            await PushNotifications.register();
-            
-            // On registration, we get a token
-            PushNotifications.addListener('registration', async ({ value: token }) => {
-              // Register this token with our backend
-              // For Capacitor, we might need a different backend handler if we use FCM directly,
-              // but if we are using Web Push for both (via Capacitor Browser or similar), we handle accordingly.
-              // However, usually Capacitor Native Push uses FCM tokens.
-              // For simplicity in this unified implementation, we will focus on Web Push for now,
-              // and mark where native push would handle its token.
-              console.log('Push registration success, token:', token);
-            });
-          }
-        } else if ('serviceWorker' in navigator && 'PushManager' in window) {
-          // Web Push via Service Worker
-          const registration = await navigator.serviceWorker.ready;
-          
-          // Get VAPID public key
-          const { data: config } = await axios.get('/api/push/config');
-          if (!config.publicKey) return;
-
-          const subscription = await registration.pushManager.subscribe({
-            userVisibleOnly: true,
-            applicationServerKey: urlBase64ToUint8Array(config.publicKey),
-          });
-
-          await axios.post('/api/push/register', {
-            subscription,
-            deviceType: 'web',
-          });
-          
-          setPermission(Notification.permission);
-        }
-      } catch (err) {
-        console.error('Failed to register for push notifications:', err);
-      }
-    };
-
-    registerPush();
-  }, [isAuthenticated]);
-
-  return { permission };
+  return { permission, loading, registerPush };
 };
 
 function urlBase64ToUint8Array(base64String: string) {

@@ -1879,7 +1879,11 @@
         "recovery_email_desc": "Used to recover your account if you lose your token",
         "recovery_email_placeholder": "Enter recovery email...",
         "no_recovery_email": "Not set",
-        "fullscreen": "Fullscreen"
+        "fullscreen": "Fullscreen",
+        "push_notifications": "Push Notifications",
+        "push_notifications_desc": "Get notified about game results, requests and invites.",
+        "push_notifications_enabled": "Notifications are enabled.",
+        "push_notifications_blocked": "Blocked by browser."
       },
       "tabs": {
         "general": "General",

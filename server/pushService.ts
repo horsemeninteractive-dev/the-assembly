@@ -18,6 +18,7 @@ interface NotificationPayload {
   title: string;
   body: string;
   icon?: string;
+  tag?: string;
   data?: any;
 }
 
@@ -31,7 +32,7 @@ export async function sendPushNotification(userId: string, payload: Notification
       .eq('user_id', userId);
 
     if (error) throw error;
-    if (!subscriptions || subscriptions.length === 0) return;
+    if (!subscriptions || subscriptions.length === 0) return false;
 
     const payloadString = JSON.stringify(payload);
 
@@ -59,7 +60,9 @@ export async function sendPushNotification(userId: string, payload: Notification
     if (failures.length > 0) {
       logger.error({ userId, failures }, 'Some push notifications failed to send');
     }
+    return true;
   } catch (err) {
     logger.error({ userId, err }, 'Error sending push notification');
+    return false;
   }
 }

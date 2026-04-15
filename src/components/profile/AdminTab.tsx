@@ -182,7 +182,7 @@ export const AdminTools: React.FC<{ adminId: string; token: string }> = ({ admin
             </motion.div>
           )}
 
-          {activeTab === 'system' && <AdminConfigPanel config={config} setConfig={setConfig} />}
+          {activeTab === 'system' && <AdminConfigPanel config={config} setConfig={setConfig} token={token} />}
 
           {activeTab === 'logs' && (
             <motion.div key="logs" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="grid grid-cols-1 md:grid-cols-3 gap-6 h-[65vh]">

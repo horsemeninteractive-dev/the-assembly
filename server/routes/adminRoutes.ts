@@ -5,6 +5,7 @@ import { UserInternal } from '../../shared/types';
 import { getRedisStatus } from '../redis';
 import { db, isConfigured, searchUsers, getSystemConfig } from '../supabaseService';
 import { logger } from '../logger';
+import { sendPushNotification } from '../pushService';
 
 export function registerAdminRoutes({ app, engine }: RouteContext): void {
   app.get('/api/admin/test', requireAdmin, async (req: Request, res: Response) => {
@@ -39,6 +40,29 @@ export function registerAdminRoutes({ app, engine }: RouteContext): void {
         external: `${Math.round(memory.external / 1024 / 1024)}MB`,
       },
     });
+  });
+
+  app.post('/api/admin/test-push', requireAdmin, async (req: Request, res: Response) => {
+    const admin = req.user;
+    if (!admin) return res.status(401).json({ error: 'Auth missing' });
+
+    try {
+      const success = await sendPushNotification(admin.id, {
+        title: 'System Alert',
+        body: 'Push notifications are operational. The Assembly has been notified.',
+        icon: '/icons/icon-192.png',
+        tag: 'system-test'
+      });
+
+      if (success) {
+        res.json({ message: 'Push notification sent to your current user id.' });
+      } else {
+        res.status(400).json({ error: 'Failed to send. Do you have an active subscription on this browser?' });
+      }
+    } catch (err: any) {
+      logger.error('Test push error:', err);
+      res.status(500).json({ error: err.message });
+    }
   });
 }
 

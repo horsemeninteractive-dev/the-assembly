@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../contexts/I18nContext';
 import { LanguageSwitcher } from '../common/LanguageSwitcher';
-import { Pencil, Check, X, Clock } from 'lucide-react';
+import { Pencil, Check, X, Clock, Bell } from 'lucide-react';
 import { cn, apiUrl } from '../../utils/utils';
 import { User } from '../../../shared/types';
+import { usePushNotifications } from '../../hooks/usePushNotifications';
 
 interface SettingsTabProps {
   user: User;
@@ -15,6 +16,7 @@ interface SettingsTabProps {
 
 export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: SettingsTabProps) {
   const { t } = useTranslation();
+  const { permission, registerPush, loading: pushLoading } = usePushNotifications(!!token && !!user);
   const [settingsTab, setSettingsTab] = useState<'general' | 'audio' | 'voice'>('general');
   const [isEditingEmail, setIsEditingEmail] = useState(false);
   const [newEmail, setNewEmail] = useState(user.email || '');
@@ -149,6 +151,41 @@ export function SettingsTab({ user, token, onUpdateUser, playSound, settings }: 
                 </p>
               </div>
               <LanguageSwitcher variant="solid" />
+            </div>
+
+            <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">
+              <div>
+                <span className="text-sm font-mono text-primary flex items-center gap-2">
+                  <Bell className="w-4 h-4" />
+                  {t('profile.settings.general.push_notifications')}
+                </span>
+                <p className="text-[10px] font-mono text-muted uppercase mt-0.5">
+                  {permission === 'granted' 
+                    ? t('profile.settings.general.push_notifications_enabled') 
+                    : permission === 'denied' 
+                    ? t('profile.settings.general.push_notifications_blocked')
+                    : t('profile.settings.general.push_notifications_desc')}
+                </p>
+              </div>
+              <button
+                onClick={() => {
+                  playSound('click');
+                  if (permission !== 'granted') registerPush();
+                }}
+                disabled={pushLoading || permission === 'denied'}
+                className={cn(
+                  'w-12 h-6 rounded-full transition-all relative shrink-0',
+                  permission === 'granted' ? 'bg-red-900' : 'bg-subtle',
+                  (pushLoading || permission === 'denied') && 'opacity-50 cursor-not-allowed'
+                )}
+              >
+                <div
+                  className={cn(
+                    'absolute top-1 w-4 h-4 rounded-full bg-white transition-all',
+                    permission === 'granted' ? 'left-7' : 'left-1'
+                  )}
+                />
+              </button>
             </div>
 
             <div className="flex items-center justify-between p-4 bg-elevated border border-subtle rounded-2xl">

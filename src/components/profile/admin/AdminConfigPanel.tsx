@@ -3,15 +3,16 @@ import { useTranslation } from '../../../contexts/I18nContext';
 import { motion } from 'motion/react';
 import { Server, Activity, Clock } from 'lucide-react';
 import { SystemConfig } from '../../../../shared/types';
-import { cn } from '../../../utils/utils';
+import { cn, apiUrl } from '../../../utils/utils';
 import { socket } from '../../../socket';
 
 interface AdminConfigPanelProps {
   config: SystemConfig;
   setConfig: React.Dispatch<React.SetStateAction<SystemConfig>>;
+  token: string;
 }
 
-export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setConfig }) => {
+export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setConfig, token }) => {
   const { t } = useTranslation();
   const handleUpdateConfig = (updates: Partial<SystemConfig>) => {
     const newConfig = { ...config, ...updates };
@@ -134,7 +135,32 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
             </div>
           </div>
 
-          <div className="pt-6 border-t border-subtle/50 flex justify-end">
+          <div className="pt-6 border-t border-subtle/50 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch(apiUrl('/api/admin/test-push'), {
+                    method: 'POST',
+                    headers: { 
+                      'Authorization': `Bearer ${token}`,
+                      'Content-Type': 'application/json'
+                    }
+                  });
+                  const data = await res.json();
+                  if (res.ok) {
+                    alert('Success: ' + data.message);
+                  } else {
+                    alert('Failed: ' + (data.error || 'Unknown error'));
+                  }
+                } catch (err: any) {
+                  alert('Error: ' + err.message);
+                }
+              }}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-orange-600/20 border border-orange-500/30 text-orange-400 hover:bg-orange-600/30 transition-all font-mono text-[10px] uppercase tracking-widest shadow-lg active:scale-95"
+            >
+              <Activity className="w-3.5 h-3.5" />
+              Send Test Web-Push
+            </button>
             <p className="text-[9px] text-faint font-mono flex items-center gap-2 uppercase tracking-tighter italic">
               <Clock className="w-3 h-3" />
               Configuration propagates through Redis Pub/Sub in real-time
