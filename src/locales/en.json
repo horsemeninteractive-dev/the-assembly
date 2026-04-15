@@ -1297,7 +1297,8 @@
         "veto_one": "The government invoked their veto power",
         "veto_many": "The veto was exercised {{count}} times",
         "marathon": "An epic {{count}}-round battle of wills",
-        "deadlock": "Both factions held the Assembly in a knife-edge deadlock"
+        "deadlock": "Both factions held the Assembly in a knife-edge deadlock",
+        "true_lie": "{{name}} drew 3 State directives but claimed otherwise"
       }
     },
     "match_replay": {
@@ -1561,7 +1562,12 @@
         "action_play_again": "Play Again",
         "action_lobby": "Lobby",
         "completed": "Completed",
-        "failed": "Failed"
+        "failed": "Failed",
+        "commendations": {
+          "mvp": "Award MVP",
+          "deceiver": "Award Commendation: Deceiver",
+          "honorable": "Award Commendation: Honorable"
+        }
       },
       "match_replay": {
         "title": "Match Replay",

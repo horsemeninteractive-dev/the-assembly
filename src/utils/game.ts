@@ -77,6 +77,23 @@ export function extractBigPlays(gameState: GameState, t: any): BigPlay[] {
     });
   }
 
+  // True Lies - President lied about drawing 3 State policies
+  const trueLies = rh.filter(r => 
+    r.actualDrewSta !== undefined &&
+    r.presDeclaration &&
+    r.actualDrewSta < 3 && 
+    r.presDeclaration.drewSta === 3
+  );
+  trueLies.forEach(lie => {
+    // Only capture the first lie to avoid cluttering if they did it multiple times
+    if (!plays.some(p => p.text.includes('lied'))) {
+      plays.push({
+        icon: 'alert',
+        text: t('game.debrief.plays.true_lie', { round: lie.round, name: lie.presidentName.replace(' (AI)', '') })
+      });
+    }
+  });
+
   // Marathon game
   if (gameState.round > 9) {
     plays.push({ icon: 'clock', text: t('game.debrief.plays.marathon', { count: gameState.round }) });

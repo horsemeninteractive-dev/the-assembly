@@ -722,55 +722,6 @@ export const ActionBar = ({
           </div>
         )}
 
-
-        {/* Spectator Prediction */}
-        {!me && gameState.phase !== 'Lobby' && gameState.phase !== 'GameOver' && gameState.round <= 1 && user && (
-          <div className="flex flex-col gap-[1vh] w-full justify-center h-full items-center p-4">
-            {gameState.spectatorPredictions?.[user.id] ? (
-              <div className="flex flex-col items-center gap-2">
-                <div className="text-primary font-mono text-responsive-xs uppercase tracking-[0.2em] text-center animate-pulse">
-                  Prediction Logged: {gameState.spectatorPredictions[user.id].prediction} Victory
-                </div>
-                <div className="text-[10px] text-faint font-light">
-                  50 IP will be credited if your faction prevails.
-                </div>
-              </div>
-            ) : (
-              <>
-                <div className="text-responsive-xs font-mono uppercase tracking-[0.15em] text-muted text-center mb-1">
-                  Predict Unity or Deception for <span className="text-yellow-500 font-bold">50 IP</span>
-                </div>
-                <div className="flex gap-[2vw] w-full max-w-[400px]">
-                  <button
-                    onClick={() => {
-                      playSound('click');
-                      socket.emit('spectatorPredict', { prediction: 'Civil' });
-                    }}
-                    className="flex-1 py-[1.2vh] sm:py-[1.5vh] bg-blue-600/10 border border-blue-500/30 hover:bg-blue-600/20 hover:border-blue-500/60 text-blue-400 rounded-xl font-bold uppercase tracking-[0.2em] transition-all shadow-lg shadow-blue-500/5 group"
-                  >
-                    <span className="flex items-center justify-center gap-2">
-                      <Scale className="w-3 h-3 group-hover:scale-110 transition-transform" />
-                      Civil
-                    </span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      playSound('click');
-                      socket.emit('spectatorPredict', { prediction: 'State' });
-                    }}
-                    className="flex-1 py-[1.2vh] sm:py-[1.5vh] bg-red-600/10 border border-red-500/30 hover:bg-red-600/20 hover:border-red-500/60 text-red-400 rounded-xl font-bold uppercase tracking-[0.2em] transition-all shadow-lg shadow-red-500/5 group"
-                  >
-                    <span className="flex items-center justify-center gap-2">
-                      <Eye className="w-3 h-3 group-hover:scale-110 transition-transform" />
-                      State
-                    </span>
-                  </button>
-                </div>
-              </>
-            )}
-          </div>
-        )}
-
         {gameState.phase === 'Lobby' &&
           !gameState.titlePrompt &&
           !isDebriefing &&

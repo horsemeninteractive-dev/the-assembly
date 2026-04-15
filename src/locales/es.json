@@ -763,10 +763,10 @@
         "24": "He descubierto una red de vínculos estatales conectados con {nombre}.",
         "25": "{nombre} es un peligro para todo lo que representa la Carta.",
         "26": "Mi investigación sobre {nombre} fue una revelación de traición.",
-        "27": "Los datos no mienten: {nombre} es un operativo del Estado.",
+        "27": "El dato no miente: {nombre} es un operativo del Estado.",
         "28": "Encontré pruebas de la colaboración de {nombre} con nuestros enemigos.",
         "29": "{nombre} no es quien dice ser. Es un agente del Estado.",
-        "30": "La investigación sobre {nombre} reveló un patrón de sabotaje dirigido por el Estado.",
+        "30": "La investigación sobre {nombre} reveló un patrón de sabotaje liderado por el Estado.",
         "31": "No puedo enfatizar esto lo suficiente: {nombre} está alineado con el Estado.",
         "32": "{nombre} se ha visto comprometido por la influencia del Estado.",
         "33": "Las pruebas contra {nombre} son indiscutibles. Son Estado."
@@ -774,7 +774,7 @@
       "suspiciousNominee": {
         "0": "Interesante elección de Canciller.",
         "1": "Seguiré atentamente a este gobierno.",
-        "2": "Esa designación plantea interrogantes dentro de la Secretaría.",
+        "2": "Ese nombramiento plantea interrogantes dentro de la Secretaría.",
         "3": "No estoy seguro de que {nombre} sea la persona adecuada para este puesto.",
         "4": "¿Por qué {nombre}? Hay opciones más confiables.",
         "5": "No me gusta esta nominación.",
@@ -870,13 +870,13 @@
         "23": "El Estado quiere que me vean como un enemigo porque soy una amenaza para ellos.",
         "24": "Invito a cualquier investigación. Mis registros son un libro abierto para la Carta.",
         "25": "Soy tan Civil como las leyes mismas. Mis acciones lo demostrarán.",
-        "26": "Las acusaciones en mi contra son un fino velo de agresión estatal.",
+        "26": "Las acusaciones en mi contra son un fino velo para la agresión del Estado.",
         "27": "Mantengo la Carta, incluso cuando el resto de ustedes dudan de mí.",
         "28": "Sólo he trabajado para salvaguardar nuestro camino dentro de la Secretaría.",
         "29": "Mi conciencia está tranquila. Sirvo a la Asamblea, no al Estado.",
         "30": "Estos ataques están destinados a debilitar mi determinación. No lo conseguirán.",
         "31": "Soy un verdadero patriota. No dejes que estos rumores infundados te influyan.",
-        "32": "He luchado por la Carta cuando otros permanecían en silencio.",
+        "32": "He luchado por la Carta mientras otros permanecían en silencio.",
         "33": "Mi compromiso con la causa Civil está más allá de cualquier cuestionamiento."
       },
       "praisingCivil": {
@@ -1297,7 +1297,8 @@
         "veto_one": "El gobierno invocó su poder de veto",
         "veto_many": "El veto fue ejercido {{count}} veces",
         "marathon": "Una batalla de voluntades épica de {{count}} ronda",
-        "deadlock": "Ambas facciones mantuvieron la Asamblea en un punto muerto al filo de la navaja"
+        "deadlock": "Ambas facciones mantuvieron la Asamblea en un punto muerto al filo de la navaja",
+        "true_lie": "{{name}} extrajo 3 directivas estatales pero afirmó lo contrario"
       }
     },
     "match_replay": {
@@ -1453,7 +1454,7 @@
           "desc": "Forzar una nueva nominación si la actual es desfavorable."
         },
         "handler": {
-          "name": "Entrenador de animales",
+          "name": "Manejador",
           "desc": "Intercambia los siguientes dos jugadores en el orden presidencial."
         },
         "auditor": {
@@ -1560,8 +1561,13 @@
         "action_shared": "Enlace copiado",
         "action_play_again": "Jugar de nuevo",
         "action_lobby": "Vestíbulo",
-        "completed": "Completado",
-        "failed": "Fallido"
+        "completed": "Terminado",
+        "failed": "Fallido",
+        "commendations": {
+          "mvp": "Premio MVP",
+          "deceiver": "Elogio del premio: Engañador",
+          "honorable": "Mención del premio: Honorable"
+        }
       },
       "match_replay": {
         "title": "Repetición del partido",
@@ -1619,7 +1625,7 @@
       "back_to_lobby": "Volver al vestíbulo",
       "tabs": {
         "overview": "Descripción general",
-        "roles": "Funciones",
+        "roles": "Roles",
         "loop": "Bucle del juego",
         "titles": "Títulos",
         "agendas": "Agendas",
@@ -1707,7 +1713,7 @@
           },
           "assassin": {
             "name": "Asesino",
-            "when": "Después de la promulgación (como Presidente)",
+            "when": "Después de la promulgación (como presidente)",
             "desc": "Cuando seas presidente, ejecuta en secreto a cualquier jugador vivo una vez finalizada la ronda. Una vez usado."
           },
           "handler": {
@@ -1754,7 +1760,7 @@
             "desc": "Vota en contra de la mayoría más de 3 veces"
           },
           "dove": {
-            "name": "La paloma",
+            "name": "la paloma",
             "desc": "Vote Sí en cada ronda elegible"
           },
           "hawk": {
@@ -1879,7 +1885,11 @@
         "recovery_email_desc": "Se utiliza para recuperar su cuenta si pierde su token",
         "recovery_email_placeholder": "Ingrese el correo electrónico de recuperación...",
         "no_recovery_email": "No establecido",
-        "fullscreen": "Pantalla completa"
+        "fullscreen": "Pantalla completa",
+        "push_notifications": "Notificaciones automáticas",
+        "push_notifications_desc": "Reciba notificaciones sobre resultados de juegos, solicitudes e invitaciones.",
+        "push_notifications_enabled": "Las notificaciones están habilitadas.",
+        "push_notifications_blocked": "Bloqueado por el navegador."
       },
       "tabs": {
         "general": "Generalidades",
@@ -1897,7 +1907,7 @@
         "tts_voice": "Selección de voz",
         "tts_default": "Valor predeterminado del sistema",
         "narrator_volume": "Volumen del Narrador",
-        "narrator_volume_desc": "Controla el volumen de los anuncios de voz de IA en el juego."
+        "narrator_volume_desc": "Controla el volumen de los anuncios de voz de IA en el juego"
       }
     },
     "lvl_label": "Nivel",
@@ -1929,7 +1939,7 @@
       "friends": "Aliados",
       "referrals": "Referencias",
       "history": "Historia",
-      "settings": "Ajustes",
+      "settings": "Configuración",
       "admin": "Administrador"
     },
     "stats": {
@@ -2150,7 +2160,7 @@
           "desc": "Ser elegido presidente 5 veces en cualquier juego."
         },
         "weekly_agenda_5": {
-          "name": "Maestro de agendas",
+          "name": "Maestro de Agendas",
           "desc": "Completa 5 agendas personales esta semana."
         },
         "weekly_win_civil_5": {
@@ -2332,7 +2342,7 @@
       "rarities": {
         "common": "Común",
         "uncommon": "Poco común",
-        "rare": "Raro",
+        "rare": "Extraño",
         "epic": "Épico",
         "legendary": "Legendario"
       },
@@ -2547,7 +2557,7 @@
       "reward_types": {
         "cp": "Puntos de claridad",
         "cp_count": "{{count}} PC",
-        "background": "Fondo",
+        "background": "Antecedentes",
         "vote": "Estilo de votación",
         "music": "Pista de música",
         "frame": "Marco de borde",

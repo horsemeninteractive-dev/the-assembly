@@ -2,7 +2,7 @@ import { Server, Socket } from 'socket.io';
 import { randomBytes, randomUUID } from 'crypto';
 import { z } from 'zod';
 import { GameEngine } from '../gameEngine';
-import { getUserById, getFriends, isFriend } from '../supabaseService';
+import { getUserById, getFriends, isFriend, getGlobalStats } from '../supabaseService';
 import { createDeck } from '../utils';
 import { Player, SystemConfig } from '../../shared/types';
 import { logger } from '../logger';
@@ -232,6 +232,14 @@ export async function handleJoinRoom(
     socket.data.roomId = roomId;
     state.spectators.push({ id: socket.id, name, avatarUrl });
     socket.join(roomId);
+
+    if (!state.globalStats) {
+      getGlobalStats().then(stats => {
+        state.globalStats = stats;
+        engine.broadcastState(roomId);
+      }).catch(err => logger.error({ err }, 'Failed to fetch global stats for joinRoom spectator'));
+    }
+
     engine.broadcastState(roomId);
     return;
   }

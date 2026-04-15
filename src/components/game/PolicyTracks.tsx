@@ -1,17 +1,24 @@
 import React from 'react';
 import { motion } from 'motion/react';
 import { Scale, Eye, Search, Zap, Target, Trophy, Layers, Trash2, User as UserIcon } from 'lucide-react';
-import { GameState } from '../../../shared/types';
+import { GameState, User } from '../../../shared/types';
 import { cn, getProxiedUrl } from '../../utils/utils';
 import { useTranslation } from '../../contexts/I18nContext';
+import { socket } from '../../socket';
 
 interface PolicyTracksProps {
   gameState: GameState;
+  user: User | null;
+  playSound: (key: string) => void;
 }
 
-export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
+export const PolicyTracks = ({ gameState, user, playSound }: PolicyTracksProps) => {
   const { t } = useTranslation();
   const numPlayers = gameState.players.length;
+
+  const myPrediction = user ? gameState.spectatorPredictions?.[user.id] : null;
+  const isSpectator = user && !gameState.players.some(p => p.userId === user.id);
+  const canPredict = isSpectator && !myPrediction && gameState.phase !== 'Lobby' && gameState.phase !== 'GameOver' && gameState.round <= 1;
 
   // slotIndex here is the directive number (1-6), but visually the track is reversed (6 on left, 1 on right)
   const getStatePower = (slotIndex: number) => {
@@ -51,6 +58,15 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
   // Visual slot order for state track: reversed (slot 6 is leftmost, slot 1 is rightmost)
   // stateVisualSlots[0] = directive number 6, stateVisualSlots[5] = directive number 1
   const stateVisualSlots = [6, 5, 4, 3, 2, 1];
+
+  const [betAmount, setBetAmount] = React.useState(50);
+  const amounts = [10, 50, 100, 250, 500];
+
+  const civilWins = (gameState.globalStats?.civilWins || 0) + 100;
+  const stateWins = (gameState.globalStats?.stateWins || 0) + 100;
+  const totalStats = civilWins + stateWins;
+  const civilOdds = (totalStats / civilWins).toFixed(2);
+  const stateOdds = (totalStats / stateWins).toFixed(2);
 
   return (
     <motion.div
@@ -212,49 +228,121 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
 
       {/* Spectators + Prediction Tally */}
       {gameState.spectators.length > 0 && (
-        <div className="col-span-3 h-[2.5vh] flex items-center gap-3 overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-1.5 shrink-0 font-light">
-            <Eye className="w-[1.2vh] h-[1.2vh] text-ghost" />
-            <span className="text-responsive-xs uppercase tracking-widest text-ghost">
-              {t('game.tracks.spectators', { count: gameState.spectators.length })}
-            </span>
-          </div>
-          <div className="flex items-center gap-2 flex-1 min-w-0">
-            {gameState.spectators.map((s) => (
-              <div key={s.id} className="flex items-center gap-1 shrink-0">
-                <div className="w-[1.5vh] h-[1.5vh] rounded-full bg-card overflow-hidden border border-default">
-                  {s.avatarUrl ? (
-                    <img
-                      src={getProxiedUrl(s.avatarUrl)}
-                      alt={s.name}
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <UserIcon className="w-[1vh] h-[1vh] text-ghost m-auto" />
-                  )}
+        <div className="col-span-3 flex flex-col md:flex-row gap-2 md:gap-3 justify-between border-t border-white/5 pt-2 mt-1 relative z-50">
+          {/* Spectator List Container */}
+          <div className="flex items-center gap-3 overflow-x-auto no-scrollbar flex-1 min-w-0 pb-1 md:pb-0">
+            <div className="flex items-center gap-1.5 shrink-0 font-light">
+              <Eye className="w-[1.4vh] h-[1.4vh] text-ghost" />
+              <span className="text-responsive-xs uppercase tracking-widest text-ghost">
+                {t('game.tracks.spectators', { count: gameState.spectators.length })}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              {gameState.spectators.map((s) => (
+                <div key={s.id} className="flex items-center gap-1 shrink-0 bg-white/5 px-2 py-0.5 rounded-full border border-white/5">
+                  <div className="w-[1.8vh] h-[1.8vh] rounded-full bg-card overflow-hidden border border-subtle">
+                    {s.avatarUrl ? (
+                      <img
+                        src={getProxiedUrl(s.avatarUrl)}
+                        alt={s.name}
+                        className="w-full h-full object-cover"
+                      />
+                    ) : (
+                      <UserIcon className="w-[1vh] h-[1vh] text-ghost m-auto" />
+                    )}
+                  </div>
+                  <span className="text-[10px] text-muted">{s.name}</span>
                 </div>
-                <span className="text-responsive-xs text-muted">{s.name}</span>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
 
-          {/* Prediction tally – right-aligned, only shown when there are votes */}
+          {/* Prediction UI/Tally */}
           {(() => {
             if (gameState.phase === 'Lobby' || gameState.phase === 'GameOver') return null;
+
+            if (canPredict) {
+              return (
+                <div className="flex items-center gap-3 shrink-0 animate-in fade-in slide-in-from-right-4 duration-500 w-full md:w-auto justify-between md:justify-end border-t border-white/5 md:border-none pt-2 md:pt-0">
+                  <div className="flex flex-col items-start md:items-end">
+                    <span className="text-[8px] font-mono text-faint uppercase mb-1">{t('game.tracks.wager_amount')}</span>
+                    <div className="flex gap-1 h-[2.5vh]">
+                      {amounts.map(amt => (
+                        <button
+                          key={amt}
+                          onClick={() => {
+                            playSound('click');
+                            setBetAmount(amt);
+                          }}
+                          className={cn(
+                            "px-2 h-full rounded-[4px] text-[10px] font-bold transition-all border",
+                            betAmount === amt 
+                              ? "bg-blue-600/20 border-blue-500/50 text-blue-300" 
+                              : "bg-black/20 border-white/5 text-muted hover:border-white/10"
+                          )}
+                        >
+                          {amt}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div className="h-[3vh] w-px bg-white/5 self-end mb-0.5 hidden md:block" />
+
+                  <div className="flex flex-col items-end md:items-center">
+                    <span className="text-[8px] font-mono text-faint uppercase mb-1">{t('game.tracks.global_odds')}</span>
+                    <div className="flex gap-1.5 h-[2.5vh]">
+                      <button
+                        onClick={() => {
+                          playSound('click');
+                          socket.emit('spectatorPredict', { prediction: 'Civil', amount: betAmount });
+                        }}
+                        className="px-3 h-full bg-blue-600/10 border border-blue-500/30 hover:bg-blue-600/20 hover:border-blue-500/60 text-blue-400 rounded-[4px] text-[10px] font-bold uppercase flex items-center justify-center gap-1.5 leading-none transition-all group min-w-[60px]"
+                      >
+                        <span>Civil</span>
+                        <span className="text-[8px] opacity-80 font-mono bg-blue-900/40 px-1 py-0.5 rounded">{civilOdds}x</span>
+                      </button>
+                      <button
+                        onClick={() => {
+                          playSound('click');
+                          socket.emit('spectatorPredict', { prediction: 'State', amount: betAmount });
+                        }}
+                        className="px-3 h-full bg-red-600/10 border border-red-500/30 hover:bg-red-600/20 hover:border-red-500/60 text-red-400 rounded-[4px] text-[10px] font-bold uppercase flex items-center justify-center gap-1.5 leading-none transition-all group min-w-[60px]"
+                      >
+                        <span>State</span>
+                        <span className="text-[8px] opacity-80 font-mono bg-red-900/40 px-1 py-0.5 rounded">{stateOdds}x</span>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              );
+            }
+
+            if (myPrediction) {
+              return (
+                 <div className="flex items-center gap-2 text-responsive-xs font-mono uppercase bg-black/20 px-3 py-1.5 rounded-lg border border-white/5 shrink-0 w-full md:w-auto justify-between md:justify-end mt-2 md:mt-0">
+                  <span className="text-faint">{t('game.tracks.your_wager')}</span>
+                  <span className={cn("font-bold", myPrediction.prediction === 'Civil' ? "text-blue-400" : "text-red-400")}>
+                    {myPrediction.amount} IP @ {myPrediction.odds}x
+                  </span>
+                </div>
+              );
+            }
+
             const preds = gameState.spectatorPredictions
               ? Object.values(gameState.spectatorPredictions)
               : [];
             if (preds.length === 0) return null;
-            const civil = preds.filter(p => p.prediction === 'Civil').length;
-            const total = preds.length;
-            const civilPct = Math.round((civil / total) * 100);
+            const civilCount = preds.filter(p => p.prediction === 'Civil').length;
+            const totalCount = preds.length;
+            const civilPct = Math.round((civilCount / totalCount) * 100);
             const statePct = 100 - civilPct;
             return (
-              <div className="flex items-center gap-1.5 shrink-0 ml-auto">
-                <span className={cn("text-[8px] font-mono uppercase tracking-widest", civilPct > statePct ? "text-blue-400 font-bold" : "text-faint")}>
-                  {civilPct}%
+              <div className="flex items-center gap-3 shrink-0 w-full md:w-auto justify-between md:justify-end bg-black/20 px-3 py-1.5 rounded-lg border border-white/5 mt-2 md:mt-0">
+                <span className={cn("text-[9px] font-mono uppercase tracking-widest", civilPct > statePct ? "text-blue-400 font-bold" : "text-faint")}>
+                  {civilPct}% Civil
                 </span>
-                <div className="w-[40px] sm:w-[60px] h-[4px] rounded-full overflow-hidden flex bg-black/40 border border-white/5">
+                <div className="w-[100px] h-[6px] rounded-full overflow-hidden flex bg-black/40 border border-white/5 shadow-inner">
                   <motion.div
                     initial={{ width: '50%' }}
                     animate={{ width: `${civilPct}%` }}
@@ -266,8 +354,8 @@ export const PolicyTracks = ({ gameState }: PolicyTracksProps) => {
                     className="h-full bg-gradient-to-l from-red-600 to-red-400"
                   />
                 </div>
-                <span className={cn("text-[8px] font-mono uppercase tracking-widest", statePct > civilPct ? "text-red-400 font-bold" : "text-faint")}>
-                  {statePct}%
+                <span className={cn("text-[9px] font-mono uppercase tracking-widest", statePct > civilPct ? "text-red-400 font-bold" : "text-faint")}>
+                  {statePct}% State
                 </span>
               </div>
             );

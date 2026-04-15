@@ -173,5 +173,10 @@ export const censureVoteSchema = z.object({
 
 export const spectatorPredictSchema = z.object({
   prediction: z.enum(['Civil', 'State']),
+  amount: z.number().int().min(10).max(1000),
 });
 
+export const giveCommendationSchema = z.object({
+  targetId: z.string().min(1).max(64),
+  type: z.enum(['MVP', 'Deceiver', 'Honorable']),
+});

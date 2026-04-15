@@ -246,7 +246,9 @@ export const ReplayModal = ({ gameState, isOpen, onClose, playSound }: ReplayMod
                             <span className="text-[9px] font-mono text-faint uppercase font-bold">{t('game.match_replay.pres_deck')}</span>
                             {showTruth && currentRound.presDeclaration && (
                               (() => {
-                                const lied = currentRound.presDeclaration.civ !== (currentRound.presDeclaration.drewCiv ?? 0);
+                                const actCiv = currentRound.actualDrewCiv ?? currentRound.presDeclaration.drewCiv ?? 0;
+                                const actSta = currentRound.actualDrewSta ?? currentRound.presDeclaration.drewSta ?? 0;
+                                const lied = actCiv !== currentRound.presDeclaration.drewCiv || actSta !== currentRound.presDeclaration.drewSta;
                                 return lied && <span className="text-[8px] px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 uppercase font-bold">{t('game.match_replay.deception_detected')}</span>;
                               })()
                             )}
@@ -258,8 +260,8 @@ export const ReplayModal = ({ gameState, isOpen, onClose, playSound }: ReplayMod
                               <div className="flex gap-1.5 grayscale opacity-40">
                                 {showTruth && currentRound.presDeclaration ? (
                                   <>
-                                    {Array(currentRound.presDeclaration.drewCiv).fill(0).map((_, i) => <PolicyIcon key={`t-p-c-${i}`} type="Civil" size="w-6 h-8" />)}
-                                    {Array(currentRound.presDeclaration.drewSta).fill(0).map((_, i) => <PolicyIcon key={`t-p-s-${i}`} type="State" size="w-6 h-8" />)}
+                                    {Array(currentRound.actualDrewCiv ?? currentRound.presDeclaration.drewCiv).fill(0).map((_, i) => <PolicyIcon key={`t-p-c-${i}`} type="Civil" size="w-6 h-8" />)}
+                                    {Array(currentRound.actualDrewSta ?? currentRound.presDeclaration.drewSta).fill(0).map((_, i) => <PolicyIcon key={`t-p-s-${i}`} type="State" size="w-6 h-8" />)}
                                   </>
                                 ) : (
                                   <div className="w-10 h-8 rounded border border-dashed border-default flex items-center justify-center text-[8px] text-faint">{t('game.match_replay.hidden')}</div>

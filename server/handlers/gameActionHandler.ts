@@ -15,8 +15,9 @@ import {
   sendReactionSchema,
   censureVoteSchema,
   spectatorPredictSchema,
+  giveCommendationSchema,
 } from '../game/schemas';
-import { sendFriendRequest, acceptFriendRequest } from '../supabaseService';
+import { sendFriendRequest, acceptFriendRequest, getUserById, saveUser, getGlobalStats } from '../supabaseService';
 import { getUserSocketId, getSocketId } from '../redis';
 
 /**
@@ -588,10 +589,10 @@ export function registerGameActionHandlers(
     }
   });
 
-  socket.on('spectatorPredict', (payload) => {
+  socket.on('spectatorPredict', async (payload) => {
     const result = spectatorPredictSchema.safeParse(payload);
     if (!result.success) return socket.emit('error', 'Invalid prediction data.');
-    const { prediction } = result.data;
+    const { prediction, amount } = result.data;
 
     const roomId = getRoom();
     if (!roomId) return;
@@ -609,19 +610,104 @@ export function registerGameActionHandlers(
 
     if (!state.spectatorPredictions) state.spectatorPredictions = {};
 
-    const key = socket.data.userId || socket.id;
+    const userId = socket.data.userId;
+    if (!userId) {
+      socket.emit('error', 'Register an account to wager IP on match outcomes.');
+      return;
+    }
+
+    const key = userId;
     if (state.spectatorPredictions[key]) {
       socket.emit('error', 'You have already placed a prediction.');
       return;
     }
 
-    state.spectatorPredictions[key] = {
-      prediction,
-      timestamp: Date.now(),
-    };
+    // Validate and deduct IP
+    try {
+      const user = await getUserById(userId);
+      if (!user) {
+        socket.emit('error', 'User profile not found.');
+        return;
+      }
 
-    state.log.push(`A spectator has predicted a ${prediction} victory.`);
+      if (user.stats.points < amount) {
+        socket.emit('error', `Insufficient IP balance. You have ${user.stats.points} IP.`);
+        return;
+      }
+
+      // Deduct IP immediately
+      user.stats.points -= amount;
+      await saveUser(user);
+
+      // Refresh global stats if missing
+      if (!state.globalStats) {
+        state.globalStats = await getGlobalStats();
+      }
+
+      // Calculate dynamic odds
+      const civilWins = state.globalStats.civilWins + 100;
+      const stateWins = state.globalStats.stateWins + 100;
+      const total = civilWins + stateWins;
+      const prob = (prediction === 'Civil' ? civilWins : stateWins) / total;
+      const odds = Math.max(1.1, Number((1 / prob).toFixed(2))); // Minimum odds 1.1x
+
+      state.spectatorPredictions[key] = {
+        prediction,
+        amount,
+        odds,
+        timestamp: Date.now(),
+      };
+
+      state.log.push(`${me.name} wagered ${amount} IP on a ${prediction} victory at ${odds}x odds.`);
+      if (state.log.length > 50) state.log.shift();
+      
+      engine.broadcastState(roomId);
+      
+      // Emit user update to show new balance
+      const { password: _, ...safeUser } = user;
+      socket.emit('userUpdate', safeUser as any);
+      
+    } catch (err) {
+      logger.error({ err, userId, roomId }, 'Failed to process spectator prediction');
+      socket.emit('error', 'An error occurred while processing your wager.');
+    }
+  });
+
+  socket.on('giveCommendation', (payload) => {
+    const result = giveCommendationSchema.safeParse(payload);
+    if (!result.success) return socket.emit('error', 'Invalid commendation data.');
+    const { targetId, type } = result.data;
+
+    const roomId = getRoom();
+    if (!roomId) return;
+    const state = engine.rooms.get(roomId);
+    if (!state || state.phase !== 'GameOver') return;
+
+    if (!state.commendationsGiven) state.commendationsGiven = {};
+    if (!state.commendations) state.commendations = {};
+
+    const myId = Array.from(userSockets.entries()).find(([_, sid]) => sid === socket.id)?.[0];
+    if (!myId) return;
+
+    if (state.commendationsGiven[myId]) {
+      socket.emit('error', 'You have already given a commendation this match.');
+      return;
+    }
+
+    if (myId === targetId) {
+      socket.emit('error', 'You cannot commend yourself.');
+      return;
+    }
+
+    if (!state.players.some(p => p.id === targetId)) {
+      socket.emit('error', 'Target player not found.');
+      return;
+    }
+
+    state.commendationsGiven[myId] = true;
+    if (!state.commendations[targetId]) state.commendations[targetId] = [];
+    state.commendations[targetId].push(type as any);
+
     engine.broadcastState(roomId);
   });
 }
-

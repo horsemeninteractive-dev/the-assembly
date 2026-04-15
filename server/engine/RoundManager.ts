@@ -8,8 +8,10 @@
  */
 
 import { randomUUID } from 'crypto';
+import { logger } from '../logger';
 import { GameState, Player, Policy, GamePhase } from '../../shared/types';
 import { createDeck } from '../utils';
+import { getGlobalStats } from '../db/matches';
 import { AI_BOTS } from './ai/aiPersonalities';
 import { assignRoles } from '../game/gameRules';
 import { initializeSuspicion } from '../game/suspicion';
@@ -246,6 +248,13 @@ export class RoundManager {
       this.engine.crisisEngine.initDeck(roomId);
     }
     addLog(state, 'Game started! Roles assigned.');
+    
+    // Fetch global stats for spectator predictions
+    getGlobalStats().then(stats => {
+      state.globalStats = stats;
+      this.engine.broadcastState(roomId);
+    }).catch(err => logger.error({ err }, 'Failed to fetch global stats for betting'));
+
     this.nextRound(state, roomId, false);
   }
 

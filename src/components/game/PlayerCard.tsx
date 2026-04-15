@@ -180,13 +180,13 @@ export const PlayerCard = React.memo(
               {roleInfo.label}
             </div>
             {spectatorRole?.titleRole && (
-              <div className="hidden sm:block px-1 py-0.5 rounded text-[7px] font-mono leading-none bg-yellow-900/80 text-yellow-300 border border-yellow-700/40 max-w-[3.5rem] truncate">
-                {spectatorRole.titleRole.slice(0, 5)}
+              <div className="hidden sm:block px-1.5 py-0.5 rounded text-[7px] font-mono leading-none bg-yellow-900/80 text-yellow-300 border border-yellow-700/40 max-w-[5.5rem] truncate shadow-sm">
+                {spectatorRole.titleRole}
               </div>
             )}
             {spectatorRole?.agendaName && (
-              <div className="hidden sm:block px-1 py-0.5 rounded text-[7px] font-mono leading-none bg-emerald-900/80 text-emerald-300 border border-emerald-700/40 max-w-[3.5rem] truncate">
-                {spectatorRole.agendaName.split(' ')[0]}
+              <div className="hidden sm:block px-1.5 py-0.5 rounded text-[7px] font-mono leading-none bg-emerald-900/80 text-emerald-300 border border-emerald-700/40 max-w-[5.5rem] truncate shadow-sm">
+                {spectatorRole.agendaName}
               </div>
             )}
           </div>

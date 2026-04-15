@@ -116,6 +116,7 @@ export type GamePhase =
   | 'Snap_Election'
   | 'Event_Reveal'
   | 'GameOver';
+export type CommendationType = 'MVP' | 'Deceiver' | 'Honorable';
 export type ExecutiveAction =
   | 'Investigate'
   | 'SpecialElection'
@@ -585,6 +586,8 @@ export interface GameState {
     votes: { playerId: string; playerName: string; vote: 'Aye' | 'Nay' }[];
     presDeclaration?: { civ: number; sta: number; drewCiv: number; drewSta: number };
     chanDeclaration?: { civ: number; sta: number };
+    actualDrewCiv?: number;
+    actualDrewSta?: number;
     executiveAction?: string;
   }[];
   averageElo?: number;
@@ -609,11 +612,14 @@ export interface GameState {
   snapElectionVolunteers?: string[];
   chatBlackoutBuffer?: { senderId: string; senderName: string; text: string; timestamp: number }[];
   spectatorPredictions?: {
-    [userId: string]: { prediction: 'Civil' | 'State'; timestamp: number };
+    [userId: string]: { prediction: 'Civil' | 'State'; amount: number; odds: number; timestamp: number };
   };
+  globalStats?: { civilWins: number; stateWins: number };
   isPractice?: boolean;
   aiDifficulty?: 'Casual' | 'Normal' | 'Elite';
   activeCipherMessage?: { text: string; timestamp: number };
+  commendations?: { [targetId: string]: CommendationType[] };
+  commendationsGiven?: { [senderId: string]: boolean };
 }
 
 export interface ServerToClientEvents {
@@ -729,5 +735,5 @@ export interface ClientToServerEvents {
   adminUpdateConfig: (config: Partial<SystemConfig>) => void;
   adminGetChatLogs: (roomId: string) => void;
   adminClearRedis: () => void;
-  spectatorPredict: (data: { prediction: 'Civil' | 'State' }) => void;
+  spectatorPredict: (data: { prediction: 'Civil' | 'State'; amount: number }) => void;
 }

@@ -460,6 +460,9 @@ export class LegislativeManager {
     const chanDecl = s.declarations.find((d) => d.type === 'Chancellor');
     const action = getExecutiveAction(s);
 
+    const actualDrewCiv = s.presidentSaw?.filter(p => p === 'Civil').length ?? 0;
+    const actualDrewSta = s.presidentSaw?.filter(p => p === 'State').length ?? 0;
+
     s.roundHistory.push({
       round: s.round,
       presidentName: pres.name,
@@ -475,6 +478,8 @@ export class LegislativeManager {
         ? { civ: presDecl.civ, sta: presDecl.sta, drewCiv: presDecl.drewCiv ?? 0, drewSta: presDecl.drewSta ?? 0 }
         : undefined,
       chanDeclaration: chanDecl ? { civ: chanDecl.civ, sta: chanDecl.sta } : undefined,
+      actualDrewCiv,
+      actualDrewSta,
       executiveAction: action !== 'None' ? action : undefined,
     });
   }

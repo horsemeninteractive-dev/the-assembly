@@ -424,12 +424,14 @@ export class MatchCloser {
     if (s.spectatorPredictions && winningSide && !s.isPractice) {
       const predictionEntries = Object.entries(s.spectatorPredictions);
       for (const [userId, pred] of predictionEntries) {
-        if (pred.prediction === winningSide && userId.length > 30) {
+        if (pred.prediction === winningSide) {
           try {
             const u = await getUserById(userId);
             if (u) {
-              u.stats.points += 50;
+              const reward = Math.floor(pred.amount * (pred.odds || 1.0));
+              u.stats.points += reward;
               await saveUser(u);
+              
               const sid = await getUserSocketId(userId);
               if (sid) {
                 const { password: _, ...safe } = u;

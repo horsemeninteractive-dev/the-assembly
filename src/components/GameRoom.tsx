@@ -409,7 +409,7 @@ export const GameRoom = ({
             height: `${100 / uiScale}%`,
           }}
         >
-          <PolicyTracks gameState={gameState} />
+          <PolicyTracks gameState={gameState} user={user} playSound={playSound} />
 
           <PlayerGrid
             gameState={gameState}

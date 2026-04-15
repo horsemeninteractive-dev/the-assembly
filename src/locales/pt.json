@@ -707,7 +707,7 @@
         "4": "Minhas descobertas sobre {nome} são positivas. Eles apoiam a Carta.",
         "5": "{name} está definitivamente do nosso lado.",
         "6": "Confio totalmente em {nome}.",
-        "7": "A investigação foi bem-sucedida. {nome} é civil.",
+        "7": "A investigação foi bem-sucedida. {nome} é Civil.",
         "8": "{name} é um verdadeiro aliado.",
         "9": "Eu verifiquei a lealdade de {name}.",
         "10": "Pesquisei {nome} e encontrei um cidadão leal.",
@@ -1297,7 +1297,8 @@
         "veto_one": "O governo invocou o seu poder de veto",
         "veto_many": "O veto foi exercido {{count}} vezes",
         "marathon": "Uma batalha de vontades épica de {{count}} rodadas",
-        "deadlock": "Ambas as facções mantiveram a Assembleia num impasse"
+        "deadlock": "Ambas as facções mantiveram a Assembleia num impasse",
+        "true_lie": "{{name}} elaborou 3 diretivas estaduais, mas afirmou o contrário"
       }
     },
     "match_replay": {
@@ -1561,7 +1562,12 @@
         "action_play_again": "Jogue novamente",
         "action_lobby": "Átrio",
         "completed": "Concluído",
-        "failed": "Fracassado"
+        "failed": "Falha",
+        "commendations": {
+          "mvp": "Prêmio MVP",
+          "deceiver": "Comenda do Prêmio: Enganador",
+          "honorable": "Comenda do Prêmio: Honorável"
+        }
       },
       "match_replay": {
         "title": "Repetição da partida",
@@ -1623,7 +1629,7 @@
         "loop": "Loop de jogo",
         "titles": "Títulos",
         "agendas": "Agendas",
-        "tips": "Pontas"
+        "tips": "Dicas"
       },
       "overview": {
         "p1": "A Assembleia é {{social_deduction_game}} para 5–10 jogadores. Cada jogador recebe secretamente uma facção – Civil ou Estadual – e deve trabalhar com ou contra os outros para alcançar a condição de vitória de sua facção.",
@@ -1707,7 +1713,7 @@
           },
           "assassin": {
             "name": "Assassino",
-            "when": "Após a promulgação (como Presidente)",
+            "when": "Após a promulgação (como presidente)",
             "desc": "Quando você for presidente, execute secretamente qualquer jogador vivo após o término da rodada. Uma vez usado."
           },
           "handler": {
@@ -1754,7 +1760,7 @@
             "desc": "Vote contra a maioria mais de 3 vezes"
           },
           "dove": {
-            "name": "A Pomba",
+            "name": "A pomba",
             "desc": "Vote sim em todas as rodadas elegíveis"
           },
           "hawk": {
@@ -1803,7 +1809,7 @@
           },
           "clean_sweep": {
             "name": "Varredura Limpa",
-            "desc": "Promulgar uma diretiva civil como Chanceler"
+            "desc": "Promulgar uma diretriz civil como Chanceler"
           },
           "weathervane": {
             "name": "O Cata-vento",
@@ -1811,7 +1817,7 @@
           },
           "productive": {
             "name": "Sessão Produtiva",
-            "desc": "Mais da metade das rodadas promulgam uma política"
+            "desc": "Mais de metade das rondas promulgam uma política"
           },
           "close_race": {
             "name": "Corrida Fechada",
@@ -1879,7 +1885,11 @@
         "recovery_email_desc": "Usado para recuperar sua conta caso você perca seu token",
         "recovery_email_placeholder": "Digite o e-mail de recuperação...",
         "no_recovery_email": "Não definido",
-        "fullscreen": "Tela cheia"
+        "fullscreen": "Tela cheia",
+        "push_notifications": "Notificações push",
+        "push_notifications_desc": "Seja notificado sobre resultados de jogos, solicitações e convites.",
+        "push_notifications_enabled": "As notificações estão habilitadas.",
+        "push_notifications_blocked": "Bloqueado pelo navegador."
       },
       "tabs": {
         "general": "Geral",
@@ -2034,7 +2044,7 @@
           "desc": "Ganhe um jogo como Supervisor."
         },
         "daily_play_casual": {
-          "name": "Montagem Casual",
+          "name": "Montagem casual",
           "desc": "Jogue um jogo no modo Casual."
         },
         "daily_play_classic": {
@@ -2150,7 +2160,7 @@
           "desc": "Seja eleito presidente 5 vezes em qualquer jogo."
         },
         "weekly_agenda_5": {
-          "name": "Mestre das Agendas",
+          "name": "Mestre de Agendas",
           "desc": "Complete 5 agendas pessoais esta semana."
         },
         "weekly_win_civil_5": {
@@ -2232,7 +2242,7 @@
       "subtitle": "Convide amigos para a Assembleia e ganhe recompensas.",
       "active_reward": "Recompensa Ativa",
       "reward_desc": "Ganhe <1>150 CP</1> para cada amigo que entrar usando seu link e jogar sua <3>primeira partida</3>.",
-      "link_label": "Seu link de indicação",
+      "link_label": "Seu link de referência",
       "copy_hint": "Toque para copiar o link do seu convite exclusivo",
       "copied_hint": "Link copiado para a área de transferência",
       "tracking_title": "Rastreamento Automatizado",
@@ -2243,7 +2253,7 @@
         "self_label": "Você",
         "xp_contributed": "{{count}} XP contribuído",
         "btn_promote": "Promover a Diretor",
-        "btn_demote": "Rebaixar para membro",
+        "btn_demote": "Rebaixar para Membro",
         "btn_transfer": "Transferência de Presidência",
         "btn_kick": "Remover do Clã"
       },
@@ -2297,7 +2307,7 @@
         "contribution": "{{count}} XP contribuído",
         "overview": "Visão geral",
         "challenges": "Objetivos",
-        "invite_label": "Convidar para o Clã",
+        "invite_label": "Convidar para o clã",
         "invite_placeholder": "Encontre o jogador para convidar...",
         "members_label": "Membros do Clã"
       },
@@ -2332,7 +2342,7 @@
       "rarities": {
         "common": "Comum",
         "uncommon": "Incomum",
-        "rare": "Raro",
+        "rare": "Cru",
         "epic": "Épico",
         "legendary": "Lendário"
       },
@@ -2506,7 +2516,7 @@
         "sessions": "Sessões Históricas",
         "persisted_log": "Registros arquivados: {{id}}",
         "waiting": "Aguardando dados...",
-        "empty": "Não foram encontrados registos de auditoria"
+        "empty": "Nenhum registro de auditoria encontrado"
       }
     },
     "shop": {
@@ -2547,7 +2557,7 @@
       "reward_types": {
         "cp": "Pontos de clareza",
         "cp_count": "{{count}} CP",
-        "background": "Fundo",
+        "background": "Antecedentes",
         "vote": "Estilo de votação",
         "music": "Faixa musical",
         "frame": "Quadro de borda",
@@ -2583,7 +2593,7 @@
       "level": "Nível",
       "members": "Membros",
       "no_desc": "Nenhuma descrição fornecida.",
-      "share_clan": "Compartilhar clã",
+      "share_clan": "Compartilhar Clã",
       "roster": "Lista do Clã",
       "contribution": "Contribuir.",
       "founded_on": "Clã fundado em {{date}}",
@@ -2639,7 +2649,7 @@
       "total_wins": "Total de vitórias",
       "agendas_done": "Agendas concluídas",
       "deaths": "Mortes",
-      "achievements": "Conquistas conquistadas",
+      "achievements": "Conquistas obtidas",
       "medals": "medalhas"
     },
     "errors": {

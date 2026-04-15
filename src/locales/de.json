@@ -738,7 +738,7 @@
       "investigateState": {
         "0": "Die Untersuchung bestätigt ihre Übereinstimmung, {name} ist Staat.",
         "1": "Die Ermittlungen sind… besorgniserregend. Beobachten Sie {Name} genau.",
-        "2": "Ich habe etwas Wichtiges über {name} erfahren. Gehen Sie vorsichtig vor.",
+        "2": "Ich habe etwas Wichtiges über {Name} erfahren. Gehen Sie vorsichtig vor.",
         "3": "Die Loyalität von {name} gilt nicht der Charta.",
         "4": "Ich kann {Name} nach dem, was ich gesehen habe, nicht vertrauen.",
         "5": "Die Beweise gegen {Name} sind vernichtend.",
@@ -814,7 +814,7 @@
         "3": "Wir müssen {Name} an den Rand drängen, bevor es zu spät ist.",
         "4": "Ich sage es laut: {Name} arbeitet für den Staat.",
         "5": "{Name} ist ein Verräter.",
-        "6": "Ich bin sicher, dass {name} der Staat ist.",
+        "6": "Ich bin sicher, dass {name} der Bundesstaat ist.",
         "7": "Wir müssen {name} loswerden.",
         "8": "Vertrauen Sie {name} unter keinen Umständen.",
         "9": "{name} sabotiert uns.",
@@ -854,7 +854,7 @@
         "7": "Ich werde hereingelegt.",
         "8": "Die Anschuldigungen sind falsch.",
         "9": "Ich bin so höflich, wie es nur geht.",
-        "10": "Mein Handeln lag stets im Interesse der Charta.",
+        "10": "Mein Handeln lag immer im Interesse der Charta.",
         "11": "Ich werde ins Visier genommen, weil ich eine Bedrohung für den Staat darstelle.",
         "12": "Glauben Sie nicht den Lügen, die über mich verbreitet werden.",
         "13": "Ich kann auf eine lange Geschichte treuer Dienste für die Versammlung zurückblicken.",
@@ -1297,7 +1297,8 @@
         "veto_one": "Die Regierung berief sich auf ihr Vetorecht",
         "veto_many": "Das Veto wurde {{count}} Mal ausgeübt",
         "marathon": "Ein epischer {{count}}-Runden-Willenskampf",
-        "deadlock": "Beide Fraktionen hielten die Versammlung in einer Sackgasse"
+        "deadlock": "Beide Fraktionen hielten die Versammlung in einer Sackgasse",
+        "true_lie": "{{name}} entwarf drei staatliche Richtlinien, behauptete aber etwas anderes"
       }
     },
     "match_replay": {
@@ -1330,7 +1331,7 @@
       "nay": "Nein",
       "no_vote": "Keine Stimmen erfasst",
       "footer_info": "Die gezeigten Erklärungen entsprechen den öffentlichen Behauptungen der Spieler. Aktivieren Sie den Wahrheitsmodus, um tatsächliche Karten anzuzeigen.",
-      "close": "Schließen Sie die Wiedergabe"
+      "close": "Wiedergabe schließen"
     },
     "narration": {
       "nomination": "Die Versammlung tagt. Präsident, nominieren Sie Ihren Kanzler.",
@@ -1535,7 +1536,7 @@
         "title": "Spielergebnisse",
         "banners": {
           "civil_win_default": "Charta wiederhergestellt",
-          "state_win_default": "Staatliche Vormachtstellung",
+          "state_win_default": "Staatliche Vorherrschaft",
           "inconclusive": "Nicht schlüssig",
           "civil_desc": "Die Charta wurde verteidigt.",
           "state_desc": "Das Sekretariat ist dem Staat zugefallen.",
@@ -1560,8 +1561,13 @@
         "action_shared": "Link kopiert",
         "action_play_again": "Nochmals abspielen",
         "action_lobby": "Lobby",
-        "completed": "Abgeschlossen",
-        "failed": "Fehlgeschlagen"
+        "completed": "Vollendet",
+        "failed": "Fehlgeschlagen",
+        "commendations": {
+          "mvp": "Auszeichnung als MVP",
+          "deceiver": "Auszeichnung: Betrüger",
+          "honorable": "Auszeichnung: Ehrenvoll"
+        }
       },
       "match_replay": {
         "title": "Spielwiederholung",
@@ -1762,7 +1768,7 @@
             "desc": "Stimmen Sie in mindestens 3 Runden mit Nein"
           },
           "stonewalled": {
-            "name": "Mit Steinmauern versehen",
+            "name": "Mit Steinmauern",
             "desc": "Stimmen Sie mit „Nein“ für zwei Regierungen, die scheitern"
           },
           "short_session": {
@@ -1861,8 +1867,8 @@
     },
     "legislative": {
       "discard": "Verwerfen",
-      "enact": "Erlassen",
-      "propose_veto": "Veto vorschlagen",
+      "enact": "",
+      "propose_veto": "erlassen Veto vorschlagen",
       "send_dispatch": "Anonymen Versand senden"
     }
   },
@@ -1879,7 +1885,11 @@
         "recovery_email_desc": "Wird verwendet, um Ihr Konto wiederherzustellen, wenn Sie Ihren Token verlieren",
         "recovery_email_placeholder": "Geben Sie die Wiederherstellungs-E-Mail-Adresse ein...",
         "no_recovery_email": "Nicht festgelegt",
-        "fullscreen": "Vollbild"
+        "fullscreen": "Vollbild",
+        "push_notifications": "Push-Benachrichtigungen",
+        "push_notifications_desc": "Lassen Sie sich über Spielergebnisse, Anfragen und Einladungen benachrichtigen.",
+        "push_notifications_enabled": "Benachrichtigungen sind aktiviert.",
+        "push_notifications_blocked": "Vom Browser blockiert."
       },
       "tabs": {
         "general": "Allgemein",
@@ -2134,7 +2144,7 @@
           "desc": "Gewinne ein Spiel als Aufseher."
         },
         "weekly_play_classic_2": {
-          "name": "Klassischer Modus Normal",
+          "name": "Klassischer Modus Regulär",
           "desc": "Spielen Sie 2 Spiele im klassischen Modus."
         },
         "weekly_win_5": {
@@ -2467,7 +2477,7 @@
       "error_fetch_failed": "Archivabruf fehlgeschlagen",
       "roles": {
         "civil": "Zivil",
-        "state": "Staat",
+        "state": "Zustand",
         "overseer": "Aufseher"
       },
       "outcomes": {
@@ -2570,7 +2580,7 @@
         "crisis": "Krise"
       },
       "stats": {
-        "win_rate": "Gewinn%",
+        "win_rate": "Gewinnen%",
         "games": "Spiele",
         "wins": "Siege",
         "elo": "ELO"

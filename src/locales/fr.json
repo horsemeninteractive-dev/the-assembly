@@ -817,7 +817,7 @@
         "6": "Je suis certain que {name} est State.",
         "7": "Nous devons nous débarrasser de {name}.",
         "8": "Ne faites confiance à {name} sous aucun prétexte.",
-        "9": "{name} nous sabote.",
+        "9": "{nom} nous sabote.",
         "10": "Je suis sûr à 99 % que {name} est un agent de l'État.",
         "11": "Les preuves contre {nom} s'accumulent.",
         "12": "Nous ne pouvons pas laisser {name} s'approcher du siège du chancelier.",
@@ -1297,7 +1297,8 @@
         "veto_one": "Le gouvernement a invoqué son droit de veto",
         "veto_many": "Le veto a été exercé {{count}} fois",
         "marathon": "Une bataille de volontés épique en {{count}} round",
-        "deadlock": "Les deux factions ont tenu l'Assemblée dans une impasse extrême"
+        "deadlock": "Les deux factions ont tenu l'Assemblée dans une impasse extrême",
+        "true_lie": "{{name}} a rédigé 3 directives de l'État mais a affirmé le contraire"
       }
     },
     "match_replay": {
@@ -1407,7 +1408,7 @@
         "title": "Vote et déclarations",
         "subtitle": "Le cœur du prélèvement social",
         "p1": "Les votes sont {{simultaneous}} jusqu'à ce qu'ils soient révélés. Vous ne pouvez pas voir comment les autres ont voté avant de voter.",
-        "aye": "TOUJOURS",
+        "aye": "OUI",
         "aye_desc": "Soutenez ce gouvernement",
         "nay": "NON",
         "nay_desc": "Bloquer ce gouvernement",
@@ -1497,7 +1498,7 @@
       },
       "tips": {
         "title": "Survivre à l'Assemblée",
-        "subtitle": "Choses clés à retenir",
+        "subtitle": "Points clés à retenir",
         "civil": {
           "heading": "Acteurs civils : ne faites confiance à personne",
           "body": "Vous êtes plus nombreux que l'État mais vous ne savez pas qui ils sont. Les déclarations contradictoires, les nominations suspectes et les schémas de vote sont vos seuls indices."
@@ -1560,8 +1561,13 @@
         "action_shared": "Lien copié",
         "action_play_again": "Rejouer",
         "action_lobby": "Hall",
-        "completed": "Terminé",
-        "failed": "Échoué"
+        "completed": "Complété",
+        "failed": "Échec",
+        "commendations": {
+          "mvp": "Récompense MVP",
+          "deceiver": "Mention élogieuse : Trompeur",
+          "honorable": "Mention élogieuse : Honorable"
+        }
       },
       "match_replay": {
         "title": "Replay du match",
@@ -1762,7 +1768,7 @@
             "desc": "Votez Non dans au moins 3 tours"
           },
           "stonewalled": {
-            "name": "Aux murs de pierre",
+            "name": "Murs de pierre",
             "desc": "Votez Non pour 2 gouvernements qui échouent"
           },
           "short_session": {
@@ -1861,7 +1867,7 @@
     },
     "legislative": {
       "discard": "Jeter",
-      "enact": "Promulguer",
+      "enact": "Adopter",
       "propose_veto": "Proposer un veto",
       "send_dispatch": "Envoyer une expédition anonyme"
     }
@@ -1879,7 +1885,11 @@
         "recovery_email_desc": "Utilisé pour récupérer votre compte si vous perdez votre token",
         "recovery_email_placeholder": "Entrez l'e-mail de récupération...",
         "no_recovery_email": "Non défini",
-        "fullscreen": "Plein écran"
+        "fullscreen": "Plein écran",
+        "push_notifications": "Notifications poussées",
+        "push_notifications_desc": "Soyez informé des résultats du jeu, des demandes et des invitations.",
+        "push_notifications_enabled": "Les notifications sont activées.",
+        "push_notifications_blocked": "Bloqué par le navigateur."
       },
       "tabs": {
         "general": "Général",
@@ -2034,7 +2044,7 @@
           "desc": "Gagnez une partie en tant que surveillant."
         },
         "daily_play_casual": {
-          "name": "Assemblée informelle",
+          "name": "Assemblée occasionnelle",
           "desc": "Jouez à une partie en mode Casual."
         },
         "daily_play_classic": {
@@ -2332,7 +2342,7 @@
       "rarities": {
         "common": "Commun",
         "uncommon": "Peu courant",
-        "rare": "Rares",
+        "rare": "Rare",
         "epic": "Épique",
         "legendary": "Légendaire"
       },
@@ -2481,7 +2491,7 @@
         "rooms": "Chambres",
         "users": "Utilisateurs",
         "system": "Système",
-        "logs": "Audit"
+        "logs": "Vérification"
       },
       "broadcast": {
         "title": "Diffusion mondiale",
@@ -2547,7 +2557,7 @@
       "reward_types": {
         "cp": "Points de clarté",
         "cp_count": "{{count}} PC",
-        "background": "Arrière-plan",
+        "background": "Contexte",
         "vote": "Style de vote",
         "music": "Piste musicale",
         "frame": "Cadre de bordure",
