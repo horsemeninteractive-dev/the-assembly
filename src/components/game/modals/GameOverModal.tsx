@@ -146,9 +146,9 @@ export const GameOverModal = ({
                   const reason = gameState.winReason;
                   const winner = gameState.winner;
                   if (!reason) {
-                    if (winner === 'Civil') return t('game.game_over.banners.civil_win_default');
-                    if (winner === 'State') return t('game.game_over.banners.state_win_default');
-                    return t('game.game_over.banners.inconclusive');
+                    if (winner === 'Civil') return t('game.modals.game_over.banners.civil_win_default');
+                    if (winner === 'State') return t('game.modals.game_over.banners.state_win_default');
+                    return t('game.modals.game_over.banners.inconclusive');
                   }
                   const map: Record<string, string> = {
                     'CHARTER RESTORED': 'charter_restored',
@@ -162,10 +162,10 @@ export const GameOverModal = ({
               </div>
               <p className="text-responsive-xs text-muted font-mono uppercase tracking-[0.2em]">
                 {gameState.winner === 'Civil'
-                  ? t('game.game_over.banners.civil_desc')
+                  ? t('game.modals.game_over.banners.civil_desc')
                   : gameState.winner === 'State'
-                    ? t('game.game_over.banners.state_desc')
-                    : t('game.game_over.banners.abort_desc')}
+                    ? t('game.modals.game_over.banners.state_desc')
+                    : t('game.modals.game_over.banners.abort_desc')}
               </p>
             </div>
 
@@ -174,7 +174,7 @@ export const GameOverModal = ({
               {/* Left Column: Match Summary & Progress */}
               <div className="lg:w-1/2 lg:basis-1/2 lg:overflow-y-auto custom-scrollbar p-[3vh] space-y-[2.5vh] shrink-0">
                 <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono border-b border-subtle/30 pb-2 flex justify-between items-center">
-                  <span>{t('game.game_over.performance_header')}</span>
+                  <span>{t('game.modals.game_over.performance_header')}</span>
                 </div>
 
                 {/* ── Post-match ELO summary ────────────────── */}
@@ -195,8 +195,8 @@ export const GameOverModal = ({
                         )}
                       >
                         {postMatchResult.won
-                          ? t('game.game_over.victory')
-                          : t('game.game_over.defeat')}
+                          ? t('game.modals.game_over.victory')
+                          : t('game.modals.game_over.defeat')}
                       </span>
                       <span className="text-[10px] font-mono text-faint uppercase tracking-widest">
                         {postMatchResult.mode} · {postMatchResult.role}
@@ -212,7 +212,7 @@ export const GameOverModal = ({
                       {isRanked ? (
                         <div className="bg-surface-glass/40 rounded-xl p-2.5 text-center border border-subtle">
                           <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                            <Trophy className="w-3 h-3" /> {t('game.game_over.elo')}
+                            <Trophy className="w-3 h-3" /> {t('game.modals.game_over.elo')}
                           </div>
                           <EloChange change={postMatchResult.eloChange} />
                           <div className="text-[9px] font-mono text-faint mt-0.5">
@@ -233,17 +233,17 @@ export const GameOverModal = ({
                       ) : (
                         <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                           <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                            <Trophy className="w-3 h-3" /> {t('game.game_over.elo')}
+                            <Trophy className="w-3 h-3" /> {t('game.modals.game_over.elo')}
                           </div>
                           <span className="text-muted text-xs font-mono">
-                            {t('game.game_over.casual')}
+                            {t('game.modals.game_over.casual')}
                           </span>
                         </div>
                       )}
 
                       <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                         <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                          <Flame className="w-3 h-3" /> {t('game.game_over.xp')}
+                          <Flame className="w-3 h-3" /> {t('game.modals.game_over.xp')}
                         </div>
                         <span className="text-yellow-400 font-mono text-sm font-bold">
                           +{postMatchResult.xpEarned}
@@ -252,7 +252,7 @@ export const GameOverModal = ({
 
                       <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                         <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                          <Coins className="w-3 h-3" /> {t('game.game_over.ip')}
+                          <Coins className="w-3 h-3" /> {t('game.modals.game_over.ip')}
                         </div>
                         <span className="text-emerald-400 font-mono text-sm font-bold">
                           +{postMatchResult.ipEarned}
@@ -263,7 +263,7 @@ export const GameOverModal = ({
                         postMatchResult.clanXpEarned > 0 && (
                           <div className="bg-surface/50 rounded-xl p-2.5 text-center border border-subtle">
                             <div className="text-[10px] font-mono text-faint uppercase tracking-widest mb-1 flex items-center justify-center gap-1">
-                              <Shield className="w-3 h-3" /> {t('game.game_over.clan_xp')}
+                              <Shield className="w-3 h-3" /> {t('game.modals.game_over.clan_xp')}
                             </div>
                             <span className="text-blue-400 font-mono text-sm font-bold">
                               +{postMatchResult.clanXpEarned}
@@ -299,7 +299,7 @@ export const GameOverModal = ({
                         />
                         <div className="min-w-0">
                           <div className="text-responsive-xs uppercase tracking-widest text-muted font-mono mb-0.5">
-                            {t('game.game_over.agenda')}
+                            {t('game.modals.game_over.agenda')}
                           </div>
                           <div className="text-responsive-sm font-bold text-primary uppercase tracking-wide">
                             {t(`game.agendas.${agenda.id}.name`)}
@@ -324,7 +324,7 @@ export const GameOverModal = ({
                         <div className="flex items-center gap-2 mb-2">
                           <Medal className="w-[2vh] h-[2vh] text-yellow-400 shrink-0" />
                           <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-yellow-400">
-                            {t('game.game_over.achievements_header')}
+                            {t('game.modals.game_over.achievements_header')}
                           </span>
                         </div>
                         <div className="space-y-1.5">
@@ -350,7 +350,7 @@ export const GameOverModal = ({
               <div className="lg:w-1/2 lg:basis-1/2 flex flex-col min-h-0 bg-black/5 lg:bg-transparent shrink-0">
                 <div className="flex-1 lg:overflow-y-auto custom-scrollbar p-[3vh] space-y-[2.5vh]">
                   <div className="text-responsive-xs uppercase tracking-[0.2em] text-muted font-mono border-b border-subtle/30 pb-2 flex justify-between items-center">
-                    <span>{t('game.game_over.revelations_header')}</span>
+                    <span>{t('game.modals.game_over.revelations_header')}</span>
                     <OverseerIcon className="w-3 h-3 opacity-30" />
                   </div>
 
@@ -400,7 +400,7 @@ export const GameOverModal = ({
                                   {p.name.replace(' (AI)', '')}
                                   {p.id === myId && (
                                     <span className="ml-1.5 text-[9px] text-yellow-500 uppercase tracking-tighter">
-                                      {t('game.game_over.you')}
+                                      {t('game.modals.game_over.you')}
                                     </span>
                                   )}
                                 </span>
@@ -409,13 +409,13 @@ export const GameOverModal = ({
                                 {receivedCommendations.length > 0 && (
                                   <div className="flex gap-1 mt-1">
                                     {receivedCommendations.includes('MVP') && (
-                                      <div className="flex items-center gap-0.5 text-[8px] font-mono text-yellow-400 bg-yellow-900/20 px-1 py-0.5 rounded border border-yellow-500/20" title={t('game.game_over.commendations.mvp')}><Star className="w-2.5 h-2.5" /> {receivedCommendations.filter(c => c === 'MVP').length}</div>
+                                      <div className="flex items-center gap-0.5 text-[8px] font-mono text-yellow-400 bg-yellow-900/20 px-1 py-0.5 rounded border border-yellow-500/20" title={t('game.modals.game_over.commendations.mvp')}><Star className="w-2.5 h-2.5" /> {receivedCommendations.filter(c => c === 'MVP').length}</div>
                                     )}
                                     {receivedCommendations.includes('Deceiver') && (
-                                      <div className="flex items-center gap-0.5 text-[8px] font-mono text-purple-400 bg-purple-900/20 px-1 py-0.5 rounded border border-purple-500/20" title={t('game.game_over.commendations.deceiver')}><VenetianMask className="w-2.5 h-2.5" /> {receivedCommendations.filter(c => c === 'Deceiver').length}</div>
+                                      <div className="flex items-center gap-0.5 text-[8px] font-mono text-purple-400 bg-purple-900/20 px-1 py-0.5 rounded border border-purple-500/20" title={t('game.modals.game_over.commendations.deceiver')}><VenetianMask className="w-2.5 h-2.5" /> {receivedCommendations.filter(c => c === 'Deceiver').length}</div>
                                     )}
                                     {receivedCommendations.includes('Honorable') && (
-                                      <div className="flex items-center gap-0.5 text-[8px] font-mono text-blue-400 bg-blue-900/20 px-1 py-0.5 rounded border border-blue-500/20" title={t('game.game_over.commendations.honorable')}><Handshake className="w-2.5 h-2.5" /> {receivedCommendations.filter(c => c === 'Honorable').length}</div>
+                                      <div className="flex items-center gap-0.5 text-[8px] font-mono text-blue-400 bg-blue-900/20 px-1 py-0.5 rounded border border-blue-500/20" title={t('game.modals.game_over.commendations.honorable')}><Handshake className="w-2.5 h-2.5" /> {receivedCommendations.filter(c => c === 'Honorable').length}</div>
                                     )}
                                   </div>
                                 )}
@@ -447,7 +447,7 @@ export const GameOverModal = ({
                                 <div className="flex items-center gap-1.5">
                                   <Target className="w-2.5 h-2.5 text-muted" />
                                   <span className="text-[10px] font-mono text-tertiary uppercase tracking-wider truncate">
-                                    {t('game.game_over.agenda')}:{' '}
+                                    {t('game.modals.game_over.agenda')}:{' '}
                                     <span className="text-secondary">
                                       {agendaId ? t(`game.agendas.${agendaId}.name`) : agendaName}
                                     </span>
@@ -468,13 +468,13 @@ export const GameOverModal = ({
                           {/* Give Commendation Actions */}
                           {!myCommendationsGiven && p.id !== myId && !p.isAI && (
                             <div className="mt-2 pt-2 border-t border-subtle/10 flex justify-end gap-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
-                              <button onClick={() => handleCommend('MVP')} className="p-1.5 hover:bg-yellow-500/20 hover:text-yellow-400 text-muted rounded-md transition-colors" title={t('game.game_over.commendations.mvp')}>
+                              <button onClick={() => handleCommend('MVP')} className="p-1.5 hover:bg-yellow-500/20 hover:text-yellow-400 text-muted rounded-md transition-colors" title={t('game.modals.game_over.commendations.mvp')}>
                                 <Star className="w-3.5 h-3.5" />
                               </button>
-                              <button onClick={() => handleCommend('Deceiver')} className="p-1.5 hover:bg-purple-500/20 hover:text-purple-400 text-muted rounded-md transition-colors" title={t('game.game_over.commendations.deceiver')}>
+                              <button onClick={() => handleCommend('Deceiver')} className="p-1.5 hover:bg-purple-500/20 hover:text-purple-400 text-muted rounded-md transition-colors" title={t('game.modals.game_over.commendations.deceiver')}>
                                 <VenetianMask className="w-3.5 h-3.5" />
                               </button>
-                              <button onClick={() => handleCommend('Honorable')} className="p-1.5 hover:bg-blue-500/20 hover:text-blue-400 text-muted rounded-md transition-colors" title={t('game.game_over.commendations.honorable')}>
+                              <button onClick={() => handleCommend('Honorable')} className="p-1.5 hover:bg-blue-500/20 hover:text-blue-400 text-muted rounded-md transition-colors" title={t('game.modals.game_over.commendations.honorable')}>
                                 <Handshake className="w-3.5 h-3.5" />
                               </button>
                             </div>
@@ -496,7 +496,7 @@ export const GameOverModal = ({
                   className="flex-1 py-[1.2vh] bg-card text-tertiary border border-default rounded-xl hover:bg-hover hover:text-primary transition-all font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2"
                 >
                   <Scroll className="w-[2vh] h-[2vh]" />
-                  {t('game.game_over.action_log')}
+                  {t('game.modals.game_over.action_log')}
                 </button>
                 <button
                   onMouseEnter={() => playSound('hover')}
