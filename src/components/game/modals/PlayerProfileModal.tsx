@@ -27,6 +27,9 @@ interface PlayerProfileModalProps {
   onClose: () => void;
   playSound: (sound: string) => void;
   onSendFriendRequest: (userId: string) => void;
+  isMe?: boolean;
+  isHost?: boolean;
+  onKick?: (userId: string) => void;
 }
 
 export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
@@ -35,6 +38,9 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
   onClose,
   playSound,
   onSendFriendRequest,
+  isMe,
+  isHost,
+  onKick,
 }) => {
   const { t } = useTranslation();
   const [user, setUser] = useState<User | null>(null);
@@ -289,6 +295,19 @@ export const PlayerProfileModal: React.FC<PlayerProfileModalProps> = ({
               </>
             )}
           </button>
+
+          {!isMe && onKick && (
+            <button
+              onClick={() => {
+                onKick(userId);
+                onClose();
+              }}
+              className="w-full py-[1.5vh] rounded-xl font-mono text-responsive-xs uppercase tracking-widest flex items-center justify-center gap-2 transition-all border bg-red-900/20 text-red-400 border-red-900/50 hover:bg-red-900/30"
+            >
+              <Shield size={14} className="text-red-500" />
+              {isHost ? t('admin.kick_player') : t('game.actions.vote_to_kick')}
+            </button>
+          )}
         </div>
       </motion.div>
     </div>,

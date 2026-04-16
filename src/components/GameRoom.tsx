@@ -27,6 +27,7 @@ import { PolicyPeekModal } from './game/modals/PolicyPeekModal';
 import { DossierModal } from './game/modals/DossierModal';
 import { DeclarationModal } from './game/modals/DeclarationModal';
 import { PlayerProfileModal } from './game/modals/PlayerProfileModal';
+import { KickVoteModal } from './game/modals/KickVoteModal';
 import { GameReferencePanel } from './game/GameReferencePanel';
 import { useScaling } from '../hooks/useScaling';
 import { useWebRTC } from '../hooks/useWebRTC';
@@ -362,6 +363,15 @@ export const GameRoom = ({
     return () => clearInterval(interval);
   }, []);
 
+  const handleKick = (targetId: string) => {
+    const isHost = !!(user?.id && gameState.hostUserId === user.id);
+    if (isHost) {
+      socket.emit('kickPlayer', targetId);
+    } else {
+      socket.emit('initiateKickVote', targetId);
+    }
+  };
+
   // ── Render ───────────────────────────────────────────────────────────────
   return (
     <div
@@ -610,6 +620,17 @@ export const GameRoom = ({
           onClose={() => setSelectedPlayerId(null)}
           playSound={playSound}
           onSendFriendRequest={(targetUserId) => socket.emit('sendFriendRequest', targetUserId)}
+          isMe={selectedPlayerId === me?.id}
+          isHost={!!(user?.id && gameState.hostUserId === user.id)}
+          onKick={handleKick}
+        />
+      )}
+      {gameState.kickVote && (
+        <KickVoteModal
+          gameState={gameState}
+          me={me}
+          onCastVote={(vote) => socket.emit('castKickVote', vote)}
+          playSound={playSound}
         />
       )}
       <InvestigationModal

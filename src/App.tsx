@@ -9,6 +9,7 @@ import { usePushNotifications } from './hooks/usePushNotifications';
 import { Auth } from './components/Auth';
 import { UpdateBanner } from './components/UpdateBanner';
 import { InviteModal } from './components/game/modals/InviteModal';
+import { DailyRewardModal } from './components/game/modals/DailyRewardModal';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { EnterSplash } from './components/app/EnterSplash';
 import { AppSplash } from './components/app/AppSplash';
@@ -26,6 +27,7 @@ export default function App() {
   const settings = useSettings();
   const {
     user, token, loading, isInteracted, isDiscord, isMobile,
+    loginReward, setLoginReward,
     handleAuthSuccess, handleEnterAssembly
   } = useAuthContext();
   
@@ -154,6 +156,7 @@ export default function App() {
                 <LobbyView setIsProfileOpen={setIsProfileOpen} setIsPurchaseModalOpen={setIsPurchaseModalOpen} />
                 <ProfileModal isOpen={isProfileOpen} onClose={() => setIsProfileOpen(false)} setIsProfileOpen={setIsProfileOpen} setIsPurchaseModalOpen={setIsPurchaseModalOpen} />
                 {pendingInvite && <InviteModal inviterName={pendingInvite.fromUsername} roomId={pendingInvite.roomId} onAccept={() => { handleJoinRoom(pendingInvite.roomId); setPendingInvite(null); }} onReject={() => setPendingInvite(null)} />}
+                {loginReward && <DailyRewardModal reward={loginReward} onClose={() => { playSound('ui_win'); setLoginReward(null); }} />}
               </motion.div>
             ) : (
               <motion.div key="gameroom" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex-1 flex flex-col">

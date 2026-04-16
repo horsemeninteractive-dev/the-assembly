@@ -100,7 +100,7 @@
       "label_3": "입법 세션",
       "step_3": "대통령은 정책 카드 3장을 뽑아 1장을 버리고 2장을 총리에게 전달합니다. 하나가 제정될 예정이다.",
       "label_4": "선언",
-      "step_4": "양측은 회의에서 무슨 일이 일어났는지 선언합니다. 이러한 진술은 거짓말, 즉 노골적이고 설득력 있는 거짓말일 수 있습니다.",
+      "step_4": "양측은 세션에서 무슨 일이 일어났는지 선언합니다. 이러한 진술은 거짓말, 즉 노골적이고 설득력 있는 거짓말일 수 있습니다.",
       "label_5": "실행 조치",
       "step_5": "충분한 국가 정책과 대통령은 조사, 구금, 처형 등 권력을 행사합니다."
     },
@@ -155,6 +155,16 @@
       "how_to_play": "플레이 방법",
       "logout": "로그아웃"
     },
+    "banner": {
+      "event_active": "특별 이벤트 진행 중",
+      "xp_multiplier": "{{multiplier}}x XP 배수가 활성화되었습니다! 캐비닛을 더 빠르게 진행하세요.",
+      "ip_multiplier": "{{multiplier}}x IP 승수가 활성화되었습니다! 더 많은 영향력 포인트를 획득하세요."
+    },
+    "daily_reward": {
+      "title": "일일 로그인 보상",
+      "subtitle": "당신은 국회로 돌아왔습니다! 당신의 등반에 도움이 될 IP와 XP의 일일 급여를 받으세요.",
+      "streak_label": "연속 로그인: 일 {{count}}"
+    },
     "ranks": {
       "initiate": "시작",
       "trainee": "연습생",
@@ -194,7 +204,7 @@
       "status_locked": "잠김",
       "players_count": "{{count}}/{{max}}",
       "btn_join": "가입",
-      "btn_watch": "시청",
+      "btn_watch": "보다",
       "filter_joinable": "참가 가능",
       "filter_active": "활성",
       "sort_label": "정렬",
@@ -231,7 +241,7 @@
       "mode_classic_desc": "표준 역할/규칙. ELO 없음, 포인트 감소.",
       "mode_crisis_desc": "라운드 기반 이벤트 카드. 하이 리스크, 하이 포인트.",
       "privacy": "개인정보 보호",
-      "privacy_public": "공공의",
+      "privacy_public": "공개",
       "privacy_public_desc": "누구나 참여할 수 있습니다",
       "privacy_friends": "친구만",
       "privacy_friends_desc": "당신의 친구만",
@@ -257,7 +267,7 @@
   "game": {
     "roles": {
       "civil": {
-        "name": "민간",
+        "name": "예의 바른",
         "flavor": "헌장을 보호하십시오. 아무도 믿지 마세요."
       },
       "state": {
@@ -271,7 +281,7 @@
     },
     "round": "라운드 {{round}}",
     "phase": "단계: {{phase}}",
-    "civil_directives": "민사 지시",
+    "civil_directives": "민사 명령",
     "state_directives": "국가 지침",
     "winner": "{{faction}} 승리!",
     "gameOver": "게임 오버",
@@ -327,7 +337,7 @@
       },
       "spec": {
         "name": "보궐선거",
-        "desc": "대통령이 다음 후보를 선택"
+        "desc": "대통령이 차기후보 선정"
       },
       "win": {
         "name": "국가 승리",
@@ -367,7 +377,7 @@
       "auditor": {
         "name": "감사관",
         "action": "검사",
-        "desc": "지시문 폐기 더미의 최상위 카드를 볼 수 있는 권한을 얻습니다."
+        "desc": "지시문 폐기 더미의 맨 위 카드를 볼 수 있는 권한을 얻습니다."
       },
       "assassin": {
         "name": "암살자",
@@ -410,7 +420,7 @@
       "win_civil": "헌장 복원",
       "win_civil_desc": "시민이 즉시 승리",
       "win_state": "국가 패권",
-      "win_state_desc": "국가가 즉시 승리합니다",
+      "win_state_desc": "국가가 즉시 승리합니다.",
       "quorum_revote": "투표",
       "win_reasons": {
         "charter_restored": "헌장 복원",
@@ -491,7 +501,7 @@
       "need_players_ranked": "순위를 위해서는 5명 이상의 플레이어가 필요합니다",
       "no_players": "플레이어 없음",
       "voted_for": "{{name}}에 투표함",
-      "censure_select": "비난할 선수를 카드에서 선택하세요(다음 후보에서 제외)",
+      "censure_select": "비난할 선수를 카드에서 선택합니다(다음 후보에서 제외).",
       "snap_volunteer_prompt": "어떤 플레이어라도 차기 회장이 되기 위해 자원할 수 있습니다.",
       "volunteered": "자원봉사",
       "volunteer": "자원봉사자",
@@ -513,6 +523,9 @@
       "title_flip_vote": "뒤집기 투표",
       "title_yes": "예",
       "title_no": "아니요"
+    },
+    "actions": {
+      "vote_to_kick": "킥에 투표하세요"
     },
     "chat": {
       "title": "조립 채팅",
@@ -1050,7 +1063,7 @@
       "modes": {
         "casual": "캐주얼",
         "ranked": "순위",
-        "classic": "클래식",
+        "classic": "권위 있는",
         "crisis": "위기"
       }
     },
@@ -1116,7 +1129,7 @@
         "desc": "게임이 끝날 때까지 최소 4개의 주 명령이 제정되어야 합니다."
       },
       "clean_sweep": {
-        "name": "클린 스윕",
+        "name": "깨끗한 청소",
         "desc": "총리로서 민사 명령을 제정하십시오."
       },
       "the_weathervane": {
@@ -1152,7 +1165,7 @@
       "chancellor": "총리",
       "drew": "드류",
       "passed": "합격",
-      "received": "받았다",
+      "received": "수신됨",
       "votes": "투표",
       "aye": "응",
       "nay": "아니요",
@@ -1192,7 +1205,7 @@
         "action_share": "공유 링크 복사",
         "action_play_again": "다시 플레이",
         "action_lobby": "로비",
-        "completed": "완전한",
+        "completed": "완료됨",
         "failed": "실패",
         "title": "경기 결과",
         "title_role": "제목",
@@ -1206,7 +1219,7 @@
         "title": "친구 요청",
         "description": "<1>{{username}}</1> 친구가 되고 싶어합니다.",
         "deny": "거부",
-        "accept": "수락"
+        "accept": "수용하다"
       },
       "investigation": {
         "title": "조사 결과",
@@ -1217,7 +1230,7 @@
       },
       "policy_peek": {
         "title": "지시어 미리보기",
-        "subtitle": "이 자료의 상위 3개 지시어:",
+        "subtitle": "이 자료의 상위 3개 지시문:",
         "empty": "현재 더미가 비어 있습니다.",
         "end": "끝 엿보기"
       },
@@ -1297,13 +1310,13 @@
       },
       "plays": {
         "assassin": "{{assassin}} 암살자로서 {{killed}}을(를) 제거했습니다",
-        "execution_one": "{{name}} 대통령령으로 처형됨",
+        "execution_one": "{{name}} 대통령령으로 처형되었습니다",
         "execution_many": "{{names}} 대통령령에 의해 처형됨",
         "chaos_one": "의회에 혼란 지시가 내려졌습니다",
         "chaos_many": "{{count}} 혼란 지시가 의회를 불안정하게 만들었습니다",
         "veto_one": "정부가 거부권을 행사했다",
         "veto_many": "거부권이 {{count}}번 행사되었습니다",
-        "marathon": "장대한 {{count}}라운드 의지 전투",
+        "marathon": "의지의 장대한 {{count}} 라운드 전투",
         "deadlock": "두 파벌 모두 칼날처럼 교착상태에 빠져 의회를 열었습니다",
         "true_lie": "{{name}} 3개의 주정부 지침을 그렸지만 달리 주장함"
       }
@@ -1392,7 +1405,7 @@
       },
       "loop": {
         "title": "게임 루프",
-        "subtitle": "각 라운드는 동일한 순서를 따릅니다",
+        "subtitle": "각 라운드는 동일한 순서를 따릅니다.",
         "step_1": {
           "label": "대통령 후보",
           "desc": "현 대통령은 교육감 후보를 지명합니다. 대통령 역할은 매 라운드마다 순환됩니다."
@@ -1433,7 +1446,7 @@
             "desc": "뽑기 더미의 상위 3장 카드를 확인하세요."
           },
           "investigate": {
-            "name": "조사",
+            "name": "조사하다",
             "desc": "플레이어가 시민인지 국가인지(구체적으로 누구인지는 아님) 알아보세요."
           },
           "special": {
@@ -1528,7 +1541,7 @@
           "title": "동맹 요청",
           "description": "<1>{{username}}</1>는 동맹이 되기를 원합니다.",
           "deny": "거부",
-          "accept": "수락"
+          "accept": "수용하다"
         },
         "declaration": {
           "drew_label": "<1>주장:</1> 제가 그렸습니다...",
@@ -1549,7 +1562,7 @@
         "overview": "개요",
         "roles": "역할",
         "loop": "게임 루프",
-        "titles": "타이틀",
+        "titles": "제목",
         "agendas": "의제",
         "tips": "팁"
       },
@@ -1635,7 +1648,7 @@
           },
           "assassin": {
             "name": "암살자",
-            "when": "제정 후(대통령)",
+            "when": "제정 후(회장직)",
             "desc": "당신이 대통령이 되면 라운드가 끝난 후 살아있는 플레이어를 비밀리에 처형하십시오. 일단 사용되었습니다."
           },
           "handler": {
@@ -1707,7 +1720,7 @@
           },
           "nominated": {
             "name": "후보",
-            "desc": "총리로 두 번 지명됨"
+            "desc": "두 번이나 총리 후보로 지명됨"
           },
           "deadlock": {
             "name": "교착상태",
@@ -1785,12 +1798,20 @@
       "aye_sub": "(예)",
       "nay": "아니!",
       "nay_sub": "(아니요)",
-      "detained": "당신은 구금되어 이번 라운드에 투표할 수 없습니다"
+      "detained": "당신은 구금되어 이번 라운드에 투표할 수 없습니다",
+      "kick_vote_title": "킥 투표",
+      "kick_vote_header": "{{name}}을(를) 추방하시겠습니까?",
+      "kick_vote_initiator": "요청자: {{name}}",
+      "progress": "진행 상황",
+      "required": "필수",
+      "target_wait": "당신은 투표를 받고 있습니다...",
+      "voted_wait": "투표하세요. 다른 사람들을 기다리는 중...",
+      "vote_closed": "투표가 종료되었습니다."
     },
     "legislative": {
       "discard": "폐기",
       "enact": "제정",
-      "propose_veto": "거부권을 제안하세요",
+      "propose_veto": "거부권 제안",
       "send_dispatch": "익명으로 디스패치 보내기"
     }
   },
@@ -1826,7 +1847,7 @@
       },
       "voice": {
         "ai_voice": "AI 내레이터 음성",
-        "tts_voice": "음성 선택",
+        "tts_voice": "음색 선택",
         "tts_default": "시스템 기본값",
         "narrator_volume": "내레이터 볼륨",
         "narrator_volume_desc": "게임 내 AI 음성 안내 볼륨 조절"
@@ -1947,7 +1968,7 @@
         },
         "daily_survive_state_win": {
           "name": "생존자",
-          "desc": "국가가 승리하는 게임이 끝날 때까지 살아남으세요."
+          "desc": "국가가 승리하는 게임이 끝날 때까지 살아남습니다."
         },
         "daily_win_ranked": {
           "name": "순위 경쟁자",
@@ -1994,7 +2015,7 @@
           "desc": "최소 10라운드 동안 진행되는 게임에서 승리하세요."
         },
         "daily_voted_aye_failed": {
-          "name": "투표에서 배신당함",
+          "name": "투표에서 배반당했다",
           "desc": "선거에 실패한 정부에 찬성 투표를 해주세요."
         },
         "daily_civil_full_track": {
@@ -2066,7 +2087,7 @@
           "desc": "감독관으로 게임에서 승리하세요."
         },
         "weekly_play_classic_2": {
-          "name": "클래식 모드 레귤러",
+          "name": "클래식 모드 일반",
           "desc": "클래식 모드 게임 2개를 플레이하세요."
         },
         "weekly_win_5": {
@@ -2172,7 +2193,7 @@
     },
     "clans": {
       "members": {
-        "self_label": "당신",
+        "self_label": "너",
         "xp_contributed": "{{count}} 기여 XP",
         "btn_promote": "임원으로 승진",
         "btn_demote": "회원으로 강등",
@@ -2236,7 +2257,7 @@
       "invites": {
         "banner_title": "클랜 초대",
         "banner_desc": "{{inviter}}님이 {{clan}} [{{tag}}]에 가입하도록 귀하를 초대했습니다.",
-        "btn_accept": "수락",
+        "btn_accept": "수용하다",
         "btn_decline": "거절"
       },
       "alerts": {
@@ -2264,7 +2285,7 @@
       "rarities": {
         "common": "공통",
         "uncommon": "흔하지 않은",
-        "rare": "희귀한",
+        "rare": "드물다",
         "epic": "에픽",
         "legendary": "전설적인"
       },
@@ -2272,7 +2293,7 @@
       "btn_equip": "장비"
     },
     "medals": {
-      "summary_title": "메달 수집",
+      "summary_title": "메달 컬렉션",
       "summary_complete": "완료",
       "pin_hint_desc": "획득한 메달을 탭하여 고정하세요.",
       "pin_hint_status": "{{count}} / 3개 고정됨",
@@ -2364,7 +2385,7 @@
           "desc": "10개의 개인 일정을 완료하세요."
         },
         "agenda_twentyfive": {
-          "name": "뛰어난 전술가",
+          "name": "마스터 전술가",
           "desc": "25개의 개인 일정을 완료하세요."
         },
         "first_kill": {
@@ -2377,7 +2398,7 @@
         },
         "clean_sweep": {
           "name": "깨끗한 청소",
-          "desc": "단일 국가 지시 없이 게임에서 승리하세요."
+          "desc": "단일 국가 지시 없이 게임에서 승리하십시오."
         },
         "long_game": {
           "name": "소모전",
@@ -2410,7 +2431,7 @@
     },
     "admin": {
       "tabs": {
-        "rooms": "방",
+        "rooms": "객실",
         "users": "사용자",
         "system": "시스템",
         "logs": "감사"
@@ -2432,13 +2453,14 @@
         "btn_purge": "퍼지 룸",
         "active_sessions": "활성 세션",
         "host_label": "호스트: {{name}}",
-        "users_summary": "{{current}} / {{max}} 대리인"
+        "users_summary": "{{current}} / {{max}} 대리인",
+        "kick_player": "킥 플레이어"
       },
       "logs": {
         "sessions": "역사적 세션",
         "persisted_log": "보관된 기록: {{id}}",
         "waiting": "데이터를 기다리는 중...",
-        "empty": "감사 기록을 찾을 수 없습니다."
+        "empty": "감사 기록을 찾을 수 없습니다"
       }
     },
     "shop": {
@@ -2448,7 +2470,7 @@
       "item_type_policy": "정책 스킨",
       "item_style": "{{type}} 스타일",
       "btn_owned": "소유",
-      "btn_locked_pass": "패스 보상",
+      "btn_locked_pass": "통과 보상",
       "btn_buy_pts": "구매 · {{price}} IP"
     },
     "pass": {
@@ -2468,7 +2490,7 @@
       "footer_season": "시즌 {{number}} · 활성",
       "footer_premium_hint": "레벨을 올리면 프리미엄 보상이 잠금 해제됩니다. 계속 플레이하세요.",
       "btn_claim": "소유권 주장",
-      "btn_claimed": "청구됨",
+      "btn_claimed": "소유권 주장",
       "btn_locked": "잠김",
       "rewards": {
         "geometric_grid": "기하학적 격자",
@@ -2502,7 +2524,7 @@
         "crisis": "위기"
       },
       "stats": {
-        "win_rate": "이기다%",
+        "win_rate": "승리%",
         "games": "게임",
         "wins": "승리",
         "elo": "엘로"
@@ -2511,7 +2533,7 @@
   },
   "social": {
     "clan": {
-      "profile_label": "클랜 프로필",
+      "profile_label": "Clan Profile",
       "level": "레벨",
       "members": "회원",
       "no_desc": "설명이 제공되지 않았습니다.",
@@ -2538,7 +2560,7 @@
       "no_friends_hint": "위에서 플레이어를 검색하거나 게임에서 누군가를 추가하세요.",
       "online": "온라인({{count}})",
       "offline": "오프라인({{count}})",
-      "in_game": "어셈블리에서 · {{roomId}}",
+      "in_game": "조립중 · {{roomId}}",
       "in_lobby": "로비에서",
       "recently_played": "최근에",
       "time_m_ago": "{{count}}분 전",

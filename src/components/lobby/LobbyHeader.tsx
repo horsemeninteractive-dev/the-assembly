@@ -10,7 +10,7 @@ import {
   LogOut,
 } from 'lucide-react';
 import { Tooltip } from '../Tooltip';
-import { User } from '../../../shared/types';
+import { User, SystemConfig } from '../../../shared/types';
 import { cn, getProxiedUrl } from '../../utils/utils';
 import { getFrameStyles, getBackgroundTexture } from '../../utils/cosmetics';
 import { getRankTier, getRankLabel } from '../../utils/ranks';
@@ -28,6 +28,7 @@ interface LobbyHeaderProps {
   onLogout: () => void;
   globalStats: { civilWins: number; stateWins: number };
   playSound: (soundKey: string) => void;
+  systemConfig: SystemConfig;
 }
 
 export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
@@ -40,6 +41,7 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
   onLogout,
   globalStats,
   playSound,
+  systemConfig,
 }) => {
   const { t } = useTranslation();
   const total = globalStats.civilWins + globalStats.stateWins || 1;
@@ -52,6 +54,50 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
       transition={{ type: 'spring', stiffness: 200, damping: 20 }}
       className="border-b border-subtle bg-surface-glass sticky top-0 z-50 flex flex-col"
     >
+      {(systemConfig.xpMultiplier > 1 || systemConfig.ipMultiplier > 1) && (
+        <div className="bg-gradient-to-r from-purple-900/40 via-purple-600/40 to-purple-900/40 border-b border-purple-500/30 py-1.5 overflow-hidden relative">
+          <motion.div 
+            initial={{ x: '100%' }}
+            animate={{ x: '-100%' }}
+            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
+            className="whitespace-nowrap flex gap-12 items-center"
+          >
+            <div className="flex items-center gap-2">
+              <Zap className="w-3 h-3 text-purple-400 fill-purple-400" />
+              <span className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest text-purple-200">
+                {t('lobby.banner.event_active')}
+              </span>
+            </div>
+            {systemConfig.xpMultiplier > 1 && (
+              <span className="text-[10px] sm:text-xs font-mono text-purple-100">
+                {t('lobby.banner.xp_multiplier', { multiplier: systemConfig.xpMultiplier })}
+              </span>
+            )}
+            {systemConfig.ipMultiplier > 1 && (
+              <span className="text-[10px] sm:text-xs font-mono text-purple-100">
+                {t('lobby.banner.ip_multiplier', { multiplier: systemConfig.ipMultiplier })}
+              </span>
+            )}
+            {/* Duplicated for smooth loop */}
+            <div className="flex items-center gap-2">
+              <Zap className="w-3 h-3 text-purple-400 fill-purple-400" />
+              <span className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest text-purple-200">
+                {t('lobby.banner.event_active')}
+              </span>
+            </div>
+            {systemConfig.xpMultiplier > 1 && (
+              <span className="text-[10px] sm:text-xs font-mono text-purple-100">
+                {t('lobby.banner.xp_multiplier', { multiplier: systemConfig.xpMultiplier })}
+              </span>
+            )}
+            {systemConfig.ipMultiplier > 1 && (
+              <span className="text-[10px] sm:text-xs font-mono text-purple-100">
+                {t('lobby.banner.ip_multiplier', { multiplier: systemConfig.ipMultiplier })}
+              </span>
+            )}
+          </motion.div>
+        </div>
+      )}
       <div className="h-[8vh] sm:h-[10vh] px-5 flex items-center justify-between">
         <div className="flex items-center gap-[1vw] sm:gap-[2vw] min-w-0 flex-1">
           <div className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] bg-elevated rounded-xl flex items-center justify-center border border-white/40 shrink-0 overflow-hidden">

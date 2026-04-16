@@ -60,6 +60,7 @@ export const Lobby: React.FC<LobbyProps> = ({
     roomName?: string;
     mode?: string;
   } | null>(null);
+  const { handleJoinRoom, systemConfig } = useGameContext();
   const [globalStats, setGlobalStats] = useState<{ civilWins: number; stateWins: number }>({
     civilWins: 0,
     stateWins: 0,
@@ -161,6 +162,7 @@ export const Lobby: React.FC<LobbyProps> = ({
         onLogout={onLogout}
         globalStats={globalStats}
         playSound={playSound}
+        systemConfig={systemConfig}
       />
 
       {/* ── DESKTOP lg+: fixed-height sidebar + scrollable room pane ── */}

@@ -155,6 +155,16 @@
       "how_to_play": "Cómo jugar",
       "logout": "Cerrar sesión"
     },
+    "banner": {
+      "event_active": "EVENTO ESPECIAL ACTIVO",
+      "xp_multiplier": "¡El multiplicador {{multiplier}}x XP está activo! Progrese su gabinete más rápido.",
+      "ip_multiplier": "{{multiplier}}x ¡El multiplicador de IP está activo! Gana más puntos de influencia."
+    },
+    "daily_reward": {
+      "title": "Recompensa diaria por inicio de sesión",
+      "subtitle": "¡Has regresado a la Asamblea! Obtenga su estipendio diario de IP y XP para ayudarlo a ascender.",
+      "streak_label": "Racha de inicio de sesión: Día {{count}}"
+    },
     "ranks": {
       "initiate": "Iniciar",
       "trainee": "Aprendiz",
@@ -194,7 +204,7 @@
       "status_locked": "Bloqueado",
       "players_count": "{{count}}/{{max}}",
       "btn_join": "Unirse",
-      "btn_watch": "Ver",
+      "btn_watch": "Mirar",
       "filter_joinable": "Unirse",
       "filter_active": "Activo",
       "sort_label": "Ordenar",
@@ -257,7 +267,7 @@
   "game": {
     "roles": {
       "civil": {
-        "name": "Civiles",
+        "name": "Civil",
         "flavor": "Proteger la Carta. No confíes en nadie."
       },
       "state": {
@@ -302,7 +312,7 @@
       "identity_civil": "Civil",
       "identity_overseer": "El supervisor",
       "identity_state": "Agente estatal",
-      "agenda": "Agenda Personal",
+      "agenda": "Agenda personal",
       "agenda_none": "No hay agenda personal asignada.",
       "agenda_bonus": "Completar esto otorga XP e IP adicionales.",
       "title_role": "Rol del título",
@@ -327,7 +337,7 @@
       },
       "spec": {
         "name": "Elección Especial",
-        "desc": "El presidente elige al próximo candidato"
+        "desc": "Presidente elige próximo candidato"
       },
       "win": {
         "name": "Victoria del Estado",
@@ -336,7 +346,7 @@
       "investigate": "Investigar",
       "special_election": "Elección Especial",
       "execution": "Ejecución",
-      "policy_peek": "Vistazo a la política"
+      "policy_peek": "Vistazo a las políticas"
     },
     "policies": {
       "civil": {
@@ -513,6 +523,9 @@
       "title_flip_vote": "Voto invertido",
       "title_yes": "Sí",
       "title_no": "No"
+    },
+    "actions": {
+      "vote_to_kick": "Vota para expulsar"
     },
     "chat": {
       "title": "Charla de asamblea",
@@ -1152,7 +1165,7 @@
       "chancellor": "Canciller",
       "drew": "Dibujó",
       "passed": "Aprobado",
-      "received": "Recibió",
+      "received": "Recibido",
       "votes": "Votos",
       "aye": "Sí",
       "nay": "No",
@@ -1179,7 +1192,7 @@
         "defeat": "Misión fallida",
         "elo": "ELO",
         "casual": "Informal",
-        "xp": "EXP",
+        "xp": "XP",
         "ip": "propiedad intelectual",
         "clan_xp": "XP del clan",
         "agenda": "Agenda",
@@ -1192,7 +1205,7 @@
         "action_share": "Copiar compartir enlace",
         "action_play_again": "Jugar de nuevo",
         "action_lobby": "Vestíbulo",
-        "completed": "Terminado",
+        "completed": "Completado",
         "failed": "Fallido",
         "title": "Resultados del partido",
         "title_role": "Título",
@@ -1329,7 +1342,7 @@
       "deception_detected": "Engaño detectado",
       "actual_draw": "Sorteo real",
       "hidden": "OCULTO",
-      "public_claim": "Reclamo Público",
+      "public_claim": "Reclamo público",
       "chan_hand": "La mano del canciller",
       "conflicting_stories": "Historias contradictorias",
       "actual_received": "Real recibido",
@@ -1392,7 +1405,7 @@
       },
       "loop": {
         "title": "El bucle del juego",
-        "subtitle": "Cada ronda sigue la misma secuencia",
+        "subtitle": "Cada ronda sigue la misma secuencia.",
         "step_1": {
           "label": "Nominación presidencial",
           "desc": "El actual Presidente nomina a un candidato a Canciller. El rol presidencial rota en cada ronda."
@@ -1485,7 +1498,7 @@
           "desc": "Convocatoria de una nueva votación de emergencia durante elecciones fallidas de alta tensión."
         },
         "cipher": {
-          "name": "Cifrado",
+          "name": "Cifrar",
           "desc": "Enviar un despacho anónimo a la sala durante la fase legislativa."
         }
       },
@@ -1547,7 +1560,7 @@
       "back_to_lobby": "Volver al vestíbulo",
       "tabs": {
         "overview": "Descripción general",
-        "roles": "Roles",
+        "roles": "Funciones",
         "loop": "Bucle del juego",
         "titles": "Títulos",
         "agendas": "Agendas",
@@ -1635,7 +1648,7 @@
           },
           "assassin": {
             "name": "Asesino",
-            "when": "Después de la promulgación (como presidente)",
+            "when": "Después de la promulgación (como Presidente)",
             "desc": "Cuando seas presidente, ejecuta en secreto a cualquier jugador vivo una vez finalizada la ronda. Una vez usado."
           },
           "handler": {
@@ -1682,7 +1695,7 @@
             "desc": "Vota en contra de la mayoría más de 3 veces"
           },
           "dove": {
-            "name": "la paloma",
+            "name": "La paloma",
             "desc": "Vote Sí en cada ronda elegible"
           },
           "hawk": {
@@ -1785,7 +1798,15 @@
       "aye_sub": "(SÍ)",
       "nay": "¡NO!",
       "nay_sub": "(NO)",
-      "detained": "Estás detenido y no puedes votar en esta ronda"
+      "detained": "Estás detenido y no puedes votar en esta ronda",
+      "kick_vote_title": "Voto de expulsión",
+      "kick_vote_header": "¿Expulsar {{name}}?",
+      "kick_vote_initiator": "Solicitado por {{name}}",
+      "progress": "Progreso",
+      "required": "Requerido",
+      "target_wait": "Estás siendo votado...",
+      "voted_wait": "Voto emitido. Esperando a los demás...",
+      "vote_closed": "Votación cerrada."
     },
     "legislative": {
       "discard": "Descartar",
@@ -2026,7 +2047,7 @@
           "desc": "Promulga 2 directivas civiles como Canciller en un solo juego."
         },
         "daily_win_state_5plus_players": {
-          "name": "Operativo Estatal",
+          "name": "Operativo estatal",
           "desc": "Gana como Estado o Supervisor en un juego con al menos 5 jugadores."
         },
         "weekly_win_3": {
@@ -2168,7 +2189,7 @@
       "copy_hint": "Toque para copiar su enlace de invitación único",
       "copied_hint": "Enlace copiado al portapapeles",
       "tracking_title": "Seguimiento automatizado",
-      "tracking_desc": "Las recompensas se acreditan automáticamente en su cuenta una vez que su referencia completa su primera partida de 10 jugadores."
+      "tracking_desc": "Las recompensas se acreditan automáticamente en su cuenta una vez que su recomendado completa su primera partida de 10 jugadores."
     },
     "clans": {
       "members": {
@@ -2203,7 +2224,7 @@
         "name_placeholder": "La Primera Asamblea",
         "desc_label": "Información",
         "desc_placeholder": "Propósito de tu clan...",
-        "btn_creating": "Fundación...",
+        "btn_creating": "Establecimiento...",
         "btn_submit": "Establecer clan",
         "error_failed": "No se pudo fundar el clan"
       },
@@ -2264,7 +2285,7 @@
       "rarities": {
         "common": "Común",
         "uncommon": "Poco común",
-        "rare": "Extraño",
+        "rare": "Raro",
         "epic": "Épico",
         "legendary": "Legendario"
       },
@@ -2410,7 +2431,7 @@
     },
     "admin": {
       "tabs": {
-        "rooms": "Habitaciones",
+        "rooms": "Alojamiento",
         "users": "Usuarios",
         "system": "Sistema",
         "logs": "Auditoría"
@@ -2432,7 +2453,8 @@
         "btn_purge": "Salas de purga",
         "active_sessions": "Sesiones activas",
         "host_label": "Anfitrión: {{name}}",
-        "users_summary": "{{current}} / {{max}} Delegados"
+        "users_summary": "{{current}} / {{max}} Delegados",
+        "kick_player": "Patear al jugador"
       },
       "logs": {
         "sessions": "Sesiones Históricas",

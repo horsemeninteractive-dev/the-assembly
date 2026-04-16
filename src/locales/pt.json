@@ -155,6 +155,16 @@
       "how_to_play": "Como jogar",
       "logout": "Sair"
     },
+    "banner": {
+      "event_active": "EVENTO ESPECIAL ATIVO",
+      "xp_multiplier": "{{multiplier}}x Multiplicador de XP está ativo! Avance seu gabinete mais rápido.",
+      "ip_multiplier": "{{multiplier}}x Multiplicador de IP está ativo! Ganhe mais pontos de influência."
+    },
+    "daily_reward": {
+      "title": "Recompensa diária de login",
+      "subtitle": "Você voltou para a Assembleia! Pegue seu estipêndio diário de IP e XP para ajudar na sua escalada.",
+      "streak_label": "Sequência de login: Dia {{count}}"
+    },
     "ranks": {
       "initiate": "Iniciar",
       "trainee": "Estagiário",
@@ -194,7 +204,7 @@
       "status_locked": "Bloqueado",
       "players_count": "{{count}}/{{max}}",
       "btn_join": "Participe",
-      "btn_watch": "Assista",
+      "btn_watch": "Assistir",
       "filter_joinable": "Juntável",
       "filter_active": "Ativo",
       "sort_label": "Classificar",
@@ -225,7 +235,7 @@
       "players_max": "10 jogadores",
       "action_timer": "Temporizador de ação",
       "timer_off": "DESLIGADO",
-      "game_mode": "Modo de Jogo",
+      "game_mode": "Modo de jogo",
       "mode_ranked_desc": "ELO e pontos totais atribuídos.",
       "mode_casual_desc": "Sem alterações de ELO, pontos reduzidos.",
       "mode_classic_desc": "Funções/regras padrão. Sem ELO, pontos reduzidos.",
@@ -513,6 +523,9 @@
       "title_flip_vote": "Votação invertida",
       "title_yes": "Sim",
       "title_no": "Não"
+    },
+    "actions": {
+      "vote_to_kick": "Vote para chutar"
     },
     "chat": {
       "title": "Bate-papo de montagem",
@@ -1299,12 +1312,12 @@
         "assassin": "{{assassin}} eliminou {{killed}} como o Assassino",
         "execution_one": "{{name}} foi executado por decreto presidencial",
         "execution_many": "{{names}} foram executados por decreto presidencial",
-        "chaos_one": "Uma diretiva sobre o caos foi imposta à Assembleia",
+        "chaos_one": "Uma directiva sobre o caos foi imposta à Assembleia",
         "chaos_many": "{{count}} diretivas do caos desestabilizaram a Assembleia",
         "veto_one": "O governo invocou o seu poder de veto",
         "veto_many": "O veto foi exercido {{count}} vezes",
         "marathon": "Uma batalha de vontades épica de {{count}} rodadas",
-        "deadlock": "Ambas as facções mantiveram a Assembleia num impasse",
+        "deadlock": "Ambas as facções mantiveram a Assembleia num impasse extremo",
         "true_lie": "{{name}} elaborou 3 diretivas estaduais, mas afirmou o contrário"
       }
     },
@@ -1430,10 +1443,10 @@
         "actions": {
           "peek": {
             "name": "Espiada da política",
-            "desc": "Veja as 3 primeiras cartas da pilha de compras."
+            "desc": "Veja as 3 primeiras cartas da pilha de compra."
           },
           "investigate": {
-            "name": "Investigue",
+            "name": "Investigar",
             "desc": "Saiba se um jogador é Civil ou Estadual (não quem especificamente)."
           },
           "special": {
@@ -1548,7 +1561,7 @@
       "tabs": {
         "overview": "Visão geral",
         "roles": "Funções",
-        "loop": "Loop de jogo",
+        "loop": "Loop de Jogo",
         "titles": "Títulos",
         "agendas": "Agendas",
         "tips": "Dicas"
@@ -1635,7 +1648,7 @@
           },
           "assassin": {
             "name": "Assassino",
-            "when": "Após a promulgação (como presidente)",
+            "when": "Após a promulgação (como Presidente)",
             "desc": "Quando você for presidente, execute secretamente qualquer jogador vivo após o término da rodada. Uma vez usado."
           },
           "handler": {
@@ -1682,7 +1695,7 @@
             "desc": "Vote contra a maioria mais de 3 vezes"
           },
           "dove": {
-            "name": "A pomba",
+            "name": "A Pomba",
             "desc": "Vote sim em todas as rodadas elegíveis"
           },
           "hawk": {
@@ -1731,7 +1744,7 @@
           },
           "clean_sweep": {
             "name": "Varredura Limpa",
-            "desc": "Promulgar uma diretriz civil como Chanceler"
+            "desc": "Promulgar uma diretiva civil como Chanceler"
           },
           "weathervane": {
             "name": "O Cata-vento",
@@ -1785,7 +1798,15 @@
       "aye_sub": "(SIM)",
       "nay": "NÃO!",
       "nay_sub": "(NÃO)",
-      "detained": "Você está detido e não pode votar nesta rodada"
+      "detained": "Você está detido e não pode votar nesta rodada",
+      "kick_vote_title": "Votação de chute",
+      "kick_vote_header": "Expulsar {{name}}?",
+      "kick_vote_initiator": "Solicitado por {{name}}",
+      "progress": "Progresso",
+      "required": "Obrigatório",
+      "target_wait": "Você está sendo votado...",
+      "voted_wait": "Elenco de votação. Esperando pelos outros...",
+      "vote_closed": "Votação encerrada."
     },
     "legislative": {
       "discard": "Descartar",
@@ -1826,7 +1847,7 @@
       },
       "voice": {
         "ai_voice": "Voz do Narrador AI",
-        "tts_voice": "Seleção de Voz",
+        "tts_voice": "Seleção de voz",
         "tts_default": "Padrão do sistema",
         "narrator_volume": "Volume do narrador",
         "narrator_volume_desc": "Controla o volume dos anúncios de voz da IA ​​no jogo"
@@ -1837,7 +1858,7 @@
     "cp_label": "CP",
     "xp_label": "Experiência",
     "edit_username": "Editar nome de usuário",
-    "public_profile": "Perfil Público",
+    "public_profile": "Perfil público",
     "username_update": {
       "error_length": "O nome de usuário deve ter de 3 a 20 caracteres",
       "failed": "Falha ao atualizar o nome de usuário"
@@ -1885,7 +1906,7 @@
       "ranked_games": "Jogos Ranqueados",
       "casual_wins": "Vitórias casuais",
       "casual_games": "Jogos Casuais",
-      "classic_wins": "Vitórias clássicas",
+      "classic_wins": "Vitórias Clássicas",
       "classic_games": "Jogos Clássicos"
     },
     "challenges": {
@@ -1966,7 +1987,7 @@
           "desc": "Ganhe um jogo como Supervisor."
         },
         "daily_play_casual": {
-          "name": "Montagem casual",
+          "name": "Montagem Casual",
           "desc": "Jogue um jogo no modo Casual."
         },
         "daily_play_classic": {
@@ -2164,7 +2185,7 @@
       "subtitle": "Convide amigos para a Assembleia e ganhe recompensas.",
       "active_reward": "Recompensa Ativa",
       "reward_desc": "Ganhe <1>150 CP</1> para cada amigo que entrar usando seu link e jogar sua <3>primeira partida</3>.",
-      "link_label": "Seu link de referência",
+      "link_label": "Seu link de indicação",
       "copy_hint": "Toque para copiar o link do seu convite exclusivo",
       "copied_hint": "Link copiado para a área de transferência",
       "tracking_title": "Rastreamento Automatizado",
@@ -2203,7 +2224,7 @@
         "name_placeholder": "A Primeira Assembleia",
         "desc_label": "Informação",
         "desc_placeholder": "Objetivo do seu clã...",
-        "btn_creating": "Fundação...",
+        "btn_creating": "Fundando...",
         "btn_submit": "Estabelecer Clã",
         "error_failed": "Falha ao fundar o clã"
       },
@@ -2229,7 +2250,7 @@
         "contribution": "{{count}} XP contribuído",
         "overview": "Visão geral",
         "challenges": "Objetivos",
-        "invite_label": "Convidar para o clã",
+        "invite_label": "Convidar para o Clã",
         "invite_placeholder": "Encontre o jogador para convidar...",
         "members_label": "Membros do Clã"
       },
@@ -2264,7 +2285,7 @@
       "rarities": {
         "common": "Comum",
         "uncommon": "Incomum",
-        "rare": "Cru",
+        "rare": "Raro",
         "epic": "Épico",
         "legendary": "Lendário"
       },
@@ -2432,24 +2453,25 @@
         "btn_purge": "Expurgar salas",
         "active_sessions": "Sessões ativas",
         "host_label": "Anfitrião: {{name}}",
-        "users_summary": "{{current}} / {{max}} Delegados"
+        "users_summary": "{{current}} / {{max}} Delegados",
+        "kick_player": "Chutar Jogador"
       },
       "logs": {
         "sessions": "Sessões Históricas",
         "persisted_log": "Registros arquivados: {{id}}",
         "waiting": "Aguardando dados...",
-        "empty": "Nenhum registro de auditoria encontrado"
+        "empty": "Não foram encontrados registos de auditoria"
       }
     },
     "shop": {
       "title": "Requisição de Cosméticos",
       "subtitle": "Troque IP e CP por molduras de borda, crachás e muito mais.",
       "btn_purchase": "Requisição ({{amount}})",
-      "item_type_policy": "Skin da política",
+      "item_type_policy": "Tema da política",
       "item_style": "{{type}} Estilo",
       "btn_owned": "Propriedade",
       "btn_locked_pass": "Recompensa de Passe",
-      "btn_buy_pts": "Comprar · {{price}} IP"
+      "btn_buy_pts": "Comprar · {{price}} PI"
     },
     "pass": {
       "title": "Passe de montagem",
@@ -2473,7 +2495,7 @@
       "rewards": {
         "geometric_grid": "Grade Geométrica",
         "purple_rain": "Chuva Roxa",
-        "static_noise": "Ruído Estático",
+        "static_noise": "Ruído estático",
         "purple_pill": "Pílula Roxa"
       },
       "reward_types": {
@@ -2511,7 +2533,7 @@
   },
   "social": {
     "clan": {
-      "profile_label": "Perfil do Clã",
+      "profile_label": "Perfil do clã",
       "level": "Nível",
       "members": "Membros",
       "no_desc": "Nenhuma descrição fornecida.",

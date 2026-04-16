@@ -155,6 +155,16 @@
       "how_to_play": "How to Play",
       "logout": "Logout"
     },
+    "banner": {
+      "event_active": "SPECIAL EVENT ACTIVE",
+      "xp_multiplier": "{{multiplier}}x XP Multiplier is active! Progress your cabinet faster.",
+      "ip_multiplier": "{{multiplier}}x IP Multiplier is active! Earn more Influence Points."
+    },
+    "daily_reward": {
+      "title": "Daily Login Reward",
+      "subtitle": "You've returned to the Assembly! Grab your daily stipend of IP and XP to help your climb.",
+      "streak_label": "Login Streak: Day {{count}}"
+    },
     "ranks": {
       "initiate": "Initiate",
       "trainee": "Trainee",
@@ -513,6 +523,9 @@
       "title_flip_vote": "Flip Vote",
       "title_yes": "Yes",
       "title_no": "No"
+    },
+    "actions": {
+      "vote_to_kick": "Vote to Kick"
     },
     "chat": {
       "title": "Assembly Chat",
@@ -1785,7 +1798,15 @@
       "aye_sub": "(YES)",
       "nay": "NAY!",
       "nay_sub": "(NO)",
-      "detained": "You are detained and cannot vote this round"
+      "detained": "You are detained and cannot vote this round",
+      "kick_vote_title": "Kick Vote",
+      "kick_vote_header": "Expel {{name}}?",
+      "kick_vote_initiator": "Requested by {{name}}",
+      "progress": "Progress",
+      "required": "Required",
+      "target_wait": "You are being voted on...",
+      "voted_wait": "Vote cast. Waiting for others...",
+      "vote_closed": "Vote closed."
     },
     "legislative": {
       "discard": "Discard",
@@ -2432,7 +2453,8 @@
         "btn_purge": "Purge Rooms",
         "active_sessions": "Active Sessions",
         "host_label": "Host: {{name}}",
-        "users_summary": "{{current}} / {{max}} Delegates"
+        "users_summary": "{{current}} / {{max}} Delegates",
+        "kick_player": "Kick Player"
       },
       "logs": {
         "sessions": "Historical Sessions",

@@ -673,41 +673,93 @@ export function registerGameActionHandlers(
     }
   });
 
-  socket.on('giveCommendation', (payload) => {
-    const result = giveCommendationSchema.safeParse(payload);
-    if (!result.success) return socket.emit('error', 'Invalid commendation data.');
-    const { targetId, type } = result.data;
+    engine.broadcastState(roomId);
+  });
 
+  socket.on('initiateKickVote', (targetId) => {
     const roomId = getRoom();
     if (!roomId) return;
     const state = engine.rooms.get(roomId);
-    if (!state || state.phase !== 'GameOver') return;
+    if (!state || state.phase === 'Lobby' || state.phase === 'GameOver') return;
 
-    if (!state.commendationsGiven) state.commendationsGiven = {};
-    if (!state.commendations) state.commendations = {};
-
-    const myId = Array.from(userSockets.entries()).find(([_, sid]) => sid === socket.id)?.[0];
-    if (!myId) return;
-
-    if (state.commendationsGiven[myId]) {
-      socket.emit('error', 'You have already given a commendation this match.');
-      return;
+    if (state.kickVote) {
+      return socket.emit('error', 'A kick vote is already in progress.');
     }
 
-    if (myId === targetId) {
-      socket.emit('error', 'You cannot commend yourself.');
-      return;
+    const initiator = state.players.find((p) => p.socketId === socket.id);
+    if (!initiator || !initiator.isAlive) return;
+
+    const target = state.players.find((p) => p.id === targetId);
+    if (!target) return socket.emit('error', 'Target player not found.');
+    if (target.id === initiator.id) return socket.emit('error', 'You cannot kick yourself.');
+
+    // Only non-hosts can start kick votes (hosts have direct kick button)
+    if (initiator.userId === state.hostUserId) {
+      return socket.emit('error', 'Use the admin kick feature instead.');
     }
 
-    if (!state.players.some(p => p.id === targetId)) {
-      socket.emit('error', 'Target player not found.');
-      return;
-    }
+    state.kickVote = {
+      targetId,
+      initiatorId: initiator.id,
+      votes: { [initiator.id]: 'Aye' },
+      endsAt: Date.now() + 30000, // 30 second window
+    };
 
-    state.commendationsGiven[myId] = true;
-    if (!state.commendations[targetId]) state.commendations[targetId] = [];
-    state.commendations[targetId].push(type as any);
-
+    state.log.push(`${initiator.name} initiated a vote to kick ${target.name}.`);
     engine.broadcastState(roomId);
+
+    // Auto-tally after 30 seconds
+    setTimeout(() => {
+      const s = engine.rooms.get(roomId);
+      if (s && s.kickVote && s.kickVote.targetId === targetId) {
+        tallyKickVote(s, roomId);
+      }
+    }, 30050);
   });
+
+  socket.on('castKickVote', (vote) => {
+    const roomId = getRoom();
+    if (!roomId) return;
+    const state = engine.rooms.get(roomId);
+    if (!state || !state.kickVote) return;
+
+    const player = state.players.find((p) => p.socketId === socket.id);
+    if (!player || !player.isAlive || player.id === state.kickVote.targetId) return;
+
+    state.kickVote.votes[player.id] = vote;
+
+    const humanPlayers = state.players.filter(p => !p.isAI && p.isAlive && p.id !== state.kickVote?.targetId);
+    const votesCount = Object.keys(state.kickVote.votes).length;
+
+    if (votesCount >= humanPlayers.length) {
+      tallyKickVote(state, roomId);
+    } else {
+      engine.broadcastState(roomId);
+    }
+  });
+
+  function tallyKickVote(state: any, roomId: string) {
+    if (!state.kickVote) return;
+    const targetId = state.kickVote.targetId;
+    const target = state.players.find((p: any) => p.id === targetId);
+    const votes = Object.values(state.kickVote.votes);
+    const ayes = votes.filter(v => v === 'Aye').length;
+    
+    // Simple majority of ALIVE players (including target for count)
+    const livingPlayers = state.players.filter((p: any) => p.isAlive).length;
+    const threshold = Math.floor(livingPlayers / 2) + 1;
+
+    if (ayes >= threshold) {
+      state.log.push(`Kick vote passed for ${target?.name ?? 'Unknown'}.`);
+      state.players = state.players.filter((p: any) => p.id !== targetId);
+      if (target?.socketId) {
+        io.to(target.socketId).emit('kicked');
+      }
+    } else {
+      state.log.push(`Kick vote failed for ${target?.name ?? 'Unknown'}.`);
+    }
+
+    state.kickVote = undefined;
+    engine.broadcastState(roomId);
+  }
 }

@@ -561,10 +561,10 @@ export const PlayerCard = React.memo(
               </div>
             )}
             <div className="text-2xl font-thematic uppercase tracking-widest leading-none">
-              {effectiveVote}
+              {effectiveVote === 'Aye' ? t('game.voting.aye') : effectiveVote === 'Nay' ? t('game.voting.nay') : effectiveVote}
             </div>
             <div className="text-[8px] font-mono uppercase mt-1">
-              ({effectiveVote === 'Aye' ? 'YES' : 'NO'})
+              ({effectiveVote === 'Aye' ? t('game.voting.aye_sub') : effectiveVote === 'Nay' ? t('game.voting.nay_sub') : effectiveVote})
             </div>
           </div>
         </motion.div>

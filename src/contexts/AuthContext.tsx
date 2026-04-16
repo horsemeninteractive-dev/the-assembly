@@ -9,6 +9,8 @@ interface AuthContextType {
   loading: boolean;
   isInteracted: boolean;
   setIsInteracted: React.Dispatch<React.SetStateAction<boolean>>;
+  loginReward: { bonusXp: number; bonusIp: number; streak: number } | null;
+  setLoginReward: React.Dispatch<React.SetStateAction<{ bonusXp: number; bonusIp: number; streak: number } | null>>;
   isDiscord: boolean;
   isMobile: boolean;
   showTutorial: boolean;

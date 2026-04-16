@@ -28,6 +28,7 @@ export function useAuth() {
     );
   });
   const [showTutorial, setShowTutorial] = useState(false);
+  const [loginReward, setLoginReward] = useState<{ bonusXp: number; bonusIp: number; streak: number } | null>(null);
 
   const handleAuthSuccess = useCallback((userData: User, authToken: string) => {
     setUser(userData);
@@ -90,7 +91,10 @@ export function useAuth() {
           headers: { Authorization: `Bearer ${token}` },
         });
         const data = await res.json();
-        if (data.user) setUser(data.user);
+        if (data.user) {
+          setUser(data.user);
+          if (data.loginReward) setLoginReward(data.loginReward);
+        }
       } catch {}
     }
   }, [token]);
@@ -156,6 +160,7 @@ export function useAuth() {
               if (data.user) {
                 currentUser = data.user;
                 currentToken = data.token || currentTokenRef;
+                if (data.loginReward) setLoginReward(data.loginReward);
               }
             } else if (res.status === 401) {
               // Token expired or invalid
@@ -263,7 +268,10 @@ export function useAuth() {
           })
             .then((res) => res.json())
             .then((data) => {
-              if (data.user && data.token) handleAuthSuccess(data.user, data.token);
+              if (data.user && data.token) {
+                handleAuthSuccess(data.user, data.token);
+                if (data.loginReward) setLoginReward(data.loginReward);
+              }
             })
             .catch((e) => debugError('Capacitor Code exchange failed', e));
         } else if (urlToken && urlUser) {
@@ -289,6 +297,8 @@ export function useAuth() {
     isMobile,
     showTutorial,
     setShowTutorial,
+    loginReward,
+    setLoginReward,
     handleAuthSuccess,
     handleLogout,
     handleEnterAssembly,

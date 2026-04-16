@@ -5,7 +5,7 @@ import { RouteContext } from './types';
 import { requireAuth, sanitizeUser, JWT_SECRET } from './shared';
 import { logger } from '../logger';
 import { updateEmailSchema, updateUsernameSchema } from '../game/schemas';
-import { getUser, getUserByEmail, saveUser, getMatchHistory, getMatchById } from '../supabaseService';
+import { getUser, getUserByEmail, saveUser, getMatchHistory, getMatchById, processDailyLogin } from '../supabaseService';
 import { refreshChallenges, buildChallengesResponse } from '../db/challenges';
 import { ACHIEVEMENT_MAP } from '../../src/utils/achievements';
 
@@ -27,8 +27,10 @@ export function registerUserRoutes({ app, engine }: RouteContext): void {
   });
 
   app.get('/api/me', requireAuth, async (req: Request, res: Response) => {
-    const userWithoutPassword = sanitizeUser(req.user!);
-    res.json({ user: userWithoutPassword });
+    const user = req.user!;
+    const loginReward = await processDailyLogin(user);
+    const userWithoutPassword = sanitizeUser(user);
+    res.json({ user: userWithoutPassword, loginReward });
   });
 
   app.post('/api/user/update-email', requireAuth, profileLimiter, async (req: Request, res: Response) => {

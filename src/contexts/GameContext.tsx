@@ -2,7 +2,7 @@ import React, { createContext, useContext } from 'react';
 import { useSocketManager } from '../hooks/useSocketManager';
 import { useAuthContext } from './AuthContext';
 import { useAudioContext } from './AudioContext';
-import { GameState, PrivateInfo, RoomPrivacy, GameMode } from '../../shared/types';
+import { GameState, PrivateInfo, RoomPrivacy, GameMode, SystemConfig } from '../../shared/types';
 
 interface GameContextType {
   joined: boolean;
@@ -21,6 +21,7 @@ interface GameContextType {
   adminBroadcast: { message: string; sender: string } | null;
   setAdminBroadcast: React.Dispatch<React.SetStateAction<{ message: string; sender: string } | null>>;
   serverRestarting: string | null;
+  systemConfig: SystemConfig;
   handleJoinRoom: (
     roomId: string,
     maxPlayers?: number,

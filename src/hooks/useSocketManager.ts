@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { User, GameState, PrivateInfo, RoomPrivacy, StructuredError, GameMode } from '../../shared/types';
+import { User, GameState, PrivateInfo, RoomPrivacy, StructuredError, GameMode, SystemConfig } from '../../shared/types';
 import { socket } from '../socket';
 import { apiUrl, debugLog, debugWarn, debugError } from '../utils/utils';
 import * as aiSpeech from '../services/aiSpeech';
@@ -21,6 +21,7 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
   const [pendingClanInvite, setPendingClanInvite] = useState<{ inviteId: string; clanId: string; clanName: string; clanTag: string; fromUsername: string } | null>(null);
   const [adminBroadcast, setAdminBroadcast] = useState<{ message: string; sender: string } | null>(null);
   const [serverRestarting, setServerRestarting] = useState<string | null>(null);
+  const [systemConfig, setSystemConfig] = useState<SystemConfig>({ maintenanceMode: false, xpMultiplier: 1, ipMultiplier: 1 });
 
   const handleJoinRoom = useCallback(
     (
@@ -134,6 +135,9 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
         window.location.reload();
       }, 5500);
     });
+    socket.on('adminConfigUpdate', (config: SystemConfig) => {
+      setSystemConfig(config);
+    });
     socket.on('hostChanged', ({ newHostUserId }: { newHostUserId: string }) => {
       setGameState((prev) => (prev ? { ...prev, hostUserId: newHostUserId } : prev));
     });
@@ -151,6 +155,7 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
       socket.off('adminBroadcast');
       socket.off('hostChanged');
       socket.off('clanInviteReceived');
+      socket.off('adminConfigUpdate');
     };
   }, [handleLeaveRoom, playSound, setUser]);
 
@@ -202,6 +207,7 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
     adminBroadcast,
     setAdminBroadcast,
     serverRestarting,
+    systemConfig,
     handleJoinRoom,
     handleLeaveRoom,
   };

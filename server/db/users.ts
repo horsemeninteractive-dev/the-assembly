@@ -63,6 +63,8 @@ export const SupabaseUserSchema = z.object({
   referral_code: z.string().nullable().optional(),
   referred_by: z.string().nullable().optional(),
   referral_processed: z.boolean().nullable().default(false),
+  last_login_at: z.string().nullable().optional(),
+  login_streak: z.number().nullable().default(0),
 }).catchall(z.any());
 
 export function mapSupabaseToUser(data: any): UserInternal | null {
@@ -109,6 +111,8 @@ export function mapSupabaseToUser(data: any): UserInternal | null {
     referralCode: validData.referral_code ?? undefined,
     referredBy: validData.referred_by ?? undefined,
     referralProcessed: !!validData.referral_processed,
+    lastLoginAt: validData.last_login_at ?? undefined,
+    loginStreak: validData.login_streak ?? 0,
     // Clan badge — populated when the query joins the clans table via clan_id
     clan: data.clans
       ? ({
@@ -154,6 +158,8 @@ export function mapUserToSupabase(userData: UserInternal): Record<string, unknow
     referral_code: userData.referralCode,
     referred_by: userData.referredBy,
     referral_processed: userData.referralProcessed,
+    last_login_at: userData.lastLoginAt,
+    login_streak: userData.loginStreak,
   };
 }
 
@@ -334,6 +340,8 @@ export function makeNewUser(overrides: Partial<UserInternal> = {}): UserInternal
     referralCode,
     referredBy: undefined,
     referralProcessed: false,
+    lastLoginAt: undefined,
+    loginStreak: 0,
     ...overrides,
   };
 }
@@ -529,5 +537,46 @@ export async function searchUsers(
     .slice(0, limit);
 
   return results;
+}
+
+export async function processDailyLogin(user: UserInternal): Promise<{ bonusXp: number; bonusIp: number; streak: number } | null> {
+  const now = new Date();
+  const lastLogin = user.lastLoginAt ? new Date(user.lastLoginAt) : null;
+
+  if (lastLogin) {
+    const isSameDay =
+      now.getFullYear() === lastLogin.getFullYear() &&
+      now.getMonth() === lastLogin.getMonth() &&
+      now.getDate() === lastLogin.getDate();
+
+    if (isSameDay) return null;
+
+    const yesterday = new Date(now);
+    yesterday.setDate(now.getDate() - 1);
+    const isYesterday =
+      yesterday.getFullYear() === lastLogin.getFullYear() &&
+      yesterday.getMonth() === lastLogin.getMonth() &&
+      yesterday.getDate() === lastLogin.getDate();
+
+    if (isYesterday) {
+      user.loginStreak = (user.loginStreak || 0) + 1;
+    } else {
+      user.loginStreak = 1;
+    }
+  } else {
+    user.loginStreak = 1;
+  }
+
+  user.lastLoginAt = now.toISOString();
+
+  // Classic retention hook rewards
+  const bonusXp = 50 + Math.min(user.loginStreak * 10, 250);
+  const bonusIp = 25 + Math.min(user.loginStreak * 5, 125);
+
+  user.stats.xp += bonusXp;
+  user.stats.points += bonusIp;
+
+  await saveUser(user);
+  return { bonusXp, bonusIp, streak: user.loginStreak };
 }
 

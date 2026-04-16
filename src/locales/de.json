@@ -155,6 +155,16 @@
       "how_to_play": "Spielanleitung",
       "logout": "Abmelden"
     },
+    "banner": {
+      "event_active": "SONDERVERANSTALTUNG AKTIV",
+      "xp_multiplier": "{{multiplier}}x XP-Multiplikator ist aktiv! Bringen Sie Ihren Schrank schneller voran.",
+      "ip_multiplier": "{{multiplier}}x IP-Multiplikator ist aktiv! Verdiene mehr Einflusspunkte."
+    },
+    "daily_reward": {
+      "title": "Tägliche Login-Belohnung",
+      "subtitle": "Sie sind zur Versammlung zurückgekehrt! Schnappen Sie sich Ihr tägliches IP- und XP-Stipendium, um Ihren Aufstieg zu unterstützen.",
+      "streak_label": "Login Streak: Tag {{count}}"
+    },
     "ranks": {
       "initiate": "Initiieren",
       "trainee": "Azubi",
@@ -194,7 +204,7 @@
       "status_locked": "Gesperrt",
       "players_count": "{{count}}/{{max}}",
       "btn_join": "Beitreten",
-      "btn_watch": "Beobachten Sie",
+      "btn_watch": "Betrachten",
       "filter_joinable": "Beitrittsfähig",
       "filter_active": "Aktiv",
       "sort_label": "Sortieren",
@@ -257,7 +267,7 @@
   "game": {
     "roles": {
       "civil": {
-        "name": "Zivil",
+        "name": "Bürgerlich",
         "flavor": "Schützen Sie die Charta. Vertraue niemandem."
       },
       "state": {
@@ -327,7 +337,7 @@
       },
       "spec": {
         "name": "Sonderwahl",
-        "desc": "Präsident wählt nächsten Kandidaten"
+        "desc": "Der Präsident wählt den nächsten Kandidaten"
       },
       "win": {
         "name": "Staatssieg",
@@ -336,7 +346,7 @@
       "investigate": "Untersuchen",
       "special_election": "Sonderwahl",
       "execution": "Ausführung",
-      "policy_peek": "Richtlinien-Peek"
+      "policy_peek": "Policy Peek"
     },
     "policies": {
       "civil": {
@@ -410,7 +420,7 @@
       "win_civil": "Charta wiederhergestellt",
       "win_civil_desc": "Civil gewinnt sofort",
       "win_state": "Staatliche Vorherrschaft",
-      "win_state_desc": "Staat gewinnt sofort",
+      "win_state_desc": "Der Staat gewinnt sofort",
       "quorum_revote": "WIDERRUFEN",
       "win_reasons": {
         "charter_restored": "Charta wiederhergestellt",
@@ -513,6 +523,9 @@
       "title_flip_vote": "Flip-Abstimmung",
       "title_yes": "Ja",
       "title_no": "Nein"
+    },
+    "actions": {
+      "vote_to_kick": "Vote to Kick"
     },
     "chat": {
       "title": "Versammlungschat",
@@ -1050,7 +1063,7 @@
       "modes": {
         "casual": "Lässig",
         "ranked": "Rangliste",
-        "classic": "Klassisch",
+        "classic": "Klassiker",
         "crisis": "Krise"
       }
     },
@@ -1116,7 +1129,7 @@
         "desc": "Bis zum Ende des Spiels müssen mindestens 4 staatliche Anweisungen erlassen worden sein."
       },
       "clean_sweep": {
-        "name": "Sauber fegen",
+        "name": "Sauberer Sweep",
         "desc": "Erlassen Sie als Kanzler eine zivilrechtliche Weisung."
       },
       "the_weathervane": {
@@ -1145,7 +1158,7 @@
       "rejected": "Abgelehnt",
       "no_policy": "Keine Richtlinie",
       "civil": "Zivil",
-      "state": "Staat",
+      "state": "Zustand",
       "pres_short": "Pres",
       "chan_short": "Chan",
       "president": "Präsident",
@@ -1192,7 +1205,7 @@
         "action_share": "Teilen-Link kopieren",
         "action_play_again": "Nochmals abspielen",
         "action_lobby": "Lobby",
-        "completed": "Vollendet",
+        "completed": "Abgeschlossen",
         "failed": "Fehlgeschlagen",
         "title": "Spielergebnisse",
         "title_role": "Titel",
@@ -1206,7 +1219,7 @@
         "title": "Freundschaftsanfrage",
         "description": "<1>{{username}}</1> möchte Freunde sein.",
         "deny": "Verweigern",
-        "accept": "Akzeptiere"
+        "accept": "Akzeptieren"
       },
       "investigation": {
         "title": "Untersuchungsergebnis",
@@ -1325,7 +1338,7 @@
       "enacted": "Richtlinie in Kraft gesetzt",
       "power_triggered": "Ausgelöste Leistung: {{action}}",
       "legislative_hand": "Legislative Hand",
-      "pres_deck": "Präsidentendeck",
+      "pres_deck": "Deck des Präsidenten",
       "deception_detected": "Täuschung entdeckt",
       "actual_draw": "Tatsächliche Auslosung",
       "hidden": "VERSTECKT",
@@ -1407,7 +1420,7 @@
         },
         "step_4": {
           "label": "Erklärungen",
-          "desc": "Sowohl der Präsident als auch die Kanzlerin erklären öffentlich, welche Karten sie gesehen und weitergegeben haben. So wird Vertrauen aufgebaut – oder gebrochen."
+          "desc": "Sowohl der Präsident als auch die Kanzlerin erklären öffentlich, welche Karten sie gesehen und weitergegeben haben. So wird Vertrauen aufgebaut – oder zerstört."
         },
         "chaos_desc": "Scheitern 3 Wahlen hintereinander, wird automatisch eine {{chaos}} gezogen und ohne Abstimmung durchgeführt."
       },
@@ -1528,7 +1541,7 @@
           "title": "Verbündetenanfrage",
           "description": "<1>{{username}}</1> möchte Verbündete sein.",
           "deny": "Verweigern",
-          "accept": "Akzeptiere"
+          "accept": "Akzeptieren"
         },
         "declaration": {
           "drew_label": "<1>Behauptung:</1> Ich habe gezeichnet...",
@@ -1785,12 +1798,20 @@
       "aye_sub": "(JA)",
       "nay": "NEIN!",
       "nay_sub": "(NEIN)",
-      "detained": "Sie sind inhaftiert und können in dieser Runde nicht abstimmen"
+      "detained": "Sie sind inhaftiert und können in dieser Runde nicht abstimmen",
+      "kick_vote_title": "Kick-Abstimmung",
+      "kick_vote_header": "{{name}} ausschließen?",
+      "kick_vote_initiator": "Angefordert von {{name}}",
+      "progress": "Fortschritt",
+      "required": "Erforderlich",
+      "target_wait": "Über Sie wird abgestimmt...",
+      "voted_wait": "Stimmabgabe. Auf andere warten...",
+      "vote_closed": "Abstimmung geschlossen."
     },
     "legislative": {
       "discard": "Verwerfen",
       "enact": "",
-      "propose_veto": "erlassen Veto vorschlagen",
+      "propose_veto": "erlassen Schlagen Sie ein Veto vor",
       "send_dispatch": "Anonymen Versand senden"
     }
   },
@@ -1826,7 +1847,7 @@
       },
       "voice": {
         "ai_voice": "KI-Erzählerstimme",
-        "tts_voice": "Stimmenauswahl",
+        "tts_voice": "Sprachauswahl",
         "tts_default": "Systemstandard",
         "narrator_volume": "Erzählerlautstärke",
         "narrator_volume_desc": "Steuert die Lautstärke für KI-Sprachansagen im Spiel"
@@ -1883,7 +1904,7 @@
       "overseer_wins": "Aufseher gewinnt",
       "ranked_wins": "Ranglistensiege",
       "ranked_games": "Ranglistenspiele",
-      "casual_wins": "Gelegenheitssiege",
+      "casual_wins": "Gelegenheitsgewinne",
       "casual_games": "Gelegenheitsspiele",
       "classic_wins": "Klassische Siege",
       "classic_games": "Klassische Spiele"
@@ -2026,7 +2047,7 @@
           "desc": "Führen Sie als Kanzler in einem einzigen Spiel zwei zivile Anweisungen aus."
         },
         "daily_win_state_5plus_players": {
-          "name": "Staatsbeamter",
+          "name": "Staatsoperativ",
           "desc": "Gewinnen Sie als Staat oder Aufseher ein Spiel mit mindestens 5 Spielern."
         },
         "weekly_win_3": {
@@ -2066,7 +2087,7 @@
           "desc": "Gewinne ein Spiel als Aufseher."
         },
         "weekly_play_classic_2": {
-          "name": "Klassischer Modus Regulär",
+          "name": "Klassischer Modus Normal",
           "desc": "Spielen Sie 2 Spiele im klassischen Modus."
         },
         "weekly_win_5": {
@@ -2236,7 +2257,7 @@
       "invites": {
         "banner_title": "Clan-Einladung",
         "banner_desc": "{{inviter}} hat Sie eingeladen, {{clan}} [{{tag}}]",
-        "btn_accept": "beizutreten Akzeptiere",
+        "btn_accept": "beizutreten Akzeptieren",
         "btn_decline": "Ablehnen"
       },
       "alerts": {
@@ -2399,7 +2420,7 @@
       "error_fetch_failed": "Archivabruf fehlgeschlagen",
       "roles": {
         "civil": "Zivil",
-        "state": "Zustand",
+        "state": "Staat",
         "overseer": "Aufseher"
       },
       "outcomes": {
@@ -2432,7 +2453,8 @@
         "btn_purge": "Räume bereinigen",
         "active_sessions": "Aktive Sitzungen",
         "host_label": "Host: {{name}}",
-        "users_summary": "{{current}} / {{max}} Delegierte"
+        "users_summary": "{{current}} / {{max}} Delegierte",
+        "kick_player": "Spieler kicken"
       },
       "logs": {
         "sessions": "Historische Sitzungen",
@@ -2502,7 +2524,7 @@
         "crisis": "Krise"
       },
       "stats": {
-        "win_rate": "Gewinnen%",
+        "win_rate": "Gewinn%",
         "games": "Spiele",
         "wins": "Siege",
         "elo": "ELO"

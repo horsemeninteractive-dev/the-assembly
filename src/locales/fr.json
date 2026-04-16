@@ -155,6 +155,16 @@
       "how_to_play": "Comment jouer",
       "logout": "Déconnexion"
     },
+    "banner": {
+      "event_active": "ÉVÉNEMENT SPÉCIAL ACTIF",
+      "xp_multiplier": "{{multiplier}}x Le multiplicateur XP est actif ! Faites progresser votre armoire plus rapidement.",
+      "ip_multiplier": "{{multiplier}}x Le multiplicateur IP est actif ! Gagnez plus de points d'influence."
+    },
+    "daily_reward": {
+      "title": "Récompense de connexion quotidienne",
+      "subtitle": "Vous êtes de retour à l'Assemblée ! Récupérez votre allocation quotidienne d'IP et d'XP pour vous aider à grimper.",
+      "streak_label": "Série de connexions : Jour {{count}}"
+    },
     "ranks": {
       "initiate": "Initier",
       "trainee": "Stagiaire",
@@ -194,7 +204,7 @@
       "status_locked": "Verrouillé",
       "players_count": "{{count}}/{{max}}",
       "btn_join": "Rejoindre",
-      "btn_watch": "Regarder",
+      "btn_watch": "Montre",
       "filter_joinable": "Rejoignable",
       "filter_active": "Actif",
       "sort_label": "Trier",
@@ -257,7 +267,7 @@
   "game": {
     "roles": {
       "civil": {
-        "name": "Civile",
+        "name": "Civil",
         "flavor": "Protégez la Charte. Ne faites confiance à personne."
       },
       "state": {
@@ -292,7 +302,7 @@
       "strategist_deck": "Le stratège regarde le jeu.",
       "legislative_chancellor": "Le Chancelier édicte une directive.",
       "auditor_inspect": "L'auditeur inspecte la pile de défausse.",
-      "defector_align": "Le transfuge envisage un réalignement secret.",
+      "defector_align": "Le Transfuge envisage un réalignement secret.",
       "quorum_revote": "Le quorum décide d'un nouveau vote d'urgence.",
       "assassin_target": "Assassin choisit une cible."
     },
@@ -410,7 +420,7 @@
       "win_civil": "Charte restaurée",
       "win_civil_desc": "Civil gagne immédiatement",
       "win_state": "Suprématie de l'État",
-      "win_state_desc": "L'État gagne immédiatement",
+      "win_state_desc": "L’État gagne immédiatement",
       "quorum_revote": "RÉVOTER",
       "win_reasons": {
         "charter_restored": "Charte restaurée",
@@ -439,9 +449,9 @@
     },
     "action_bar": {
       "current_phase": "Phase actuelle",
-      "crisis_active": "Actif en crise",
+      "crisis_active": "Crise active",
       "anonymous_dispatch": "Envoi anonyme intercepté",
-      "encrypted_dispatch": "Canal de répartition crypté",
+      "encrypted_dispatch": "Canal de distribution crypté",
       "cipher_placeholder": "Entrez le message (max 80 caractères)...",
       "quick_reactions": "Réactions rapides",
       "toggle_reactions": "Basculer les réactions",
@@ -491,7 +501,7 @@
       "need_players_ranked": "Besoin de plus de 5 joueurs pour le classement",
       "no_players": "Aucun joueur",
       "voted_for": "A voté pour {{name}}",
-      "censure_select": "Sélectionnez un joueur sur sa carte à censurer (exclure de la prochaine nomination)",
+      "censure_select": "Sélectionner un joueur sur sa carte à censurer (exclure de la prochaine nomination)",
       "snap_volunteer_prompt": "N'importe quel joueur peut se porter volontaire pour être le prochain président.",
       "volunteered": "Bénévole",
       "volunteer": "Bénévole",
@@ -513,6 +523,9 @@
       "title_flip_vote": "Vote inversé",
       "title_yes": "Oui",
       "title_no": "Non"
+    },
+    "actions": {
+      "vote_to_kick": "Votez pour Kick"
     },
     "chat": {
       "title": "Discussion d'Assemblée",
@@ -1177,7 +1190,7 @@
         "performance_header": "Performances des matchs",
         "victory": "Victoire obtenue",
         "defeat": "Mission échouée",
-        "elo": "ELO",
+        "elo": "ÉLO",
         "casual": "Décontracté",
         "xp": "XP",
         "ip": "Propriété intellectuelle",
@@ -1192,7 +1205,7 @@
         "action_share": "Copier le lien de partage",
         "action_play_again": "Rejouer",
         "action_lobby": "Hall",
-        "completed": "Complété",
+        "completed": "Terminé",
         "failed": "Échec",
         "title": "Résultats des matchs",
         "title_role": "Titre",
@@ -1485,7 +1498,7 @@
           "desc": "Appel à un nouveau vote d’urgence lors d’élections ratées sous haute tension."
         },
         "cipher": {
-          "name": "Chiffre",
+          "name": "Chiffrer",
           "desc": "Envoyez une dépêche anonyme à la salle pendant la phase législative."
         }
       },
@@ -1715,7 +1728,7 @@
           },
           "prolific": {
             "name": "Prolifique",
-            "desc": "Adopter 2 politiques en tant que chancelier"
+            "desc": "Adopter 2 politiques en tant que Chancelier"
           },
           "veteran": {
             "name": "Le vétéran",
@@ -1785,7 +1798,15 @@
       "aye_sub": "(OUI)",
       "nay": "NON!",
       "nay_sub": "(NON)",
-      "detained": "Vous êtes détenu et ne pouvez pas voter ce tour"
+      "detained": "Vous êtes détenu et ne pouvez pas voter ce tour",
+      "kick_vote_title": "Vote d'exclusion",
+      "kick_vote_header": "Expulser {{name}} ?",
+      "kick_vote_initiator": "Demandé par {{name}}",
+      "progress": "Progrès",
+      "required": "Obligatoire",
+      "target_wait": "Vous êtes voté pour...",
+      "voted_wait": "Vote exprimé. En attendant les autres...",
+      "vote_closed": "Vote clos."
     },
     "legislative": {
       "discard": "Jeter",
@@ -1834,7 +1855,7 @@
     },
     "lvl_label": "Niveau",
     "ip_label": "Propriété intellectuelle",
-    "cp_label": "CP",
+    "cp_label": "PC",
     "xp_label": "Expérience",
     "edit_username": "Modifier le nom d'utilisateur",
     "public_profile": "Profil public",
@@ -1966,7 +1987,7 @@
           "desc": "Gagnez une partie en tant que surveillant."
         },
         "daily_play_casual": {
-          "name": "Assemblée occasionnelle",
+          "name": "Assemblée informelle",
           "desc": "Jouez à une partie en mode Casual."
         },
         "daily_play_classic": {
@@ -2172,7 +2193,7 @@
     },
     "clans": {
       "members": {
-        "self_label": "Vous",
+        "self_label": "Toi",
         "xp_contributed": "{{count}} XP contribué",
         "btn_promote": "Promouvoir Officier",
         "btn_demote": "Rétrograder au rang de membre",
@@ -2263,8 +2284,8 @@
       "item_type_policy": "Peau de politique",
       "rarities": {
         "common": "Commun",
-        "uncommon": "Peu courant",
-        "rare": "Rare",
+        "uncommon": "Peu fréquent",
+        "rare": "Rares",
         "epic": "Épique",
         "legendary": "Légendaire"
       },
@@ -2317,11 +2338,11 @@
         },
         "civil_ten_wins": {
           "name": "Défenseur de la Charte",
-          "desc": "Gagnez 10 parties en tant que Civil."
+          "desc": "Gagnez 10 parties en tant que civil."
         },
         "civil_twenty_wins": {
           "name": "Gardien de la Charte",
-          "desc": "Gagnez 20 parties en tant que Civil."
+          "desc": "Gagnez 20 parties en tant que civil."
         },
         "state_first_win": {
           "name": "Agent de l'Ombre",
@@ -2432,7 +2453,8 @@
         "btn_purge": "Purger les salles",
         "active_sessions": "Séances actives",
         "host_label": "Hôte : {{name}}",
-        "users_summary": "{{current}} / {{max}} Délégués"
+        "users_summary": "{{current}} / {{max}} Délégués",
+        "kick_player": "Kicker le joueur"
       },
       "logs": {
         "sessions": "Séances historiques",
@@ -2445,7 +2467,7 @@
       "title": "Réquisition de cosmétiques",
       "subtitle": "Échangez IP et CP contre des cadres de bordure, des badges et bien plus encore.",
       "btn_purchase": "Demande ({{amount}})",
-      "item_type_policy": "Peau de politique",
+      "item_type_policy": "Apparence de politique",
       "item_style": "{{type}} Style",
       "btn_owned": "Propriété",
       "btn_locked_pass": "Récompense de passe",

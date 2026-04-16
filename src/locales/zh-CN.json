@@ -155,6 +155,16 @@
       "how_to_play": "怎么玩",
       "logout": "退出"
     },
+    "banner": {
+      "event_active": "特别活动活跃",
+      "xp_multiplier": "{{multiplier}}x XP 乘数已激活！更快地进步你的内阁。",
+      "ip_multiplier": "{{multiplier}}x IP 倍增器已激活！赚取更多影响力积分。"
+    },
+    "daily_reward": {
+      "title": "每日登录奖励",
+      "subtitle": "你已经回到议会了！获取每日 IP 和 XP 津贴来帮助你攀登。",
+      "streak_label": "连续登录：第 {{count}} 天"
+    },
     "ranks": {
       "initiate": "发起",
       "trainee": "实习生",
@@ -173,7 +183,7 @@
       "no_rooms": "没有房间",
       "quick_join": "快速加入",
       "quick_join_desc": "最佳可用房间",
-      "create": "创建装配体",
+      "create": "创建程序集",
       "create_desc": "召集您自己的",
       "practice": "独奏练习",
       "practice_desc": "训练与人工智能机器人",
@@ -194,7 +204,7 @@
       "status_locked": "锁定",
       "players_count": "{{count}}/{{max}}",
       "btn_join": "加入",
-      "btn_watch": "观看",
+      "btn_watch": "手表",
       "filter_joinable": "可加入",
       "filter_active": "活跃",
       "sort_label": "排序",
@@ -231,7 +241,7 @@
       "mode_classic_desc": "标准角色/规则。没有ELO，减少积分。",
       "mode_crisis_desc": "基于回合的事件卡。高风险，高积分。",
       "privacy": "隐私",
-      "privacy_public": "民众",
+      "privacy_public": "公共",
       "privacy_public_desc": "任何人都可以加入",
       "privacy_friends": "仅限朋友",
       "privacy_friends_desc": "仅限您的朋友",
@@ -475,7 +485,7 @@
       "execute_prompt": "选择要执行的玩家。",
       "peek_prompt": "查看这副牌最上面的 3 张牌。",
       "must_use_power": "你必须运用你的执行力。",
-      "pres_must_use": "总统必须行使行政权力。",
+      "pres_must_use": "总统必须使用其行政权。",
       "lobby_ready_prompt": "当您准备好开始时，请按“准备就绪”。当所有玩家都准备好时，游戏开始。",
       "game_over_title": "游戏结束",
       "see_results": "查看装配结果",
@@ -491,7 +501,7 @@
       "need_players_ranked": "需要 5 名以上玩家才能进行排名",
       "no_players": "没有玩家",
       "voted_for": "投票给 {{name}}",
-      "censure_select": "选择卡上的一名球员进行谴责（从下一次提名中排除）",
+      "censure_select": "选择卡上的一名球员进行谴责（排除在下一次提名之外）",
       "snap_volunteer_prompt": "任何玩家都可以自愿成为下一任总统。",
       "volunteered": "自愿",
       "volunteer": "志愿者",
@@ -514,10 +524,13 @@
       "title_yes": "是的",
       "title_no": "没有"
     },
+    "actions": {
+      "vote_to_kick": "投票踢"
+    },
     "chat": {
       "title": "组装聊天",
       "round_separator": "回合 {{count}}",
-      "dead_cant_speak": "死去的玩家无法说话...",
+      "dead_cant_speak": "死去的玩家不能说话……",
       "placeholder": "输入消息...",
       "chanCivilStateEnacted": {
         "0": "我收到了两项国家指令。总统欠议会一个解释。",
@@ -1050,7 +1063,7 @@
       "modes": {
         "casual": "休闲",
         "ranked": "排名",
-        "classic": "经典",
+        "classic": "经典的",
         "crisis": "危机"
       }
     },
@@ -1152,7 +1165,7 @@
       "chancellor": "校长",
       "drew": "德鲁",
       "passed": "通过",
-      "received": "已收到",
+      "received": "收到",
       "votes": "投票",
       "aye": "是啊",
       "nay": "不",
@@ -1167,7 +1180,7 @@
     "modals": {
       "game_over": {
         "banners": {
-          "civil_win_default": "恢复宪章",
+          "civil_win_default": "宪章恢复",
           "state_win_default": "国家至上",
           "inconclusive": "尚无定论",
           "civil_desc": "《宪章》得到了捍卫。",
@@ -1177,7 +1190,7 @@
         "performance_header": "比赛表现",
         "victory": "胜利已达成",
         "defeat": "任务失败",
-        "elo": "ELO",
+        "elo": "埃洛",
         "casual": "休闲",
         "xp": "XP",
         "ip": "知识产权",
@@ -1192,7 +1205,7 @@
         "action_share": "复制分享链接",
         "action_play_again": "再玩一次",
         "action_lobby": "大堂",
-        "completed": "完全的",
+        "completed": "已完成",
         "failed": "失败",
         "title": "比赛结果",
         "title_role": "标题",
@@ -1707,7 +1720,7 @@
           },
           "nominated": {
             "name": "提名",
-            "desc": "两次被提名总理"
+            "desc": "两次被提名为校长"
           },
           "deadlock": {
             "name": "僵局",
@@ -1785,7 +1798,15 @@
       "aye_sub": "（是）",
       "nay": "不！",
       "nay_sub": "（否）",
-      "detained": "您已被拘留，无法在本轮投票"
+      "detained": "您已被拘留，无法在本轮投票",
+      "kick_vote_title": "踢投票",
+      "kick_vote_header": "驱逐{{name}}？",
+      "kick_vote_initiator": "请求者：{{name}}",
+      "progress": "进展",
+      "required": "必填",
+      "target_wait": "您正在投票...",
+      "voted_wait": "投票。等待其他人...",
+      "vote_closed": "投票结束。"
     },
     "legislative": {
       "discard": "丢弃",
@@ -1832,7 +1853,7 @@
         "narrator_volume_desc": "控制游戏中 AI 语音播报的音量"
       }
     },
-    "lvl_label": "等级",
+    "lvl_label": "级别",
     "ip_label": "知识产权",
     "cp_label": "CP",
     "xp_label": "经验",
@@ -1858,7 +1879,7 @@
       "clan": "氏族",
       "shop": "店铺",
       "pass": "通过",
-      "friends": "盟友",
+      "friends": "盟国",
       "referrals": "推荐",
       "history": "历史",
       "settings": "设置",
@@ -1966,7 +1987,7 @@
           "desc": "作为监督者赢得一场比赛。"
         },
         "daily_play_casual": {
-          "name": "随意组装",
+          "name": "随意集会",
           "desc": "玩休闲模式游戏。"
         },
         "daily_play_classic": {
@@ -1991,7 +2012,7 @@
         },
         "daily_win_long": {
           "name": "长时间会议",
-          "desc": "赢得一场至少持续 10 轮的游戏。"
+          "desc": "赢得一场至少持续 10 轮的比赛。"
         },
         "daily_voted_aye_failed": {
           "name": "被选票出卖",
@@ -2223,7 +2244,7 @@
         "btn_share": "复制邀请链接",
         "btn_edit": "修改部落",
         "btn_save": "确认更改",
-        "btn_saving": "致力于...",
+        "btn_saving": "承诺...",
         "xp_label": "氏族等级 XP",
         "total_xp": "{{count}} 累计经验值",
         "contribution": "{{count}} XP 贡献",
@@ -2264,7 +2285,7 @@
       "rarities": {
         "common": "常见",
         "uncommon": "不常见",
-        "rare": "稀有的",
+        "rare": "罕见",
         "epic": "史诗",
         "legendary": "传奇"
       },
@@ -2410,7 +2431,7 @@
     },
     "admin": {
       "tabs": {
-        "rooms": "房间",
+        "rooms": "客房",
         "users": "用户",
         "system": "系统",
         "logs": "审计"
@@ -2432,7 +2453,8 @@
         "btn_purge": "净化室",
         "active_sessions": "活跃会话",
         "host_label": "主持人：{{name}}",
-        "users_summary": "{{current}} / {{max}} 代表"
+        "users_summary": "{{current}} / {{max}} 代表",
+        "kick_player": "踢球员"
       },
       "logs": {
         "sessions": "历史会议",
@@ -2463,7 +2485,7 @@
       "locked": "分类",
       "season": "赛季 {{number}}",
       "season_desc": "完成挑战并赚取 XP 来解锁专属化妆品。",
-      "level": "等级",
+      "level": "级别",
       "xp_summary": "{{amount}} 获得 XP",
       "footer_season": "赛季 {{number}} · 活跃",
       "footer_premium_hint": "高级奖励可以通过升级来解锁。继续玩。",
@@ -2502,7 +2524,7 @@
         "crisis": "危机"
       },
       "stats": {
-        "win_rate": "赢％",
+        "win_rate": "赢%",
         "games": "游戏",
         "wins": "胜利",
         "elo": "ELO"
@@ -2511,8 +2533,8 @@
   },
   "social": {
     "clan": {
-      "profile_label": "部落简介",
-      "level": "等级",
+      "profile_label": "氏族简介",
+      "level": "级别",
       "members": "会员",
       "no_desc": "没有提供描述。",
       "share_clan": "分享部落",
@@ -2538,7 +2560,7 @@
       "no_friends_hint": "搜索上面的玩家或添加游戏中的某人。",
       "online": "在线 ({{count}})",
       "offline": "离线 ({{count}})",
-      "in_game": "正在组装·{{roomId}}",
+      "in_game": "组装中·{{roomId}}",
       "in_lobby": "在大厅",
       "recently_played": "最近玩过",
       "time_m_ago": "{{count}} 分钟前",

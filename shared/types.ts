@@ -328,6 +328,8 @@ export interface User {
   tokenVersion?: number;
   referralCode?: string;
   referredBy?: string;
+  lastLoginAt?: string;
+  loginStreak?: number;
 }
 
 export interface UserInternal extends User {
@@ -614,6 +616,12 @@ export interface GameState {
   spectatorPredictions?: {
     [userId: string]: { prediction: 'Civil' | 'State'; amount: number; odds: number; timestamp: number };
   };
+  kickVote?: {
+    targetId: string;
+    initiatorId: string;
+    votes: Record<string, 'Aye' | 'Nay'>;
+    endsAt: number;
+  };
   globalStats?: { civilWins: number; stateWins: number };
   isPractice?: boolean;
   aiDifficulty?: 'Casual' | 'Normal' | 'Elite';
@@ -736,4 +744,7 @@ export interface ClientToServerEvents {
   adminGetChatLogs: (roomId: string) => void;
   adminClearRedis: () => void;
   spectatorPredict: (data: { prediction: 'Civil' | 'State'; amount: number }) => void;
+  giveCommendation: (data: { targetId: string; type: CommendationType }) => void;
+  initiateKickVote: (targetId: string) => void;
+  castKickVote: (vote: 'Aye' | 'Nay') => void;
 }
