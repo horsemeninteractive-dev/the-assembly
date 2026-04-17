@@ -358,6 +358,42 @@
         "seasonal_win_25": {
           "name": "Legendary Victor",
           "desc": "Win 25 games this season."
+        },
+        "clan_daily_play": {
+          "name": "Unified Effort",
+          "desc": "Play 5 games as a clan."
+        },
+        "clan_daily_win": {
+          "name": "Shared Victory",
+          "desc": "Secure 2 wins across the clan."
+        },
+        "clan_daily_directives": {
+          "name": "Legislative Momentum",
+          "desc": "Enact 10 directives total."
+        },
+        "clan_daily_agendas": {
+          "name": "Strategic Focus",
+          "desc": "Complete 3 personal agendas across the clan."
+        },
+        "clan_weekly_play": {
+          "name": "Dominant Presence",
+          "desc": "Play 25 games as a clan."
+        },
+        "clan_weekly_win": {
+          "name": "Unstoppable Force",
+          "desc": "Secure 10 wins across the clan."
+        },
+        "clan_weekly_directives": {
+          "name": "Supreme Council",
+          "desc": "Enact 50 directives total."
+        },
+        "clan_seasonal_play": {
+          "name": "Eternal Assembly",
+          "desc": "Play 100 games this season."
+        },
+        "clan_seasonal_win": {
+          "name": "Seasoned Conquerors",
+          "desc": "Secure 40 wins this season."
         }
       }
     },

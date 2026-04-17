@@ -1302,32 +1302,6 @@
       "prediction_unity": "Unité",
       "prediction_deception": "Tromperie"
     },
-    "debrief": {
-      "intro_title": "LE RÉSULTAT",
-      "charter_defended": "LA CHARTE A ÉTÉ DÉFENDUE",
-      "secretariat_fallen": "LE SECRÉTARIAT EST TOMBÉ",
-      "key_moments": "MOMENTS CLÉS",
-      "identities_confirmed": "IDENTITÉS CONFIRMÉES",
-      "tap_to_advance": "APPUYEZ PARTOUT POUR CONTINUER",
-      "no_plays": "Aucun événement notable ne s'est produit",
-      "roles": {
-        "civil": "Civile",
-        "state": "État",
-        "overseer": "Surveillant"
-      },
-      "plays": {
-        "assassin": "{{assassin}} éliminé {{killed}} en tant qu'Assassin",
-        "execution_one": "{{name}} a été exécuté par décret présidentiel",
-        "execution_many": "{{names}} ont été exécutés par décret présidentiel",
-        "chaos_one": "Une directive sur le chaos a été imposée à l'Assemblée",
-        "chaos_many": "{{count}} les directives du chaos ont déstabilisé l'Assemblée",
-        "veto_one": "Le gouvernement a invoqué son droit de veto",
-        "veto_many": "Le veto a été exercé {{count}} fois",
-        "true_lie": "Round {{round}} : Le président {{name}} a prétendu dessiner 3 politiques d'État, mais a en fait dessiné Civil",
-        "marathon": "Une bataille de volontés épique en {{count}} round",
-        "deadlock": "Les deux factions ont tenu l'Assemblée dans une impasse extrême"
-      }
-    },
     "match_replay": {
       "title": "Replay du match",
       "subtitle": "Reconstruction d'après-match",
@@ -1358,7 +1332,33 @@
       "nay": "Non",
       "no_vote": "Aucun vote n'a eu lieu ce tour",
       "footer_info": "Replay utilise des données d'archives décryptées. Utilisez la chronologie ci-dessus pour parcourir les étapes du match.",
-      "close": "Fermer Reconstruction"
+      "close": "Fermer la reconstruction"
+    },
+    "debrief": {
+      "intro_title": "LE RÉSULTAT",
+      "charter_defended": "LA CHARTE A ÉTÉ DÉFENDUE",
+      "secretariat_fallen": "LE SECRÉTARIAT EST TOMBÉ",
+      "key_moments": "MOMENTS CLÉS",
+      "identities_confirmed": "IDENTITÉS CONFIRMÉES",
+      "tap_to_advance": "APPUYEZ PARTOUT POUR CONTINUER",
+      "no_plays": "Aucun événement notable ne s'est produit",
+      "roles": {
+        "civil": "Civile",
+        "state": "État",
+        "overseer": "Surveillant"
+      },
+      "plays": {
+        "assassin": "{{assassin}} éliminé {{killed}} en tant qu'Assassin",
+        "execution_one": "{{name}} a été exécuté par décret présidentiel",
+        "execution_many": "{{names}} ont été exécutés par décret présidentiel",
+        "chaos_one": "Une directive sur le chaos a été imposée à l'Assemblée",
+        "chaos_many": "{{count}} les directives du chaos ont déstabilisé l'Assemblée",
+        "veto_one": "Le gouvernement a invoqué son droit de veto",
+        "veto_many": "Le veto a été exercé {{count}} fois",
+        "true_lie": "Round {{round}} : Le président {{name}} a prétendu dessiner 3 politiques d'État, mais a en fait dessiné Civil",
+        "marathon": "Une bataille de volontés épique en {{count}} round",
+        "deadlock": "Les deux factions ont tenu l'Assemblée dans une impasse extrême"
+      }
     },
     "narration": {
       "nomination": "L'Assemblée est en séance. Président, nommez votre chancelier.",
@@ -2184,6 +2184,42 @@
         "seasonal_win_25": {
           "name": "Victor légendaire",
           "desc": "Gagnez 25 matchs cette saison."
+        },
+        "clan_daily_play": {
+          "name": "Effort unifié",
+          "desc": "Jouez 5 parties en clan."
+        },
+        "clan_daily_win": {
+          "name": "Victoire partagée",
+          "desc": "Obtenez 2 victoires dans tout le clan."
+        },
+        "clan_daily_directives": {
+          "name": "Dynamique législative",
+          "desc": "Adoptez 10 directives au total."
+        },
+        "clan_daily_agendas": {
+          "name": "Orientation stratégique",
+          "desc": "Terminez 3 agendas personnels à travers le clan."
+        },
+        "clan_weekly_play": {
+          "name": "Présence dominante",
+          "desc": "Jouez à 25 parties en clan."
+        },
+        "clan_weekly_win": {
+          "name": "Force imparable",
+          "desc": "Obtenez 10 victoires dans tout le clan."
+        },
+        "clan_weekly_directives": {
+          "name": "Conseil suprême",
+          "desc": "Adopter 50 directives au total."
+        },
+        "clan_seasonal_play": {
+          "name": "Assemblée éternelle",
+          "desc": "Jouez 100 matchs cette saison."
+        },
+        "clan_seasonal_win": {
+          "name": "Conquérants chevronnés",
+          "desc": "Obtenez 40 victoires cette saison."
         }
       }
     },
@@ -2200,7 +2236,7 @@
     },
     "clans": {
       "members": {
-        "self_label": "Vous",
+        "self_label": "Toi",
         "xp_contributed": "{{count}} XP contribué",
         "btn_promote": "Promouvoir Officier",
         "btn_demote": "Rétrograder au rang de membre",
@@ -2474,7 +2510,7 @@
       "title": "Réquisition de cosmétiques",
       "subtitle": "Échangez IP et CP contre des cadres de bordure, des badges et bien plus encore.",
       "btn_purchase": "Demande ({{amount}})",
-      "item_type_policy": "Peau de politique",
+      "item_type_policy": "Apparence de politique",
       "item_style": "{{type}} Style",
       "btn_owned": "Propriété",
       "btn_locked_pass": "Récompense de passe",
@@ -2526,7 +2562,7 @@
       "modes": {
         "overall": "Globalement",
         "ranked": "Classé",
-        "casual": "Occasionnel",
+        "casual": "Décontracté",
         "classic": "Classique",
         "crisis": "Crise"
       },

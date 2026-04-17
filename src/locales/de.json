@@ -1302,32 +1302,6 @@
       "prediction_unity": "Einheit",
       "prediction_deception": "Täuschung"
     },
-    "debrief": {
-      "intro_title": "DAS ERGEBNIS",
-      "charter_defended": "DIE CHARTA WURDE VERTEIDIGT",
-      "secretariat_fallen": "DAS SEKRETARIAT IST GEFALLEN",
-      "key_moments": "SCHLÜSSELMOMENTE",
-      "identities_confirmed": "IDENTITÄTEN BESTÄTIGT",
-      "tap_to_advance": "Irgendwo antippen, um fortzufahren",
-      "no_plays": "Es sind keine nennenswerten Ereignisse aufgetreten",
-      "roles": {
-        "civil": "Zivil",
-        "state": "Staat",
-        "overseer": "Aufseher"
-      },
-      "plays": {
-        "assassin": "{{assassin}} eliminierte {{killed}} als Assassine",
-        "execution_one": "{{name}} wurde per Präsidialdekret hingerichtet",
-        "execution_many": "{{names}} wurden per Präsidialdekret hingerichtet",
-        "chaos_one": "Der Versammlung wurde eine Chaos-Anweisung aufgezwungen",
-        "chaos_many": "{{count}} Chaosanweisungen destabilisierten die Versammlung",
-        "veto_one": "Die Regierung berief sich auf ihr Vetorecht",
-        "veto_many": "Das Veto wurde {{count}} Mal ausgeübt",
-        "true_lie": "Runde {{round}}: Präsident {{name}} behauptete, 3 staatliche Richtlinien zu ziehen, zog aber tatsächlich zivile",
-        "marathon": "Ein epischer {{count}}-Runden-Willenskampf",
-        "deadlock": "Beide Fraktionen hielten die Versammlung in einer Sackgasse"
-      }
-    },
     "match_replay": {
       "title": "Spielwiederholung",
       "subtitle": "Rekonstruktion nach dem Spiel",
@@ -1358,7 +1332,33 @@
       "nay": "Nein",
       "no_vote": "In dieser Runde fand keine Abstimmung statt",
       "footer_info": "Replay verwendet entschlüsselte Archivdaten. Verwenden Sie die Zeitleiste oben, um durch die Spielmeilensteine ​​zu navigieren.",
-      "close": "Rekonstruktion schließen"
+      "close": "Schließen Sie die Rekonstruktion"
+    },
+    "debrief": {
+      "intro_title": "DAS ERGEBNIS",
+      "charter_defended": "DIE CHARTA WURDE VERTEIDIGT",
+      "secretariat_fallen": "DAS SEKRETARIAT IST GEFALLEN",
+      "key_moments": "SCHLÜSSELMOMENTE",
+      "identities_confirmed": "IDENTITÄTEN BESTÄTIGT",
+      "tap_to_advance": "Irgendwo antippen, um fortzufahren",
+      "no_plays": "Es sind keine nennenswerten Ereignisse aufgetreten",
+      "roles": {
+        "civil": "Zivil",
+        "state": "Staat",
+        "overseer": "Aufseher"
+      },
+      "plays": {
+        "assassin": "{{assassin}} eliminierte {{killed}} als Assassine",
+        "execution_one": "{{name}} wurde per Präsidialdekret hingerichtet",
+        "execution_many": "{{names}} wurden per Präsidialdekret hingerichtet",
+        "chaos_one": "Der Versammlung wurde eine Chaos-Anweisung aufgezwungen",
+        "chaos_many": "{{count}} Chaosanweisungen destabilisierten die Versammlung",
+        "veto_one": "Die Regierung berief sich auf ihr Vetorecht",
+        "veto_many": "Das Veto wurde {{count}} Mal ausgeübt",
+        "true_lie": "Runde {{round}}: Präsident {{name}} behauptete, 3 staatliche Richtlinien zu ziehen, zog aber tatsächlich zivile",
+        "marathon": "Ein epischer {{count}}-Runden-Willenskampf",
+        "deadlock": "Beide Fraktionen hielten die Versammlung in einer Sackgasse"
+      }
     },
     "narration": {
       "nomination": "Die Versammlung tagt. Präsident, nominieren Sie Ihren Kanzler.",
@@ -2184,6 +2184,42 @@
         "seasonal_win_25": {
           "name": "Legendärer Sieger",
           "desc": "Gewinne in dieser Saison 25 Spiele."
+        },
+        "clan_daily_play": {
+          "name": "Einheitlicher Aufwand",
+          "desc": "Spiele 5 Spiele als Clan."
+        },
+        "clan_daily_win": {
+          "name": "Geteilter Sieg",
+          "desc": "Sichern Sie sich 2 Siege im gesamten Clan."
+        },
+        "clan_daily_directives": {
+          "name": "Gesetzgebungsdynamik",
+          "desc": "Erlassen Sie insgesamt 10 Richtlinien."
+        },
+        "clan_daily_agendas": {
+          "name": "Strategischer Fokus",
+          "desc": "Schließe 3 persönliche Agenden im gesamten Clan ab."
+        },
+        "clan_weekly_play": {
+          "name": "Dominante Präsenz",
+          "desc": "Spiele 25 Spiele als Clan."
+        },
+        "clan_weekly_win": {
+          "name": "Unaufhaltsame Kraft",
+          "desc": "Sichern Sie sich 10 Siege im gesamten Clan."
+        },
+        "clan_weekly_directives": {
+          "name": "Oberster Rat",
+          "desc": "Erlassen Sie insgesamt 50 Richtlinien."
+        },
+        "clan_seasonal_play": {
+          "name": "Ewige Versammlung",
+          "desc": "Spiele in dieser Saison 100 Spiele."
+        },
+        "clan_seasonal_win": {
+          "name": "Erfahrene Eroberer",
+          "desc": "Sichern Sie sich in dieser Saison 40 Siege."
         }
       }
     },
@@ -2255,7 +2291,7 @@
         "xp_label": "Clan-Level-XP",
         "total_xp": "{{count}} Gesamt-EP angesammelt",
         "contribution": "{{count}} XP beigetragen",
-        "overview": "Überblick",
+        "overview": "Übersicht",
         "challenges": "Ziele",
         "invite_label": "Zum Clan einladen",
         "invite_placeholder": "Spieler zum Einladen finden...",
@@ -2264,7 +2300,7 @@
       "invites": {
         "banner_title": "Clan-Einladung",
         "banner_desc": "{{inviter}} hat Sie eingeladen, {{clan}} [{{tag}}]",
-        "btn_accept": "beizutreten Akzeptiere",
+        "btn_accept": "beizutreten Akzeptieren",
         "btn_decline": "Ablehnen"
       },
       "alerts": {
@@ -2290,7 +2326,7 @@
       "vote_yes": "Ja Token",
       "item_type_policy": "Richtlinien-Skin",
       "rarities": {
-        "common": "Gemeinsam",
+        "common": "Gewöhnlich",
         "uncommon": "Gelegentlich",
         "rare": "Selten",
         "epic": "Episch",

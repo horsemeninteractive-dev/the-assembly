@@ -1302,6 +1302,38 @@
       "prediction_unity": "团结",
       "prediction_deception": "欺骗"
     },
+    "match_replay": {
+      "title": "比赛重播",
+      "subtitle": "赛后重建",
+      "reveal_truth": "揭露真相",
+      "hide_deceptions": "隐藏欺骗",
+      "no_history": "本场比赛没有历史记录",
+      "government_header": "{{round}} 轮政府",
+      "president": "总统",
+      "chancellor": "校长",
+      "session_summary": "会议总结",
+      "chaos_forced": "混沌被迫",
+      "rejected": "政府拒绝",
+      "fail_veto": "双方同意行使否决权。",
+      "fail_default": "议会未能确认这一联盟。",
+      "enacted": "指令已颁布",
+      "power_triggered": "电源触发：{{action}}",
+      "legislative_hand": "立法之手",
+      "pres_deck": "总统甲板",
+      "deception_detected": "检测到欺骗",
+      "actual_draw": "实际抽奖",
+      "hidden": "隐藏",
+      "public_claim": "公开索赔",
+      "chan_hand": "校长之手",
+      "conflicting_stories": "相互矛盾的故事",
+      "actual_received": "实际收到",
+      "voting_records": "投票记录",
+      "aye": "是啊",
+      "nay": "不",
+      "no_vote": "本轮没有投票",
+      "footer_info": "重播使用解密的档案数据。使用上面的时间线浏览比赛里程碑。",
+      "close": "关闭重建"
+    },
     "debrief": {
       "intro_title": "结果",
       "charter_defended": "宪章得到捍卫",
@@ -1327,38 +1359,6 @@
         "marathon": "一场史诗般的 {{count}} 轮意志之战",
         "deadlock": "两派使议会陷入了刀锋般的僵局"
       }
-    },
-    "match_replay": {
-      "title": "比赛重播",
-      "subtitle": "赛后重建",
-      "reveal_truth": "揭露真相",
-      "hide_deceptions": "隐藏欺骗",
-      "no_history": "这场比赛没有历史记录",
-      "government_header": "{{round}} 轮政府",
-      "president": "总统",
-      "chancellor": "校长",
-      "session_summary": "会议总结",
-      "chaos_forced": "混沌强行",
-      "rejected": "政府拒绝",
-      "fail_veto": "双方同意行使否决权。",
-      "fail_default": "议会未能确认这一联盟。",
-      "enacted": "指令已颁布",
-      "power_triggered": "电源触发：{{action}}",
-      "legislative_hand": "立法之手",
-      "pres_deck": "总统甲板",
-      "deception_detected": "检测到欺骗",
-      "actual_draw": "实际抽奖",
-      "hidden": "隐藏",
-      "public_claim": "公开索赔",
-      "chan_hand": "校长之手",
-      "conflicting_stories": "相互矛盾的故事",
-      "actual_received": "实际收到",
-      "voting_records": "投票记录",
-      "aye": "是啊",
-      "nay": "不",
-      "no_vote": "本轮没有投票",
-      "footer_info": "重播使用解密的档案数据。使用上面的时间线浏览比赛里程碑。",
-      "close": "关闭重建"
     },
     "narration": {
       "nomination": "议会正在开会。总统，提名你的总理。",
@@ -2184,6 +2184,42 @@
         "seasonal_win_25": {
           "name": "传奇维克多",
           "desc": "本赛季赢得25场比赛。"
+        },
+        "clan_daily_play": {
+          "name": "齐心协力",
+          "desc": "以部落身份玩 5 场游戏。"
+        },
+        "clan_daily_win": {
+          "name": "共同胜利",
+          "desc": "在整个部落中确保 2 场胜利。"
+        },
+        "clan_daily_directives": {
+          "name": "立法动力",
+          "desc": "共颁布 10 项指令。"
+        },
+        "clan_daily_agendas": {
+          "name": "战略重点",
+          "desc": "完成整个部落的 3 项个人议程。"
+        },
+        "clan_weekly_play": {
+          "name": "主导存在",
+          "desc": "作为一个部落进行 25 场比赛。"
+        },
+        "clan_weekly_win": {
+          "name": "不可阻挡的力量",
+          "desc": "确保整个部落取得 10 场胜利。"
+        },
+        "clan_weekly_directives": {
+          "name": "最高委员会",
+          "desc": "总共颁布 50 条指令。"
+        },
+        "clan_seasonal_play": {
+          "name": "永恒集会",
+          "desc": "本赛季打 100 场比赛。"
+        },
+        "clan_seasonal_win": {
+          "name": "经验丰富的征服者",
+          "desc": "本赛季取得40场胜利。"
         }
       }
     },
@@ -2224,7 +2260,7 @@
         "your_clan": "你的氏族"
       },
       "create": {
-        "title": "找到了一个新氏族",
+        "title": "找到了一个新部落",
         "tag_label": "部落标签（4-5 个字符）",
         "tag_placeholder": "阿斯利",
         "name_label": "部落名称",
@@ -2290,7 +2326,7 @@
       "vote_yes": "是的令牌",
       "item_type_policy": "政策皮肤",
       "rarities": {
-        "common": "常见的",
+        "common": "常见",
         "uncommon": "不常见",
         "rare": "罕见",
         "epic": "史诗",
@@ -2438,7 +2474,7 @@
     },
     "admin": {
       "tabs": {
-        "rooms": "房间",
+        "rooms": "客房",
         "users": "用户",
         "system": "系统",
         "logs": "审计"
@@ -2526,7 +2562,7 @@
       "modes": {
         "overall": "总体",
         "ranked": "排名",
-        "casual": "随意的",
+        "casual": "休闲",
         "classic": "经典",
         "crisis": "危机"
       },
@@ -2540,7 +2576,7 @@
   },
   "social": {
     "clan": {
-      "profile_label": "部落简介",
+      "profile_label": "氏族简介",
       "level": "级别",
       "members": "会员",
       "no_desc": "没有提供描述。",
@@ -2560,14 +2596,14 @@
       "searching": "正在搜索...",
       "search_no_results": "没有找到“{{query}}”的玩家",
       "status_sent": "已发送",
-      "friends_label": "盟国",
+      "friends_label": "盟友",
       "pending_requests": "待处理请求 ({{count}})",
       "wants_to_be_friends": "想成为盟友",
       "no_friends": "还没有盟友。",
       "no_friends_hint": "搜索上面的玩家或添加游戏中的某人。",
       "online": "在线 ({{count}})",
       "offline": "离线 ({{count}})",
-      "in_game": "正在组装·{{roomId}}",
+      "in_game": "组装中·{{roomId}}",
       "in_lobby": "在大厅",
       "recently_played": "最近玩过",
       "time_m_ago": "{{count}} 分钟前",

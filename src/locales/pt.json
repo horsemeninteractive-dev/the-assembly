@@ -1302,6 +1302,38 @@
       "prediction_unity": "Unidade",
       "prediction_deception": "Decepção"
     },
+    "match_replay": {
+      "title": "Repetição da partida",
+      "subtitle": "Reconstrução Pós-Jogo",
+      "reveal_truth": "Revele a verdade",
+      "hide_deceptions": "Ocultar enganos",
+      "no_history": "Nenhum histórico registrado para esta partida",
+      "government_header": "Rodada {{round}} Governo",
+      "president": "Presidente",
+      "chancellor": "Chanceler",
+      "session_summary": "Resumo da sessão",
+      "chaos_forced": "Caos Forçado",
+      "rejected": "Governo rejeitado",
+      "fail_veto": "Ambas as partes concordaram em exercer o poder de veto.",
+      "fail_default": "A Assembleia não conseguiu confirmar esta coligação.",
+      "enacted": "Diretiva promulgada",
+      "power_triggered": "Energia acionada: {{action}}",
+      "legislative_hand": "Mão Legislativa",
+      "pres_deck": "Deck do Presidente",
+      "deception_detected": "Decepção detectada",
+      "actual_draw": "Sorteio Real",
+      "hidden": "ESCONDIDO",
+      "public_claim": "Reivindicação Pública",
+      "chan_hand": "Mão do Chanceler",
+      "conflicting_stories": "Histórias conflitantes",
+      "actual_received": "Real Recebido",
+      "voting_records": "Registros de votação",
+      "aye": "Sim",
+      "nay": "Não",
+      "no_vote": "Nenhuma votação foi realizada nesta rodada",
+      "footer_info": "O Replay usa dados de arquivo descriptografados. Use a linha do tempo acima para navegar pelos marcos da partida.",
+      "close": "Fechar Reconstrução"
+    },
     "debrief": {
       "intro_title": "O RESULTADO",
       "charter_defended": "A CARTA FOI DEFENDIDA",
@@ -1327,38 +1359,6 @@
         "marathon": "Uma batalha de vontades épica de {{count}} rodadas",
         "deadlock": "Ambas as facções mantiveram a Assembleia num impasse extremo"
       }
-    },
-    "match_replay": {
-      "title": "Repetição da partida",
-      "subtitle": "Reconstrução Pós-Jogo",
-      "reveal_truth": "Revele a verdade",
-      "hide_deceptions": "Ocultar enganos",
-      "no_history": "Nenhum histórico registrado para esta partida",
-      "government_header": "Rodada {{round}} Governo",
-      "president": "Presidente",
-      "chancellor": "Chanceler",
-      "session_summary": "Resumo da sessão",
-      "chaos_forced": "Caos forçado",
-      "rejected": "Governo rejeitado",
-      "fail_veto": "Ambas as partes concordaram em exercer o poder de veto.",
-      "fail_default": "A Assembleia não conseguiu confirmar esta coligação.",
-      "enacted": "Diretiva promulgada",
-      "power_triggered": "Energia acionada: {{action}}",
-      "legislative_hand": "Mão Legislativa",
-      "pres_deck": "Deck do Presidente",
-      "deception_detected": "Decepção detectada",
-      "actual_draw": "Sorteio Real",
-      "hidden": "ESCONDIDO",
-      "public_claim": "Reivindicação Pública",
-      "chan_hand": "Mão do Chanceler",
-      "conflicting_stories": "Histórias conflitantes",
-      "actual_received": "Real Recebido",
-      "voting_records": "Registros de votação",
-      "aye": "Sim",
-      "nay": "Não",
-      "no_vote": "Nenhuma votação foi realizada nesta rodada",
-      "footer_info": "O Replay usa dados de arquivo descriptografados. Use a linha do tempo acima para navegar pelos marcos da partida.",
-      "close": "Fechar Reconstrução"
     },
     "narration": {
       "nomination": "A Assembleia está em sessão. Presidente, nomeie seu Chanceler.",
@@ -2184,6 +2184,42 @@
         "seasonal_win_25": {
           "name": "Victor Lendário",
           "desc": "Ganhe 25 jogos nesta temporada."
+        },
+        "clan_daily_play": {
+          "name": "Esforço Unificado",
+          "desc": "Jogue 5 partidas como um clã."
+        },
+        "clan_daily_win": {
+          "name": "Vitória Compartilhada",
+          "desc": "Garanta 2 vitórias em todo o clã."
+        },
+        "clan_daily_directives": {
+          "name": "Momento legislativo",
+          "desc": "Promulgue 10 diretivas no total."
+        },
+        "clan_daily_agendas": {
+          "name": "Foco Estratégico",
+          "desc": "Complete 3 agendas pessoais em todo o clã."
+        },
+        "clan_weekly_play": {
+          "name": "Presença Dominante",
+          "desc": "Jogue 25 partidas como um clã."
+        },
+        "clan_weekly_win": {
+          "name": "Força Imparável",
+          "desc": "Garanta 10 vitórias em todo o clã."
+        },
+        "clan_weekly_directives": {
+          "name": "Conselho Supremo",
+          "desc": "Promulgue 50 diretivas no total."
+        },
+        "clan_seasonal_play": {
+          "name": "Assembleia Eterna",
+          "desc": "Jogue 100 partidas nesta temporada."
+        },
+        "clan_seasonal_win": {
+          "name": "Conquistadores experientes",
+          "desc": "Garanta 40 vitórias nesta temporada."
         }
       }
     },
@@ -2224,14 +2260,14 @@
         "your_clan": "Seu Clã"
       },
       "create": {
-        "title": "Encontrou um novo clã",
+        "title": "Encontrou um Novo Clã",
         "tag_label": "Tag do clã (4-5 caracteres)",
         "tag_placeholder": "ASLY",
         "name_label": "Nome do Clã",
         "name_placeholder": "A Primeira Assembleia",
         "desc_label": "Informação",
         "desc_placeholder": "Objetivo do seu clã...",
-        "btn_creating": "Fundação...",
+        "btn_creating": "Fundando...",
         "btn_submit": "Estabelecer Clã",
         "error_failed": "Falha ao fundar o clã"
       },
@@ -2474,7 +2510,7 @@
       "title": "Requisição de Cosméticos",
       "subtitle": "Troque IP e CP por molduras de borda, crachás e muito mais.",
       "btn_purchase": "Requisição ({{amount}})",
-      "item_type_policy": "Skin da política",
+      "item_type_policy": "Tema da política",
       "item_style": "{{type}} Estilo",
       "btn_owned": "Propriedade",
       "btn_locked_pass": "Recompensa de Passe",
@@ -2502,7 +2538,7 @@
       "rewards": {
         "geometric_grid": "Grade Geométrica",
         "purple_rain": "Chuva Roxa",
-        "static_noise": "Ruído Estático",
+        "static_noise": "Ruído estático",
         "purple_pill": "Pílula Roxa"
       },
       "reward_types": {
@@ -2540,7 +2576,7 @@
   },
   "social": {
     "clan": {
-      "profile_label": "Perfil do Clã",
+      "profile_label": "Perfil do clã",
       "level": "Nível",
       "members": "Membros",
       "no_desc": "Nenhuma descrição fornecida.",
@@ -2596,7 +2632,7 @@
       "kills": "Mata",
       "kd_ratio": "Razão K/D",
       "win_rate_role": "Taxa de vitórias por função",
-      "perf_mode": "Desempenho por Modo",
+      "perf_mode": "Desempenho por modo",
       "total_wins": "Total de vitórias",
       "agendas_done": "Agendas concluídas",
       "deaths": "Mortes",

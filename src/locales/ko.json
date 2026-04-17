@@ -1302,6 +1302,38 @@
       "prediction_unity": "단결",
       "prediction_deception": "속임수"
     },
+    "match_replay": {
+      "title": "경기 리플레이",
+      "subtitle": "경기 후 재건",
+      "reveal_truth": "진실을 밝혀라",
+      "hide_deceptions": "속임수 숨기기",
+      "no_history": "이 경기에 기록된 기록이 없습니다.",
+      "government_header": "라운드 {{round}} 정부",
+      "president": "대통령",
+      "chancellor": "총리",
+      "session_summary": "세션 요약",
+      "chaos_forced": "혼돈 강제",
+      "rejected": "정부가 거부됨",
+      "fail_veto": "양측은 거부권을 행사하기로 합의했습니다.",
+      "fail_default": "의회는 이 연합을 확인하지 못했습니다.",
+      "enacted": "지침이 제정됨",
+      "power_triggered": "전원 트리거됨: {{action}}",
+      "legislative_hand": "입법부의 손",
+      "pres_deck": "대통령 덱",
+      "deception_detected": "속임수가 감지됨",
+      "actual_draw": "실제 추첨",
+      "hidden": "숨겨진",
+      "public_claim": "공개 주장",
+      "chan_hand": "총리의 손",
+      "conflicting_stories": "상충되는 이야기",
+      "actual_received": "실제 수신됨",
+      "voting_records": "투표 기록",
+      "aye": "응",
+      "nay": "아니요",
+      "no_vote": "이번 라운드에는 투표가 실시되지 않았습니다",
+      "footer_info": "재생에서는 해독된 보관 데이터를 사용합니다. 위의 타임라인을 사용하여 경기 일정을 탐색하세요.",
+      "close": "가까운 재건"
+    },
     "debrief": {
       "intro_title": "결과",
       "charter_defended": "헌장은 방어되었습니다",
@@ -1327,38 +1359,6 @@
         "marathon": "의지의 장대한 {{count}} 라운드 전투",
         "deadlock": "두 파벌 모두 칼날처럼 교착상태에 빠져 의회를 열었습니다"
       }
-    },
-    "match_replay": {
-      "title": "경기 리플레이",
-      "subtitle": "경기 후 재건",
-      "reveal_truth": "진실을 밝혀라",
-      "hide_deceptions": "속임수 숨기기",
-      "no_history": "이 경기에 기록된 기록이 없습니다",
-      "government_header": "라운드 {{round}} 정부",
-      "president": "대통령",
-      "chancellor": "총리",
-      "session_summary": "세션 요약",
-      "chaos_forced": "카오스 강제",
-      "rejected": "정부가 거부됨",
-      "fail_veto": "양측은 거부권을 행사하기로 합의했습니다.",
-      "fail_default": "의회는 이 연합을 확인하지 못했습니다.",
-      "enacted": "지침이 제정됨",
-      "power_triggered": "전원 트리거됨: {{action}}",
-      "legislative_hand": "입법부의 손",
-      "pres_deck": "대통령 덱",
-      "deception_detected": "속임수가 감지됨",
-      "actual_draw": "실제 추첨",
-      "hidden": "숨겨진",
-      "public_claim": "공개 주장",
-      "chan_hand": "총리의 손",
-      "conflicting_stories": "상충되는 이야기",
-      "actual_received": "실제 수신됨",
-      "voting_records": "투표 기록",
-      "aye": "응",
-      "nay": "아니요",
-      "no_vote": "이번 라운드에는 투표가 실시되지 않았습니다",
-      "footer_info": "재생에서는 해독된 보관 데이터를 사용합니다. 위의 타임라인을 사용하여 경기 일정을 탐색하세요.",
-      "close": "재건 닫기"
     },
     "narration": {
       "nomination": "국회가 개회 중입니다. 대통령님, 총리를 지명해 주십시오.",
@@ -2184,6 +2184,42 @@
         "seasonal_win_25": {
           "name": "전설적인 빅터",
           "desc": "이번 시즌 25승을 거두세요."
+        },
+        "clan_daily_play": {
+          "name": "통합된 노력",
+          "desc": "클랜으로 게임 5회 플레이"
+        },
+        "clan_daily_win": {
+          "name": "공동의 승리",
+          "desc": "클랜 전체에서 2승을 거두세요."
+        },
+        "clan_daily_directives": {
+          "name": "입법 추진력",
+          "desc": "총 10개의 지시문을 제정하세요."
+        },
+        "clan_daily_agendas": {
+          "name": "전략적 초점",
+          "desc": "클랜 전체에서 개인 일정 3개를 완료하세요."
+        },
+        "clan_weekly_play": {
+          "name": "지배적인 존재",
+          "desc": "클랜으로 게임 25회 플레이"
+        },
+        "clan_weekly_win": {
+          "name": "막을 수 없는 힘",
+          "desc": "클랜 전체에서 10승을 거두세요."
+        },
+        "clan_weekly_directives": {
+          "name": "최고위원회",
+          "desc": "총 50개의 지시문을 제정하세요."
+        },
+        "clan_seasonal_play": {
+          "name": "영원한 집회",
+          "desc": "이번 시즌 100경기를 치른다."
+        },
+        "clan_seasonal_win": {
+          "name": "노련한 정복자",
+          "desc": "이번 시즌 40승을 달성하세요."
         }
       }
     },
@@ -2200,7 +2236,7 @@
     },
     "clans": {
       "members": {
-        "self_label": "당신",
+        "self_label": "너",
         "xp_contributed": "{{count}} 기여 XP",
         "btn_promote": "임원으로 승진",
         "btn_demote": "회원으로 강등",
@@ -2264,7 +2300,7 @@
       "invites": {
         "banner_title": "클랜 초대",
         "banner_desc": "{{inviter}}님이 {{clan}} [{{tag}}]에 가입하도록 귀하를 초대했습니다.",
-        "btn_accept": "수락",
+        "btn_accept": "수용하다",
         "btn_decline": "거절"
       },
       "alerts": {
@@ -2290,7 +2326,7 @@
       "vote_yes": "예 토큰",
       "item_type_policy": "정책 스킨",
       "rarities": {
-        "common": "흔한",
+        "common": "공통",
         "uncommon": "흔하지 않은",
         "rare": "드물다",
         "epic": "에픽",
@@ -2300,7 +2336,7 @@
       "btn_equip": "장비"
     },
     "medals": {
-      "summary_title": "메달 수집",
+      "summary_title": "메달 컬렉션",
       "summary_complete": "완료",
       "pin_hint_desc": "획득한 메달을 탭하여 고정하세요.",
       "pin_hint_status": "{{count}} / 3개 고정됨",
@@ -2392,7 +2428,7 @@
           "desc": "10개의 개인 일정을 완료하세요."
         },
         "agenda_twentyfive": {
-          "name": "뛰어난 전술가",
+          "name": "마스터 전술가",
           "desc": "25개의 개인 일정을 완료하세요."
         },
         "first_kill": {
@@ -2438,7 +2474,7 @@
     },
     "admin": {
       "tabs": {
-        "rooms": "방",
+        "rooms": "객실",
         "users": "사용자",
         "system": "시스템",
         "logs": "감사"
@@ -2526,7 +2562,7 @@
       "modes": {
         "overall": "전반적으로",
         "ranked": "순위",
-        "casual": "평상복",
+        "casual": "캐주얼",
         "classic": "클래식",
         "crisis": "위기"
       },
@@ -2567,7 +2603,7 @@
       "no_friends_hint": "위에서 플레이어를 검색하거나 게임에서 누군가를 추가하세요.",
       "online": "온라인({{count}})",
       "offline": "오프라인({{count}})",
-      "in_game": "어셈블리에서 · {{roomId}}",
+      "in_game": "조립중 · {{roomId}}",
       "in_lobby": "로비에서",
       "recently_played": "최근에",
       "time_m_ago": "{{count}}분 전",

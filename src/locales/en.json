@@ -1302,31 +1302,6 @@
       "prediction_unity": "Unity",
       "prediction_deception": "Deception"
     },
-    "debrief": {
-      "intro_title": "The Assembly Has Concluded",
-      "charter_defended": "The Charter has been defended.",
-      "secretariat_fallen": "The Secretariat has fallen to the State.",
-      "key_moments": "Key Moments",
-      "identities_confirmed": "All Identities Confirmed",
-      "tap_to_advance": "Tap to advance",
-      "roles": {
-        "civil": "Civil",
-        "state": "State Agent",
-        "overseer": "The Overseer"
-      },
-      "plays": {
-        "assassin": "{{assassin}} eliminated {{killed}} as the Assassin",
-        "execution_one": "{{name}} was executed by presidential decree",
-        "execution_many": "{{names}} were executed by presidential decree",
-        "chaos_one": "A chaos directive was forced upon the Assembly",
-        "chaos_many": "{{count}} chaos directives destabilised the Assembly",
-        "veto_one": "The government invoked their veto power",
-        "veto_many": "The veto was exercised {{count}} times",
-        "marathon": "An epic {{count}}-round battle of wills",
-        "deadlock": "Both factions held the Assembly in a knife-edge deadlock",
-        "true_lie": "{{name}} drew 3 State directives but claimed otherwise"
-      }
-    },
     "match_replay": {
       "title": "Match Replay",
       "subtitle": "Post-Match Reconstruction",
@@ -2209,6 +2184,42 @@
         "seasonal_win_25": {
           "name": "Legendary Victor",
           "desc": "Win 25 games this season."
+        },
+        "clan_daily_play": {
+          "name": "Unified Effort",
+          "desc": "Play 5 games as a clan."
+        },
+        "clan_daily_win": {
+          "name": "Shared Victory",
+          "desc": "Secure 2 wins across the clan."
+        },
+        "clan_daily_directives": {
+          "name": "Legislative Momentum",
+          "desc": "Enact 10 directives total."
+        },
+        "clan_daily_agendas": {
+          "name": "Strategic Focus",
+          "desc": "Complete 3 personal agendas across the clan."
+        },
+        "clan_weekly_play": {
+          "name": "Dominant Presence",
+          "desc": "Play 25 games as a clan."
+        },
+        "clan_weekly_win": {
+          "name": "Unstoppable Force",
+          "desc": "Secure 10 wins across the clan."
+        },
+        "clan_weekly_directives": {
+          "name": "Supreme Council",
+          "desc": "Enact 50 directives total."
+        },
+        "clan_seasonal_play": {
+          "name": "Eternal Assembly",
+          "desc": "Play 100 games this season."
+        },
+        "clan_seasonal_win": {
+          "name": "Seasoned Conquerors",
+          "desc": "Secure 40 wins this season."
         }
       }
     },

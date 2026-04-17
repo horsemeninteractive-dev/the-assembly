@@ -1302,38 +1302,12 @@
       "prediction_unity": "Unidad",
       "prediction_deception": "Engaño"
     },
-    "debrief": {
-      "intro_title": "EL RESULTADO",
-      "charter_defended": "LA CARTA FUE DEFENDIDA",
-      "secretariat_fallen": "LA SECRETARÍA HA CAÍDO",
-      "key_moments": "MOMENTOS CLAVE",
-      "identities_confirmed": "IDENTIDADES CONFIRMADAS",
-      "tap_to_advance": "TOCA CUALQUIER LUGAR PARA CONTINUAR",
-      "no_plays": "No ocurrieron eventos notables",
-      "roles": {
-        "civil": "Civiles",
-        "state": "Estado",
-        "overseer": "Supervisor"
-      },
-      "plays": {
-        "assassin": "{{assassin}} eliminado {{killed}} como Asesino",
-        "execution_one": "{{name}} fue ejecutado por decreto presidencial",
-        "execution_many": "{{names}} fueron ejecutados por decreto presidencial",
-        "chaos_one": "Se impuso una directiva de caos a la Asamblea",
-        "chaos_many": "{{count}} directivas del caos desestabilizaron la Asamblea",
-        "veto_one": "El gobierno invocó su poder de veto",
-        "veto_many": "El veto fue ejercido {{count}} veces",
-        "true_lie": "Ronda {{round}}: El Presidente {{name}} afirmó haber dibujado 3 políticas de Estado, pero en realidad dibujó Civil",
-        "marathon": "Una batalla de voluntades épica de {{count}} ronda",
-        "deadlock": "Ambas facciones mantuvieron la Asamblea en un punto muerto al filo de la navaja"
-      }
-    },
     "match_replay": {
       "title": "Repetición del partido",
       "subtitle": "Reconstrucción post-partido",
       "reveal_truth": "Revelar la verdad",
       "hide_deceptions": "Ocultar engaños",
-      "no_history": "No hay historial registrado para este partido",
+      "no_history": "No hay historial registrado para este partido.",
       "government_header": "Ronda {{round}} Gobierno",
       "president": "Presidente",
       "chancellor": "Canciller",
@@ -1359,6 +1333,32 @@
       "no_vote": "No se celebró ninguna votación en esta ronda",
       "footer_info": "La reproducción utiliza datos de archivo descifrados. Utilice la línea de tiempo de arriba para navegar a través de los hitos del partido.",
       "close": "Cerrar la reconstrucción"
+    },
+    "debrief": {
+      "intro_title": "EL RESULTADO",
+      "charter_defended": "LA CARTA FUE DEFENDIDA",
+      "secretariat_fallen": "LA SECRETARÍA HA CAÍDO",
+      "key_moments": "MOMENTOS CLAVE",
+      "identities_confirmed": "IDENTIDADES CONFIRMADAS",
+      "tap_to_advance": "TOCA CUALQUIER LUGAR PARA CONTINUAR",
+      "no_plays": "No ocurrieron eventos notables",
+      "roles": {
+        "civil": "Civiles",
+        "state": "Estado",
+        "overseer": "Supervisor"
+      },
+      "plays": {
+        "assassin": "{{assassin}} eliminado {{killed}} como Asesino",
+        "execution_one": "{{name}} fue ejecutado por decreto presidencial",
+        "execution_many": "{{names}} fueron ejecutados por decreto presidencial",
+        "chaos_one": "Se impuso una directiva de caos a la Asamblea",
+        "chaos_many": "{{count}} directivas del caos desestabilizaron la Asamblea",
+        "veto_one": "El gobierno invocó su poder de veto",
+        "veto_many": "El veto fue ejercido {{count}} veces",
+        "true_lie": "Ronda {{round}}: El Presidente {{name}} afirmó haber dibujado 3 políticas de Estado, pero en realidad dibujó Civil",
+        "marathon": "Una batalla de voluntades épica de {{count}} ronda",
+        "deadlock": "Ambas facciones mantuvieron la Asamblea en un punto muerto al filo de la navaja"
+      }
     },
     "narration": {
       "nomination": "La Asamblea está en sesión. Presidente, nombre a su Canciller.",
@@ -2184,6 +2184,42 @@
         "seasonal_win_25": {
           "name": "Víctor legendario",
           "desc": "Gana 25 juegos esta temporada."
+        },
+        "clan_daily_play": {
+          "name": "Esfuerzo unificado",
+          "desc": "Juega 5 juegos como clan."
+        },
+        "clan_daily_win": {
+          "name": "Victoria compartida",
+          "desc": "Consigue 2 victorias en todo el clan."
+        },
+        "clan_daily_directives": {
+          "name": "Impulso legislativo",
+          "desc": "Promulgar 10 directivas en total."
+        },
+        "clan_daily_agendas": {
+          "name": "Enfoque estratégico",
+          "desc": "Completa 3 agendas personales en todo el clan."
+        },
+        "clan_weekly_play": {
+          "name": "Presencia dominante",
+          "desc": "Juega 25 juegos como clan."
+        },
+        "clan_weekly_win": {
+          "name": "Fuerza imparable",
+          "desc": "Consigue 10 victorias en todo el clan."
+        },
+        "clan_weekly_directives": {
+          "name": "Consejo Supremo",
+          "desc": "Promulgar 50 directivas en total."
+        },
+        "clan_seasonal_play": {
+          "name": "Asamblea eterna",
+          "desc": "Juega 100 partidos esta temporada."
+        },
+        "clan_seasonal_win": {
+          "name": "Conquistadores experimentados",
+          "desc": "Consigue 40 victorias esta temporada."
         }
       }
     },
@@ -2231,7 +2267,7 @@
         "name_placeholder": "La Primera Asamblea",
         "desc_label": "Información",
         "desc_placeholder": "Propósito de tu clan...",
-        "btn_creating": "Fundación...",
+        "btn_creating": "Establecimiento...",
         "btn_submit": "Establecer clan",
         "error_failed": "No se pudo fundar el clan"
       },
@@ -2328,7 +2364,7 @@
           "desc": "Juega 100 juegos."
         },
         "first_victory": {
-          "name": "Para el registro",
+          "name": "Para que conste",
           "desc": "Gana tu primer juego."
         },
         "ten_wins": {
@@ -2438,7 +2474,7 @@
     },
     "admin": {
       "tabs": {
-        "rooms": "Habitaciones",
+        "rooms": "Alojamiento",
         "users": "Usuarios",
         "system": "Sistema",
         "logs": "Auditoría"
@@ -2526,7 +2562,7 @@
       "modes": {
         "overall": "General",
         "ranked": "Clasificado",
-        "casual": "Casual",
+        "casual": "Informal",
         "classic": "Clásico",
         "crisis": "Crisis"
       },
