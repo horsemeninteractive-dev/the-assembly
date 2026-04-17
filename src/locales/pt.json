@@ -1,5 +1,6 @@
 {
   "common": {
+    "confirm_cta": "Reivindicar recompensa",
     "title": "A ASSEMBLEIA",
     "loading": "Carregando...",
     "error": "Erro",
@@ -23,7 +24,7 @@
     "invite": "Convidar",
     "lvl": "Nível",
     "results": "Resultados",
-    "search": "Pesquisar",
+    "search": "Procurar",
     "sent": "Enviado",
     "state_short": "Está",
     "status": "Estado"
@@ -173,7 +174,12 @@
       "high_delegate": "Alto Delegado",
       "consul": "Cônsul",
       "assembly_master": "Mestre de Montagem",
-      "overseer": "Supervisor"
+      "overseer": "Supervisor",
+      "bronze": "Bronze",
+      "silver": "Prata",
+      "gold": "Ouro",
+      "platinum": "Platina",
+      "diamond": "Diamante"
     },
     "matchmaking": {
       "title": "Monte uma partida",
@@ -204,7 +210,7 @@
       "status_locked": "Bloqueado",
       "players_count": "{{count}}/{{max}}",
       "btn_join": "Participe",
-      "btn_watch": "Assistir",
+      "btn_watch": "Assista",
       "filter_joinable": "Juntável",
       "filter_active": "Ativo",
       "sort_label": "Classificar",
@@ -235,7 +241,7 @@
       "players_max": "10 jogadores",
       "action_timer": "Temporizador de ação",
       "timer_off": "DESLIGADO",
-      "game_mode": "Modo de jogo",
+      "game_mode": "Modo de Jogo",
       "mode_ranked_desc": "ELO e pontos totais atribuídos.",
       "mode_casual_desc": "Sem alterações de ELO, pontos reduzidos.",
       "mode_classic_desc": "Funções/regras padrão. Sem ELO, pontos reduzidos.",
@@ -501,7 +507,7 @@
       "need_players_ranked": "Precisa de mais de 5 jogadores para as Ranqueadas",
       "no_players": "Sem jogadores",
       "voted_for": "Votou em {{name}}",
-      "censure_select": "Selecione um jogador em seu cartão para censurar (excluir da próxima nomeação)",
+      "censure_select": "Selecione um jogador em seu cartão para censurar (excluir da próxima indicação)",
       "snap_volunteer_prompt": "Qualquer jogador pode se voluntariar para ser o próximo presidente.",
       "volunteered": "Voluntário",
       "volunteer": "Voluntário",
@@ -1056,7 +1062,7 @@
       "your_dossier": "Seu Dossiê",
       "my_profile": "Meu Perfil",
       "leave_assembly": "Sair da montagem",
-      "title": "A ASSEMBLEIA",
+      "title": "A ASSEMBLÉIA",
       "practice_mode": "MODO DE PRÁTICA",
       "invite_tooltip": "Compartilhe este código para convidar jogadores",
       "timer_label": "Tempo restante",
@@ -1297,16 +1303,17 @@
       "prediction_deception": "Decepção"
     },
     "debrief": {
-      "intro_title": "A Assembleia foi concluída",
-      "charter_defended": "A Carta foi defendida.",
-      "secretariat_fallen": "A Secretaria caiu para o Estado.",
-      "key_moments": "Momentos-chave",
-      "identities_confirmed": "Todas as identidades confirmadas",
-      "tap_to_advance": "Toque para avançar",
+      "intro_title": "O RESULTADO",
+      "charter_defended": "A CARTA FOI DEFENDIDA",
+      "secretariat_fallen": "A SECRETARIA CAIU",
+      "key_moments": "MOMENTOS CHAVE",
+      "identities_confirmed": "IDENTIDADES CONFIRMADAS",
+      "tap_to_advance": "TOQUE EM QUALQUER LUGAR PARA CONTINUAR",
+      "no_plays": "Nenhum evento notável ocorreu",
       "roles": {
         "civil": "Civil",
-        "state": "Agente Estadual",
-        "overseer": "O Supervisor"
+        "state": "Estado",
+        "overseer": "Supervisor"
       },
       "plays": {
         "assassin": "{{assassin}} eliminou {{killed}} como o Assassino",
@@ -1316,9 +1323,9 @@
         "chaos_many": "{{count}} diretivas do caos desestabilizaram a Assembleia",
         "veto_one": "O governo invocou o seu poder de veto",
         "veto_many": "O veto foi exercido {{count}} vezes",
+        "true_lie": "Rodada {{round}}: Presidente {{name}} afirmou ter desenhado 3 políticas de Estado, mas na verdade desenhou Civil",
         "marathon": "Uma batalha de vontades épica de {{count}} rodadas",
-        "deadlock": "Ambas as facções mantiveram a Assembleia num impasse extremo",
-        "true_lie": "{{name}} elaborou 3 diretivas estaduais, mas afirmou o contrário"
+        "deadlock": "Ambas as facções mantiveram a Assembleia num impasse extremo"
       }
     },
     "match_replay": {
@@ -1331,7 +1338,7 @@
       "president": "Presidente",
       "chancellor": "Chanceler",
       "session_summary": "Resumo da sessão",
-      "chaos_forced": "Caos Forçado",
+      "chaos_forced": "Caos forçado",
       "rejected": "Governo rejeitado",
       "fail_veto": "Ambas as partes concordaram em exercer o poder de veto.",
       "fail_default": "A Assembleia não conseguiu confirmar esta coligação.",
@@ -1446,7 +1453,7 @@
             "desc": "Veja as 3 primeiras cartas da pilha de compra."
           },
           "investigate": {
-            "name": "Investigar",
+            "name": "Investigue",
             "desc": "Saiba se um jogador é Civil ou Estadual (não quem especificamente)."
           },
           "special": {
@@ -1847,7 +1854,7 @@
       },
       "voice": {
         "ai_voice": "Voz do Narrador AI",
-        "tts_voice": "Seleção de voz",
+        "tts_voice": "Seleção de Voz",
         "tts_default": "Padrão do sistema",
         "narrator_volume": "Volume do narrador",
         "narrator_volume_desc": "Controla o volume dos anúncios de voz da IA ​​no jogo"
@@ -1906,7 +1913,7 @@
       "ranked_games": "Jogos Ranqueados",
       "casual_wins": "Vitórias casuais",
       "casual_games": "Jogos Casuais",
-      "classic_wins": "Vitórias Clássicas",
+      "classic_wins": "Vitórias clássicas",
       "classic_games": "Jogos Clássicos"
     },
     "challenges": {
@@ -2217,14 +2224,14 @@
         "your_clan": "Seu Clã"
       },
       "create": {
-        "title": "Encontrou um Novo Clã",
+        "title": "Encontrou um novo clã",
         "tag_label": "Tag do clã (4-5 caracteres)",
         "tag_placeholder": "ASLY",
         "name_label": "Nome do Clã",
         "name_placeholder": "A Primeira Assembleia",
         "desc_label": "Informação",
         "desc_placeholder": "Objetivo do seu clã...",
-        "btn_creating": "Fundando...",
+        "btn_creating": "Fundação...",
         "btn_submit": "Estabelecer Clã",
         "error_failed": "Falha ao fundar o clã"
       },
@@ -2467,7 +2474,7 @@
       "title": "Requisição de Cosméticos",
       "subtitle": "Troque IP e CP por molduras de borda, crachás e muito mais.",
       "btn_purchase": "Requisição ({{amount}})",
-      "item_type_policy": "Tema da política",
+      "item_type_policy": "Skin da política",
       "item_style": "{{type}} Estilo",
       "btn_owned": "Propriedade",
       "btn_locked_pass": "Recompensa de Passe",
@@ -2495,7 +2502,7 @@
       "rewards": {
         "geometric_grid": "Grade Geométrica",
         "purple_rain": "Chuva Roxa",
-        "static_noise": "Ruído estático",
+        "static_noise": "Ruído Estático",
         "purple_pill": "Pílula Roxa"
       },
       "reward_types": {
@@ -2533,7 +2540,7 @@
   },
   "social": {
     "clan": {
-      "profile_label": "Perfil do clã",
+      "profile_label": "Perfil do Clã",
       "level": "Nível",
       "members": "Membros",
       "no_desc": "Nenhuma descrição fornecida.",
@@ -2589,7 +2596,7 @@
       "kills": "Mata",
       "kd_ratio": "Razão K/D",
       "win_rate_role": "Taxa de vitórias por função",
-      "perf_mode": "Desempenho por modo",
+      "perf_mode": "Desempenho por Modo",
       "total_wins": "Total de vitórias",
       "agendas_done": "Agendas concluídas",
       "deaths": "Mortes",

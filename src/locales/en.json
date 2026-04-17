@@ -1,5 +1,6 @@
 {
   "common": {
+    "confirm_cta": "Claim Reward",
     "title": "THE ASSEMBLY",
     "loading": "Loading...",
     "error": "Error",
@@ -173,7 +174,12 @@
       "high_delegate": "High Delegate",
       "consul": "Consul",
       "assembly_master": "Assembly Master",
-      "overseer": "Overseer"
+      "overseer": "Overseer",
+      "bronze": "Bronze",
+      "silver": "Silver",
+      "gold": "Gold",
+      "platinum": "Platinum",
+      "diamond": "Diamond"
     },
     "matchmaking": {
       "title": "Assemble a Match",
@@ -1352,6 +1358,32 @@
       "no_vote": "No vote held this round",
       "footer_info": "Replay uses decrypted archival data. Use the timeline above to navigate through match milestones.",
       "close": "Close Reconstruction"
+    },
+    "debrief": {
+      "intro_title": "THE OUTCOME",
+      "charter_defended": "THE CHARTER WAS DEFENDED",
+      "secretariat_fallen": "THE SECRETARIAT HAS FALLEN",
+      "key_moments": "KEY MOMENTS",
+      "identities_confirmed": "IDENTITIES CONFIRMED",
+      "tap_to_advance": "TAP ANYWHERE TO CONTINUE",
+      "no_plays": "No notable events occurred",
+      "roles": {
+        "civil": "Civil",
+        "state": "State",
+        "overseer": "Overseer"
+      },
+      "plays": {
+        "assassin": "{{assassin}} eliminated {{killed}} as the Assassin",
+        "execution_one": "{{name}} was executed by presidential decree",
+        "execution_many": "{{names}} were executed by presidential decree",
+        "chaos_one": "A chaos directive was forced upon the Assembly",
+        "chaos_many": "{{count}} chaos directives destabilised the Assembly",
+        "veto_one": "The government invoked their veto power",
+        "veto_many": "The veto was exercised {{count}} times",
+        "true_lie": "Round {{round}}: President {{name}} claimed to draw 3 State policies, but actually drew Civil",
+        "marathon": "An epic {{count}}-round battle of wills",
+        "deadlock": "Both factions held the Assembly in a knife-edge deadlock"
+      }
     },
     "narration": {
       "nomination": "The Assembly is in session. President, nominate your Chancellor.",

@@ -1,5 +1,6 @@
 {
   "common": {
+    "confirm_cta": "Réclamez une récompense",
     "title": "L'ASSEMBLÉE",
     "loading": "Chargement...",
     "error": "Erreur",
@@ -23,7 +24,7 @@
     "invite": "Inviter",
     "lvl": "Niveau",
     "results": "Résultats",
-    "search": "Rechercher",
+    "search": "Recherche",
     "sent": "Envoyé",
     "state_short": "Sta",
     "status": "Statut"
@@ -136,7 +137,7 @@
         "desc": "Montez à l'échelle. Gagnez de la PI. Débloquez des produits cosmétiques."
       },
       "item_8": {
-        "label": "Jeu gratuit",
+        "label": "Jouer gratuitement",
         "desc": "Tout le gameplay est gratuit. Les cosmétiques sont facultatifs."
       }
     },
@@ -173,7 +174,12 @@
       "high_delegate": "Haut Délégué",
       "consul": "Consul",
       "assembly_master": "Maître d'assemblage",
-      "overseer": "Surveillant"
+      "overseer": "Surveillant",
+      "bronze": "Bronze",
+      "silver": "Argent",
+      "gold": "Or",
+      "platinum": "Platine",
+      "diamond": "Diamant"
     },
     "matchmaking": {
       "title": "Assemblez un match",
@@ -204,7 +210,7 @@
       "status_locked": "Verrouillé",
       "players_count": "{{count}}/{{max}}",
       "btn_join": "Rejoindre",
-      "btn_watch": "Montre",
+      "btn_watch": "Regarder",
       "filter_joinable": "Rejoignable",
       "filter_active": "Actif",
       "sort_label": "Trier",
@@ -267,7 +273,7 @@
   "game": {
     "roles": {
       "civil": {
-        "name": "Civil",
+        "name": "Civile",
         "flavor": "Protégez la Charte. Ne faites confiance à personne."
       },
       "state": {
@@ -420,7 +426,7 @@
       "win_civil": "Charte restaurée",
       "win_civil_desc": "Civil gagne immédiatement",
       "win_state": "Suprématie de l'État",
-      "win_state_desc": "L’État gagne immédiatement",
+      "win_state_desc": "L'État gagne immédiatement",
       "quorum_revote": "RÉVOTER",
       "win_reasons": {
         "charter_restored": "Charte restaurée",
@@ -451,7 +457,7 @@
       "current_phase": "Phase actuelle",
       "crisis_active": "Crise active",
       "anonymous_dispatch": "Envoi anonyme intercepté",
-      "encrypted_dispatch": "Canal de distribution crypté",
+      "encrypted_dispatch": "Canal de répartition crypté",
       "cipher_placeholder": "Entrez le message (max 80 caractères)...",
       "quick_reactions": "Réactions rapides",
       "toggle_reactions": "Basculer les réactions",
@@ -501,7 +507,7 @@
       "need_players_ranked": "Besoin de plus de 5 joueurs pour le classement",
       "no_players": "Aucun joueur",
       "voted_for": "A voté pour {{name}}",
-      "censure_select": "Sélectionner un joueur sur sa carte à censurer (exclure de la prochaine nomination)",
+      "censure_select": "Sélectionnez un joueur sur sa carte à censurer (exclure de la prochaine nomination)",
       "snap_volunteer_prompt": "N'importe quel joueur peut se porter volontaire pour être le prochain président.",
       "volunteered": "Bénévole",
       "volunteer": "Bénévole",
@@ -974,7 +980,7 @@
         "6": "Nous devons être prudents.",
         "7": "L'Assemblée est en danger.",
         "8": "Nous devons être plus intelligents.",
-        "9": "L'État se rapproche.",
+        "9": "L’État se rapproche.",
         "10": "Les ombres s'allongent sur l'Assemblée.",
         "11": "Nous sommes la dernière ligne de défense de la Charte.",
         "12": "Chaque décision que nous prenons résonne au Secrétariat.",
@@ -1190,7 +1196,7 @@
         "performance_header": "Performances des matchs",
         "victory": "Victoire obtenue",
         "defeat": "Mission échouée",
-        "elo": "ÉLO",
+        "elo": "ELO",
         "casual": "Décontracté",
         "xp": "XP",
         "ip": "Propriété intellectuelle",
@@ -1297,16 +1303,17 @@
       "prediction_deception": "Tromperie"
     },
     "debrief": {
-      "intro_title": "L'Assemblée est terminée",
-      "charter_defended": "La Charte a été défendue.",
-      "secretariat_fallen": "Le Secrétariat est tombé aux mains de l'État.",
-      "key_moments": "Moments clés",
-      "identities_confirmed": "Toutes les identités confirmées",
-      "tap_to_advance": "Appuyez pour avancer",
+      "intro_title": "LE RÉSULTAT",
+      "charter_defended": "LA CHARTE A ÉTÉ DÉFENDUE",
+      "secretariat_fallen": "LE SECRÉTARIAT EST TOMBÉ",
+      "key_moments": "MOMENTS CLÉS",
+      "identities_confirmed": "IDENTITÉS CONFIRMÉES",
+      "tap_to_advance": "APPUYEZ PARTOUT POUR CONTINUER",
+      "no_plays": "Aucun événement notable ne s'est produit",
       "roles": {
         "civil": "Civile",
-        "state": "Agent d'État",
-        "overseer": "Le surveillant"
+        "state": "État",
+        "overseer": "Surveillant"
       },
       "plays": {
         "assassin": "{{assassin}} éliminé {{killed}} en tant qu'Assassin",
@@ -1316,9 +1323,9 @@
         "chaos_many": "{{count}} les directives du chaos ont déstabilisé l'Assemblée",
         "veto_one": "Le gouvernement a invoqué son droit de veto",
         "veto_many": "Le veto a été exercé {{count}} fois",
+        "true_lie": "Round {{round}} : Le président {{name}} a prétendu dessiner 3 politiques d'État, mais a en fait dessiné Civil",
         "marathon": "Une bataille de volontés épique en {{count}} round",
-        "deadlock": "Les deux factions ont tenu l'Assemblée dans une impasse extrême",
-        "true_lie": "{{name}} a rédigé 3 directives de l'État mais a affirmé le contraire"
+        "deadlock": "Les deux factions ont tenu l'Assemblée dans une impasse extrême"
       }
     },
     "match_replay": {
@@ -1391,7 +1398,7 @@
       },
       "roles": {
         "civil": {
-          "name": "Civile",
+          "name": "Civil",
           "flavor": "Défendre la Charte. La crise ne doit pas consumer le Secrétariat."
         },
         "state": {
@@ -1498,7 +1505,7 @@
           "desc": "Appel à un nouveau vote d’urgence lors d’élections ratées sous haute tension."
         },
         "cipher": {
-          "name": "Chiffrer",
+          "name": "Chiffre",
           "desc": "Envoyez une dépêche anonyme à la salle pendant la phase législative."
         }
       },
@@ -1568,7 +1575,7 @@
       },
       "overview": {
         "p1": "L'Assemblée est un {{social_deduction_game}} pour 5 à 10 joueurs. Chaque joueur se voit secrètement attribuer une faction – civile ou étatique – et doit travailler avec ou contre les autres pour atteindre la condition de victoire de sa faction.",
-        "civil_wins_label": "Victoires civiles par",
+        "civil_wins_label": "Le civil gagne par",
         "civil_wins": [
           "Adoptant 5 directives civiles",
           "Exécution du surveillant"
@@ -1658,7 +1665,7 @@
           },
           "defector": {
             "name": "Transfuge",
-            "when": "Vote (Révéler)",
+            "when": "Voter (Révéler)",
             "desc": "Modifiez secrètement votre vote après la révélation initiale mais avant que le résultat ne soit finalisé. Cela peut transformer une égalité 5-5 en une passe 6-4. Une fois utilisé."
           },
           "archivist": {
@@ -2193,7 +2200,7 @@
     },
     "clans": {
       "members": {
-        "self_label": "Toi",
+        "self_label": "Vous",
         "xp_contributed": "{{count}} XP contribué",
         "btn_promote": "Promouvoir Officier",
         "btn_demote": "Rétrograder au rang de membre",
@@ -2467,7 +2474,7 @@
       "title": "Réquisition de cosmétiques",
       "subtitle": "Échangez IP et CP contre des cadres de bordure, des badges et bien plus encore.",
       "btn_purchase": "Demande ({{amount}})",
-      "item_type_policy": "Apparence de politique",
+      "item_type_policy": "Peau de politique",
       "item_style": "{{type}} Style",
       "btn_owned": "Propriété",
       "btn_locked_pass": "Récompense de passe",
@@ -2519,7 +2526,7 @@
       "modes": {
         "overall": "Globalement",
         "ranked": "Classé",
-        "casual": "Décontracté",
+        "casual": "Occasionnel",
         "classic": "Classique",
         "crisis": "Crise"
       },

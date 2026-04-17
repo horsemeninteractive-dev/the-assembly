@@ -23,6 +23,14 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
   const [serverRestarting, setServerRestarting] = useState<string | null>(null);
   const [systemConfig, setSystemConfig] = useState<SystemConfig>({ maintenanceMode: false, xpMultiplier: 1, ipMultiplier: 1 });
 
+  // Load system config from DB on mount (multipliers, maintenance mode, etc.)
+  useEffect(() => {
+    fetch(apiUrl('/api/config'))
+      .then((res) => res.json())
+      .then((cfg: SystemConfig) => { if (cfg) setSystemConfig(cfg); })
+      .catch(() => {});
+  }, []);
+
   const handleJoinRoom = useCallback(
     (
       roomId: string,

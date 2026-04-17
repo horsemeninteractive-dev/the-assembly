@@ -161,23 +161,39 @@ const BigPlaysSlide = ({ plays }: { plays: BigPlay[] }) => {
         {t('game.debrief.key_moments')}
       </motion.p>
       <div className="w-full space-y-3">
-        {plays.map((play, i) => {
-          const Icon = BIG_PLAY_ICON[play.icon];
-          return (
-            <motion.div
-              key={i}
-              initial={{ opacity: 0, x: -24 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.5, delay: 0.3 + i * 0.25, ease: 'easeOut' }}
-              className="flex items-center gap-4 bg-card/60 dark:bg-white/5 border border-default rounded-2xl px-5 py-4 backdrop-blur-sm"
-            >
-              <span className="text-secondary shrink-0">
-                <Icon className="w-5 h-5" />
-              </span>
-              <p className="text-sm text-primary font-mono leading-snug">{play.text}</p>
-            </motion.div>
-          );
-        })}
+        {plays.length > 0 ? (
+          plays.map((play, i) => {
+            const Icon = BIG_PLAY_ICON[play.icon];
+            return (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -24 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.3 + i * 0.25, ease: 'easeOut' }}
+                className="flex items-center gap-4 bg-card/60 dark:bg-white/5 border border-default rounded-2xl px-5 py-4 backdrop-blur-sm"
+              >
+                <span className="text-secondary shrink-0">
+                  <Icon className="w-5 h-5" />
+                </span>
+                <p className="text-sm text-primary font-mono leading-snug">{play.text}</p>
+              </motion.div>
+            );
+          })
+        ) : (
+          <motion.div
+            initial={{ opacity: 0, x: -24 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.5, delay: 0.3, ease: 'easeOut' }}
+            className="flex items-center gap-4 bg-card/60 dark:bg-white/5 border border-default rounded-2xl px-5 py-4 backdrop-blur-sm"
+          >
+            <span className="text-secondary shrink-0 text-faint">
+              <Clock className="w-5 h-5" />
+            </span>
+            <p className="text-sm text-muted font-mono leading-snug italic">
+              {t('game.debrief.no_plays')}
+            </p>
+          </motion.div>
+        )}
       </div>
     </div>
   );
@@ -417,7 +433,7 @@ export const DebriefSequence = ({
     const result: Slide[] = [{ kind: 'intro' }];
 
     const plays = extractBigPlays(gameState, t);
-    if (plays.length > 0) result.push({ kind: 'bigplays', plays });
+    result.push({ kind: 'bigplays', plays });
 
     const ordered = orderedPlayers(gameState.players);
     ordered.forEach((player, i) => {

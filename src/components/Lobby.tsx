@@ -16,6 +16,7 @@ import { LobbyRoomCreator } from './lobby/LobbyRoomCreator';
 import { LobbyPracticeCreator } from './lobby/LobbyPracticeCreator';
 
 import { useTranslation, Trans } from '../contexts/I18nContext';
+import { useGameContext } from '../contexts/GameContext';
 interface LobbyProps {
   user: User;
   onJoinRoom: (

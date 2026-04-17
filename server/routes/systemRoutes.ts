@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { RouteContext } from './types';
 import { getRedisStatus } from '../redis';
-import { getGlobalStats, getAllLeaderboards } from '../supabaseService';
+import { getGlobalStats, getAllLeaderboards, getSystemConfig } from '../supabaseService';
 import { logger } from '../logger';
 import rateLimit from 'express-rate-limit';
 import { requireAuth, sanitizeUser } from './shared';
@@ -50,6 +50,16 @@ export function registerSystemRoutes({ app, engine }: RouteContext): void {
     } catch (err) {
       logger.error({ err }, 'Error fetching global stats');
       res.json({ civilWins: 0, stateWins: 0 });
+    }
+  });
+
+  app.get('/api/config', async (_req: Request, res: Response) => {
+    try {
+      const config = await getSystemConfig();
+      res.json(config);
+    } catch (err) {
+      logger.error({ err }, 'Error fetching system config');
+      res.json({ maintenanceMode: false, xpMultiplier: 1, ipMultiplier: 1, minVersion: '0.9.0' });
     }
   });
 

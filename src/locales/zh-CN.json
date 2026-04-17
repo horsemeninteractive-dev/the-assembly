@@ -1,5 +1,6 @@
 {
   "common": {
+    "confirm_cta": "领取奖励",
     "title": "大会",
     "loading": "正在加载...",
     "error": "错误",
@@ -24,7 +25,7 @@
     "lvl": "等级",
     "results": "结果",
     "search": "搜索",
-    "sent": "发送",
+    "sent": "已发送",
     "state_short": "斯塔",
     "status": "状态"
   },
@@ -95,7 +96,7 @@
       "subtitle": "每一轮都迫使每个玩家参与、声明并接受评判。没有什么可隐藏的。",
       "label_1": "提名",
       "step_1": "总统提名一名校长。你信任的人以及你提名的人揭示了一切。",
-      "label_2": "表决",
+      "label_2": "投票",
       "step_2": "所有玩家同时投票。公开的、不可避免的、可以解释的。",
       "label_3": "立法会议",
       "step_3": "总统抽 3 张政策卡，弃掉 1 张，将 2 张交给财政大臣。将颁布一项。",
@@ -173,7 +174,12 @@
       "high_delegate": "高级代表",
       "consul": "领事",
       "assembly_master": "装配大师",
-      "overseer": "监督者"
+      "overseer": "监督者",
+      "bronze": "青铜",
+      "silver": "银",
+      "gold": "黄金",
+      "platinum": "白金",
+      "diamond": "钻石"
     },
     "matchmaking": {
       "title": "组装火柴",
@@ -198,13 +204,13 @@
       "rejoin_btn": "重新加入游戏",
       "status_recruiting": "招聘",
       "status_in_progress": "进行中",
-      "privacy_public": "公共",
+      "privacy_public": "民众",
       "privacy_private": "私人",
       "privacy_friends": "朋友",
       "status_locked": "锁定",
       "players_count": "{{count}}/{{max}}",
       "btn_join": "加入",
-      "btn_watch": "手表",
+      "btn_watch": "观看",
       "filter_joinable": "可加入",
       "filter_active": "活跃",
       "sort_label": "排序",
@@ -443,7 +449,7 @@
       "detain": "拘留",
       "censure": "谴责",
       "selected": "已选择",
-      "exclude_hint": "排除提名",
+      "exclude_hint": "排除在提名之外",
       "proven_not_overseer": "证明不是监督者",
       "aria_label": "玩家 {{name}}{{you}}"
     },
@@ -495,13 +501,13 @@
       "ready": "准备好！",
       "host_label": "主持人",
       "ready_count": "{{count}} / {{total}} 准备好",
-      "lock_room": "上锁室",
+      "lock_room": "锁室",
       "unlock_room": "解锁房间",
       "force_start": "强制开始游戏",
       "need_players_ranked": "需要 5 名以上玩家才能进行排名",
       "no_players": "没有玩家",
       "voted_for": "投票给 {{name}}",
-      "censure_select": "选择卡上的一名球员进行谴责（排除在下一次提名之外）",
+      "censure_select": "选择卡上的一名球员进行谴责（从下一次提名中排除）",
       "snap_volunteer_prompt": "任何玩家都可以自愿成为下一任总统。",
       "volunteered": "自愿",
       "volunteer": "志愿者",
@@ -530,7 +536,7 @@
     "chat": {
       "title": "组装聊天",
       "round_separator": "回合 {{count}}",
-      "dead_cant_speak": "死去的玩家不能说话……",
+      "dead_cant_speak": "死去的玩家无法说话...",
       "placeholder": "输入消息...",
       "chanCivilStateEnacted": {
         "0": "我收到了两项国家指令。总统欠议会一个解释。",
@@ -1063,7 +1069,7 @@
       "modes": {
         "casual": "休闲",
         "ranked": "排名",
-        "classic": "经典的",
+        "classic": "经典",
         "crisis": "危机"
       }
     },
@@ -1190,7 +1196,7 @@
         "performance_header": "比赛表现",
         "victory": "胜利已达成",
         "defeat": "任务失败",
-        "elo": "埃洛",
+        "elo": "ELO",
         "casual": "休闲",
         "xp": "XP",
         "ip": "知识产权",
@@ -1210,7 +1216,7 @@
         "title": "比赛结果",
         "title_role": "标题",
         "commendations": {
-          "mvp": "授予 MVP",
+          "mvp": "授予MVP",
           "deceiver": "奖励表彰：骗子",
           "honorable": "奖项表彰：荣誉"
         }
@@ -1297,15 +1303,16 @@
       "prediction_deception": "欺骗"
     },
     "debrief": {
-      "intro_title": "大会已结束",
-      "charter_defended": "《宪章》得到了捍卫。",
-      "secretariat_fallen": "秘书处已落入国家手中。",
+      "intro_title": "结果",
+      "charter_defended": "宪章得到捍卫",
+      "secretariat_fallen": "秘书处已经垮台",
       "key_moments": "关键时刻",
-      "identities_confirmed": "所有身份均已确认",
-      "tap_to_advance": "点击前进",
+      "identities_confirmed": "身份已确认",
+      "tap_to_advance": "点击任意位置继续",
+      "no_plays": "没有发生值得注意的事件",
       "roles": {
         "civil": "民用",
-        "state": "状态代理",
+        "state": "状态",
         "overseer": "监督者"
       },
       "plays": {
@@ -1316,9 +1323,9 @@
         "chaos_many": "{{count}} 混乱指令破坏了议会的稳定",
         "veto_one": "政府动用了否决权",
         "veto_many": "否决权被行使{{count}}次",
+        "true_lie": "第{{round}}轮：总统{{name}}声称抽出3项国家政策，但实际上抽出了民事",
         "marathon": "一场史诗般的 {{count}} 轮意志之战",
-        "deadlock": "两派使议会陷入了刀锋般的僵局",
-        "true_lie": "{{name}} 绘制了 3 条国家指令，但另有声明"
+        "deadlock": "两派使议会陷入了刀锋般的僵局"
       }
     },
     "match_replay": {
@@ -1331,7 +1338,7 @@
       "president": "总统",
       "chancellor": "校长",
       "session_summary": "会议总结",
-      "chaos_forced": "混沌被迫",
+      "chaos_forced": "混沌强行",
       "rejected": "政府拒绝",
       "fail_veto": "双方同意行使否决权。",
       "fail_default": "议会未能确认这一联盟。",
@@ -1720,7 +1727,7 @@
           },
           "nominated": {
             "name": "提名",
-            "desc": "两次被提名为校长"
+            "desc": "两次被提名总理"
           },
           "deadlock": {
             "name": "僵局",
@@ -1756,7 +1763,7 @@
           },
           "close_race": {
             "name": "近距离比赛",
-            "desc": "游戏结束时跟踪 2 个指令内"
+            "desc": "游戏结束时在 2 个指令内追踪"
           },
           "swing_vote": {
             "name": "摇摆投票",
@@ -1802,7 +1809,7 @@
       "kick_vote_title": "踢投票",
       "kick_vote_header": "驱逐{{name}}？",
       "kick_vote_initiator": "请求者：{{name}}",
-      "progress": "进展",
+      "progress": "进步",
       "required": "必填",
       "target_wait": "您正在投票...",
       "voted_wait": "投票。等待其他人...",
@@ -1836,7 +1843,7 @@
       },
       "tabs": {
         "general": "一般",
-        "audio": "音频",
+        "audio": "声音的",
         "voice": "语音"
       },
       "audio": {
@@ -1872,14 +1879,14 @@
       "more": "更多选项"
     },
     "tabs": {
-      "stats": "统计",
+      "stats": "统计数据",
       "inventory": "库存",
       "achievements": "奖牌",
       "challenges": "挑战",
       "clan": "氏族",
       "shop": "店铺",
       "pass": "通过",
-      "friends": "盟国",
+      "friends": "盟友",
       "referrals": "推荐",
       "history": "历史",
       "settings": "设置",
@@ -2217,7 +2224,7 @@
         "your_clan": "你的氏族"
       },
       "create": {
-        "title": "找到了一个新部落",
+        "title": "找到了一个新氏族",
         "tag_label": "部落标签（4-5 个字符）",
         "tag_placeholder": "阿斯利",
         "name_label": "部落名称",
@@ -2283,7 +2290,7 @@
       "vote_yes": "是的令牌",
       "item_type_policy": "政策皮肤",
       "rarities": {
-        "common": "常见",
+        "common": "常见的",
         "uncommon": "不常见",
         "rare": "罕见",
         "epic": "史诗",
@@ -2431,7 +2438,7 @@
     },
     "admin": {
       "tabs": {
-        "rooms": "客房",
+        "rooms": "房间",
         "users": "用户",
         "system": "系统",
         "logs": "审计"
@@ -2519,7 +2526,7 @@
       "modes": {
         "overall": "总体",
         "ranked": "排名",
-        "casual": "休闲",
+        "casual": "随意的",
         "classic": "经典",
         "crisis": "危机"
       },
@@ -2533,7 +2540,7 @@
   },
   "social": {
     "clan": {
-      "profile_label": "氏族简介",
+      "profile_label": "部落简介",
       "level": "级别",
       "members": "会员",
       "no_desc": "没有提供描述。",
@@ -2553,14 +2560,14 @@
       "searching": "正在搜索...",
       "search_no_results": "没有找到“{{query}}”的玩家",
       "status_sent": "已发送",
-      "friends_label": "盟友",
+      "friends_label": "盟国",
       "pending_requests": "待处理请求 ({{count}})",
       "wants_to_be_friends": "想成为盟友",
       "no_friends": "还没有盟友。",
       "no_friends_hint": "搜索上面的玩家或添加游戏中的某人。",
       "online": "在线 ({{count}})",
       "offline": "离线 ({{count}})",
-      "in_game": "组装中·{{roomId}}",
+      "in_game": "正在组装·{{roomId}}",
       "in_lobby": "在大厅",
       "recently_played": "最近玩过",
       "time_m_ago": "{{count}} 分钟前",

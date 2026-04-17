@@ -1,5 +1,6 @@
 {
   "common": {
+    "confirm_cta": "Reclamar recompensa",
     "title": "LA ASAMBLEA",
     "loading": "Cargando...",
     "error": "Error",
@@ -173,7 +174,12 @@
       "high_delegate": "Alto Delegado",
       "consul": "Cónsul",
       "assembly_master": "Maestro de montaje",
-      "overseer": "Supervisor"
+      "overseer": "Supervisor",
+      "bronze": "Bronce",
+      "silver": "Plata",
+      "gold": "Oro",
+      "platinum": "Platino",
+      "diamond": "Diamante"
     },
     "matchmaking": {
       "title": "Armar una cerilla",
@@ -204,7 +210,7 @@
       "status_locked": "Bloqueado",
       "players_count": "{{count}}/{{max}}",
       "btn_join": "Unirse",
-      "btn_watch": "Mirar",
+      "btn_watch": "Ver",
       "filter_joinable": "Unirse",
       "filter_active": "Activo",
       "sort_label": "Ordenar",
@@ -267,7 +273,7 @@
   "game": {
     "roles": {
       "civil": {
-        "name": "Civil",
+        "name": "Civiles",
         "flavor": "Proteger la Carta. No confíes en nadie."
       },
       "state": {
@@ -325,7 +331,7 @@
     "powers": {
       "peek": {
         "name": "Vistazo a las políticas",
-        "desc": "El presidente adelanta las 3 directivas principales"
+        "desc": "El presidente adelanta las 3 principales directivas"
       },
       "kill": {
         "name": "Ejecución",
@@ -337,7 +343,7 @@
       },
       "spec": {
         "name": "Elección Especial",
-        "desc": "Presidente elige próximo candidato"
+        "desc": "El presidente elige al próximo candidato"
       },
       "win": {
         "name": "Victoria del Estado",
@@ -414,7 +420,7 @@
       "civil_label": "Civiles",
       "state_label": "Estado",
       "deck": "Cubierta",
-      "discard": "Descartar",
+      "discard": "Desechar",
       "spectators": "Espectadores ({{count}})",
       "election_tracker": "Rastreador de elecciones",
       "win_civil": "Carta restaurada",
@@ -1297,16 +1303,17 @@
       "prediction_deception": "Engaño"
     },
     "debrief": {
-      "intro_title": "La Asamblea ha concluido",
-      "charter_defended": "La Carta ha sido defendida.",
-      "secretariat_fallen": "La Secretaría ha recaído en el Estado.",
-      "key_moments": "Momentos clave",
-      "identities_confirmed": "Todas las identidades confirmadas",
-      "tap_to_advance": "Toca para avanzar",
+      "intro_title": "EL RESULTADO",
+      "charter_defended": "LA CARTA FUE DEFENDIDA",
+      "secretariat_fallen": "LA SECRETARÍA HA CAÍDO",
+      "key_moments": "MOMENTOS CLAVE",
+      "identities_confirmed": "IDENTIDADES CONFIRMADAS",
+      "tap_to_advance": "TOCA CUALQUIER LUGAR PARA CONTINUAR",
+      "no_plays": "No ocurrieron eventos notables",
       "roles": {
         "civil": "Civiles",
-        "state": "Agente estatal",
-        "overseer": "El supervisor"
+        "state": "Estado",
+        "overseer": "Supervisor"
       },
       "plays": {
         "assassin": "{{assassin}} eliminado {{killed}} como Asesino",
@@ -1316,9 +1323,9 @@
         "chaos_many": "{{count}} directivas del caos desestabilizaron la Asamblea",
         "veto_one": "El gobierno invocó su poder de veto",
         "veto_many": "El veto fue ejercido {{count}} veces",
+        "true_lie": "Ronda {{round}}: El Presidente {{name}} afirmó haber dibujado 3 políticas de Estado, pero en realidad dibujó Civil",
         "marathon": "Una batalla de voluntades épica de {{count}} ronda",
-        "deadlock": "Ambas facciones mantuvieron la Asamblea en un punto muerto al filo de la navaja",
-        "true_lie": "{{name}} extrajo 3 directivas estatales pero afirmó lo contrario"
+        "deadlock": "Ambas facciones mantuvieron la Asamblea en un punto muerto al filo de la navaja"
       }
     },
     "match_replay": {
@@ -1391,7 +1398,7 @@
       },
       "roles": {
         "civil": {
-          "name": "Civiles",
+          "name": "Civil",
           "flavor": "Defender la Carta. La crisis no debe consumir la Secretaría."
         },
         "state": {
@@ -1405,7 +1412,7 @@
       },
       "loop": {
         "title": "El bucle del juego",
-        "subtitle": "Cada ronda sigue la misma secuencia.",
+        "subtitle": "Cada ronda sigue la misma secuencia",
         "step_1": {
           "label": "Nominación presidencial",
           "desc": "El actual Presidente nomina a un candidato a Canciller. El rol presidencial rota en cada ronda."
@@ -1498,7 +1505,7 @@
           "desc": "Convocatoria de una nueva votación de emergencia durante elecciones fallidas de alta tensión."
         },
         "cipher": {
-          "name": "Cifrar",
+          "name": "Cifrado",
           "desc": "Enviar un despacho anónimo a la sala durante la fase legislativa."
         }
       },
@@ -1528,7 +1535,7 @@
           "body": "Conoces a tus aliados pero no puedes comunicarte abiertamente. Coordine mediante nominaciones, declaraciones y patrones de votación sutiles, sin ser obvio."
         },
         "decl": {
-          "heading": "Las declaraciones lo son todo",
+          "heading": "Las declaraciones lo son todo.",
           "body": "Después de cada sesión legislativa, tanto el Presidente como el Canciller declaran lo que vieron. Al hacer referencias cruzadas a estas afirmaciones es como se detectan mentiras."
         },
         "dossier": {
@@ -1658,7 +1665,7 @@
           },
           "defector": {
             "name": "Desertor",
-            "when": "Votación (Revelar)",
+            "when": "Votar (revelar)",
             "desc": "Cambie su voto en secreto después de la revelación inicial pero antes de que se finalice el resultado. Esto puede convertir un empate 5-5 en un pase de 6-4. Una vez usado."
           },
           "archivist": {
@@ -2047,7 +2054,7 @@
           "desc": "Promulga 2 directivas civiles como Canciller en un solo juego."
         },
         "daily_win_state_5plus_players": {
-          "name": "Operativo estatal",
+          "name": "Operativo Estatal",
           "desc": "Gana como Estado o Supervisor en un juego con al menos 5 jugadores."
         },
         "weekly_win_3": {
@@ -2083,7 +2090,7 @@
           "desc": "Ser elegido Canciller 3 veces en cualquier juego."
         },
         "weekly_win_overseer": {
-          "name": "Supremacía de las Sombras",
+          "name": "Supremacía de las sombras",
           "desc": "Gana una partida como supervisor."
         },
         "weekly_play_classic_2": {
@@ -2224,7 +2231,7 @@
         "name_placeholder": "La Primera Asamblea",
         "desc_label": "Información",
         "desc_placeholder": "Propósito de tu clan...",
-        "btn_creating": "Establecimiento...",
+        "btn_creating": "Fundación...",
         "btn_submit": "Establecer clan",
         "error_failed": "No se pudo fundar el clan"
       },
@@ -2321,7 +2328,7 @@
           "desc": "Juega 100 juegos."
         },
         "first_victory": {
-          "name": "Para que conste",
+          "name": "Para el registro",
           "desc": "Gana tu primer juego."
         },
         "ten_wins": {
@@ -2431,7 +2438,7 @@
     },
     "admin": {
       "tabs": {
-        "rooms": "Alojamiento",
+        "rooms": "Habitaciones",
         "users": "Usuarios",
         "system": "Sistema",
         "logs": "Auditoría"
@@ -2519,7 +2526,7 @@
       "modes": {
         "overall": "General",
         "ranked": "Clasificado",
-        "casual": "Informal",
+        "casual": "Casual",
         "classic": "Clásico",
         "crisis": "Crisis"
       },

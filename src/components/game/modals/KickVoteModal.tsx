@@ -45,7 +45,7 @@ export const KickVoteModal: React.FC<KickVoteModalProps> = ({
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-red-500">
               <Shield className="w-5 h-5" />
-              <span className="text-sm font-mono uppercase tracking-widest">{t('game.voting.kick_vote_title', 'Kick Vote')}</span>
+              <span className="text-sm font-mono uppercase tracking-widest">{t('game.voting.kick_vote_title')}</span>
             </div>
             <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-900/20 border border-red-900/30 text-red-400 font-mono text-xs">
               <Timer className="w-3.5 h-3.5" />
@@ -55,18 +55,18 @@ export const KickVoteModal: React.FC<KickVoteModalProps> = ({
 
           <div className="text-center space-y-2">
             <h3 className="text-xl font-thematic tracking-wide">
-              {t('game.voting.kick_vote_header', 'Expel {{name}}?', { name: target?.name ?? 'Player' })}
+              {t('game.voting.kick_vote_header', { name: target?.name ?? 'Player' })}
             </h3>
             <p className="text-secondary text-sm font-mono">
-              {t('game.voting.kick_vote_initiator', 'Requested by {{name}}', { name: initiator?.name ?? 'Unknown' })}
+              {t('game.voting.kick_vote_initiator', { name: initiator?.name ?? 'Unknown' })}
             </p>
           </div>
 
           <div className="space-y-4">
             <div className="bg-black/20 rounded-xl p-4 border border-white/5">
               <div className="flex justify-between text-[10px] font-mono uppercase tracking-widest text-faint mb-2">
-                <span>{t('game.voting.progress', 'Progress')}</span>
-                <span>{ayes} / {threshold} {t('game.voting.required', 'Required')}</span>
+                <span>{t('game.voting.progress')}</span>
+                <span>{ayes} / {threshold} {t('game.voting.required')}</span>
               </div>
               <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
                 <motion.div 
@@ -87,7 +87,7 @@ export const KickVoteModal: React.FC<KickVoteModalProps> = ({
                   className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-red-900/20 border border-red-900/40 text-red-400 hover:bg-red-900/30 transition-all font-mono uppercase tracking-widest text-xs"
                 >
                   <ThumbsUp className="w-6 h-6" />
-                  {t('game.voting.aye', 'Aye')}
+                  {t('game.voting.aye')}
                 </button>
                 <button
                   onClick={() => {
@@ -97,16 +97,16 @@ export const KickVoteModal: React.FC<KickVoteModalProps> = ({
                   className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-white/5 border border-white/10 text-primary hover:bg-white/10 transition-all font-mono uppercase tracking-widest text-xs"
                 >
                   <ThumbsDown className="w-6 h-6" />
-                  {t('game.voting.nay', 'Nay')}
+                  {t('game.voting.nay')}
                 </button>
               </div>
             ) : (
               <div className="text-center p-6 bg-white/5 rounded-2xl border border-white/5 italic text-secondary text-sm font-mono">
                 {isTarget 
-                  ? t('game.voting.target_wait', 'You are being voted on...') 
+                  ? t('game.voting.target_wait') 
                   : myVote 
-                    ? t('game.voting.voted_wait', 'Vote cast. Waiting for others...')
-                    : t('game.voting.vote_closed', 'Vote closed.')}
+                    ? t('game.voting.voted_wait')
+                    : t('game.voting.vote_closed')}
               </div>
             )}
           </div>

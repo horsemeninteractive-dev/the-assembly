@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../../contexts/I18nContext';
 import { motion } from 'motion/react';
 import { Server, Activity, Clock } from 'lucide-react';
@@ -14,9 +14,18 @@ interface AdminConfigPanelProps {
 
 export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setConfig, token }) => {
   const { t } = useTranslation();
-  const handleUpdateConfig = (updates: Partial<SystemConfig>) => {
+
+  // Local draft state — updates UI instantly without hitting the DB on every slider tick
+  const [draft, setDraft] = useState<SystemConfig>(config);
+
+  // Keep draft in sync if parent config changes externally (e.g. socket event on another screen)
+  useEffect(() => { setDraft(config); }, [config]);
+
+  // Called only when slider is released — persists to DB via socket
+  const commitConfig = (updates: Partial<SystemConfig>) => {
     const newConfig = { ...config, ...updates };
     setConfig(newConfig);
+    setDraft(newConfig);
     socket.emit('adminUpdateConfig', updates);
   };
 
@@ -44,10 +53,11 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
         </div>
 
         <div className="space-y-6">
+          {/* Maintenance Mode Toggle */}
           <div
             className={cn(
               'flex items-center justify-between p-7 rounded-3xl border transition-all shadow-inner',
-              config.maintenanceMode
+              draft.maintenanceMode
                 ? 'bg-red-900/20 border-red-500/40'
                 : 'bg-elevated/30 border-subtle'
             )}
@@ -56,7 +66,7 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
               <div
                 className={cn(
                   'w-12 h-12 rounded-2xl flex items-center justify-center shadow-lg',
-                  config.maintenanceMode ? 'bg-red-600 text-white' : 'bg-card text-ghost'
+                  draft.maintenanceMode ? 'bg-red-600 text-white' : 'bg-card text-ghost'
                 )}
               >
                 <Activity className="w-6 h-6" />
@@ -66,30 +76,29 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
                   {t('profile.admin.config.maintenance')}
                 </div>
                 <div className="text-[10px] font-mono uppercase mt-0.5 opacity-60">
-                  {config.maintenanceMode
+                  {draft.maintenanceMode
                     ? 'Blocking non-admin sessions'
                     : 'Sessions open to all'}
                 </div>
               </div>
             </div>
             <button
-              onClick={() =>
-                handleUpdateConfig({ maintenanceMode: !config.maintenanceMode })
-              }
+              onClick={() => commitConfig({ maintenanceMode: !draft.maintenanceMode })}
               className={cn(
                 'relative w-16 h-8 rounded-full transition-all duration-300 shadow-lg',
-                config.maintenanceMode ? 'bg-red-600' : 'bg-zinc-700 border border-zinc-600'
+                draft.maintenanceMode ? 'bg-red-600' : 'bg-zinc-700 border border-zinc-600'
               )}
             >
               <div
                 className={cn(
                   'absolute top-1 w-6 h-6 rounded-full bg-white transition-all transform shadow-md',
-                  config.maintenanceMode ? 'left-9' : 'left-1'
+                  draft.maintenanceMode ? 'left-9' : 'left-1'
                 )}
               />
             </button>
           </div>
 
+          {/* XP / IP Multiplier Sliders */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-elevated/50 p-6 rounded-3xl border border-subtle space-y-4">
               <div className="flex justify-between items-center">
@@ -97,7 +106,7 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
                   {t('profile.admin.config.xp_boost')}
                 </div>
                 <span className="text-2xl font-thematic text-primary">
-                  {config.xpMultiplier}x
+                  {draft.xpMultiplier}x
                 </span>
               </div>
               <input
@@ -105,10 +114,10 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
                 min="1"
                 max="5"
                 step="0.5"
-                value={config.xpMultiplier}
-                onChange={(e) =>
-                  handleUpdateConfig({ xpMultiplier: parseFloat(e.target.value) })
-                }
+                value={draft.xpMultiplier}
+                onChange={(e) => setDraft(d => ({ ...d, xpMultiplier: parseFloat(e.target.value) }))}
+                onMouseUp={(e) => commitConfig({ xpMultiplier: parseFloat((e.target as HTMLInputElement).value) })}
+                onTouchEnd={(e) => commitConfig({ xpMultiplier: parseFloat((e.target as HTMLInputElement).value) })}
                 className="w-full accent-blue-500 h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer"
               />
             </div>
@@ -118,7 +127,7 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
                   {t('profile.admin.config.ip_boost')}
                 </div>
                 <span className="text-2xl font-thematic text-primary">
-                  {config.ipMultiplier}x
+                  {draft.ipMultiplier}x
                 </span>
               </div>
               <input
@@ -126,10 +135,10 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
                 min="1"
                 max="5"
                 step="0.5"
-                value={config.ipMultiplier}
-                onChange={(e) =>
-                  handleUpdateConfig({ ipMultiplier: parseFloat(e.target.value) })
-                }
+                value={draft.ipMultiplier}
+                onChange={(e) => setDraft(d => ({ ...d, ipMultiplier: parseFloat(e.target.value) }))}
+                onMouseUp={(e) => commitConfig({ ipMultiplier: parseFloat((e.target as HTMLInputElement).value) })}
+                onTouchEnd={(e) => commitConfig({ ipMultiplier: parseFloat((e.target as HTMLInputElement).value) })}
                 className="w-full accent-emerald-500 h-2 bg-zinc-800 rounded-lg appearance-none cursor-pointer"
               />
             </div>
@@ -141,10 +150,10 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
                 try {
                   const res = await fetch(apiUrl('/api/admin/test-push'), {
                     method: 'POST',
-                    headers: { 
-                      'Authorization': `Bearer ${token}`,
-                      'Content-Type': 'application/json'
-                    }
+                    headers: {
+                      Authorization: `Bearer ${token}`,
+                      'Content-Type': 'application/json',
+                    },
                   });
                   const data = await res.json();
                   if (res.ok) {
@@ -163,7 +172,7 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
             </button>
             <p className="text-[9px] text-faint font-mono flex items-center gap-2 uppercase tracking-tighter italic">
               <Clock className="w-3 h-3" />
-              Configuration propagates through Redis Pub/Sub in real-time
+              Configuration saved to database on slider release
             </p>
           </div>
         </div>
@@ -171,5 +180,3 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
     </motion.div>
   );
 };
-
-

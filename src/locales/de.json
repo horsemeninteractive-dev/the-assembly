@@ -1,5 +1,6 @@
 {
   "common": {
+    "confirm_cta": "Fordern Sie eine Belohnung an",
     "title": "DIE MONTAGE",
     "loading": "Wird geladen...",
     "error": "Fehler",
@@ -23,7 +24,7 @@
     "invite": "Einladen",
     "lvl": "Level",
     "results": "Ergebnisse",
-    "search": "Suche",
+    "search": "Suchen",
     "sent": "Gesendet",
     "state_short": "Sta",
     "status": "Status"
@@ -95,7 +96,7 @@
       "subtitle": "Jede Runde zwingt jeden Spieler dazu, teilzunehmen, sich zu melden und beurteilt zu werden. Es gibt kein Verstecken.",
       "label_1": "Nominierung",
       "step_1": "Der Präsident ernennt einen Kanzler. Wem Sie vertrauen – und wen Sie nominieren – verrät alles.",
-      "label_2": "Wählen",
+      "label_2": "Abstimmung",
       "step_2": "Alle Spieler stimmen gleichzeitig ab. Öffentlich, unausweichlich und offen für Interpretationen.",
       "label_3": "Legislativsitzung",
       "step_3": "Der Präsident zieht 3 Richtlinienkarten, wirft 1 ab und gibt 2 an den Kanzler weiter. Einer wird in Kraft gesetzt.",
@@ -173,7 +174,12 @@
       "high_delegate": "Hoher Delegierter",
       "consul": "Konsul",
       "assembly_master": "Montagemeister",
-      "overseer": "Aufseher"
+      "overseer": "Aufseher",
+      "bronze": "Bronze",
+      "silver": "Silber",
+      "gold": "Gold",
+      "platinum": "Platin",
+      "diamond": "Diamant"
     },
     "matchmaking": {
       "title": "Stellen Sie ein Match zusammen",
@@ -204,7 +210,7 @@
       "status_locked": "Gesperrt",
       "players_count": "{{count}}/{{max}}",
       "btn_join": "Beitreten",
-      "btn_watch": "Betrachten",
+      "btn_watch": "Beobachten Sie",
       "filter_joinable": "Beitrittsfähig",
       "filter_active": "Aktiv",
       "sort_label": "Sortieren",
@@ -267,7 +273,7 @@
   "game": {
     "roles": {
       "civil": {
-        "name": "Bürgerlich",
+        "name": "Zivil",
         "flavor": "Schützen Sie die Charta. Vertraue niemandem."
       },
       "state": {
@@ -325,7 +331,7 @@
     "powers": {
       "peek": {
         "name": "Policy Peek",
-        "desc": "Präsident stellt eine Vorschau auf die drei wichtigsten Richtlinien vor"
+        "desc": "Der Präsident gibt eine Vorschau auf die drei wichtigsten Richtlinien"
       },
       "kill": {
         "name": "Ausführung",
@@ -337,7 +343,7 @@
       },
       "spec": {
         "name": "Sonderwahl",
-        "desc": "Der Präsident wählt den nächsten Kandidaten"
+        "desc": "Präsident wählt nächsten Kandidaten"
       },
       "win": {
         "name": "Staatssieg",
@@ -420,7 +426,7 @@
       "win_civil": "Charta wiederhergestellt",
       "win_civil_desc": "Civil gewinnt sofort",
       "win_state": "Staatliche Vorherrschaft",
-      "win_state_desc": "Der Staat gewinnt sofort",
+      "win_state_desc": "Staat gewinnt sofort",
       "quorum_revote": "WIDERRUFEN",
       "win_reasons": {
         "charter_restored": "Charta wiederhergestellt",
@@ -1063,7 +1069,7 @@
       "modes": {
         "casual": "Lässig",
         "ranked": "Rangliste",
-        "classic": "Klassiker",
+        "classic": "Klassisch",
         "crisis": "Krise"
       }
     },
@@ -1158,7 +1164,7 @@
       "rejected": "Abgelehnt",
       "no_policy": "Keine Richtlinie",
       "civil": "Zivil",
-      "state": "Zustand",
+      "state": "Staat",
       "pres_short": "Pres",
       "chan_short": "Chan",
       "president": "Präsident",
@@ -1219,7 +1225,7 @@
         "title": "Freundschaftsanfrage",
         "description": "<1>{{username}}</1> möchte Freunde sein.",
         "deny": "Verweigern",
-        "accept": "Akzeptieren"
+        "accept": "Akzeptiere"
       },
       "investigation": {
         "title": "Untersuchungsergebnis",
@@ -1297,16 +1303,17 @@
       "prediction_deception": "Täuschung"
     },
     "debrief": {
-      "intro_title": "Die Versammlung ist zu Ende",
-      "charter_defended": "Die Charta wurde verteidigt.",
-      "secretariat_fallen": "Das Sekretariat ist dem Staat zugefallen.",
-      "key_moments": "Schlüsselmomente",
-      "identities_confirmed": "Alle Identitäten bestätigt",
-      "tap_to_advance": "Tippen Sie, um fortzufahren",
+      "intro_title": "DAS ERGEBNIS",
+      "charter_defended": "DIE CHARTA WURDE VERTEIDIGT",
+      "secretariat_fallen": "DAS SEKRETARIAT IST GEFALLEN",
+      "key_moments": "SCHLÜSSELMOMENTE",
+      "identities_confirmed": "IDENTITÄTEN BESTÄTIGT",
+      "tap_to_advance": "Irgendwo antippen, um fortzufahren",
+      "no_plays": "Es sind keine nennenswerten Ereignisse aufgetreten",
       "roles": {
         "civil": "Zivil",
-        "state": "Staatsagent",
-        "overseer": "Der Aufseher"
+        "state": "Staat",
+        "overseer": "Aufseher"
       },
       "plays": {
         "assassin": "{{assassin}} eliminierte {{killed}} als Assassine",
@@ -1316,9 +1323,9 @@
         "chaos_many": "{{count}} Chaosanweisungen destabilisierten die Versammlung",
         "veto_one": "Die Regierung berief sich auf ihr Vetorecht",
         "veto_many": "Das Veto wurde {{count}} Mal ausgeübt",
+        "true_lie": "Runde {{round}}: Präsident {{name}} behauptete, 3 staatliche Richtlinien zu ziehen, zog aber tatsächlich zivile",
         "marathon": "Ein epischer {{count}}-Runden-Willenskampf",
-        "deadlock": "Beide Fraktionen hielten die Versammlung in einer Sackgasse",
-        "true_lie": "{{name}} entwarf drei staatliche Richtlinien, behauptete aber etwas anderes"
+        "deadlock": "Beide Fraktionen hielten die Versammlung in einer Sackgasse"
       }
     },
     "match_replay": {
@@ -1338,7 +1345,7 @@
       "enacted": "Richtlinie in Kraft gesetzt",
       "power_triggered": "Ausgelöste Leistung: {{action}}",
       "legislative_hand": "Legislative Hand",
-      "pres_deck": "Deck des Präsidenten",
+      "pres_deck": "Präsidentendeck",
       "deception_detected": "Täuschung entdeckt",
       "actual_draw": "Tatsächliche Auslosung",
       "hidden": "VERSTECKT",
@@ -1391,7 +1398,7 @@
       },
       "roles": {
         "civil": {
-          "name": "Zivil",
+          "name": "Bürgerlich",
           "flavor": "Verteidigen Sie die Charta. Die Krise darf das Sekretariat nicht verschlingen."
         },
         "state": {
@@ -1528,7 +1535,7 @@
           "body": "Sie kennen Ihre Verbündeten, können aber nicht offen kommunizieren. Koordinieren Sie sich durch Nominierungen, Erklärungen und subtile Abstimmungsmuster – ohne offensichtlich zu sein."
         },
         "decl": {
-          "heading": "Deklarationen sind alles",
+          "heading": "Erklärungen sind alles",
           "body": "Nach jeder Legislaturperiode erklären sowohl der Präsident als auch der Kanzler, was sie gesehen haben. Durch Querverweise auf diese Behauptungen erkennt man Lügen."
         },
         "dossier": {
@@ -1541,7 +1548,7 @@
           "title": "Verbündetenanfrage",
           "description": "<1>{{username}}</1> möchte Verbündete sein.",
           "deny": "Verweigern",
-          "accept": "Akzeptieren"
+          "accept": "Akzeptiere"
         },
         "declaration": {
           "drew_label": "<1>Behauptung:</1> Ich habe gezeichnet...",
@@ -1568,7 +1575,7 @@
       },
       "overview": {
         "p1": "Die Versammlung ist eine {{social_deduction_game}} für 5–10 Spieler. Jedem Spieler wird heimlich eine Fraktion – Zivil oder Staat – zugewiesen und er muss mit oder gegen die anderen zusammenarbeiten, um die Siegbedingung seiner Fraktion zu erfüllen.",
-        "civil_wins_label": "Zivil gewinnt durch",
+        "civil_wins_label": "Civil gewinnt durch",
         "civil_wins": [
           "Erlass von 5 zivilrechtlichen Richtlinien",
           "Ausführung des Aufsehers"
@@ -1756,7 +1763,7 @@
           },
           "close_race": {
             "name": "Enges Rennen",
-            "desc": "Verfolgt innerhalb von 2 Anweisungen am Ende des Spiels"
+            "desc": "Fährt am Ende des Spiels innerhalb von 2 Richtungen"
           },
           "swing_vote": {
             "name": "Die Swing-Abstimmung",
@@ -1811,7 +1818,7 @@
     "legislative": {
       "discard": "Verwerfen",
       "enact": "",
-      "propose_veto": "erlassen Schlagen Sie ein Veto vor",
+      "propose_veto": "erlassen Veto vorschlagen",
       "send_dispatch": "Anonymen Versand senden"
     }
   },
@@ -1847,7 +1854,7 @@
       },
       "voice": {
         "ai_voice": "KI-Erzählerstimme",
-        "tts_voice": "Sprachauswahl",
+        "tts_voice": "Stimmenauswahl",
         "tts_default": "Systemstandard",
         "narrator_volume": "Erzählerlautstärke",
         "narrator_volume_desc": "Steuert die Lautstärke für KI-Sprachansagen im Spiel"
@@ -2047,7 +2054,7 @@
           "desc": "Führen Sie als Kanzler in einem einzigen Spiel zwei zivile Anweisungen aus."
         },
         "daily_win_state_5plus_players": {
-          "name": "Staatsoperativ",
+          "name": "Staatsbeamter",
           "desc": "Gewinnen Sie als Staat oder Aufseher ein Spiel mit mindestens 5 Spielern."
         },
         "weekly_win_3": {
@@ -2248,7 +2255,7 @@
         "xp_label": "Clan-Level-XP",
         "total_xp": "{{count}} Gesamt-EP angesammelt",
         "contribution": "{{count}} XP beigetragen",
-        "overview": "Übersicht",
+        "overview": "Überblick",
         "challenges": "Ziele",
         "invite_label": "Zum Clan einladen",
         "invite_placeholder": "Spieler zum Einladen finden...",
@@ -2257,7 +2264,7 @@
       "invites": {
         "banner_title": "Clan-Einladung",
         "banner_desc": "{{inviter}} hat Sie eingeladen, {{clan}} [{{tag}}]",
-        "btn_accept": "beizutreten Akzeptieren",
+        "btn_accept": "beizutreten Akzeptiere",
         "btn_decline": "Ablehnen"
       },
       "alerts": {
@@ -2283,7 +2290,7 @@
       "vote_yes": "Ja Token",
       "item_type_policy": "Richtlinien-Skin",
       "rarities": {
-        "common": "Gewöhnlich",
+        "common": "Gemeinsam",
         "uncommon": "Gelegentlich",
         "rare": "Selten",
         "epic": "Episch",

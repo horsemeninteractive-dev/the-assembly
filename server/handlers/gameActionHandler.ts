@@ -673,9 +673,6 @@ export function registerGameActionHandlers(
     }
   });
 
-    engine.broadcastState(roomId);
-  });
-
   socket.on('initiateKickVote', (targetId) => {
     const roomId = getRoom();
     if (!roomId) return;
@@ -728,7 +725,7 @@ export function registerGameActionHandlers(
 
     state.kickVote.votes[player.id] = vote;
 
-    const humanPlayers = state.players.filter(p => !p.isAI && p.isAlive && p.id !== state.kickVote?.targetId);
+    const humanPlayers = state.players.filter(p => !p.isAI && p.isAlive && (state.kickVote ? p.id !== state.kickVote.targetId : true));
     const votesCount = Object.keys(state.kickVote.votes).length;
 
     if (votesCount >= humanPlayers.length) {
@@ -763,3 +760,4 @@ export function registerGameActionHandlers(
     engine.broadcastState(roomId);
   }
 }
+
