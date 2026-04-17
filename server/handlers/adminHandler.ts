@@ -7,7 +7,7 @@ import {
 } from '../game/schemas';
 import { getUserById, updateSystemConfig, saveUser } from '../supabaseService';
 import { SystemConfig } from '../../shared/types';
-import { getUserSocketId, getSocketId } from '../redis';
+import { getUserSocketId, getSocketId, isRedisConfigured, pubClient } from '../redis';
 
 /**
  * Handlers for administrative and host management actions like kicking players,
@@ -121,8 +121,16 @@ export function registerAdminHandlers(
     const admin = await getUserById(socket.data.userId);
     if (!admin || !admin.isAdmin) return;
     
-    configRef.current = await updateSystemConfig(config);
+    const updated = await updateSystemConfig(config);
+    configRef.current = updated;
+    
+    // Broadcast to all clients (all instances)
     io.emit('adminConfigUpdate', configRef.current);
+
+    // Notify other server instances to refresh their local configRef
+    if (isRedisConfigured && pubClient) {
+      pubClient.publish('cluster:adminConfigRefresh', JSON.stringify(configRef.current));
+    }
   });
 
   socket.on('adminClearRedis', async () => {

@@ -1181,7 +1181,11 @@
         "execution": "Exécution",
         "specialelection": "Élection spéciale",
         "policypeek": "Aperçu de la directive"
-      }
+      },
+      "list_view": "Vue en liste",
+      "heatmap_view": "Carte thermique",
+      "heatmap_player": "Joueur",
+      "heatmap_round": "R{{round}}"
     },
     "modals": {
       "game_over": {
@@ -1398,7 +1402,7 @@
       },
       "roles": {
         "civil": {
-          "name": "Civil",
+          "name": "Civile",
           "flavor": "Défendre la Charte. La crise ne doit pas consumer le Secrétariat."
         },
         "state": {
@@ -2564,13 +2568,15 @@
         "ranked": "Classé",
         "casual": "Décontracté",
         "classic": "Classique",
-        "crisis": "Crise"
+        "crisis": "Crise",
+        "betting": "Paris"
       },
       "stats": {
         "win_rate": "Gagner%",
         "games": "Jeux",
         "wins": "Gagne",
-        "elo": "ELO"
+        "elo": "ELO",
+        "profit": "Profit"
       }
     }
   },
@@ -2618,7 +2624,7 @@
   "playercard": {
     "play_now": "Jouer maintenant",
     "player_profile": "Profil du joueur",
-    "elo_label": "ELO",
+    "elo_label": "ÉLO",
     "elo_to_next": "{{amount}} ELO au niveau suivant",
     "joined_on": "Inscrit {{date}}",
     "share_profile": "Partager le profil",

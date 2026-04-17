@@ -1181,7 +1181,11 @@
         "execution": "执行",
         "specialelection": "特别选举",
         "policypeek": "指令窥视"
-      }
+      },
+      "list_view": "列表视图",
+      "heatmap_view": "热图",
+      "heatmap_player": "玩家",
+      "heatmap_round": "R{{round}}"
     },
     "modals": {
       "game_over": {
@@ -2564,13 +2568,15 @@
         "ranked": "排名",
         "casual": "休闲",
         "classic": "经典",
-        "crisis": "危机"
+        "crisis": "危机",
+        "betting": "投注"
       },
       "stats": {
         "win_rate": "赢%",
         "games": "游戏",
         "wins": "胜利",
-        "elo": "ELO"
+        "elo": "ELO",
+        "profit": "利润"
       }
     }
   },
@@ -2618,7 +2624,7 @@
   "playercard": {
     "play_now": "立即播放",
     "player_profile": "玩家简介",
-    "elo_label": "ELO",
+    "elo_label": "埃洛",
     "elo_to_next": "{{amount}} ELO 进入下一级",
     "joined_on": "已加入{{date}}",
     "share_profile": "分享个人资料",

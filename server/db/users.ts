@@ -32,6 +32,8 @@ const UserStatsSchema = z.object({
   classicGames: z.number().default(0),
   crisisWins: z.number().default(0),
   crisisGames: z.number().default(0),
+  bettingWins: z.number().default(0),
+  bettingPoints: z.number().default(0),
 }).catchall(z.any());
 
 export const SupabaseUserSchema = z.object({
@@ -327,6 +329,8 @@ export function makeNewUser(overrides: Partial<UserInternal> = {}): UserInternal
       classicGames: 0,
       crisisWins: 0,
       crisisGames: 0,
+      bettingWins: 0,
+      bettingPoints: 0,
     },
     ownedCosmetics: [],
     cabinetPoints: 0,
@@ -423,7 +427,7 @@ export async function deletePasswordResetTokens(userId: string): Promise<void> {
   }
 }
 
-type LeaderboardMode = 'Overall' | 'Ranked' | 'Casual' | 'Classic' | 'Crisis';
+type LeaderboardMode = 'Overall' | 'Ranked' | 'Casual' | 'Classic' | 'Crisis' | 'Betting';
 
 export async function getLeaderboard(
   mode: LeaderboardMode = 'Overall',
@@ -443,7 +447,9 @@ export async function getLeaderboard(
             ? 'stats->classicWins'
             : mode === 'Crisis'
               ? 'stats->crisisWins'
-              : 'stats->wins';
+              : mode === 'Betting'
+                ? 'stats->bettingWins'
+                : 'stats->wins';
 
     return await withRetry(async () => {
       const { data, error } = await adminDb
@@ -474,6 +480,10 @@ export async function getLeaderboard(
     return allUsers
       .sort((a, b) => (b.stats.crisisWins ?? 0) - (a.stats.crisisWins ?? 0))
       .slice(safeOffset, safeOffset + safeLimit);
+  if (mode === 'Betting')
+    return allUsers
+      .sort((a, b) => (b.stats.bettingWins ?? 0) - (a.stats.bettingWins ?? 0))
+      .slice(safeOffset, safeOffset + safeLimit);
   return allUsers
     .sort((a, b) => (b.stats.wins ?? 0) - (a.stats.wins ?? 0))
     .slice(safeOffset, safeOffset + safeLimit);
@@ -488,15 +498,17 @@ export async function getAllLeaderboards(
   casual: any[];
   classic: any[];
   crisis: any[];
+  betting: any[];
 }> {
-  const [overall, ranked, casual, classic, crisis] = await Promise.all([
+  const [overall, ranked, casual, classic, crisis, betting] = await Promise.all([
     getLeaderboard('Overall', limit, offset),
     getLeaderboard('Ranked', limit, offset),
     getLeaderboard('Casual', limit, offset),
     getLeaderboard('Classic', limit, offset),
     getLeaderboard('Crisis', limit, offset),
+    getLeaderboard('Betting', limit, offset),
   ]);
-  return { overall, ranked, casual, classic, crisis };
+  return { overall, ranked, casual, classic, crisis, betting };
 }
 
 export async function searchUsers(

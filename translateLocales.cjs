@@ -64,13 +64,63 @@ async function translateText(text, targetLang) {
 
 async function translateAll() {
   for (const lang of langs) {
-    console.log(`Starting translation for ${lang.code}...`);
-    const newData = JSON.parse(fileContent);
+    const targetFilePath = `src/locales/${lang.file}`;
+    console.log(`Checking translations for ${lang.code} (${lang.file})...`);
     
-    const BATCH_SIZE = 25; // Smaller batch for stability
-    
-    for (let i = 0; i < flatStrings.length; i += BATCH_SIZE) {
-      const batch = flatStrings.slice(i, i + BATCH_SIZE);
+    let existingData = {};
+    if (fs.existsSync(targetFilePath)) {
+      try {
+        existingData = JSON.parse(fs.readFileSync(targetFilePath, 'utf8'));
+      } catch (e) {
+        console.warn(`Could not parse existing ${lang.file}, starting fresh.`);
+      }
+    }
+
+    // Identify which strings need translation
+    const toTranslate = [];
+    const newData = JSON.parse(fileContent); // Start with English structure
+
+    function getValueByPath(obj, pathParts) {
+      let current = obj;
+      for (const part of pathParts) {
+        if (current === undefined || current === null) return undefined;
+        current = current[part];
+      }
+      return current;
+    }
+
+    function setValueByPath(obj, pathParts, value) {
+      let current = obj;
+      for (let i = 0; i < pathParts.length - 1; i++) {
+        if (!current[pathParts[i]]) current[pathParts[i]] = {};
+        current = current[pathParts[i]];
+      }
+      current[pathParts[pathParts.length - 1]] = value;
+    }
+
+    for (const item of flatStrings) {
+      const existingValue = getValueByPath(existingData, item.path);
+      if (existingValue && existingValue !== item.original) {
+        // Keep existing translation
+        setValueByPath(newData, item.path, existingValue);
+      } else {
+        // Mark for translation
+        toTranslate.push(item);
+      }
+    }
+
+    if (toTranslate.length === 0) {
+      console.log(`No new keys for ${lang.code}. Skipping.`);
+      // Even if no new keys, we still write newData to sync structure/deleted keys
+      fs.writeFileSync(targetFilePath, JSON.stringify(newData, null, 2) + '\n');
+      continue;
+    }
+
+    console.log(`Found ${toTranslate.length} new/missing keys for ${lang.code}. Translating...`);
+
+    const BATCH_SIZE = 25; 
+    for (let i = 0; i < toTranslate.length; i += BATCH_SIZE) {
+      const batch = toTranslate.slice(i, i + BATCH_SIZE);
       const batchProtected = batch.map(item => protect(item.original));
       const textToTranslate = batchProtected.map(b => b.protectedStr).join(' ||| ');
       
@@ -82,34 +132,25 @@ async function translateAll() {
           const item = batch[j];
           const transLine = translatedLines[j] !== undefined ? translatedLines[j] : batchProtected[j].protectedStr;
           const finalStr = unprotect(transLine.trim(), batchProtected[j].placeholders);
-          
-          let current = newData;
-          for (let k = 0; k < item.path.length - 1; k++) {
-            current = current[item.path[k]];
-          }
-          current[item.path[item.path.length - 1]] = finalStr;
+          setValueByPath(newData, item.path, finalStr);
         }
         
-        await new Promise(r => setTimeout(r, 1500)); // Sleep to avoid rate limits
+        await new Promise(r => setTimeout(r, 1500)); 
         process.stdout.write('.');
       } catch (err) {
         console.error(`\nError on batch ${i} for ${lang.code}:`, err.message);
-        for (let j = 0; j < batch.length; j++) {
-          const item = batch[j];
-          let current = newData;
-          for (let k = 0; k < item.path.length - 1; k++) {
-            current = current[item.path[k]];
-          }
-          current[item.path[item.path.length - 1]] = item.original;
+        // Fallback to original text if translation fails
+        for (const item of batch) {
+          setValueByPath(newData, item.path, item.original);
         }
         await new Promise(r => setTimeout(r, 3000));
       }
     }
     
-    fs.writeFileSync(`src/locales/${lang.file}`, JSON.stringify(newData, null, 2) + '\n');
+    fs.writeFileSync(targetFilePath, JSON.stringify(newData, null, 2) + '\n');
     console.log(`\nFinished ${lang.file}`);
   }
-  console.log('All translations complete via GTX method.');
+  console.log('All translations complete via incremental GTX method.');
 }
 
 translateAll();

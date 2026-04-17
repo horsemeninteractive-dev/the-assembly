@@ -185,6 +185,8 @@ export interface UserStats {
   classicGames: number;
   crisisWins: number;
   crisisGames: number;
+  bettingWins: number;
+  bettingPoints: number;
 }
 
 export interface MatchSummary {

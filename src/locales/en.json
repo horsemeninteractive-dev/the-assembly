@@ -1181,7 +1181,11 @@
         "execution": "Execution",
         "specialelection": "Special Election",
         "policypeek": "Directive Peek"
-      }
+      },
+      "list_view": "List View",
+      "heatmap_view": "Heatmap",
+      "heatmap_player": "Player",
+      "heatmap_round": "R{{round}}"
     },
     "modals": {
       "game_over": {
@@ -2564,13 +2568,15 @@
         "ranked": "Ranked",
         "casual": "Casual",
         "classic": "Classic",
-        "crisis": "Crisis"
+        "crisis": "Crisis",
+        "betting": "Betting"
       },
       "stats": {
         "win_rate": "Win%",
         "games": "Games",
         "wins": "Wins",
-        "elo": "ELO"
+        "elo": "ELO",
+        "profit": "Profit"
       }
     }
   },

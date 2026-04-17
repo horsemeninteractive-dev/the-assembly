@@ -1181,7 +1181,11 @@
         "execution": "Ausführung",
         "specialelection": "Sonderwahl",
         "policypeek": "Direktive Peek"
-      }
+      },
+      "list_view": "Listenansicht",
+      "heatmap_view": "Heatmap",
+      "heatmap_player": "Spieler",
+      "heatmap_round": "R{{round}}"
     },
     "modals": {
       "game_over": {
@@ -1843,7 +1847,7 @@
       },
       "tabs": {
         "general": "Allgemein",
-        "audio": "Audio",
+        "audio": "erlassen Audio",
         "voice": "Stimme"
       },
       "audio": {
@@ -1861,7 +1865,7 @@
       }
     },
     "lvl_label": "Ebene",
-    "ip_label": "IP",
+    "ip_label": "erlassen IP",
     "cp_label": "CP",
     "xp_label": "Erfahrung",
     "edit_username": "Benutzernamen bearbeiten",
@@ -2281,7 +2285,7 @@
         "hint": "Treten Sie einem Clan bei, um gemeinsame Belohnungen zu erhalten und in der globalen Rangliste aufzusteigen.",
         "btn_create": "Gründerpfad",
         "btn_find": "Clans durchsuchen",
-        "btn_leaderboard": "Rankings"
+        "btn_leaderboard": "Ranglisten"
       },
       "manage": {
         "btn_share": "Einladungslink kopieren",
@@ -2564,13 +2568,15 @@
         "ranked": "Rangliste",
         "casual": "Lässig",
         "classic": "Klassisch",
-        "crisis": "Krise"
+        "crisis": "Krise",
+        "betting": "Wetten"
       },
       "stats": {
         "win_rate": "Gewinn%",
         "games": "Spiele",
         "wins": "Siege",
-        "elo": "ELO"
+        "elo": "ELO",
+        "profit": "Gewinn"
       }
     }
   },

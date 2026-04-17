@@ -1181,7 +1181,11 @@
         "execution": "실행",
         "specialelection": "보궐선거",
         "policypeek": "지시문 엿보기"
-      }
+      },
+      "list_view": "에 대한 단결 또는 속임수를 예측하세요 목록 보기",
+      "heatmap_view": "히트맵",
+      "heatmap_player": "플레이어",
+      "heatmap_round": "에 대한 단결 또는 속임수를 예측하세요 R{{round}}"
     },
     "modals": {
       "game_over": {
@@ -2564,13 +2568,15 @@
         "ranked": "순위",
         "casual": "캐주얼",
         "classic": "클래식",
-        "crisis": "위기"
+        "crisis": "위기",
+        "betting": "베팅"
       },
       "stats": {
         "win_rate": "승리%",
         "games": "게임",
         "wins": "승리",
-        "elo": "엘로"
+        "elo": "엘로",
+        "profit": "이익"
       }
     }
   },

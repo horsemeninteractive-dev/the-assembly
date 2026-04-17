@@ -40,6 +40,7 @@ export function registerSystemRoutes({ app, engine }: RouteContext): void {
       casual: strip(boards.casual),
       classic: strip(boards.classic),
       crisis: strip(boards.crisis),
+      betting: strip(boards.betting),
     });
   });
 

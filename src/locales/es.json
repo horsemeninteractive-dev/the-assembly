@@ -1181,7 +1181,11 @@
         "execution": "Ejecución",
         "specialelection": "Elección Especial",
         "policypeek": "Vistazo directivo"
-      }
+      },
+      "list_view": "Vista de lista",
+      "heatmap_view": "Mapa de calor",
+      "heatmap_player": "Jugador",
+      "heatmap_round": "R{{round}}"
     },
     "modals": {
       "game_over": {
@@ -1398,7 +1402,7 @@
       },
       "roles": {
         "civil": {
-          "name": "Civil",
+          "name": "Civiles",
           "flavor": "Defender la Carta. La crisis no debe consumir la Secretaría."
         },
         "state": {
@@ -2564,13 +2568,15 @@
         "ranked": "Clasificado",
         "casual": "Informal",
         "classic": "Clásico",
-        "crisis": "Crisis"
+        "crisis": "Crisis",
+        "betting": "Apuestas"
       },
       "stats": {
         "win_rate": "Ganar%",
         "games": "Juegos",
         "wins": "Victorias",
-        "elo": "ELO"
+        "elo": "ELO",
+        "profit": "Beneficio"
       }
     }
   },

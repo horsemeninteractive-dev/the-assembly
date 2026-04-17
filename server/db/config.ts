@@ -9,37 +9,46 @@ export async function getSystemConfig(): Promise<SystemConfig> {
     minVersion: '0.9.0',
   };
 
-  if (isConfigured) {
-    const { data, error } = await db.from('system_config').select('*').limit(1).single();
+  if (!isConfigured) return defaultConfig;
+
+  try {
+    const { data, error } = await adminDb
+      .from('system_config')
+      .select('*')
+      .eq('id', 1)
+      .maybeSingle();
+
     if (error || !data) return defaultConfig;
+
     return {
-      maintenanceMode: data.maintenance_mode,
-      xpMultiplier: Number(data.xp_multiplier),
-      ipMultiplier: Number(data.ip_multiplier),
-      minVersion: data.min_version,
+      maintenanceMode: !!data.maintenance_mode,
+      xpMultiplier: Number(data.xp_multiplier) || 1.0,
+      ipMultiplier: Number(data.ip_multiplier) || 1.0,
+      minVersion: data.min_version || '0.9.0',
     };
+  } catch (err) {
+    return defaultConfig;
   }
-  return defaultConfig;
 }
 
 export async function updateSystemConfig(config: Partial<SystemConfig>): Promise<SystemConfig> {
+  // Always get current first to ensure we merge correctly
   const current = await getSystemConfig();
   const updated = { ...current, ...config };
 
   if (isConfigured) {
-    const { data } = await db.from('system_config').select('id').limit(1).single();
-    if (data?.id) {
-      await adminDb
-        .from('system_config')
-        .update({
-          maintenance_mode: updated.maintenanceMode,
-          xp_multiplier: updated.xpMultiplier,
-          ip_multiplier: updated.ipMultiplier,
-          min_version: updated.minVersion,
-        })
-        .eq('id', data.id);
+    const payload = {
+      id: 1, // Enforce single row
+      maintenance_mode: updated.maintenanceMode,
+      xp_multiplier: updated.xpMultiplier,
+      ip_multiplier: updated.ipMultiplier,
+      min_version: updated.minVersion,
+    };
+
+    const { error } = await adminDb.from('system_config').upsert(payload, { onConflict: 'id' });
+    if (error) {
+      console.error('Failed to persist system config:', error);
     }
   }
   return updated;
 }
-

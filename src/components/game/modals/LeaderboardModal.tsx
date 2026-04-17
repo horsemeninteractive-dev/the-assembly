@@ -13,8 +13,8 @@ interface LeaderboardModalProps {
   onClose: () => void;
 }
 
-type ModeTab = 'Overall' | 'Ranked' | 'Casual' | 'Classic' | 'Crisis';
-type StatTab = 'Win%' | 'Games' | 'Wins' | 'ELO';
+type ModeTab = 'Overall' | 'Ranked' | 'Casual' | 'Classic' | 'Crisis' | 'Betting';
+type StatTab = 'Win%' | 'Games' | 'Wins' | 'ELO' | 'Profit';
 
 const MODE_TABS: { id: ModeTab; labelKey: string; color: string; activeBg: string }[] = [
   { id: 'Overall', labelKey: 'profile.leaderboard.modes.overall', color: 'text-white', activeBg: 'bg-zinc-700 border-zinc-500' },
@@ -29,6 +29,12 @@ const MODE_TABS: { id: ModeTab; labelKey: string; color: string; activeBg: strin
     labelKey: 'profile.leaderboard.modes.casual',
     color: 'text-blue-400',
     activeBg: 'bg-blue-900/40 border-blue-600/60',
+  },
+  {
+    id: 'Betting',
+    labelKey: 'profile.leaderboard.modes.betting',
+    color: 'text-indigo-400',
+    activeBg: 'bg-indigo-900/40 border-indigo-600/60',
   },
   {
     id: 'Classic',
@@ -59,6 +65,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
     casual: [],
     classic: [],
     crisis: [],
+    betting: [],
   });
   const [loading, setLoading] = useState(true);
   const [modeTab, setModeTab] = useState<ModeTab>('Overall');
@@ -78,6 +85,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
   useEffect(() => {
     if (modeTab === 'Ranked') setStatTab('ELO');
     else if (modeTab === 'Overall') setStatTab('Wins');
+    else if (modeTab === 'Betting') setStatTab('Profit');
     else setStatTab('Win%');
   }, [modeTab]);
 
@@ -87,6 +95,8 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
   const availableStats: StatTab[] =
     modeTab === 'Ranked' || modeTab === 'Overall'
       ? ['ELO', 'Win%', 'Wins', 'Games']
+      : modeTab === 'Betting'
+      ? ['Profit', 'Wins']
       : ['Win%', 'Wins', 'Games'];
 
   const getStatValue = (u: any, stat: StatTab): number => {
@@ -94,8 +104,11 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
     switch (stat) {
       case 'ELO':
         return u.stats?.elo ?? 1000;
+      case 'Profit':
+        return u.stats?.bettingPoints ?? 0;
       case 'Wins':
         if (modeTab === 'Overall') return u.stats?.wins ?? 0;
+        if (mode === 'betting') return u.stats?.bettingWins ?? 0;
         return u.stats?.[`${mode}Wins`] ?? 0;
       case 'Games':
         if (modeTab === 'Overall') return u.stats?.gamesPlayed ?? 0;
@@ -119,6 +132,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
     const val = getStatValue(u, stat);
     if (stat === 'Win%') return `${val.toFixed(1)}%`;
     if (stat === 'ELO') return val.toString();
+    if (stat === 'Profit') return `${val} IP`;
     return val.toString();
   };
 
@@ -126,6 +140,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
     if (stat === 'ELO') return 'text-yellow-400';
     if (stat === 'Win%') return 'text-emerald-400';
     if (stat === 'Wins') return 'text-blue-400';
+    if (stat === 'Profit') return 'text-indigo-400';
     return 'text-purple-400';
   };
 
@@ -183,6 +198,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
               {stat === 'Win%' ? t('profile.leaderboard.stats.win_rate') :
                stat === 'Games' ? t('profile.leaderboard.stats.games') :
                stat === 'Wins' ? t('profile.leaderboard.stats.wins') :
+               stat === 'Profit' ? t('profile.leaderboard.stats.profit') :
                t('profile.leaderboard.stats.elo')}
             </button>
           ))}
@@ -197,6 +213,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
             {statTab !== 'ELO' && <div className="w-16 text-right shrink-0">
               {statTab === 'Win%' ? t('profile.leaderboard.stats.win_rate') :
                statTab === 'Games' ? t('profile.leaderboard.stats.games') :
+               statTab === 'Profit' ? t('profile.leaderboard.stats.profit') :
                t('profile.leaderboard.stats.wins')}
             </div>}
           </div>

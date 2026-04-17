@@ -430,6 +430,11 @@ export class MatchCloser {
             if (u) {
               const reward = Math.floor(pred.amount * (pred.odds || 1.0));
               u.stats.points += reward;
+              
+              // Update betting stats
+              u.stats.bettingWins = (u.stats.bettingWins || 0) + 1;
+              u.stats.bettingPoints = (u.stats.bettingPoints || 0) + reward;
+
               await saveUser(u);
               
               const sid = await getUserSocketId(userId);

@@ -1181,7 +1181,11 @@
         "execution": "Execução",
         "specialelection": "Eleição Especial",
         "policypeek": "Espiada da Diretiva"
-      }
+      },
+      "list_view": "Visualização de lista",
+      "heatmap_view": "Mapa de calor",
+      "heatmap_player": "Jogador",
+      "heatmap_round": "R{{round}}"
     },
     "modals": {
       "game_over": {
@@ -2564,13 +2568,15 @@
         "ranked": "Classificado",
         "casual": "Casual",
         "classic": "Clássico",
-        "crisis": "Crise"
+        "crisis": "Crise",
+        "betting": "Apostas"
       },
       "stats": {
         "win_rate": "Ganhar%",
         "games": "Jogos",
         "wins": "Vitórias",
-        "elo": "ELO"
+        "elo": "ELO",
+        "profit": "Lucro"
       }
     }
   },

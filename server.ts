@@ -41,7 +41,7 @@ import {
   recordStripeEvent,
 } from './server/supabaseService.ts';
 import { getMatchById } from './server/db/matches.ts';
-import { pubClient, subClient, isRedisConfigured, setUserSocketId, getSocketId, getUserSocketId, removeUserSocketId, refreshUserStatus } from './server/redis.ts';
+import { pubClient, subClient, clusterSubClient, isRedisConfigured, setUserSocketId, getSocketId, getUserSocketId, removeUserSocketId, refreshUserStatus } from './server/redis.ts';
 import { SystemConfig } from './shared/types.ts';
 import { registerStripeWebhook, stripe } from './server/handlers/stripeHandler.ts';
 import { registerSocketAuthMiddleware } from './server/handlers/socketAuthHandler.ts';
@@ -219,6 +219,23 @@ async function startServer() {
   }
 
   const configRef = { current: await getSystemConfig() };
+
+  // Sync cluster-wide system config updates
+  if (isRedisConfigured && clusterSubClient) {
+    clusterSubClient.subscribe('cluster:adminConfigRefresh').catch(err => logger.error({ err }, 'Failed to subscribe to cluster config refresh'));
+    clusterSubClient.on('message', (channel, message) => {
+      if (channel === 'cluster:adminConfigRefresh') {
+        try {
+          const newConfig = JSON.parse(message);
+          configRef.current = newConfig;
+          logger.info('Refreshed local system config from cluster broadcast');
+        } catch (err) {
+          logger.error({ err }, 'Failed to parse cluster config refresh message');
+        }
+      }
+    });
+  }
+
   const engine = new GameEngine({ io, getConfig: () => configRef.current });
   const userSockets = new Map<string, string>();
 
@@ -611,6 +628,9 @@ async function gracefulShutdown() {
       'Server is undergoing maintenance or starting a new version. Reconnecting in 5s!'
     );
     io.close();
+  }
+  if (isRedisConfigured && clusterSubClient) {
+    clusterSubClient.quit();
   }
 
   // Gracefully await all in-flight asynchronous database writes (stats, record checks, etc.)

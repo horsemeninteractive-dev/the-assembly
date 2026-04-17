@@ -1181,7 +1181,11 @@
         "execution": "Исполнение",
         "specialelection": "Специальные выборы",
         "policypeek": "Директива Пик"
-      }
+      },
+      "list_view": "Просмотр списка",
+      "heatmap_view": "Тепловая карта",
+      "heatmap_player": "Игрок",
+      "heatmap_round": "Р{{round}}"
     },
     "modals": {
       "game_over": {
@@ -2564,13 +2568,15 @@
         "ranked": "Рейтинг",
         "casual": "Казуальный",
         "classic": "Классический",
-        "crisis": "Кризис"
+        "crisis": "Кризис",
+        "betting": "Ставки"
       },
       "stats": {
         "win_rate": "Выигрыш%",
         "games": "Игры",
         "wins": "Победы",
-        "elo": "ЭЛО"
+        "elo": "ЭЛО",
+        "profit": "Выгода"
       }
     }
   },
