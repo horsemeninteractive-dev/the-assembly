@@ -18,6 +18,8 @@ interface GameContextType {
   setPendingFriendRequest: React.Dispatch<React.SetStateAction<{ fromUserId: string; fromUsername: string } | null>>;
   pendingClanInvite: { inviteId: string; clanId: string; clanName: string; clanTag: string; fromUsername: string } | null;
   setPendingClanInvite: React.Dispatch<React.SetStateAction<{ inviteId: string; clanId: string; clanName: string; clanTag: string; fromUsername: string } | null>>;
+  pendingSeasonReward: { tier: string; ipReward: number; cpReward: number; seasonPeriod: string } | null;
+  setPendingSeasonReward: React.Dispatch<React.SetStateAction<{ tier: string; ipReward: number; cpReward: number; seasonPeriod: string } | null>>;
   adminBroadcast: { message: string; sender: string } | null;
   setAdminBroadcast: React.Dispatch<React.SetStateAction<{ message: string; sender: string } | null>>;
   serverRestarting: string | null;

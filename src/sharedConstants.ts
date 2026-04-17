@@ -476,4 +476,22 @@ export const PASS_ITEM_LEVELS: { [key: string]: number } = {
   'frame-pass-0': 50,
 };
 
+export const RANK_TIERS = {
+  BRONZE: { name: 'Bronze', minElo: 0, maxElo: 999, color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/30' },
+  SILVER: { name: 'Silver', minElo: 1000, maxElo: 1199, color: 'text-slate-400', bg: 'bg-slate-400/10', border: 'border-slate-400/30' },
+  GOLD: { name: 'Gold', minElo: 1200, maxElo: 1399, color: 'text-yellow-400', bg: 'bg-yellow-400/10', border: 'border-yellow-400/30' },
+  PLATINUM: { name: 'Platinum', minElo: 1400, maxElo: 1599, color: 'text-cyan-400', bg: 'bg-cyan-400/10', border: 'border-cyan-400/30' },
+  ELITE: { name: 'Elite', minElo: 1600, maxElo: Infinity, color: 'text-purple-400', bg: 'bg-purple-400/10', border: 'border-purple-400/30' },
+} as const;
+
+export type RankTier = keyof typeof RANK_TIERS;
+
+export const RANK_REWARDS = {
+  BRONZE: { ip: 500, cp: 0 },
+  SILVER: { ip: 1000, cp: 100 },
+  GOLD: { ip: 2000, cp: 250 },
+  PLATINUM: { ip: 3500, cp: 500 },
+  ELITE: { ip: 5000, cp: 1000 },
+} as const;
+
 

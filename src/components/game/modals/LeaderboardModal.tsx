@@ -70,6 +70,11 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
   const [loading, setLoading] = useState(true);
   const [modeTab, setModeTab] = useState<ModeTab>('Overall');
   const [statTab, setStatTab] = useState<StatTab>('ELO');
+  const [showSeasonHistory, setShowSeasonHistory] = useState(false);
+  const [seasons, setSeasons] = useState<string[]>([]);
+  const [selectedSeason, setSelectedSeason] = useState<string>('');
+  const [seasonBoard, setSeasonBoard] = useState<any[]>([]);
+  const [seasonLoading, setSeasonLoading] = useState(false);
 
   useEffect(() => {
     fetch(apiUrl('/api/leaderboard'))
@@ -79,7 +84,27 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
         setLoading(false);
       })
       .catch(() => setLoading(false));
+
+    fetch(apiUrl('/api/seasons'))
+      .then(res => res.json())
+      .then(data => {
+        setSeasons(data);
+        if (data.length > 0) setSelectedSeason(data[0]);
+      });
   }, []);
+
+  useEffect(() => {
+    if (showSeasonHistory && selectedSeason) {
+      setSeasonLoading(true);
+      fetch(apiUrl(`/api/leaderboard/season/${encodeURIComponent(selectedSeason)}`))
+        .then(res => res.json())
+        .then(data => {
+          setSeasonBoard(data);
+          setSeasonLoading(false);
+        })
+        .catch(() => setSeasonLoading(false));
+    }
+  }, [showSeasonHistory, selectedSeason]);
 
   // When mode changes, set a sensible default stat
   useEffect(() => {
@@ -89,7 +114,9 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
     else setStatTab('Win%');
   }, [modeTab]);
 
-  const rawData: any[] = boards[modeTab.toLowerCase()] ?? [];
+  const activeModeConfig = MODE_TABS.find((m) => m.id === modeTab)!;
+
+  const rawData: any[] = showSeasonHistory ? seasonBoard : boards[modeTab.toLowerCase()] ?? [];
 
   // Which stats to offer based on mode
   const availableStats: StatTab[] =
@@ -100,6 +127,15 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
       : ['Win%', 'Wins', 'Games'];
 
   const getStatValue = (u: any, stat: StatTab): number => {
+    if (showSeasonHistory) {
+      switch (stat) {
+        case 'ELO': return u.elo ?? 1000;
+        case 'Wins': return u.rankedWins ?? 0;
+        case 'Games': return u.rankedGames ?? 0;
+        case 'Win%': return u.rankedGames > 0 ? (u.rankedWins / u.rankedGames) * 100 : 0;
+        default: return 0;
+      }
+    }
     const mode = modeTab.toLowerCase();
     switch (stat) {
       case 'ELO':
@@ -120,6 +156,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
         return games > 0 ? (wins / games) * 100 : 0;
       }
     }
+    return 0;
   };
 
   const sortedData = [...rawData].sort(
@@ -144,7 +181,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
     return 'text-purple-400';
   };
 
-  const activeModeConfig = MODE_TABS.find((m) => m.id === modeTab)!;
+  const currentLoading = showSeasonHistory ? seasonLoading : loading;
 
   return (
     <div className="fixed inset-0 bg-backdrop backdrop-blur-sm flex items-center justify-center z-[100] p-4">
@@ -159,58 +196,95 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
             <Trophy className="w-6 h-6 text-yellow-500" />
             {t('profile.leaderboard.title')}
           </h2>
-          <button onClick={onClose} className="p-2 text-muted hover:text-primary transition-colors">
-            <X className="w-5 h-5" />
-          </button>
+
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => {
+                setShowSeasonHistory(!showSeasonHistory);
+              }}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-widest border transition-all flex items-center gap-2",
+                showSeasonHistory 
+                  ? "bg-primary text-black border-primary shadow-lg shadow-primary/20" 
+                  : "bg-surface-glass text-muted border-subtle hover:text-white"
+              )}
+            >
+              <Zap className={cn("w-3 h-3", showSeasonHistory ? "fill-black" : "")} />
+              {t('season.leaderboard.historical')}
+            </button>
+            <button onClick={onClose} className="p-2 text-muted hover:text-primary transition-colors">
+              <X className="w-5 h-5" />
+            </button>
+          </div>
         </div>
+
+        {/* Season Selector Dropdown */}
+        {showSeasonHistory && seasons.length > 0 && (
+          <div className="mb-4 flex items-center justify-between gap-4 p-3 bg-base/50 rounded-xl border border-subtle">
+            <span className="text-xs font-mono text-muted uppercase tracking-[0.2em] pl-1">
+              {t('season.leaderboard.title')}
+            </span>
+            <select
+              value={selectedSeason}
+              onChange={(e) => setSelectedSeason(e.target.value)}
+              className="bg-elevated border border-subtle rounded-lg px-3 py-1.5 text-xs text-primary focus:border-primary outline-none custom-select"
+            >
+              {seasons.map(s => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+        )}
 
         {/* Mode Tabs (tier 1) */}
-        <div className="flex gap-1 p-1 bg-surface-glass/40 rounded-xl border border-subtle mb-3 backdrop-blur-sm">
-          {MODE_TABS.map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setModeTab(tab.id)}
-              className={cn(
-                'flex-1 py-1.5 rounded-xl text-[10px] font-mono uppercase tracking-widest transition-all border',
-                modeTab === tab.id
-                  ? cn(tab.activeBg, tab.color)
-                  : 'border-transparent text-muted hover:text-ghost'
-              )}
-            >
-              {t(tab.labelKey)}
-            </button>
-          ))}
-        </div>
+        {!showSeasonHistory && (
+          <div className="flex gap-1 p-1 bg-surface-glass/40 rounded-xl border border-subtle mb-3 backdrop-blur-sm">
+            {MODE_TABS.map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setModeTab(tab.id)}
+                className={cn(
+                  'flex-1 py-1.5 rounded-xl text-[10px] font-mono uppercase tracking-widest transition-all border',
+                  modeTab === tab.id
+                    ? cn(tab.activeBg, tab.color)
+                    : 'border-transparent text-muted hover:text-ghost'
+                )}
+              >
+                {t(tab.labelKey)}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Stat Tabs (tier 2) */}
-        <div className="flex gap-3 border-b border-default mb-3">
-          {availableStats.map((stat) => (
-            <button
-              key={stat}
-              onClick={() => setStatTab(stat)}
-              className={cn(
-                'pb-2 text-xs font-mono uppercase tracking-widest border-b-2 transition-colors',
-                statTab === stat
-                  ? cn('border-current', statColor(stat))
-                  : 'border-transparent text-muted hover:text-ghost'
-              )}
-            >
-              {stat === 'Win%' ? t('profile.leaderboard.stats.win_rate') :
-               stat === 'Games' ? t('profile.leaderboard.stats.games') :
-               stat === 'Wins' ? t('profile.leaderboard.stats.wins') :
-               stat === 'Profit' ? t('profile.leaderboard.stats.profit') :
-               t('profile.leaderboard.stats.elo')}
-            </button>
-          ))}
-        </div>
+        {!showSeasonHistory && (
+          <div className="flex gap-3 border-b border-default mb-3">
+            {availableStats.map((stat) => (
+              <button
+                key={stat}
+                onClick={() => setStatTab(stat)}
+                className={cn(
+                  'pb-2 text-xs font-mono uppercase tracking-widest border-b-2 transition-colors',
+                  statTab === stat
+                    ? cn('border-current', statColor(stat))
+                    : 'border-transparent text-muted hover:text-ghost'
+                )}
+              >
+                {stat === 'Win%' ? t('profile.leaderboard.stats.win_rate') :
+                 stat === 'Games' ? t('profile.leaderboard.stats.games') :
+                 stat === 'Wins' ? t('profile.leaderboard.stats.wins') :
+                 stat === 'Profit' ? t('profile.leaderboard.stats.profit') :
+                 t('profile.leaderboard.stats.elo')}
+              </button>
+            ))}
+          </div>
+        )}
 
         {/* Column headers */}
-        {!loading && (
+        {!currentLoading && (
           <div className="flex items-center gap-3 px-3 text-[10px] uppercase tracking-widest text-muted font-mono mb-2">
             <div className="w-8 text-center shrink-0">#</div>
             <div className="flex-1">{t('profile.leaderboard.column_player')}</div>
-            {statTab === 'ELO' && <div className="w-28 text-right shrink-0">{t('profile.leaderboard.column_rank_elo')}</div>}
-            {statTab !== 'ELO' && <div className="w-16 text-right shrink-0">
+            {(statTab === 'ELO' || showSeasonHistory) && <div className="w-28 text-right shrink-0">{t('profile.leaderboard.column_rank_elo')}</div>}
+            {statTab !== 'ELO' && !showSeasonHistory && <div className="w-16 text-right shrink-0">
               {statTab === 'Win%' ? t('profile.leaderboard.stats.win_rate') :
                statTab === 'Games' ? t('profile.leaderboard.stats.games') :
                statTab === 'Profit' ? t('profile.leaderboard.stats.profit') :
@@ -220,8 +294,8 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
         )}
 
         {/* List */}
-        <div className="space-y-1.5 overflow-y-auto custom-scrollbar flex-1 mb-4">
-          {loading ? (
+        <div className="flex-1 overflow-y-auto custom-scrollbar-thin bg-black/20 rounded-b-xl border border-t-0 border-subtle">
+          {currentLoading ? (
             <div className="text-center text-muted py-10 font-mono text-sm">{t('profile.leaderboard.loading')}</div>
           ) : sortedData.length === 0 ? (
             <div className="text-center text-muted py-10 font-mono text-xs">

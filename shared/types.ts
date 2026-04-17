@@ -187,6 +187,7 @@ export interface UserStats {
   crisisGames: number;
   bettingWins: number;
   bettingPoints: number;
+  peakElo: number;
 }
 
 export interface MatchSummary {
@@ -332,6 +333,7 @@ export interface User {
   referredBy?: string;
   lastLoginAt?: string;
   loginStreak?: number;
+  peakElo: number;
 }
 
 export interface UserInternal extends User {
@@ -421,6 +423,19 @@ export interface ChallengesResponse {
   dailyResetsAt: string;
   weeklyResetsAt: string;
   seasonEndsAt: string;
+}
+
+export interface SeasonSnapshot {
+  id: string;
+  userId: string;
+  seasonPeriod: string;
+  eloAtEnd: number;
+  peakElo: number;
+  rankedWins: number;
+  rankedGames: number;
+  rankTier: string;
+  rewardsClaimed: boolean;
+  createdAt: string;
 }
 
 export interface Player {
@@ -656,6 +671,7 @@ export interface ServerToClientEvents {
   powerUsed: (data: { role: string }) => void;
   queueDrained: () => void;
   postMatchResult: (result: PostMatchResult) => void;
+  seasonRewardGranted: (data: { tier: string; ipReward: number; cpReward: number; seasonPeriod: string }) => void;
   kicked: (reason?: string) => void;
   adminBroadcast: (data: { message: string; sender: string; timestamp: number }) => void;
   adminConfigUpdate: (config: SystemConfig) => void;

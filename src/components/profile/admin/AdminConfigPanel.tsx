@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../../contexts/I18nContext';
 import { motion } from 'motion/react';
-import { Server, Activity, Clock } from 'lucide-react';
+import { Server, Activity, Clock, Zap } from 'lucide-react';
 import { SystemConfig } from '../../../../shared/types';
 import { cn, apiUrl } from '../../../utils/utils';
 import { socket } from '../../../socket';
@@ -169,6 +169,39 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
             >
               <Activity className="w-3.5 h-3.5" />
               Send Test Web-Push
+            </button>
+
+            <button
+              onClick={async () => {
+                const season = prompt('Enter Season Name (e.g. "Season 1"):');
+                if (!season) return;
+                const secret = prompt('Enter Admin Secret:');
+                if (!secret) return;
+
+                if (!confirm(`Are you SURE you want to end ${season}? This will reset all ranked stats and grant rewards!`)) return;
+
+                try {
+                  const res = await fetch(apiUrl('/api/season/rollover'), {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ seasonPeriod: season, secret }),
+                  });
+                  const data = await res.json();
+                  if (res.ok) {
+                    alert('Rollover successful! Processed ' + data.processedCount + ' players.');
+                  } else {
+                    alert('Rollover failed: ' + (data.error || 'Unknown error'));
+                  }
+                } catch (err: any) {
+                  alert('Error: ' + err.message);
+                }
+              }}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-red-600/20 border border-red-500/30 text-red-400 hover:bg-red-600/30 transition-all font-mono text-[10px] uppercase tracking-widest shadow-lg active:scale-95"
+            >
+              <Zap className="w-3.5 h-3.5 fill-red-400/20" />
+              End Season (Rollover)
             </button>
             <p className="text-[9px] text-faint font-mono flex items-center gap-2 uppercase tracking-tighter italic">
               <Clock className="w-3 h-3" />

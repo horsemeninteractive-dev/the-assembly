@@ -2650,6 +2650,25 @@
       "player_not_found_desc": "该玩家不存在或者其个人资料不公开。",
       "failed_to_load_profile": "无法加载配置文件",
       "generic_desc": "检查您的连接并重试。"
+    },
+    "season": {
+      "rewards": {
+        "title": "{{period}} 结论",
+        "tier_reached": "{{tier}} 获得声望",
+        "collect": "领取奖励",
+        "rollover_desc": "您的 ELO 已针对新赛季进行软重置。祝你好运，操作员。"
+      },
+      "leaderboard": {
+        "title": "季节性排名",
+        "current": "当前季节",
+        "historical": "过去的季节",
+        "rank": "排名",
+        "player": "玩家",
+        "elo": "埃洛",
+        "peak": "顶峰",
+        "games": "游戏",
+        "tier": "等级"
+      }
     }
   }
 }

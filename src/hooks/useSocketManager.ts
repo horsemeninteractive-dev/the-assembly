@@ -19,6 +19,7 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
   const [pendingInvite, setPendingInvite] = useState<{ fromUsername: string; roomId: string } | null>(null);
   const [pendingFriendRequest, setPendingFriendRequest] = useState<{ fromUserId: string; fromUsername: string } | null>(null);
   const [pendingClanInvite, setPendingClanInvite] = useState<{ inviteId: string; clanId: string; clanName: string; clanTag: string; fromUsername: string } | null>(null);
+  const [pendingSeasonReward, setPendingSeasonReward] = useState<{ tier: string; ipReward: number; cpReward: number; seasonPeriod: string } | null>(null);
   const [adminBroadcast, setAdminBroadcast] = useState<{ message: string; sender: string } | null>(null);
   const [serverRestarting, setServerRestarting] = useState<string | null>(null);
   const [systemConfig, setSystemConfig] = useState<SystemConfig>({ maintenanceMode: false, xpMultiplier: 1, ipMultiplier: 1 });
@@ -143,6 +144,10 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
         window.location.reload();
       }, 5500);
     });
+    socket.on('seasonRewardGranted', (data) => {
+      setPendingSeasonReward(data);
+      playSound('success');
+    });
     socket.on('adminConfigUpdate', (config: SystemConfig) => {
       setSystemConfig(config);
     });
@@ -164,6 +169,7 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
       socket.off('hostChanged');
       socket.off('clanInviteReceived');
       socket.off('adminConfigUpdate');
+      socket.off('seasonRewardGranted');
     };
   }, [handleLeaveRoom, playSound, setUser]);
 
@@ -212,6 +218,8 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
     setPendingFriendRequest,
     pendingClanInvite,
     setPendingClanInvite,
+    pendingSeasonReward,
+    setPendingSeasonReward,
     adminBroadcast,
     setAdminBroadcast,
     serverRestarting,

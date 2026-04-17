@@ -2650,6 +2650,25 @@
       "player_not_found_desc": "Este jugador no existe o su perfil es privado.",
       "failed_to_load_profile": "No se pudo cargar el perfil",
       "generic_desc": "Comprueba tu conexión y vuelve a intentarlo."
+    },
+    "season": {
+      "rewards": {
+        "title": "{{period}} Conclusión",
+        "tier_reached": "{{tier}} Posición alcanzada",
+        "collect": "Reclamar recompensas",
+        "rollover_desc": "Tu ELO ha sido reiniciado para la nueva temporada. Buena suerte, Operativo."
+      },
+      "leaderboard": {
+        "title": "Clasificación estacional",
+        "current": "Temporada actual",
+        "historical": "Temporadas pasadas",
+        "rank": "Rango",
+        "player": "Jugador",
+        "elo": "ELO",
+        "peak": "Pico",
+        "games": "Juegos",
+        "tier": "Nivel"
+      }
     }
   }
 }

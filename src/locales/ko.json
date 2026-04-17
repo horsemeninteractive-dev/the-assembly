@@ -1202,8 +1202,8 @@
         "defeat": "임무 실패",
         "elo": "엘로",
         "casual": "캐주얼",
-        "xp": "XP",
-        "ip": "IP",
+        "xp": "에 대한 단결 또는 속임수를 예측하세요 XP",
+        "ip": "에 대한 단결 또는 속임수를 예측하세요 IP",
         "clan_xp": "클랜 XP",
         "agenda": "의제",
         "achievements_header": "업적 잠금 해제",
@@ -2650,6 +2650,25 @@
       "player_not_found_desc": "이 플레이어는 존재하지 않거나 프로필이 비공개입니다.",
       "failed_to_load_profile": "프로필을 로드하지 못했습니다",
       "generic_desc": "연결을 확인하고 다시 시도하세요."
+    },
+    "season": {
+      "rewards": {
+        "title": "{{period}} 결론",
+        "tier_reached": "{{tier}} 순위 달성",
+        "collect": "보상 받기",
+        "rollover_desc": "귀하의 ELO가 새 시즌을 위해 소프트 리셋되었습니다. 행운을 빌어요, 요원님."
+      },
+      "leaderboard": {
+        "title": "시즌 순위",
+        "current": "현재 시즌",
+        "historical": "지난 시즌",
+        "rank": "순위",
+        "player": "플레이어",
+        "elo": "엘로",
+        "peak": "피크",
+        "games": "계략",
+        "tier": "층"
+      }
     }
   }
 }

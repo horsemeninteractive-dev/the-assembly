@@ -194,6 +194,10 @@ export class MatchCloser {
         }
 
         user.stats.elo = Math.max(0, user.stats.elo + eloChange);
+        if (user.stats.elo > (user.stats.peakElo || 1000)) {
+          user.stats.peakElo = user.stats.elo;
+          user.peakElo = user.stats.elo;
+        }
       } else if (!isInconclusive && s.isPractice) {
         logger.info({ userId: user.id }, 'Practice mode: Bypassing persistent stat updates');
       }

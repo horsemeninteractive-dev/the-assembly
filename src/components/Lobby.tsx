@@ -6,6 +6,7 @@ import { LeaderboardModal } from './game/modals/LeaderboardModal';
 import { HowToPlayModal } from './HowToPlayModal';
 import { LegalModal } from './game/modals/LegalModal';
 import { CreditsScreen } from './lobby/CreditsScreen';
+import { SeasonalRewardsModal } from './game/modals/SeasonalRewardsModal';
 import { useScaling } from '../hooks/useScaling';
 
 // Sub-components
@@ -61,7 +62,7 @@ export const Lobby: React.FC<LobbyProps> = ({
     roomName?: string;
     mode?: string;
   } | null>(null);
-  const { handleJoinRoom, systemConfig } = useGameContext();
+  const { handleJoinRoom, systemConfig, pendingSeasonReward, setPendingSeasonReward } = useGameContext();
   const [globalStats, setGlobalStats] = useState<{ civilWins: number; stateWins: number }>({
     civilWins: 0,
     stateWins: 0,
@@ -312,6 +313,14 @@ export const Lobby: React.FC<LobbyProps> = ({
         onJoinRoom={onJoinRoom}
         playSound={playSound}
       />
+      <AnimatePresence>
+        {pendingSeasonReward && (
+          <SeasonalRewardsModal
+            reward={pendingSeasonReward}
+            onClose={() => setPendingSeasonReward(null)}
+          />
+        )}
+      </AnimatePresence>
     </div>
   );
 };

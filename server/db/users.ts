@@ -34,6 +34,7 @@ const UserStatsSchema = z.object({
   crisisGames: z.number().default(0),
   bettingWins: z.number().default(0),
   bettingPoints: z.number().default(0),
+  peakElo: z.number().default(1000),
 }).catchall(z.any());
 
 export const SupabaseUserSchema = z.object({
@@ -67,6 +68,7 @@ export const SupabaseUserSchema = z.object({
   referral_processed: z.boolean().nullable().default(false),
   last_login_at: z.string().nullable().optional(),
   login_streak: z.number().nullable().default(0),
+  peak_elo: z.number().nullable().default(1000),
 }).catchall(z.any());
 
 export function mapSupabaseToUser(data: any): UserInternal | null {
@@ -90,6 +92,7 @@ export function mapSupabaseToUser(data: any): UserInternal | null {
     password: validData.password ?? undefined,
     email: validData.email ?? undefined,
     stats: (validData.stats ?? {}) as any,
+    peakElo: validData.peak_elo ?? (validData.stats as any)?.peakElo ?? 1000,
     createdAt: validData.created_at ?? undefined,
     avatarUrl: validData.avatar_url ?? undefined,
     ownedCosmetics: validData.owned_cosmetics ?? [],
@@ -162,6 +165,7 @@ export function mapUserToSupabase(userData: UserInternal): Record<string, unknow
     referral_processed: userData.referralProcessed,
     last_login_at: userData.lastLoginAt,
     login_streak: userData.loginStreak,
+    peak_elo: (userData as any).peakElo || userData.stats.peakElo || 1000,
   };
 }
 
@@ -331,7 +335,9 @@ export function makeNewUser(overrides: Partial<UserInternal> = {}): UserInternal
       crisisGames: 0,
       bettingWins: 0,
       bettingPoints: 0,
+      peakElo: 1000,
     },
+    peakElo: 1000,
     ownedCosmetics: [],
     cabinetPoints: 0,
     claimedRewards: [],

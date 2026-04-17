@@ -100,8 +100,8 @@ async function translateAll() {
 
     for (const item of flatStrings) {
       const existingValue = getValueByPath(existingData, item.path);
-      if (existingValue && existingValue !== item.original) {
-        // Keep existing translation
+      if (existingValue !== undefined) {
+        // Keep existing translation (even if it's the same as English)
         setValueByPath(newData, item.path, existingValue);
       } else {
         // Mark for translation
