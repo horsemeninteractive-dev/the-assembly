@@ -10,7 +10,7 @@ export async function getSystemConfig(): Promise<SystemConfig> {
   };
 
   if (isConfigured) {
-    const { data, error } = await db.from('system_config').select('*').eq('id', 1).single();
+    const { data, error } = await db.from('system_config').select('*').limit(1).single();
     if (error || !data) return defaultConfig;
     return {
       maintenanceMode: data.maintenance_mode,
@@ -27,15 +27,18 @@ export async function updateSystemConfig(config: Partial<SystemConfig>): Promise
   const updated = { ...current, ...config };
 
   if (isConfigured) {
-    await adminDb
-      .from('system_config')
-      .update({
-        maintenance_mode: updated.maintenanceMode,
-        xp_multiplier: updated.xpMultiplier,
-        ip_multiplier: updated.ipMultiplier,
-        min_version: updated.minVersion,
-      })
-      .eq('id', 1);
+    const { data } = await db.from('system_config').select('id').limit(1).single();
+    if (data?.id) {
+      await adminDb
+        .from('system_config')
+        .update({
+          maintenance_mode: updated.maintenanceMode,
+          xp_multiplier: updated.xpMultiplier,
+          ip_multiplier: updated.ipMultiplier,
+          min_version: updated.minVersion,
+        })
+        .eq('id', data.id);
+    }
   }
   return updated;
 }
