@@ -2650,25 +2650,25 @@
       "player_not_found_desc": "Dieser Spieler existiert nicht oder sein Profil ist privat.",
       "failed_to_load_profile": "Profil konnte nicht geladen werden",
       "generic_desc": "Überprüfen Sie Ihre Verbindung und versuchen Sie es erneut."
+    }
+  },
+  "season": {
+    "rewards": {
+      "title": "{{period}} Fazit",
+      "tier_reached": "{{tier}} Stand erreicht",
+      "collect": "Fordern Sie Prämien an",
+      "rollover_desc": "Ihr ELO wurde für die neue Saison zurückgesetzt. Viel Glück, Agent."
     },
-    "season": {
-      "rewards": {
-        "title": "{{period}} Fazit",
-        "tier_reached": "{{tier}} Stand erreicht",
-        "collect": "Fordern Sie Prämien an",
-        "rollover_desc": "Ihr ELO wurde für die neue Saison zurückgesetzt. Viel Glück, Agent."
-      },
-      "leaderboard": {
-        "title": "Saisonwertung",
-        "current": "Aktuelle Saison",
-        "historical": "Vergangene Jahreszeiten",
-        "rank": "Rang",
-        "player": "Spieler",
-        "elo": "ELO",
-        "peak": "Spitze",
-        "games": "Spiele",
-        "tier": "Stufe"
-      }
+    "leaderboard": {
+      "title": "Saisonwertung",
+      "current": "Aktuelle Saison",
+      "historical": "Vergangene Jahreszeiten",
+      "rank": "Rang",
+      "player": "Spieler",
+      "elo": "ELO",
+      "peak": "Spitze",
+      "games": "Spiele",
+      "tier": "Stufe"
     }
   }
 }

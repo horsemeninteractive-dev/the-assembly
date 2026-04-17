@@ -2650,25 +2650,25 @@
       "player_not_found_desc": "Este jogador não existe ou seu perfil é privado.",
       "failed_to_load_profile": "Falha ao carregar perfil",
       "generic_desc": "Verifique sua conexão e tente novamente."
+    }
+  },
+  "season": {
+    "rewards": {
+      "title": "{{period}} Conclusão",
+      "tier_reached": "{{tier}} Posição alcançada",
+      "collect": "Reivindique recompensas",
+      "rollover_desc": "Seu ELO foi redefinido suavemente para a nova temporada. Boa sorte, Operativo."
     },
-    "season": {
-      "rewards": {
-        "title": "{{period}} Conclusão",
-        "tier_reached": "{{tier}} Posição alcançada",
-        "collect": "Reivindique recompensas",
-        "rollover_desc": "Seu ELO foi redefinido suavemente para a nova temporada. Boa sorte, Operativo."
-      },
-      "leaderboard": {
-        "title": "Classificação sazonal",
-        "current": "Temporada Atual",
-        "historical": "Temporadas Passadas",
-        "rank": "Classificação",
-        "player": "Jogador",
-        "elo": "ELO",
-        "peak": "Pico",
-        "games": "Jogos",
-        "tier": "Nível"
-      }
+    "leaderboard": {
+      "title": "Classificação sazonal",
+      "current": "Temporada Atual",
+      "historical": "Temporadas Passadas",
+      "rank": "Classificação",
+      "player": "Jogador",
+      "elo": "ELO",
+      "peak": "Pico",
+      "games": "Jogos",
+      "tier": "Nível"
     }
   }
 }

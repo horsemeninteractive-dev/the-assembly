@@ -2650,25 +2650,25 @@
       "player_not_found_desc": "This player does not exist or their profile is private.",
       "failed_to_load_profile": "Failed to load profile",
       "generic_desc": "Check your connection and try again."
+    }
+  },
+  "season": {
+    "rewards": {
+      "title": "{{period}} Conclusion",
+      "tier_reached": "{{tier}} Standing Achieved",
+      "collect": "Claim Rewards",
+      "rollover_desc": "Your ELO has been soft-reset for the new season. Good luck, Operative."
     },
-    "season": {
-      "rewards": {
-        "title": "{{period}} Conclusion",
-        "tier_reached": "{{tier}} Standing Achieved",
-        "collect": "Claim Rewards",
-        "rollover_desc": "Your ELO has been soft-reset for the new season. Good luck, Operative."
-      },
-      "leaderboard": {
-        "title": "Seasonal Standings",
-        "current": "Current Season",
-        "historical": "Past Seasons",
-        "rank": "Rank",
-        "player": "Player",
-        "elo": "ELO",
-        "peak": "Peak",
-        "games": "Games",
-        "tier": "Tier"
-      }
+    "leaderboard": {
+      "title": "Seasonal Standings",
+      "current": "Current Season",
+      "historical": "Past Seasons",
+      "rank": "Rank",
+      "player": "Player",
+      "elo": "ELO",
+      "peak": "Peak",
+      "games": "Games",
+      "tier": "Tier"
     }
   }
 }

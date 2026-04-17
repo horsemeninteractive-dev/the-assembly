@@ -188,8 +188,15 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
-        className="bg-surface-glass border border-default rounded-3xl p-6 max-w-lg w-full shadow-2xl flex flex-col max-h-[85vh] backdrop-blur-2xl"
+        className="bg-surface-glass border border-default rounded-3xl p-6 max-w-lg w-full shadow-2xl flex flex-col max-h-[85vh] backdrop-blur-2xl relative"
       >
+        <button 
+          onClick={onClose} 
+          className="absolute top-6 right-6 p-2 text-muted hover:text-primary transition-colors z-10"
+          aria-label={t('common.close')}
+        >
+          <X className="w-5 h-5" />
+        </button>
         {/* Header */}
         <div className="flex items-center justify-between mb-5">
           <h2 className="text-2xl font-thematic text-primary flex items-center gap-2">
@@ -197,7 +204,7 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
             {t('profile.leaderboard.title')}
           </h2>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 mr-10">
             <button
               onClick={() => {
                 setShowSeasonHistory(!showSeasonHistory);
@@ -211,9 +218,6 @@ export const LeaderboardModal = ({ user, onClose }: LeaderboardModalProps) => {
             >
               <Zap className={cn("w-3 h-3", showSeasonHistory ? "fill-black" : "")} />
               {t('season.leaderboard.historical')}
-            </button>
-            <button onClick={onClose} className="p-2 text-muted hover:text-primary transition-colors">
-              <X className="w-5 h-5" />
             </button>
           </div>
         </div>

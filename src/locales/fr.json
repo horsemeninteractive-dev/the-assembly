@@ -2650,25 +2650,25 @@
       "player_not_found_desc": "Ce joueur n'existe pas ou son profil est privé.",
       "failed_to_load_profile": "Échec du chargement du profil",
       "generic_desc": "Vérifiez votre connexion et réessayez."
+    }
+  },
+  "season": {
+    "rewards": {
+      "title": "{{period}}Conclusion",
+      "tier_reached": "{{tier}} Classement atteint",
+      "collect": "Réclamez des récompenses",
+      "rollover_desc": "Votre ELO a été réinitialisé en douceur pour la nouvelle saison. Bonne chance, agent."
     },
-    "season": {
-      "rewards": {
-        "title": "{{period}}Conclusion",
-        "tier_reached": "{{tier}} Classement atteint",
-        "collect": "Réclamez des récompenses",
-        "rollover_desc": "Votre ELO a été réinitialisé en douceur pour la nouvelle saison. Bonne chance, agent."
-      },
-      "leaderboard": {
-        "title": "Classement saisonnier",
-        "current": "Saison actuelle",
-        "historical": "Saisons passées",
-        "rank": "Rang",
-        "player": "Joueur",
-        "elo": "ÉLO",
-        "peak": "Pic",
-        "games": "Jeux",
-        "tier": "Étage"
-      }
+    "leaderboard": {
+      "title": "Classement saisonnier",
+      "current": "Saison actuelle",
+      "historical": "Saisons passées",
+      "rank": "Rang",
+      "player": "Joueur",
+      "elo": "ELO",
+      "peak": "Pic",
+      "games": "Jeux",
+      "tier": "Étage"
     }
   }
 }
