@@ -102,6 +102,7 @@ jobs:
             --region us-west1 \
             --allow-unauthenticated \
             --min-instances 0 \
+            --timeout 3600 \
             --update-env-vars NODE_ENV=production \
             --format="value(status.url)" > service_url.txt
           
@@ -109,3 +110,29 @@ jobs:
           
           echo "### :rocket: Deployment Successful!" >> $GITHUB_STEP_SUMMARY
           echo "Your updated service is live at: **$URL**" >> $GITHUB_STEP_SUMMARY
+
+      - name: Cleanup Old Images
+        run: |
+          echo "Cleaning up old images (keeping the 2 most recent for safety)..."
+          REPO_PATH="us-west1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/cloud-run-source-deploy/the-assembly"
+          
+          # Get all image digests sorted by creation time (newest first)
+          ALL_IMAGES=$(gcloud artifacts docker images list $REPO_PATH --sort-by="~CREATE_TIME" --format="value(DIGEST)" 2>/dev/null || echo "")
+          
+          if [ ! -z "$ALL_IMAGES" ]; then
+            # Skip the first 2 images (the current and the immediate previous version)
+            OLD_IMAGES=$(echo "$ALL_IMAGES" | tail -n +3)
+            
+            if [ ! -z "$OLD_IMAGES" ]; then
+              COUNT=$(echo "$OLD_IMAGES" | wc -l)
+              echo "Found $COUNT old images to prune."
+              for digest in $OLD_IMAGES; do
+                gcloud artifacts docker images delete "$REPO_PATH@$digest" --quiet --delete-tags
+              done
+              echo "Cleanup complete! Storage optimized."
+            else
+              echo "Only 2 or fewer images found. Keeping all for session safety."
+            fi
+          else
+            echo "No images found in repository."
+          fi
