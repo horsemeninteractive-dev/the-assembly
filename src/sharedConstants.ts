@@ -18,7 +18,7 @@ const getAppVersion = (): string => {
     }
   } catch {}
 
-  return 'v0.9.15'; // Fallback
+  return 'v0.10.0'; // Fallback
 };
 
 export const CLIENT_VERSION = getAppVersion();

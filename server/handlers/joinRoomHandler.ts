@@ -38,6 +38,7 @@ export async function handleJoinRoom(
     maxPlayers,
     actionTimer,
     mode,
+    houseRules,
     isSpectator,
     privacy,
     inviteCode,
@@ -125,6 +126,8 @@ export async function handleJoinRoom(
       inviteCode: code,
       hostUserId: userId,
       mode: mode || 'Ranked',
+      maxPlayers: safeMax,
+      houseRules: houseRules as any,
       phase: 'Lobby',
       civilDirectives: 0,
       stateDirectives: 0,
@@ -135,27 +138,26 @@ export async function handleJoinRoom(
       chancellorPolicies: [],
       currentExecutiveAction: 'None',
       log: [`Room ${roomId} created in ${mode || 'Ranked'} mode.`],
-      presidentIdx: 0,
-      lastPresidentIdx: -1,
-      maxPlayers: safeMax,
       actionTimer: safeTimer,
       messages: [],
       round: 1,
+      presidentIdx: 0,
+      lastPresidentIdx: -1,
       vetoUnlocked: false,
       vetoRequested: false,
       declarations: [],
       isPractice: !!isPractice,
       aiDifficulty: aiDifficulty || 'Normal',
     };
-    
+
+    engine.rooms.set(roomId, state);
     if (state.isPractice) {
       state.privacy = 'private';
       state.log = [`Room ${roomId} created as a Solo Practice session.`];
     }
-    
-    engine.rooms.set(roomId, state);
   } else {
-    // Room exists — check reconnect FIRST before any privacy gate
+    // Definitive narrowing for the else block as well
+    if (!state) return;
     // (disconnected player rejoining should never be blocked by privacy)
     if (!isSpectator && state.phase !== 'Lobby') {
       const existingPlayer = state.players.find((p) => p.userId === userId && !p.isAI);

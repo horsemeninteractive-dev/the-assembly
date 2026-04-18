@@ -254,6 +254,12 @@
       "privacy_private": "Private",
       "privacy_private_desc": "Invite code",
       "invite_code_hint": "An invite code will be generated when the room is created.",
+      "mode_house_desc": "Custom rules. Select to edit directives, titles, and more.",
+      "house_rules": "House Rules",
+      "deck_composition": "Deck Composition",
+      "use_titles": "Title Roles",
+      "use_agendas": "Agendas",
+      "use_crisis": "Crisis Cards",
       "btn_create": "Create Room",
       "btn_maintenance": "Maintenance"
     },
@@ -295,7 +301,8 @@
       "casual": "Casual",
       "ranked": "Ranked",
       "classic": "Classic",
-      "crisis": "Crisis"
+      "crisis": "Crisis",
+      "house": "House"
     },
     "phases": {
       "lobby": "Waiting for players ({{current}}/{{max}})...",

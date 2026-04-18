@@ -10,7 +10,7 @@
 import { randomUUID } from 'crypto';
 import { logger } from '../logger';
 import { GameState, Player, Policy, GamePhase } from '../../shared/types';
-import { createDeck } from '../utils';
+import { createDeck, shuffle } from '../utils';
 import { getGlobalStats } from '../db/matches';
 import { AI_BOTS } from './ai/aiPersonalities';
 import { assignRoles } from '../game/gameRules';
@@ -229,7 +229,16 @@ export class RoundManager {
     }
     const roles = assignRoles(state.players.length);
     state.players.forEach((p, i) => (p.role = roles[i]));
-    if (state.mode !== 'Classic') {
+
+    // --- GAME MODE OVERRIDES ---
+    if (state.mode === 'House' && state.houseRules) {
+      if (state.houseRules.useTitleRoles) {
+        this.engine.titleRoleResolver.assignTitleRoles(state, state.houseRules.titleRolePool as any);
+      }
+      if (state.houseRules.usePersonalAgendas) {
+        assignPersonalAgendas(state);
+      }
+    } else if (state.mode !== 'Classic') {
       this.engine.titleRoleResolver.assignTitleRoles(state);
       assignPersonalAgendas(state);
     }
@@ -244,10 +253,24 @@ export class RoundManager {
     const prevId = state.presidentialOrder[prevPos];
     const prevIdx = state.players.findIndex((p) => p.id === prevId);
     state.presidentIdx = prevIdx !== -1 ? prevIdx : 0;
-    if (state.mode === 'Crisis') {
+    if (state.mode === 'Crisis' || (state.mode === 'House' && state.houseRules?.useCrisisCards)) {
       this.engine.crisisEngine.initDeck(roomId);
     }
-    addLog(state, 'Game started! Roles assigned.');
+
+    // --- DECK INITIALIZATION ---
+    if (state.mode === 'House' && state.houseRules?.deckComposition) {
+      const { civil, state: stateCount } = state.houseRules.deckComposition;
+      const deck: Policy[] = [];
+      for (let i = 0; i < civil; i++) deck.push('Civil');
+      for (let i = 0; i < stateCount; i++) deck.push('State');
+      state.deck = shuffle(deck);
+      state.discard = [];
+    } else {
+      state.deck = createDeck();
+      state.discard = [];
+    }
+
+    addLog(state, `Game started! Mode: ${state.mode}`);
     
     // Fetch global stats for spectator predictions
     getGlobalStats().then(stats => {
@@ -471,6 +494,7 @@ export class RoundManager {
       discard: [],
       drawnPolicies: [],
       chancellorPolicies: [],
+      houseRules: undefined,
       currentExecutiveAction: 'None',
       log: [`Game reset in room ${roomId}.`],
       presidentIdx: 0,

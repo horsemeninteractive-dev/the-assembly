@@ -24,19 +24,35 @@ export class TitleRoleResolver {
   // Assignment (called from RoundManager.startGame)
   // ---------------------------------------------------------------------------
 
-  assignTitleRoles(state: GameState): void {
+  assignTitleRoles(state: GameState, pool?: TitleRole[]): void {
     const n = state.players.length;
     const count = n <= 6 ? 2 : n <= 8 ? 3 : 4;
-    const titles = shuffle<TitleRole>([
+    
+    // Default pool for Ranked/Casual matches (the original 6)
+    const defaultPool: TitleRole[] = [
       'Auditor',
       'Interdictor',
       'Archivist',
       'Defector',
       'Quorum',
       'Cipher',
-    ]);
+    ];
+
+    // House mode can use all 10 roles if no custom pool is specified
+    const fullPool: TitleRole[] = [
+      ...defaultPool,
+      'Assassin',
+      'Strategist',
+      'Broker',
+      'Handler'
+    ];
+
+    const poolToUse = pool && pool.length > 0 ? pool : (state.mode === 'House' ? fullPool : defaultPool);
+    const titles = shuffle<TitleRole>([...poolToUse]);
     const players = shuffle([...state.players]);
-    for (let i = 0; i < count; i++) {
+    const assignCount = Math.min(count, titles.length);
+    
+    for (let i = 0; i < assignCount; i++) {
       players[i].titleRole = titles[i];
       players[i].titleUsed = false;
     }

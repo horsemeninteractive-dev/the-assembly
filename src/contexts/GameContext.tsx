@@ -34,7 +34,8 @@ interface GameContextType {
     inviteCode?: string,
     avatarUrl?: string,
     isPractice?: boolean,
-    aiDifficulty?: 'Casual' | 'Normal' | 'Elite'
+    aiDifficulty?: 'Casual' | 'Normal' | 'Elite',
+    houseRules?: import('../../shared/types').HouseRules
   ) => void;
   handleLeaveRoom: (onComplete?: () => void) => void;
 }

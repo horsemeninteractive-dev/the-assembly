@@ -1,5 +1,17 @@
 import { z } from 'zod';
 
+export const houseRulesSchema = z.object({
+  deckComposition: z.object({
+    civil: z.number().int().min(0).max(30),
+    state: z.number().int().min(0).max(30),
+  }),
+  useTitleRoles: z.boolean(),
+  usePersonalAgendas: z.boolean(),
+  useCrisisCards: z.boolean(),
+  titleRolePool: z.array(z.string()).optional(),
+});
+
+
 export const statsSchema = z.object({
   gamesPlayed: z.number().int().min(0),
   wins: z.number().int().min(0),
@@ -46,7 +58,9 @@ export const joinRoomSchema = z.object({
   activeVotingStyle: z.string().optional(),
   maxPlayers: z.number().int().min(5).max(10).optional(),
   actionTimer: z.number().int().min(0).max(120).optional(),
-  mode: z.enum(['Casual', 'Ranked', 'Classic', 'Crisis']).optional(),
+  mode: z.enum(['Casual', 'Ranked', 'Classic', 'Crisis', 'House']).optional(),
+  houseRules: houseRulesSchema.optional(),
+
   isSpectator: z.boolean().optional(),
   privacy: z.enum(['public', 'private', 'friends']).optional(),
   inviteCode: z.string().optional(),

@@ -51,7 +51,8 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
       inviteCode?: string,
       avatarUrl?: string,
       isPractice?: boolean,
-      aiDifficulty?: 'Casual' | 'Normal' | 'Elite'
+      aiDifficulty?: 'Casual' | 'Normal' | 'Elite',
+      houseRules?: import('../../shared/types').HouseRules
     ) => {
       if (user) {
         socket.emit('joinRoom', {
@@ -70,6 +71,7 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
           avatarUrl: avatarUrl || user.avatarUrl,
           isPractice,
           aiDifficulty,
+          houseRules,
         });
       }
     },

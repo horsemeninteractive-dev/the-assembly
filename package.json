@@ -1,7 +1,7 @@
 {
   "name": "the-assembly",
   "private": true,
-  "version": "0.9.15",
+  "version": "0.10.0",
   "type": "module",
   "engines": {
     "node": ">=22.0.0"

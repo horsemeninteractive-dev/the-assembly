@@ -123,7 +123,16 @@ export type ExecutiveAction =
   | 'Execution'
   | 'PolicyPeek'
   | 'None';
-export type GameMode = 'Casual' | 'Ranked' | 'Classic' | 'Crisis';
+export type GameMode = 'Casual' | 'Ranked' | 'Classic' | 'Crisis' | 'House';
+
+export interface HouseRules {
+  deckComposition: { civil: number; state: number };
+  useTitleRoles: boolean;
+  usePersonalAgendas: boolean;
+  useCrisisCards: boolean;
+  titleRolePool?: TitleRole[];
+}
+
 
 export type EventCardId =
   | 'state_of_emergency'
@@ -510,6 +519,7 @@ export interface GameState {
   hostUserId?: string; // userId of the room creator
   isLocked?: boolean; // host has locked the room — no new joins
   mode: GameMode;
+  houseRules?: HouseRules;
   phase: GamePhase;
   civilDirectives: number;
   stateDirectives: number;
@@ -653,6 +663,7 @@ export interface GameState {
 export interface GameStateBroadcast extends Omit<GameState, 'deck' | 'chatBlackoutBuffer'> {
   deckSize: number;           // replaces deck
   deck: never[];              // always empty in broadcast — deckSize is the signal
+  houseRules?: HouseRules;
 }
 
 
@@ -711,6 +722,7 @@ export interface ClientToServerEvents {
     maxPlayers?: number;
     actionTimer?: number;
     mode?: GameMode;
+    houseRules?: HouseRules;
     isSpectator?: boolean;
     privacy?: RoomPrivacy;
     inviteCode?: string;

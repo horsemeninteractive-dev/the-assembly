@@ -71,7 +71,7 @@ export interface ICrisisEngine {
 }
 
 export interface ITitleRoleResolver {
-  assignTitleRoles(state: GameState): void;
+  assignTitleRoles(state: GameState, pool?: import('../../shared/types').TitleRole[]): void;
   runPostRoundTitleAbilities(s: GameState, roomId: string): void;
   continuePostRoundAfter(s: GameState, roomId: string, after: PostRoundContinuation): void;
   handleTitleAbility(s: GameState, roomId: string, abilityData: TitleAbilityData): Promise<void>;

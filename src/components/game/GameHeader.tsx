@@ -9,6 +9,7 @@ import {
   User as UserIcon,
   HelpCircle,
   Lock,
+  Settings2,
 } from 'lucide-react';
 import { Tooltip } from '../Tooltip';
 import { GameState, Player, Role, PrivateInfo } from '../../../shared/types';
@@ -88,6 +89,32 @@ export const GameHeader = ({
                 <div className="w-1 h-1 rounded-full bg-yellow-500 animate-pulse" />
                 {timerRemaining}s
               </span>
+            )}
+            {gameState.mode === 'House' && gameState.houseRules && (
+              <Tooltip 
+                position="bottom" 
+                align="start"
+                content={
+                  <div className="p-2 space-y-2 min-w-[150px]">
+                    <div className="font-mono text-[10px] uppercase text-red-500 border-b border-white/10 pb-1 mb-1">House Rules</div>
+                    <div className="grid grid-cols-2 gap-2 text-[9px] font-mono">
+                      <span className="text-ghost">DECK:</span>
+                      <span className="text-primary">{gameState.houseRules.deckComposition.civil}C / {gameState.houseRules.deckComposition.state}S</span>
+                      <span className="text-ghost">ROLES:</span>
+                      <span className={gameState.houseRules.useTitleRoles ? "text-emerald-400" : "text-red-400"}>{gameState.houseRules.useTitleRoles ? "ON" : "OFF"}</span>
+                      <span className="text-ghost">AGENDAS:</span>
+                      <span className={gameState.houseRules.usePersonalAgendas ? "text-emerald-400" : "text-red-400"}>{gameState.houseRules.usePersonalAgendas ? "ON" : "OFF"}</span>
+                      <span className="text-ghost">CRISIS:</span>
+                      <span className={gameState.houseRules.useCrisisCards ? "text-emerald-400" : "text-red-400"}>{gameState.houseRules.useCrisisCards ? "ON" : "OFF"}</span>
+                    </div>
+                  </div>
+                }
+              >
+                <div className="flex items-center gap-1 px-1.5 py-0.5 bg-red-950/20 border border-red-500/30 rounded text-responsive-xs font-mono text-red-500 tracking-[0.1em] shrink-0 cursor-help">
+                  <Settings2 className="w-[1.2vh] h-[1.2vh]" />
+                  HOUSE
+                </div>
+              </Tooltip>
             )}
             {!gameState.isPractice && gameState.privacy === 'private' && gameState.inviteCode && (
               <Tooltip content={t('game.game_header.invite_tooltip')}>
