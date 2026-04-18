@@ -103,6 +103,10 @@ jobs:
         with:
           project_id: '${{ secrets.GCP_PROJECT_ID }}'
 
+      - name: Extract Version
+        id: pkg-version
+        run: echo "VERSION=v$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
+
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy the-assembly \
@@ -112,7 +116,7 @@ jobs:
             --allow-unauthenticated \
             --min-instances 0 \
             --timeout 3600 \
-            --update-env-vars NODE_ENV=production \
+            --update-env-vars NODE_ENV=production,APP_VERSION=${{ steps.pkg-version.outputs.VERSION }} \
             --format="value(status.url)" > service_url.txt
           
           URL=$(cat service_url.txt)
