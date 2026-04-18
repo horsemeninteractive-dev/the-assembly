@@ -12,3 +12,6 @@ dist/
 android/.gradle/
 android/app/build/
 android/.idea/workspace.xml
+*.txt
+*.code-workspace
+*.ps1
