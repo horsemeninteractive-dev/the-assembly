@@ -93,7 +93,16 @@ export default function App() {
         const res = await fetch(apiUrl('/version'));
         if (res.ok) {
           const data = await res.json();
-          if (data.version && data.version !== 'dev' && data.version !== CLIENT_VERSION) setUpdateAvailable(true);
+          if (data.version && data.version !== 'dev') {
+            const serverVer = data.version.toLowerCase().replace(/^v/, '');
+            const clientVer = CLIENT_VERSION.toLowerCase().replace(/^v/, '');
+            if (serverVer !== clientVer) {
+              console.log(`[VersionCheck] Mismatch: Server(${serverVer}) !== Client(${clientVer})`);
+              setUpdateAvailable(true);
+            } else {
+              setUpdateAvailable(false);
+            }
+          }
         }
       } catch {}
     };
