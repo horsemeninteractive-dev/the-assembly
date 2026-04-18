@@ -39,6 +39,15 @@ on:
 #    gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
 #      --member="serviceAccount:YOUR_SERVICE_ACCOUNT@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
 #      --role="roles/iam.serviceAccountUser"
+#    gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+#      --member="serviceAccount:YOUR_SERVICE_ACCOUNT@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+#      --role="roles/artifactregistry.admin"
+#    gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+#      --member="serviceAccount:YOUR_SERVICE_ACCOUNT@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+#      --role="roles/cloudbuild.builds.editor"
+#    gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+#      --member="serviceAccount:YOUR_SERVICE_ACCOUNT@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+#      --role="roles/storage.admin"
 #
 # -----------------------------------------------------------------------------
 # REQUIRED GITHUB ACTIONS SECRETS:
