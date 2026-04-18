@@ -2539,6 +2539,11 @@
       "btn_claim": "Anspruch",
       "btn_claimed": "Behauptet",
       "btn_locked": "Gesperrt",
+      "ends_in": "Season ends in",
+      "content_coming_soon": "Content Coming Soon",
+      "content_coming_desc": "Belohnungen werden vor Beginn der Saison hinzugefügt.",
+      "premium_coming_soon": "Premium Track — Coming Soon",
+      "premium_label": "Prämie",
       "rewards": {
         "geometric_grid": "Geometrisches Gitter",
         "purple_rain": "Lila Regen",

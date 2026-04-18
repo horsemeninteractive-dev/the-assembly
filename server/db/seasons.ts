@@ -2,6 +2,27 @@ import { adminDb, withRetry } from './core';
 import { SeasonSnapshot } from '../../shared/types';
 import { logger } from '../logger';
 
+interface SnapshotRow {
+  id: string;
+  user_id: string;
+  season_period: string;
+  elo_at_end: number;
+  peak_elo: number;
+  ranked_wins: number;
+  ranked_games: number;
+  rank_tier: string;
+  rewards_claimed: boolean;
+  created_at: string;
+}
+
+interface LeaderboardRow extends SnapshotRow {
+  users: {
+    username: string;
+    avatar_url: string;
+    active_frame: string;
+  };
+}
+
 export async function createSeasonSnapshot(snapshot: Omit<SeasonSnapshot, 'id' | 'createdAt'>): Promise<void> {
   await withRetry(async () => {
     const { error } = await adminDb.from('season_snapshots').insert({
@@ -32,11 +53,11 @@ export async function getSeasonLeaderboard(seasonPeriod: string, limit = 50, off
     
     if (error) throw error;
 
-    return (data || []).map(row => ({
+    return (data as LeaderboardRow[] || []).map(row => ({
       userId: row.user_id,
-      username: (row.users as any).username,
-      avatarUrl: (row.users as any).avatar_url,
-      activeFrame: (row.users as any).active_frame,
+      username: row.users.username,
+      avatarUrl: row.users.avatar_url,
+      activeFrame: row.users.active_frame,
       elo: row.elo_at_end,
       peakElo: row.peak_elo,
       rankTier: row.rank_tier,
@@ -57,7 +78,7 @@ export async function getUserSeasonSnapshots(userId: string): Promise<SeasonSnap
     
     if (error) throw error;
 
-    return (data || []).map(row => ({
+    return (data as SnapshotRow[] || []).map(row => ({
       id: row.id,
       userId: row.user_id,
       seasonPeriod: row.season_period,

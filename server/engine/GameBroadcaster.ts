@@ -9,7 +9,7 @@
  */
 
 import { Server } from 'socket.io';
-import { GameState, Policy, SystemConfig } from '../../shared/types';
+import { GameState, Policy, SystemConfig, GameStateBroadcast, ServerToClientEvents, ClientToServerEvents } from '../../shared/types';
 import { logger } from '../logger';
 import { stateClient, roomKey, ROOM_TTL_SECONDS, isRedisConfigured, recordRoomDeletion } from '../redis';
 import { getPlayerAgenda, AGENDA_MAP } from '../game/personalAgendas';
@@ -23,13 +23,50 @@ export class GameBroadcaster {
   private redisDebounceTimers: Map<string, ReturnType<typeof setTimeout>> = new Map();
 
   constructor(
-    private readonly io: Server,
+    private readonly io: Server<ClientToServerEvents, ServerToClientEvents>,
     private readonly rooms: Map<string, GameState>
-  ) {}
+  ) {
+    this.io.on('connection', (socket) => {
+      socket.on('requestRoundHistory', (roomId: string) => {
+        const state = this.rooms.get(roomId);
+        if (state && state.roundHistory) {
+          socket.emit('roundHistoryFull', state.roundHistory);
+        }
+      });
+    });
+  }
 
   // ---------------------------------------------------------------------------
   // Core broadcast
   // ---------------------------------------------------------------------------
+
+  private sanitiseForBroadcast(state: GameState): GameStateBroadcast {
+    const {
+      deck,
+      chatBlackoutBuffer,
+      pendingChancellorClaim, // always stripped
+      spectatorRoles,
+      drawnPolicies,
+      chancellorPolicies,
+      ...rest
+    } = state;
+
+    return {
+      ...rest,
+      deckSize: deck ? deck.length : 0,
+      deck: [],
+      messages: rest.messages.slice(-50),
+      roundHistory: rest.roundHistory ? rest.roundHistory.slice(-3) : undefined,
+      players: rest.players.map(p => {
+        const { suspicion, alliances, ...cleanPlayer } = p;
+        return cleanPlayer;
+      }),
+      // Set empty/undefined here, to be populated per-socket in broadcastState
+      spectatorRoles: undefined,
+      drawnPolicies: [],
+      chancellorPolicies: [],
+    };
+  }
 
   broadcastState(roomId: string): void {
     const state = this.rooms.get(roomId);
@@ -38,18 +75,7 @@ export class GameBroadcaster {
     const roomSockets = this.io.sockets.adapter.rooms.get(roomId);
     if (!roomSockets) return;
 
-    // Strip sensitive card fields from the base payload upfront.
-    // pendingChancellorClaim is pure AI coordination and is NEVER sent to any client.
-    const {
-      deck,
-      discard,
-      drawnPolicies,
-      chancellorPolicies,
-      presidentSaw,
-      chancellorSaw,
-      pendingChancellorClaim: _neverSent,
-      ...publicState
-    } = state;
+    const basePayload = this.sanitiseForBroadcast(state);
 
     for (const socketId of roomSockets) {
       const socket = this.io.sockets.sockets.get(socketId);
@@ -64,7 +90,7 @@ export class GameBroadcaster {
       const isPresident = player?.isPresident === true;
       const isChancellor = player?.isChancellor === true;
 
-      const tailoredPlayers = state.players.map((p) => {
+      const tailoredPlayers = basePayload.players.map((p) => {
         const { role, titleRole, personalAgenda, vote, ...rest } = p;
         
         // Show all info if game is over, viewer is admin, or viewer is spectator
@@ -77,9 +103,7 @@ export class GameBroadcaster {
           return { ...rest, role, titleRole, personalAgenda, vote };
         }
         
-        // For other players:
-        // 1. Never show role/agenda/titleRole
-        // 2. ONLY show vote if 'Open Session' is active OR we are in the reveal phase
+        // For other players: ONLY show vote if 'Open Session' or in reveal phase
         const showVote = state.openSession || state.phase === 'Voting_Reveal' || state.phase === 'GameOver';
         
         return { 
@@ -105,17 +129,16 @@ export class GameBroadcaster {
             )
           : undefined;
 
-      const payload = {
-        ...publicState,
+      const payload: GameStateBroadcast = {
+        ...basePayload,
         players: tailoredPlayers,
         spectatorRoles: tailoredSpectatorRoles,
-        deck: seeAllCards ? deck : (new Array(deck.length).fill('Civil') as Policy[]),
-        discard: seeAllCards ? discard : (new Array(discard.length).fill('Civil') as Policy[]),
-        drawnPolicies: seeAllCards || isPresident ? drawnPolicies : [],
-        chancellorPolicies: seeAllCards || isChancellor ? chancellorPolicies : [],
-        presidentSaw: seeAllCards || isPresident ? presidentSaw : undefined,
-        chancellorSaw: seeAllCards || isChancellor ? chancellorSaw : undefined,
-        messages: state.chatBlackout && !seeAllCards ? [] : state.messages,
+        discard: seeAllCards ? state.discard : (new Array(state.discard.length).fill('Civil') as Policy[]),
+        drawnPolicies: seeAllCards || isPresident ? state.drawnPolicies : [],
+        chancellorPolicies: seeAllCards || isChancellor ? state.chancellorPolicies : [],
+        presidentSaw: seeAllCards || isPresident ? state.presidentSaw : undefined,
+        chancellorSaw: seeAllCards || isChancellor ? state.chancellorSaw : undefined,
+        messages: state.chatBlackout && !seeAllCards ? [] : basePayload.messages,
       };
 
       const isRanked = state.mode === 'Ranked';

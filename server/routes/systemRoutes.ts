@@ -60,7 +60,15 @@ export function registerSystemRoutes({ app, engine }: RouteContext): void {
       res.json(config);
     } catch (err) {
       logger.error({ err }, 'Error fetching system config');
-      res.json({ maintenanceMode: false, xpMultiplier: 1, ipMultiplier: 1, minVersion: '0.9.0' });
+      res.json({
+        maintenanceMode: false,
+        xpMultiplier: 1,
+        ipMultiplier: 1,
+        minVersion: '0.9.0',
+        currentSeasonNumber: 0,
+        currentSeasonPeriod: 'Season 0',
+        currentSeasonEndsAt: '2026-05-02T00:00:00.000Z',
+      });
     }
   });
 

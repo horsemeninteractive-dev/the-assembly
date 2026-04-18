@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useTranslation } from '../../contexts/I18nContext';
 import { User, CosmeticItem } from '../../../shared/types';
-import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../../sharedConstants';
+import { DEFAULT_ITEMS } from '../../sharedConstants';
 import { Coins, User as UserIcon, Scroll, Pause, Play } from 'lucide-react';
 import { cn, getProxiedUrl, apiUrl } from '../../utils/utils';
 import { getPolicyStyles, getVoteStyles, getFrameStyles, getRarity } from '../../utils/cosmetics';
@@ -47,7 +47,7 @@ export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, pla
 
   const filteredItems = DEFAULT_ITEMS.filter(
     (item) =>
-      item.type === shopCategory && !PASS_ITEM_LEVELS[item.id] && !item.id.endsWith('-default')
+      item.type === shopCategory && !item.id.includes('-pass-') && !item.id.endsWith('-default')
   );
 
   return (
@@ -112,11 +112,7 @@ export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, pla
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredItems.map((item) => {
-          const isPassItem = !!PASS_ITEM_LEVELS[item.id];
-          const isUnlocked = isPassItem
-            ? Math.floor(user.stats.gamesPlayed / 5) + 1 >= PASS_ITEM_LEVELS[item.id]
-            : false;
-          const isOwned = user.ownedCosmetics.includes(item.id) || isUnlocked;
+          const isOwned = user.ownedCosmetics.includes(item.id);
 
           return (
             <div

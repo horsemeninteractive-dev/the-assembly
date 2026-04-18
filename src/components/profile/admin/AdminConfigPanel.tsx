@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useTranslation } from '../../../contexts/I18nContext';
 import { motion } from 'motion/react';
-import { Server, Activity, Clock, Zap } from 'lucide-react';
+import { Server, Activity, Clock, Zap, CalendarClock, Trophy, Calendar } from 'lucide-react';
 import { SystemConfig } from '../../../../shared/types';
 import { cn, apiUrl } from '../../../utils/utils';
 import { socket } from '../../../socket';
@@ -18,8 +18,26 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
   // Local draft state — updates UI instantly without hitting the DB on every slider tick
   const [draft, setDraft] = useState<SystemConfig>(config);
 
+  // Override end-date local state (datetime-local input)
+  const [overrideDate, setOverrideDate] = useState<string>(() => {
+    // Format ISO → datetime-local (strip seconds + timezone for the input)
+    try {
+      return new Date(config.currentSeasonEndsAt).toISOString().slice(0, 16);
+    } catch {
+      return '';
+    }
+  });
+  const [savingDate, setSavingDate] = useState(false);
+
   // Keep draft in sync if parent config changes externally (e.g. socket event on another screen)
-  useEffect(() => { setDraft(config); }, [config]);
+  useEffect(() => {
+    setDraft(config);
+    try {
+      setOverrideDate(new Date(config.currentSeasonEndsAt).toISOString().slice(0, 16));
+    } catch {
+      setOverrideDate('');
+    }
+  }, [config]);
 
   // Called only when slider is released — persists to DB via socket
   const commitConfig = (updates: Partial<SystemConfig>) => {
@@ -27,6 +45,19 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
     setConfig(newConfig);
     setDraft(newConfig);
     socket.emit('adminUpdateConfig', updates);
+  };
+
+  const handleOverrideDateSave = () => {
+    if (!overrideDate) return;
+    setSavingDate(true);
+    try {
+      const iso = new Date(overrideDate).toISOString();
+      commitConfig({ currentSeasonEndsAt: iso });
+    } catch {
+      // invalid date — ignore
+    } finally {
+      setSavingDate(false);
+    }
   };
 
   return (
@@ -144,6 +175,86 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
             </div>
           </div>
 
+          {/* ──────────────────── Season Info ──────────────────── */}
+          <div className="bg-elevated/30 border border-amber-500/20 rounded-3xl p-6 space-y-5">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-amber-500/20 border border-amber-500/30 flex items-center justify-center">
+                <Trophy className="w-4.5 h-4.5 text-amber-400" />
+              </div>
+              <div>
+                <div className="text-sm font-bold text-primary uppercase tracking-widest">
+                  Season Info
+                </div>
+                <div className="text-[10px] font-mono text-amber-400/70 uppercase tracking-widest">
+                  Read-only — managed automatically by rollover
+                </div>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-3 text-center">
+              {/* Season Number */}
+              <div className="bg-card/60 border border-subtle rounded-2xl p-4">
+                <div className="text-2xl font-thematic text-amber-400 leading-none">
+                  {draft.currentSeasonNumber ?? 0}
+                </div>
+                <div className="text-[9px] font-mono text-faint uppercase tracking-widest mt-1">
+                  Season #
+                </div>
+              </div>
+              {/* Season Period */}
+              <div className="bg-card/60 border border-subtle rounded-2xl p-4 col-span-2">
+                <div className="text-base font-thematic text-primary leading-none truncate">
+                  {draft.currentSeasonPeriod ?? 'Season 0'}
+                </div>
+                <div className="text-[9px] font-mono text-faint uppercase tracking-widest mt-1">
+                  Period Label
+                </div>
+              </div>
+              {/* Ends At */}
+              <div className="bg-card/60 border border-subtle rounded-2xl p-4 col-span-3">
+                <div className="text-[11px] font-mono text-secondary leading-none">
+                  {draft.currentSeasonEndsAt
+                    ? new Date(draft.currentSeasonEndsAt).toLocaleString(undefined, {
+                        year: 'numeric', month: 'short', day: 'numeric',
+                        hour: '2-digit', minute: '2-digit', timeZoneName: 'short',
+                      })
+                    : '—'}
+                </div>
+                <div className="text-[9px] font-mono text-faint uppercase tracking-widest mt-1">
+                  Scheduled End
+                </div>
+              </div>
+            </div>
+
+            {/* Override Season End Date */}
+            <div className="bg-card/40 border border-subtle rounded-2xl p-4 space-y-3">
+              <div className="flex items-center gap-2">
+                <Calendar className="w-3.5 h-3.5 text-faint" />
+                <span className="text-[10px] font-mono text-muted uppercase tracking-widest">
+                  Override Season End Date
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                <input
+                  type="datetime-local"
+                  value={overrideDate}
+                  onChange={(e) => setOverrideDate(e.target.value)}
+                  className="flex-1 bg-base border border-subtle rounded-xl px-3 py-2 text-xs font-mono text-primary focus:outline-none focus:border-amber-500/60 transition-colors"
+                />
+                <button
+                  onClick={handleOverrideDateSave}
+                  disabled={savingDate || !overrideDate}
+                  className="px-4 py-2 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-400 hover:bg-amber-500/30 transition-all font-mono text-[10px] uppercase tracking-widest disabled:opacity-40"
+                >
+                  {savingDate ? '...' : 'Save'}
+                </button>
+              </div>
+              <p className="text-[9px] font-mono text-faint italic">
+                Adjusts the countdown displayed to players without triggering rewards or a rollover.
+              </p>
+            </div>
+          </div>
+
           <div className="pt-6 border-t border-subtle/50 flex flex-col sm:flex-row items-center justify-between gap-4">
             <button
               onClick={async () => {
@@ -173,24 +284,23 @@ export const AdminConfigPanel: React.FC<AdminConfigPanelProps> = ({ config, setC
 
             <button
               onClick={async () => {
-                const season = prompt('Enter Season Name (e.g. "Season 1"):');
-                if (!season) return;
+                const confirmed = confirm(
+                  `Are you SURE you want to end the current season?\n\nThis will:\n• Snapshot all ranked player standings\n• Grant ELO-based rewards\n• Soft-reset ELO scores\n• Advance to the next season\n\nThis cannot be undone.`
+                );
+                if (!confirmed) return;
                 const secret = prompt('Enter Admin Secret:');
                 if (!secret) return;
-
-                if (!confirm(`Are you SURE you want to end ${season}? This will reset all ranked stats and grant rewards!`)) return;
 
                 try {
                   const res = await fetch(apiUrl('/api/season/rollover'), {
                     method: 'POST',
-                    headers: {
-                      'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ seasonPeriod: season, secret }),
+                    headers: { 'Content-Type': 'application/json' },
+                    // seasonPeriod is omitted — the server will auto-derive it
+                    body: JSON.stringify({ secret }),
                   });
                   const data = await res.json();
                   if (res.ok) {
-                    alert('Rollover successful! Processed ' + data.processedCount + ' players.');
+                    alert(`Rollover successful! Processed ${data.processedCount} players.\nNew season: ${data.newSeasonPeriod}`);
                   } else {
                     alert('Rollover failed: ' + (data.error || 'Unknown error'));
                   }

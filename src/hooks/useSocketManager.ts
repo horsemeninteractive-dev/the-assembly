@@ -22,7 +22,15 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
   const [pendingSeasonReward, setPendingSeasonReward] = useState<{ tier: string; ipReward: number; cpReward: number; seasonPeriod: string } | null>(null);
   const [adminBroadcast, setAdminBroadcast] = useState<{ message: string; sender: string } | null>(null);
   const [serverRestarting, setServerRestarting] = useState<string | null>(null);
-  const [systemConfig, setSystemConfig] = useState<SystemConfig>({ maintenanceMode: false, xpMultiplier: 1, ipMultiplier: 1 });
+  const [systemConfig, setSystemConfig] = useState<SystemConfig>({
+    maintenanceMode: false,
+    xpMultiplier: 1,
+    ipMultiplier: 1,
+    currentSeasonNumber: 0,
+    currentSeasonPeriod: 'Season 0',
+    currentSeasonEndsAt: '2026-05-02T00:00:00.000Z',
+  });
+
 
   // Load system config from DB on mount (multipliers, maintenance mode, etc.)
   useEffect(() => {
@@ -94,8 +102,8 @@ export function useSocketManager({ user, token, setUser, playSound }: UseSocketM
   );
 
   useEffect(() => {
-    socket.on('gameStateUpdate', (state: GameState) => {
-      setGameState(state);
+    socket.on('gameStateUpdate', (state: import('../../shared/types').GameStateBroadcast) => {
+      setGameState(state as unknown as GameState);
       setJoined(true);
     });
     socket.on('privateInfo', (info: PrivateInfo) => setPrivateInfo(info));

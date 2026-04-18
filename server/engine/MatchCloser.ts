@@ -244,7 +244,7 @@ export class MatchCloser {
 
           // ── Challenge evaluation ─────────────────────────────────────────
           const challengeCtx: ChallengeContext = { s, p, won, agendaCompleted };
-          const freshChallengeData = refreshChallenges(user);
+          const freshChallengeData = refreshChallenges(user, config);
           challengeResult = evaluateChallenges(freshChallengeData, challengeCtx);
           user.challengeData = challengeResult.updatedChallengeData;
 
@@ -279,7 +279,8 @@ export class MatchCloser {
             if (!clanData) {
               const fetchedClan = await getClanById(clanId);
               if (fetchedClan) {
-                clanData = refreshClanChallenges(fetchedClan.challenges);
+                const config = this.engine.getConfig();
+                clanData = refreshClanChallenges(fetchedClan.challenges, config);
               }
             }
 

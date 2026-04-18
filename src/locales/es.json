@@ -2539,6 +2539,11 @@
       "btn_claim": "Reclamo",
       "btn_claimed": "Reclamado",
       "btn_locked": "Bloqueado",
+      "ends_in": "La temporada termina en",
+      "content_coming_soon": "Contenido próximamente",
+      "content_coming_desc": "Las recompensas se agregan antes de que comience la temporada.",
+      "premium_coming_soon": "Pista Premium: próximamente",
+      "premium_label": "De primera calidad",
       "rewards": {
         "geometric_grid": "Cuadrícula geométrica",
         "purple_rain": "Lluvia Púrpura",

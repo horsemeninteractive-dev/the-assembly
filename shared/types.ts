@@ -369,6 +369,9 @@ export interface SystemConfig {
   xpMultiplier: number;
   ipMultiplier: number;
   minVersion?: string;
+  currentSeasonNumber: number;    // 0, 1, 2, ...
+  currentSeasonPeriod: string;    // e.g. "Season 0", "Season 1"
+  currentSeasonEndsAt: string;    // ISO timestamp of when this season ends
 }
 
 export type AIPersonality = 'Honest' | 'Deceptive' | 'Chaotic' | 'Strategic' | 'Aggressive';
@@ -647,14 +650,18 @@ export interface GameState {
   commendationsGiven?: { [senderId: string]: boolean };
 }
 
+export interface GameStateBroadcast extends Omit<GameState, 'deck' | 'chatBlackoutBuffer'> {
+  deckSize: number;           // replaces deck
+  deck: never[];              // always empty in broadcast — deckSize is the signal
+}
+
+
 export interface ServerToClientEvents {
   reaction: (data: { playerId: string; reaction: string }) => void;
-  gameStateUpdate: (state: GameState) => void;
+  gameStateUpdate: (state: GameStateBroadcast) => void;
+  roundHistoryFull: (history: NonNullable<GameState['roundHistory']>) => void;
   error: (message: string) => void;
-  privateInfo: (info: {
-    role: Role;
-    stateAgents?: { id: string; name: string; role: Role }[];
-  }) => void;
+  privateInfo: (info: PrivateInfo) => void;
   investigationResult: (result: { targetName: string; role: Role }) => void;
   policyPeekResult: (policies: Policy[]) => void;
   voiceData: (data: { sender: string; data: ArrayBuffer }) => void;
@@ -765,4 +772,5 @@ export interface ClientToServerEvents {
   giveCommendation: (data: { targetId: string; type: CommendationType }) => void;
   initiateKickVote: (targetId: string) => void;
   castKickVote: (vote: 'Aye' | 'Nay') => void;
+  requestRoundHistory: (roomId: string) => void;
 }

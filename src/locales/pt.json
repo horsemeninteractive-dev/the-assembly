@@ -2539,6 +2539,11 @@
       "btn_claim": "Reivindicação",
       "btn_claimed": "Reivindicado",
       "btn_locked": "Bloqueado",
+      "ends_in": "A temporada termina em",
+      "content_coming_soon": "Conteúdo em breve",
+      "content_coming_desc": "recompensas estão sendo adicionadas antes do início da temporada.",
+      "premium_coming_soon": "Faixa Premium — Em breve",
+      "premium_label": "Prêmio",
       "rewards": {
         "geometric_grid": "Grade Geométrica",
         "purple_rain": "Chuva Roxa",

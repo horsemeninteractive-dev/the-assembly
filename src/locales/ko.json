@@ -2539,6 +2539,11 @@
       "btn_claim": "소유권 주장",
       "btn_claimed": "소유권 주장",
       "btn_locked": "잠김",
+      "ends_in": "시즌 종료",
+      "content_coming_soon": "콘텐츠 출시 예정",
+      "content_coming_desc": "시즌이 시작되기 전에 보상이 추가됩니다.",
+      "premium_coming_soon": "프리미엄 트랙 — 출시 예정",
+      "premium_label": "프리미엄",
       "rewards": {
         "geometric_grid": "기하학적 격자",
         "purple_rain": "보라색 비",

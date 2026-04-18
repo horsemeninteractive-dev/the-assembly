@@ -245,7 +245,9 @@ export function registerUserRoutes({ app, engine }: RouteContext): void {
   app.get('/api/challenges', requireAuth, async (req: Request, res: Response) => {
     try {
       const user = req.user!;
-      const freshData = refreshChallenges(user);
+      const { getSystemConfig } = await import('../db/config');
+      const config = await getSystemConfig();
+      const freshData = refreshChallenges(user, config);
 
       const periodsChanged =
         !user.challengeData ||
@@ -258,7 +260,7 @@ export function registerUserRoutes({ app, engine }: RouteContext): void {
         await saveUser(user);
       }
 
-      res.json(buildChallengesResponse(freshData));
+      res.json(buildChallengesResponse(freshData, config.currentSeasonEndsAt));
     } catch (err) {
       logger.error({ err }, 'GET /api/challenges error');
       res.status(500).json({ error: 'Internal server error' });

@@ -2539,6 +2539,11 @@
       "btn_claim": "Réclamation",
       "btn_claimed": "Réclamé",
       "btn_locked": "Verrouillé",
+      "ends_in": "La saison se termine dans",
+      "content_coming_soon": "Contenu à venir",
+      "content_coming_desc": "des récompenses sont ajoutées avant le début de la saison.",
+      "premium_coming_soon": "Piste Premium — Bientôt disponible",
+      "premium_label": "Prime",
       "rewards": {
         "geometric_grid": "Grille géométrique",
         "purple_rain": "Pluie violette",

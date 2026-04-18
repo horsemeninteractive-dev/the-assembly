@@ -43,7 +43,14 @@ export const AdminTools: React.FC<{ adminId: string; token: string }> = ({ admin
   const [userSearchResults, setUserSearchResults] = useState<User[]>([]);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [hasSearched, setHasSearched] = useState(false);
-  const [config, setConfig] = useState<SystemConfig>({ maintenanceMode: false, xpMultiplier: 1.0, ipMultiplier: 1.0 });
+  const [config, setConfig] = useState<SystemConfig>({ 
+    maintenanceMode: false, 
+    xpMultiplier: 1.0, 
+    ipMultiplier: 1.0, 
+    currentSeasonNumber: 0, 
+    currentSeasonPeriod: '', 
+    currentSeasonEndsAt: '' 
+  });
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
   const [chatLogs, setChatLogs] = useState<{ sender: string; text: string; timestamp: number }[]>([]);
   const [confirmDelete, setConfirmDelete] = useState<string | null>(null);

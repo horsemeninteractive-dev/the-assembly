@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { BookOpen, X, Scale, Eye, LayoutGrid, List } from 'lucide-react';
 import { GameState } from '../../../../shared/types';
 import { cn } from '../../../utils/utils';
 import { useTranslation } from '../../../contexts/I18nContext';
+import { socket } from '../../../socket';
 
 interface RoundHistoryProps {
   gameState: GameState;
@@ -14,8 +15,23 @@ interface RoundHistoryProps {
 export const RoundHistory = ({ gameState, isOpen, onClose }: RoundHistoryProps) => {
   const { t } = useTranslation();
   const [view, setView] = useState<'list' | 'heatmap'>('list');
+  const [fullHistory, setFullHistory] = useState<NonNullable<GameState['roundHistory']>>([]);
 
-  const history = gameState.roundHistory || [];
+  useEffect(() => {
+    if (isOpen) {
+      socket.emit('requestRoundHistory', gameState.roomId);
+    }
+  }, [isOpen, gameState.roomId]);
+
+  useEffect(() => {
+    const handleHistory = (h: NonNullable<GameState['roundHistory']>) => setFullHistory(h);
+    socket.on('roundHistoryFull', handleHistory);
+    return () => {
+      socket.off('roundHistoryFull', handleHistory);
+    };
+  }, []);
+
+  const history = fullHistory.length > 0 ? fullHistory : (gameState.roundHistory || []);
   const sortedRounds = [...history].sort((a, b) => a.round - b.round);
 
   const VoteHeatmap = () => {

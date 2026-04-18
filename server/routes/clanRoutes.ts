@@ -148,19 +148,24 @@ export function registerClanRoutes({ app, io, userSockets }: RouteContext): void
       const clan = await getClanByUserId(user.id);
       if (!clan) return res.status(404).json({ error: 'You are not in a clan' });
 
+      // Fetch live config to know the active season bounds
+      const { getSystemConfig } = await import('../db/config');
+      const config = await getSystemConfig();
+
       // Refresh if periods expired
-      const refreshed = refreshClanChallenges(clan.challenges);
+      const refreshed = refreshClanChallenges(clan.challenges, config);
       if (JSON.stringify(refreshed) !== JSON.stringify(clan.challenges)) {
         await saveClanChallenges(clan.id, refreshed);
       }
 
-      const enriched = enrichClanChallenges(refreshed);
+      const enriched = enrichClanChallenges(refreshed, config.currentSeasonEndsAt);
       res.json(enriched);
     } catch (err) {
       logger.error({ err }, 'getClanChallenges failed');
       res.status(500).json({ error: 'Failed to fetch clan challenges' });
     }
   });
+
 
   // ── GET /api/clans/search ────────────────────────────────────────────────
   app.get('/api/clans/search', requireAuth, async (req: Request, res: Response) => {

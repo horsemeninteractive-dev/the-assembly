@@ -4,7 +4,7 @@ import { cn, getProxiedUrl, apiUrl } from '../../utils/utils';
 import { CosmeticItem, User } from '../../../shared/types';
 import { Play, Pause, User as UserIcon, Scroll } from 'lucide-react';
 import { getPolicyStyles, getVoteStyles, getFrameStyles, getRarity } from '../../utils/cosmetics';
-import { DEFAULT_ITEMS, PASS_ITEM_LEVELS } from '../../sharedConstants';
+import { DEFAULT_ITEMS } from '../../sharedConstants';
 import { getLevelFromXp } from '../../utils/xp';
 
 interface InventoryProps {
@@ -63,13 +63,10 @@ export const InventoryTab: React.FC<InventoryProps> = ({
     if (item.id.endsWith('-default')) return true;
 
     // Show owned or unlocked items
-    const isOwned = user.ownedCosmetics.includes(item.id);
-    const isPassItem = !!PASS_ITEM_LEVELS[item.id];
-    const isUnlocked = isPassItem
-      ? getLevelFromXp(user.stats.xp) >= PASS_ITEM_LEVELS[item.id]
-      : false;
-
-    return isOwned || isUnlocked;
+    const isPassItem = item.id.includes('-pass-');
+    return isPassItem 
+      ? user.claimedRewards?.some(r => r.includes(item.id)) || false
+      : user.ownedCosmetics?.includes(item.id);
   });
 
   const categories: {

@@ -136,8 +136,8 @@ export const PolicyTracks = ({ gameState, user, playSound }: PolicyTracksProps) 
       <div className="flex flex-col items-center justify-center gap-[0.8vh] px-[1vh] border-x border-subtle/50 h-[5vh] self-center">
         <div className="flex flex-col items-center gap-0.5 group relative">
           <Layers className="w-[1.2vh] h-[1.2vh] text-muted" />
-          <span className="text-[9px] font-semibold text-primary leading-none">
-            {gameState.deck.length}
+          <span className="text-xl font-bold tracking-tight -mb-1">
+            {(gameState as unknown as import('../../../shared/types').GameStateBroadcast).deckSize}
           </span>
           <div className="absolute top-full left-1/2 -translate-x-1/2 mt-1 px-2 py-1 bg-black text-[8px] font-mono text-white rounded opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity whitespace-nowrap z-50 shadow-xl">
             {t('game.tracks.deck')}

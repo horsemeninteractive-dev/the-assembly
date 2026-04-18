@@ -2539,6 +2539,11 @@
       "btn_claim": "索赔",
       "btn_claimed": "声称",
       "btn_locked": "锁定",
+      "ends_in": "季节结束于",
+      "content_coming_soon": "内容即将推出",
+      "content_coming_desc": "奖励将在赛季开始前添加。",
+      "premium_coming_soon": "高级赛道 — 即将推出",
+      "premium_label": "优质的",
       "rewards": {
         "geometric_grid": "几何网格",
         "purple_rain": "紫雨",

@@ -36,11 +36,11 @@ import {
  * - Assigns seasonal only if the season has changed (preserves progress within a season)
  * Returns the (potentially updated) challenge data. Does NOT persist — caller must saveUser.
  */
-export function refreshChallenges(user: UserInternal): UserChallengeData {
+export function refreshChallenges(user: UserInternal, currentConfig?: import('../../shared/types').SystemConfig): UserChallengeData {
   const existing = user.challengeData;
   const today = getCurrentDayPeriod();
   const thisWeek = getCurrentWeekPeriod();
-  const thisSeason = getCurrentSeasonPeriod();
+  const thisSeason = currentConfig ? currentConfig.currentSeasonPeriod : getCurrentSeasonPeriod();
 
   const needsDaily = !existing || existing.dailyPeriod !== today;
   const needsWeekly = !existing || existing.weeklyPeriod !== thisWeek;
@@ -55,7 +55,7 @@ export function refreshChallenges(user: UserInternal): UserChallengeData {
     seasonPeriod: thisSeason,
     dailyResetsAt: getDailyResetsAt(),
     weeklyResetsAt: getWeeklyResetsAt(),
-    seasonEndsAt: getSeasonEndsAt(),
+    seasonEndsAt: currentConfig ? currentConfig.currentSeasonEndsAt : getSeasonEndsAt(),
   };
 }
 
@@ -94,7 +94,7 @@ export async function saveChallengeData(userId: string, data: UserChallengeData)
 // Build the enriched response for the API
 // ---------------------------------------------------------------------------
 
-export function buildChallengesResponse(data: UserChallengeData): ChallengesResponse {
+export function buildChallengesResponse(data: UserChallengeData, overrideSeasonEndsAt?: string): ChallengesResponse {
   function enrich(active: import('../../shared/types').ActiveChallenge): EnrichedChallenge | null {
     const def = CHALLENGE_MAP.get(active.id);
     if (!def) return null;
@@ -115,7 +115,7 @@ export function buildChallengesResponse(data: UserChallengeData): ChallengesResp
 
   const dailyResetsAt = getDailyResetsAt();
   const weeklyResetsAt = getWeeklyResetsAt();
-  const seasonEndsAt = getSeasonEndsAt();
+  const seasonEndsAt = overrideSeasonEndsAt || getSeasonEndsAt();
 
   return {
     daily: data.daily.map(enrich).filter((c): c is EnrichedChallenge => c !== null),

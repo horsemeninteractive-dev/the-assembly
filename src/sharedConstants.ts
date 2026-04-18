@@ -469,12 +469,30 @@ export const DEFAULT_ITEMS: CosmeticItem[] = [
   },
 ];
 
-export const PASS_ITEM_LEVELS: { [key: string]: number } = {
-  'bg-pass-0': 10,
-  'vote-pass-0': 20,
-  'music-pass-0': 40,
-  'frame-pass-0': 50,
+export interface PassReward {
+  level: number;
+  rewardId: string;       // e.g. 'pass-1-lvl10' — namespaced by season, no claimedRewards collision
+  labelKey: string;       // i18n key
+  cp?: number;
+  itemId?: string;        // references an id in DEFAULT_ITEMS
+  isPremium?: boolean;    // false / undefined = free track, true = premium track (scaffold for future)
+}
+
+export const SEASON_PASS_CONTENT: Record<number, PassReward[]> = {
+  0: [
+    { level: 10, rewardId: 'pass-0-lvl10', labelKey: 'profile.pass.rewards.geometric_grid', itemId: 'bg-pass-0' },
+    { level: 20, rewardId: 'pass-0-lvl20', labelKey: 'profile.pass.rewards.purple_rain', itemId: 'vote-pass-0' },
+    { level: 30, rewardId: 'pass-0-lvl30', labelKey: 'profile.pass.reward_types.cp_count', cp: 500 },
+    { level: 40, rewardId: 'pass-0-lvl40', labelKey: 'profile.pass.rewards.static_noise', itemId: 'music-pass-0' },
+    { level: 50, rewardId: 'pass-0-lvl50', labelKey: 'profile.pass.rewards.purple_pill', itemId: 'frame-pass-0' },
+  ],
+  1: [], // Season 1 content — to be populated before rollover
 };
+
+/** Replaces PASS_ITEM_LEVELS — looks up required level for a cosmetic item in a given season. */
+export function getPassItemLevel(itemId: string, seasonNumber: number): number | undefined {
+  return SEASON_PASS_CONTENT[seasonNumber]?.find(r => r.itemId === itemId)?.level;
+}
 
 export const RANK_TIERS = {
   BRONZE: { name: 'Bronze', minElo: 0, maxElo: 999, color: 'text-amber-500', bg: 'bg-amber-500/10', border: 'border-amber-500/30' },

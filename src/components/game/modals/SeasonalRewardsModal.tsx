@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { Trophy, Coins, Award, Sparkles } from 'lucide-react';
 import { useTranslation } from '../../../contexts/I18nContext';
 import { RANK_TIERS } from '../../../sharedConstants';
-import { useGameContext } from '../../../contexts/GameContext';
+import { useAudioContext } from '../../../contexts/AudioContext';
 
 interface SeasonalRewardsModalProps {
   reward: {
@@ -17,7 +17,7 @@ interface SeasonalRewardsModalProps {
 
 export const SeasonalRewardsModal: React.FC<SeasonalRewardsModalProps> = ({ reward, onClose }) => {
   const { t } = useTranslation();
-  const { playSound } = useGameContext();
+  const { playSound } = useAudioContext();
 
   if (!reward) return null;
 

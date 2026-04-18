@@ -2539,6 +2539,11 @@
       "btn_claim": "Заявить",
       "btn_claimed": "Заявлено",
       "btn_locked": "Заблокировано",
+      "ends_in": "Сезон закончится через",
+      "content_coming_soon": "Скоро появится контент",
+      "content_coming_desc": "награды добавляются перед началом сезона.",
+      "premium_coming_soon": "Премиум-трек — скоро появится",
+      "premium_label": "Премиум",
       "rewards": {
         "geometric_grid": "Геометрическая сетка",
         "purple_rain": "Пурпурный дождь",

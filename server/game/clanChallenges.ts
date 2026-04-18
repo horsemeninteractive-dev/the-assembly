@@ -168,10 +168,10 @@ function pickRandom<T>(arr: T[], n: number): T[] {
   return shuffled.slice(0, n);
 }
 
-export function assignClanChallenges(): ClanChallengeData {
+export function assignClanChallenges(currentConfig?: import('../../shared/types').SystemConfig): ClanChallengeData {
   const today = getCurrentDayPeriod();
   const thisWeek = getCurrentWeekPeriod();
-  const thisSeason = getCurrentSeasonPeriod();
+  const thisSeason = currentConfig ? currentConfig.currentSeasonPeriod : getCurrentSeasonPeriod();
 
   return {
     daily: pickRandom(DAILY, 3).map(def => ({ id: def.id, progress: 0, completed: false })),
@@ -182,16 +182,16 @@ export function assignClanChallenges(): ClanChallengeData {
     seasonPeriod: thisSeason,
     dailyResetsAt: getDailyResetsAt(),
     weeklyResetsAt: getWeeklyResetsAt(),
-    seasonEndsAt: getSeasonEndsAt(),
+    seasonEndsAt: currentConfig ? currentConfig.currentSeasonEndsAt : getSeasonEndsAt(),
   };
 }
 
-export function refreshClanChallenges(existing: ClanChallengeData | undefined): ClanChallengeData {
+export function refreshClanChallenges(existing: ClanChallengeData | undefined, currentConfig?: import('../../shared/types').SystemConfig): ClanChallengeData {
   const today = getCurrentDayPeriod();
   const thisWeek = getCurrentWeekPeriod();
-  const thisSeason = getCurrentSeasonPeriod();
+  const thisSeason = currentConfig ? currentConfig.currentSeasonPeriod : getCurrentSeasonPeriod();
 
-  if (!existing) return assignClanChallenges();
+  if (!existing) return assignClanChallenges(currentConfig);
 
   const needsDaily = existing.dailyPeriod !== today;
   const needsWeekly = existing.weeklyPeriod !== thisWeek;
@@ -206,7 +206,7 @@ export function refreshClanChallenges(existing: ClanChallengeData | undefined): 
     seasonPeriod: thisSeason,
     dailyResetsAt: getDailyResetsAt(),
     weeklyResetsAt: getWeeklyResetsAt(),
-    seasonEndsAt: getSeasonEndsAt(),
+    seasonEndsAt: currentConfig ? currentConfig.currentSeasonEndsAt : getSeasonEndsAt(),
   };
 }
 
@@ -257,7 +257,7 @@ export function evaluateClanChallenges(
 }
 
 /** Prepares a detailed response for the UI by attaching names/icons/targets to raw progress IDs. */
-export function enrichClanChallenges(data: ClanChallengeData) {
+export function enrichClanChallenges(data: ClanChallengeData, overrideSeasonEndsAt?: string) {
   const enrich = (list: ActiveChallenge[]) => list.map(active => {
     const def = CLAN_CHALLENGE_MAP.get(active.id);
     return {
@@ -278,6 +278,6 @@ export function enrichClanChallenges(data: ClanChallengeData) {
     seasonal: enrich(data.seasonal),
     dailyResetsAt: data.dailyResetsAt,
     weeklyResetsAt: data.weeklyResetsAt,
-    seasonEndsAt: data.seasonEndsAt,
+    seasonEndsAt: overrideSeasonEndsAt || data.seasonEndsAt,
   };
 }

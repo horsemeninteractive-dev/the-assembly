@@ -52,6 +52,7 @@ describe('GameEngine - updateUserStats', () => {
     earnedAchievements: [],
     pinnedAchievements: [],
     recentlyPlayedWith: [],
+    peakElo: 1000,
     stats: {
       xp: 1000,
       points: 500,
