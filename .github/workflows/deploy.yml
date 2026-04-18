@@ -1,0 +1,111 @@
+name: Deploy to Cloud Run
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    branches: [main]
+    types: [completed]
+
+# -----------------------------------------------------------------------------
+# WORKLOAD IDENTITY FEDERATION SETUP GUIDE
+# -----------------------------------------------------------------------------
+# This is a one-time manual setup required per GCP project.
+# Run these commands via your terminal or Cloud Shell using the gcloud CLI.
+# 
+# 1. Create a Workload Identity Pool:
+#    gcloud iam workload-identity-pools create github-actions-pool \
+#      --location="global" \
+#      --description="GitHub Actions for the-assembly repo" \
+#      --display-name="github-actions-pool"
+#
+# 2. Create the OIDC Provider for GitHub Actions:
+#    gcloud iam workload-identity-pools providers create-oidc github-actions-provider \
+#      --location="global" \
+#      --workload-identity-pool="github-actions-pool" \
+#      --display-name="GitHub Actions Provider" \
+#      --issuer-uri="https://token.actions.githubusercontent.com" \
+#      --attribute-mapping="google.subject=assertion.sub,attribute.actor=assertion.actor,attribute.repository=assertion.repository"
+#
+# 3. Bind the Service Account to the Identity Pool with the GitHub Repo condition:
+#    NOTE: Replace OWNER/REPO with your actual GitHub username/organization and repository name.
+#    gcloud iam service-accounts add-iam-policy-binding YOUR_SERVICE_ACCOUNT@YOUR_PROJECT_ID.iam.gserviceaccount.com \
+#      --role="roles/iam.workloadIdentityUser" \
+#      --member="principalSet://iam.googleapis.com/projects/YOUR_PROJECT_NUMBER/locations/global/workloadIdentityPools/github-actions-pool/attribute.repository/OWNER/REPO"
+#
+# 4. Grant the needed IAM roles for Cloud Run deployment to your Service Account:
+#    gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+#      --member="serviceAccount:YOUR_SERVICE_ACCOUNT@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+#      --role="roles/run.admin"
+#    gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+#      --member="serviceAccount:YOUR_SERVICE_ACCOUNT@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+#      --role="roles/iam.serviceAccountUser"
+#
+# -----------------------------------------------------------------------------
+# REQUIRED GITHUB ACTIONS SECRETS:
+# Add these to your repository settings under Settings -> Secrets and variables -> Actions
+# -----------------------------------------------------------------------------
+# - GCP_PROJECT_ID: The Google Cloud project ID (e.g., gen-lang-client-0636418324)
+# - GCP_WORKLOAD_IDENTITY_PROVIDER: The Workload Identity Provider resource name
+#     Format: projects/YOUR_PROJECT_NUMBER/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider
+# - GCP_SERVICE_ACCOUNT: The deployment service account email
+# -----------------------------------------------------------------------------
+
+jobs:
+  deploy:
+    name: Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    permissions:
+      contents: 'read'
+      id-token: 'write'
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: '.nvmrc'
+
+      - name: Cache npm dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-npm-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-npm-
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Build
+        run: npm run build
+
+      - name: Authenticate to Google Cloud
+        id: auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: '${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
+          service_account: '${{ secrets.GCP_SERVICE_ACCOUNT }}'
+
+      - name: Setup Google Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+        with:
+          project_id: '${{ secrets.GCP_PROJECT_ID }}'
+
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy the-assembly \
+            --source . \
+            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --region us-west1 \
+            --allow-unauthenticated \
+            --min-instances 0 \
+            --update-env-vars NODE_ENV=production \
+            --format="value(status.url)" > service_url.txt
+          
+          URL=$(cat service_url.txt)
+          
+          echo "### :rocket: Deployment Successful!" >> $GITHUB_STEP_SUMMARY
+          echo "Your updated service is live at: **$URL**" >> $GITHUB_STEP_SUMMARY

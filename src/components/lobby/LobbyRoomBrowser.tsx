@@ -522,17 +522,17 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                   autoFocus
                   type="text"
                   value={inviteCodeInput}
-                  onChange={(e) => setInviteCodeInput(e.target.value.toUpperCase().slice(0, 4))}
+                  onChange={(e) => setInviteCodeInput(e.target.value.toUpperCase().slice(0, 6))}
                   onKeyDown={(e) => {
-                    if (e.key === 'Enter' && inviteCodeInput.length === 4) {
+                    if (e.key === 'Enter' && inviteCodeInput.length === 6) {
                       onJoinRoom(invitePrompt.roomId, undefined, undefined, undefined, false, undefined, inviteCodeInput);
                       setInvitePrompt(null);
                       setInviteCodeInput('');
                     }
                   }}
-                  placeholder="XXXX"
-                  maxLength={4}
-                  className="w-32 text-center text-xl font-mono tracking-[0.5em] bg-elevated border border-subtle rounded-xl py-3 text-primary focus:outline-none focus:border-red-500/50 uppercase transition-colors"
+                  placeholder="XXXXXX"
+                  maxLength={6}
+                  className="w-40 text-center text-xl font-mono tracking-[0.5em] bg-elevated border border-subtle rounded-xl py-3 text-primary focus:outline-none focus:border-red-500/50 uppercase transition-colors"
                 />
                 <div className="flex gap-3 w-full">
                   <button
@@ -542,7 +542,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                     {t('lobby.browser.private_modal_cancel')}
                   </button>
                   <button
-                    disabled={inviteCodeInput.length !== 4}
+                    disabled={inviteCodeInput.length !== 6}
                     onClick={() => {
                       onJoinRoom(invitePrompt.roomId, undefined, undefined, undefined, false, undefined, inviteCodeInput);
                       setInvitePrompt(null);
@@ -550,7 +550,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                     }}
                     className={cn(
                       'flex-1 py-2 text-xs font-mono uppercase tracking-widest rounded-xl transition-colors',
-                      inviteCodeInput.length === 4
+                      inviteCodeInput.length === 6
                         ? 'btn-primary hover:bg-subtle'
                         : 'bg-card text-ghost border border-subtle cursor-not-allowed'
                     )}
