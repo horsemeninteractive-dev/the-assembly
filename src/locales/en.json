@@ -322,9 +322,9 @@
     "dossier": {
       "title": "Confidential Dossier",
       "identity": "Political Identity",
-      "identity_civil": "Civilian",
-      "identity_overseer": "The Overseer",
-      "identity_state": "State Agent",
+      "identity_civil": "Civil",
+      "identity_overseer": "Overseer",
+      "identity_state": "State",
       "agenda": "Personal Agenda",
       "agenda_none": "No personal agenda assigned.",
       "agenda_bonus": "Completing this grants bonus XP and IP.",

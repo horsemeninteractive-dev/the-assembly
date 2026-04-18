@@ -31,12 +31,6 @@ const MODE_TABS: { id: ModeTab; labelKey: string; color: string; activeBg: strin
     activeBg: 'bg-blue-900/40 border-blue-600/60',
   },
   {
-    id: 'Betting',
-    labelKey: 'profile.leaderboard.modes.betting',
-    color: 'text-indigo-400',
-    activeBg: 'bg-indigo-900/40 border-indigo-600/60',
-  },
-  {
     id: 'Classic',
     labelKey: 'profile.leaderboard.modes.classic',
     color: 'text-emerald-400',
@@ -47,6 +41,12 @@ const MODE_TABS: { id: ModeTab; labelKey: string; color: string; activeBg: strin
     labelKey: 'profile.leaderboard.modes.crisis',
     color: 'text-purple-400',
     activeBg: 'bg-purple-900/40 border-purple-600/60',
+  },
+  {
+    id: 'Betting',
+    labelKey: 'profile.leaderboard.modes.betting',
+    color: 'text-indigo-400',
+    activeBg: 'bg-indigo-900/40 border-indigo-600/60',
   },
 ];
 

@@ -83,7 +83,9 @@ export const RoundHistory = ({ gameState, isOpen, onClose }: RoundHistoryProps) 
                   </td>
                   {sortedRounds.map((r) => {
                     const vote = r.votes.find((v) => v.playerId === pId)?.vote;
-                    const isGovernment = r.presidentId === pId || r.chancellorId === pId;
+                    const isPresident = r.presidentId === pId;
+                    const isChancellor = r.chancellorId === pId;
+                    const isGovernment = isPresident || isChancellor;
                     
                     return (
                       <td key={r.round} className="p-0">
@@ -95,13 +97,17 @@ export const RoundHistory = ({ gameState, isOpen, onClose }: RoundHistoryProps) 
                               : vote === 'Nay'
                                 ? 'bg-red-500/20 text-red-500 border-red-500/30'
                                 : 'bg-surface/40 text-ghost/20 border-subtle/10',
-                            isGovernment && 'ring-1 ring-yellow-500/50 ring-inset ring-offset-1 ring-offset-elevated'
+                            isPresident && 'ring-1 ring-yellow-500/50 ring-inset ring-offset-1 ring-offset-elevated',
+                            isChancellor && 'ring-1 ring-blue-500/50 ring-inset ring-offset-1 ring-offset-elevated'
                           )}
-                          title={vote ? `${playerMap.get(pId)}: ${vote}` : undefined}
+                          title={vote ? `${playerMap.get(pId)}: ${vote}${isPresident ? ' (President)' : isChancellor ? ' (Chancellor)' : ''}` : undefined}
                         >
                           {vote === 'Aye' ? 'Y' : vote === 'Nay' ? 'N' : '—'}
                           {isGovernment && (
-                            <div className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-yellow-500 shadow-[0_0_5px_rgba(234,179,8,0.5)]" />
+                            <div className={cn(
+                              "absolute -top-1 -right-1 w-2 h-2 rounded-full",
+                              isPresident ? "bg-yellow-500 shadow-[0_0_5px_rgba(234,179,8,0.5)]" : "bg-blue-400 shadow-[0_0_5px_rgba(96,165,250,0.5)]"
+                            )} />
                           )}
                         </div>
                       </td>

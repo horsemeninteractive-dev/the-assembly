@@ -55,46 +55,38 @@ export const LobbyHeader: React.FC<LobbyHeaderProps> = ({
       className="border-b border-subtle bg-surface-glass sticky top-0 z-50 flex flex-col"
     >
       {(systemConfig.xpMultiplier > 1 || systemConfig.ipMultiplier > 1) && (
-        <div className="bg-gradient-to-r from-purple-900/40 via-purple-600/40 to-purple-900/40 border-b border-purple-500/30 py-1.5 overflow-hidden relative">
+        <div className="bg-gradient-to-r from-purple-900/40 via-purple-600/40 to-purple-900/40 border-b border-purple-500/30 py-1.5 overflow-hidden relative group">
           <motion.div 
-            initial={{ x: '100%' }}
-            animate={{ x: '-100%' }}
-            transition={{ duration: 25, repeat: Infinity, ease: "linear" }}
-            className="whitespace-nowrap flex gap-12 items-center"
+            animate={{ x: ['0%', '-50%'] }}
+            transition={{ duration: 30, repeat: Infinity, ease: "linear" }}
+            className="flex gap-24 items-center w-max pr-24"
           >
-            <div className="flex items-center gap-2">
-              <Zap className="w-3 h-3 text-purple-400 fill-purple-400" />
-              <span className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest text-purple-200">
-                {t('lobby.banner.event_active')}
-              </span>
-            </div>
-            {systemConfig.xpMultiplier > 1 && (
-              <span className="text-[10px] sm:text-xs font-mono text-purple-100">
-                {t('lobby.banner.xp_multiplier', { multiplier: systemConfig.xpMultiplier })}
-              </span>
-            )}
-            {systemConfig.ipMultiplier > 1 && (
-              <span className="text-[10px] sm:text-xs font-mono text-purple-100">
-                {t('lobby.banner.ip_multiplier', { multiplier: systemConfig.ipMultiplier })}
-              </span>
-            )}
-            {/* Duplicated for smooth loop */}
-            <div className="flex items-center gap-2">
-              <Zap className="w-3 h-3 text-purple-400 fill-purple-400" />
-              <span className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest text-purple-200">
-                {t('lobby.banner.event_active')}
-              </span>
-            </div>
-            {systemConfig.xpMultiplier > 1 && (
-              <span className="text-[10px] sm:text-xs font-mono text-purple-100">
-                {t('lobby.banner.xp_multiplier', { multiplier: systemConfig.xpMultiplier })}
-              </span>
-            )}
-            {systemConfig.ipMultiplier > 1 && (
-              <span className="text-[10px] sm:text-xs font-mono text-purple-100">
-                {t('lobby.banner.ip_multiplier', { multiplier: systemConfig.ipMultiplier })}
-              </span>
-            )}
+            {[1, 2].map((i) => (
+              <div key={i} className="flex gap-24 items-center">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-3 h-3 text-purple-400 fill-purple-400" />
+                  <span className="text-[10px] sm:text-xs font-mono font-bold uppercase tracking-widest text-purple-200">
+                    {t('lobby.banner.event_active')}
+                  </span>
+                </div>
+                {systemConfig.xpMultiplier > 1 && (
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-purple-500 animate-pulse" />
+                    <span className="text-[10px] sm:text-xs font-mono text-purple-100 font-bold uppercase tracking-tighter">
+                      {t('lobby.banner.xp_multiplier', { multiplier: systemConfig.xpMultiplier })}
+                    </span>
+                  </div>
+                )}
+                {systemConfig.ipMultiplier > 1 && (
+                  <div className="flex items-center gap-2">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                    <span className="text-[10px] sm:text-xs font-mono text-emerald-100 font-bold uppercase tracking-tighter">
+                      {t('lobby.banner.ip_multiplier', { multiplier: systemConfig.ipMultiplier })}
+                    </span>
+                  </div>
+                )}
+              </div>
+            ))}
           </motion.div>
         </div>
       )}

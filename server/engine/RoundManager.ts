@@ -333,7 +333,8 @@ export class RoundManager {
     this.resetPlayerActions(state);
 
     // Crisis mode: Draw the card first, reveal it, then finalize transition
-    if (state.mode === 'Crisis') {
+    const isCrisisEnabled = state.mode === 'Crisis' || (state.mode === 'House' && state.houseRules?.useCrisisCards);
+    if (isCrisisEnabled) {
       this.engine.crisisEngine.drawEventCard(state, roomId);
       if (state.activeEventCard) {
         this.enterPhase(state, roomId, 'Event_Reveal');
@@ -549,7 +550,7 @@ export class RoundManager {
       chatBlackoutBuffer: undefined,
     });
     // Reinit or clean up the Crisis deck
-    if (state.mode === 'Crisis') {
+    if (state.mode === 'Crisis' || (state.mode === 'House' && state.houseRules?.useCrisisCards)) {
       this.engine.crisisEngine.cleanup(roomId);
       this.engine.crisisEngine.initDeck(roomId);
     } else {

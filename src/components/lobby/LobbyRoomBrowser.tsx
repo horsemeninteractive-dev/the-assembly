@@ -43,6 +43,7 @@ const MODE_STYLES: Record<string, { chip: string; chipOff: string; stripe: strin
   Ranked:  { chip: 'bg-yellow-500 border-yellow-300 text-black  shadow-[0_0_8px_rgba(234,179,8,0.4)]',  chipOff: '', stripe: 'bg-yellow-500'  },
   Classic: { chip: 'bg-emerald-600 border-emerald-400 text-white shadow-[0_0_8px_rgba(5,150,105,0.4)]', chipOff: '', stripe: 'bg-emerald-500' },
   Crisis:  { chip: 'bg-purple-600 border-purple-400  text-white  shadow-[0_0_8px_rgba(147,51,234,0.4)]',chipOff: '', stripe: 'bg-purple-500'  },
+  House:   { chip: 'bg-white/90 border-white text-black shadow-[0_0_8px_rgba(255,255,255,0.4)]', chipOff: '', stripe: 'bg-white' },
 };
 
 export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
@@ -58,6 +59,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
   const [filterRanked,  setFilterRanked]  = useState(true);
   const [filterClassic, setFilterClassic] = useState(true);
   const [filterCrisis,  setFilterCrisis]  = useState(true);
+  const [filterHouse,   setFilterHouse]   = useState(true);
   const [filterJoinable,    setFilterJoinable]    = useState(false);
   const [filterInProgress,  setFilterInProgress]  = useState(true);
   const [sortBy, setSortBy] = useState<'players' | 'newest'>('newest');
@@ -70,6 +72,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
       if (!filterRanked  && room.mode === 'Ranked')  return false;
       if (!filterClassic && room.mode === 'Classic') return false;
       if (!filterCrisis  && room.mode === 'Crisis')  return false;
+      if (!filterHouse   && room.mode === 'House')   return false;
       if (filterJoinable   && room.phase !== 'Lobby') return false;
       if (!filterInProgress && room.phase !== 'Lobby') return false;
       return true;
@@ -84,6 +87,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
     setFilterRanked(true);
     setFilterClassic(true);
     setFilterCrisis(true);
+    setFilterHouse(true);
     setFilterJoinable(false);
     setFilterInProgress(true);
   };
@@ -93,6 +97,7 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
     { label: t('game.modes.ranked'),  active: filterRanked,  toggle: () => setFilterRanked(v => !v), raw: 'Ranked'  },
     { label: t('game.modes.classic'), active: filterClassic, toggle: () => setFilterClassic(v => !v), raw: 'Classic' },
     { label: t('game.modes.crisis'),  active: filterCrisis,  toggle: () => setFilterCrisis(v => !v), raw: 'Crisis'  },
+    { label: t('game.modes.house'),   active: filterHouse,   toggle: () => setFilterHouse(v => !v),  raw: 'House'   },
   ];
 
   const phaseFilters = [
@@ -187,7 +192,9 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                   ? 'bg-emerald-900/10 border-emerald-900/30 text-emerald-500'
                   : room.mode === 'Crisis'
                     ? 'bg-purple-900/10 border-purple-900/30 text-purple-400'
-                    : 'bg-blue-900/10 border-blue-900/30 text-blue-400'
+                    : room.mode === 'House'
+                      ? 'bg-white/10 border-white/20 text-white'
+                      : 'bg-blue-900/10 border-blue-900/30 text-blue-400'
             )}
           >
             {t(`game.modes.${room.mode.toLowerCase()}`)}
@@ -418,7 +425,8 @@ export const LobbyRoomBrowser: React.FC<LobbyRoomBrowserProps> = ({
                 f.raw === 'Casual' ? 'bg-blue-400' :
                 f.raw === 'Ranked' ? 'bg-yellow-400' :
                 f.raw === 'Classic' ? 'bg-emerald-400' :
-                'bg-purple-400'
+                f.raw === 'Crisis' ? 'bg-purple-400' :
+                'bg-white'
               )} />
               {f.label}
             </button>

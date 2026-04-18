@@ -24,7 +24,7 @@ export const AdminBroadcast: React.FC = () => {
           {t('profile.admin.broadcast.title')}
         </h3>
       </div>
-      <div className="flex gap-3">
+      <div className="flex flex-col sm:flex-row gap-3">
         <input
           type="text"
           value={broadcastMessage}
@@ -35,7 +35,7 @@ export const AdminBroadcast: React.FC = () => {
         <button
           onClick={handleBroadcast}
           disabled={isBroadcasting || !broadcastMessage.trim()}
-          className="btn-primary bg-yellow-600 border-yellow-500 text-black px-8 rounded-2xl font-thematic uppercase tracking-widest text-xs"
+          className="bg-yellow-600 border border-yellow-500 text-black px-8 py-3 rounded-2xl font-thematic uppercase tracking-widest text-xs hover:bg-yellow-500 transition-colors shrink-0"
         >
           {isBroadcasting ? t('common.sent') : t('profile.admin.broadcast.btn_send')}
         </button>

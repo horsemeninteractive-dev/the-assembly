@@ -65,7 +65,7 @@ export const GameHeader = ({
     >
       {/* Left: Logo + Room info */}
       <div className="flex items-center gap-[1vw] sm:gap-[2vw]">
-        <div className="w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] bg-elevated rounded-xl flex items-center justify-center border border-white/40 shrink-0 overflow-hidden">
+        <div className="hidden sm:flex w-[4vh] h-[4vh] sm:w-[5vh] sm:h-[5vh] bg-elevated rounded-xl items-center justify-center border border-white/40 shrink-0 overflow-hidden">
           <img
             src={getProxiedUrl('https://storage.googleapis.com/secretchancellor/SC.png')}
             alt="The Assembly Logo"
@@ -74,7 +74,7 @@ export const GameHeader = ({
           />
         </div>
         <div className="flex flex-col min-w-0">
-          <div className="font-thematic text-responsive-sm sm:text-responsive-xl text-primary tracking-wide leading-none truncate uppercase">
+          <div className="hidden sm:block font-thematic text-responsive-sm sm:text-responsive-xl text-primary tracking-wide leading-none truncate uppercase">
             {t('game.game_header.title')}
           </div>
           <div className="flex items-center gap-1.5 sm:gap-2 mt-0.5 sm:mt-1 flex-wrap">
