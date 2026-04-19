@@ -95,9 +95,9 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v2
         with:
-          # Hardcoded for diagnostic to rule out secret pasting issues
           workload_identity_provider: 'projects/874660478794/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider'
           service_account: 'github-deployer@gen-lang-client-0636418324.iam.gserviceaccount.com'
+          audience: 'https://iam.googleapis.com/projects/874660478794/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider'
           token_format: 'access_token'
 
       - name: Setup Google Cloud SDK
