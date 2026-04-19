@@ -95,13 +95,15 @@ jobs:
         id: auth
         uses: google-github-actions/auth@v2
         with:
-          workload_identity_provider: '${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}'
-          service_account: '${{ secrets.GCP_SERVICE_ACCOUNT }}'
+          # Hardcoded for diagnostic to rule out secret pasting issues
+          workload_identity_provider: 'projects/874660478794/locations/global/workloadIdentityPools/github-actions-pool/providers/github-actions-provider'
+          service_account: 'github-deployer@gen-lang-client-0636418324.iam.gserviceaccount.com'
+          token_format: 'access_token'
 
       - name: Setup Google Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
         with:
-          project_id: '${{ secrets.GCP_PROJECT_ID }}'
+          project_id: 'gen-lang-client-0636418324'
 
       - name: Extract Version
         id: pkg-version
