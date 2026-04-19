@@ -27,10 +27,11 @@ export interface CPPackage {
   id: string;
   name: string;
   cp: number;
-  price: number; // in cents for Stripe
+  price: number; // in cents/pence for Stripe
   displayPrice: string;
   description: string;
   popular?: boolean;
+  stripeProductId?: string; // Link to actual Stripe Product ID (prod_...)
 }
 
 export const CP_PACKAGES: CPPackage[] = [
@@ -39,33 +40,37 @@ export const CP_PACKAGES: CPPackage[] = [
     name: 'Starter Bundle',
     cp: 500,
     price: 499,
-    displayPrice: '$4.99',
+    displayPrice: '£4.99',
     description: 'Perfect for your first few cosmetic unlocks.',
+    stripeProductId: 'prod_UMkZT6yb54eUI3',
   },
   {
     id: 'pro',
     name: 'Pro Pack',
     cp: 1200,
     price: 999,
-    displayPrice: '$9.99',
+    displayPrice: '£9.99',
     description: 'Most popular. Great value for serious players.',
     popular: true,
+    stripeProductId: 'prod_UCCrzTEnhgpgMV',
   },
   {
     id: 'elite',
     name: 'Elite Vault',
     cp: 3000,
     price: 1999,
-    displayPrice: '$19.99',
+    displayPrice: '£19.99',
     description: 'Build your collection fast with this elite stash.',
+    stripeProductId: 'prod_UMkbjihIquGQQ5',
   },
   {
     id: 'master',
     name: 'Assembly Master',
     cp: 10000,
     price: 4999,
-    displayPrice: '$49.99',
+    displayPrice: '£49.99',
     description: 'The ultimate reserve for true masters of the Assembly.',
+    stripeProductId: 'prod_UMkdsYuYq1NSkg',
   },
 ];
 

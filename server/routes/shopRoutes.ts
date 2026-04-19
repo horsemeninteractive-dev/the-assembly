@@ -50,17 +50,23 @@ export function registerShopRoutes({ app, stripe }: RouteContext): void {
         line_items: [
           {
             price_data: {
-              currency: 'usd',
-              product_data: {
-                name: pkg.name,
-                description: `Purchase ${pkg.cp} Cabinet Points`,
-              },
+              currency: 'gbp',
+              product: pkg.stripeProductId || undefined,
+              ...(!pkg.stripeProductId
+                ? {
+                    product_data: {
+                      name: pkg.name,
+                      description: `Purchase ${pkg.cp} Cabinet Points`,
+                    },
+                  }
+                : {}),
               unit_amount: pkg.price,
             },
             quantity: 1,
           },
         ],
         mode: 'payment',
+        allow_promotion_codes: true, // Allows using 'ASSEMBLYLAUNCH'
         success_url: `${origin}/?purchase=success`,
         cancel_url: `${origin}/?purchase=cancel`,
         metadata: {
