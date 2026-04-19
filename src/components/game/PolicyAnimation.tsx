@@ -35,7 +35,6 @@ export const PolicyAnimation = ({ gameState, show, playSound }: PolicyAnimationP
       gameState.lastEnactedPolicy.type === 'Civil' ? 'reveal_civil' : 'reveal_state'
     );
     // Only react to show toggling on/off and the policy identity — NOT playSound
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [show, gameState.lastEnactedPolicy, gameState.civilDirectives, gameState.stateDirectives]);
 
   return (

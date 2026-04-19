@@ -236,6 +236,7 @@ describe('Unhappy Path Integration Tests', () => {
       pinnedAchievements: [],
       recentlyPlayedWith: [],
       peakElo: 1000,
+      premiumPassSeasons: [],
     };
     (getUserById as Mock).mockResolvedValue(bannedUser);
 

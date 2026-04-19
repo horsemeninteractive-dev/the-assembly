@@ -863,7 +863,6 @@ describe('Eligibility Guards', () => {
     const { players, state, engine } = electionSetup();
     state.detainedPlayerId = players[2].id;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const eligible = (engine as any).getEligibleChancellors(state, players[0].id) as Player[];
     expect(eligible.find((p) => p.id === players[2].id)).toBeUndefined();
   });
@@ -872,7 +871,6 @@ describe('Eligibility Guards', () => {
     const { players, state, engine } = electionSetup();
     state.rejectedChancellorId = players[1].id;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const eligible = (engine as any).getEligibleChancellors(state, players[0].id) as Player[];
     expect(eligible.find((p) => p.id === players[1].id)).toBeUndefined();
   });
@@ -887,7 +885,6 @@ describe('Eligibility Guards', () => {
 
     players[1].wasPresident = true;
 
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const eligible = (engine as any).getEligibleChancellors(state, players[0].id) as Player[];
     expect(eligible.find((p) => p.id === players[1].id)).toBeUndefined();
   });

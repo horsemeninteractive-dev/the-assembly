@@ -442,7 +442,7 @@ export const DebriefSequence = ({
 
     result.push({ kind: 'finale' });
     return result;
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   const [step, setStep] = useState(0);
   const [exiting, setExiting] = useState(false);
