@@ -1,7 +1,7 @@
 {
   "name": "The Assembly",
   "short_name": "Assembly",
-  "description": "A social deduction game of intrigue and politics for 5-10 players.",
+  "description": "A high-stakes social deduction and political strategy game. Play online with friends in this modern Secret Hitler alternative.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#07070a",
