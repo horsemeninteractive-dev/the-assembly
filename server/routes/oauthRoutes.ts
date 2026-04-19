@@ -102,9 +102,9 @@ export function registerOAuthRoutes({ app }: RouteContext): void {
   app.get('/api/auth/google/url', async (req: Request, res: Response) => {
     const origin = getAppUrl(req);
     const platform = req.query.platform === 'android' ? 'android' : 'web';
-    const csrfNonce = randomUUID();
-    await setOAuthNonce(csrfNonce);
-    const state = encodeURIComponent(JSON.stringify({ origin, platform, csrfNonce }));
+    const nonce = randomUUID();
+    const signedNonce = setOAuthNonce(nonce);
+    const state = encodeURIComponent(JSON.stringify({ origin, platform, csrfNonce: signedNonce }));
     const clientId = process.env.GOOGLE_CLIENT_ID;
     logger.info({ clientId }, 'Google Client ID');
     if (!clientId) {
@@ -136,14 +136,18 @@ export function registerOAuthRoutes({ app }: RouteContext): void {
           try {
             const stateData = JSON.parse(decodeURIComponent(req.query.state as string));
             const { csrfNonce } = stateData;
-            if (!csrfNonce || !(await verifyOAuthNonce(csrfNonce))) {
-              logger.warn({ csrfNonce }, 'Invalid or missing OAuth CSRF nonce');
+            if (!csrfNonce || !verifyOAuthNonce(csrfNonce)) {
+              logger.warn({ csrfNonce: csrfNonce?.slice(0, 20) }, 'Invalid or expired OAuth CSRF nonce (Google)');
               return res.status(403).send('Authentication failed: CSRF verification failed.');
             }
             platform = stateData.platform || 'web';
           } catch (e) {
+            logger.warn({ err: e }, 'Failed to parse OAuth state param (Google)');
             return res.status(400).send('Invalid state parameter');
           }
+        } else {
+          logger.warn('Google OAuth callback arrived with no state parameter');
+          return res.status(400).send('Missing state parameter');
         }
         const redirectUri = `${origin}/auth/google/callback`;
         const tokenRes = await axios.post('https://oauth2.googleapis.com/token', {
@@ -192,9 +196,9 @@ export function registerOAuthRoutes({ app }: RouteContext): void {
   app.get('/api/auth/discord/url', async (req: Request, res: Response) => {
     const origin = getAppUrl(req);
     const platform = req.query.platform === 'android' ? 'android' : 'web';
-    const csrfNonce = randomUUID();
-    await setOAuthNonce(csrfNonce);
-    const state = encodeURIComponent(JSON.stringify({ origin, platform, csrfNonce }));
+    const nonce = randomUUID();
+    const signedNonce = setOAuthNonce(nonce);
+    const state = encodeURIComponent(JSON.stringify({ origin, platform, csrfNonce: signedNonce }));
     const clientId = process.env.DISCORD_CLIENT_ID;
     logger.info({ clientId }, 'Discord Client ID');
     if (!clientId) {
@@ -238,14 +242,18 @@ export function registerOAuthRoutes({ app }: RouteContext): void {
           try {
             const stateData = JSON.parse(decodeURIComponent(req.query.state as string));
             const { csrfNonce } = stateData;
-            if (!csrfNonce || !(await verifyOAuthNonce(csrfNonce))) {
-              logger.warn({ csrfNonce }, 'Invalid or missing OAuth CSRF nonce');
+            if (!csrfNonce || !verifyOAuthNonce(csrfNonce)) {
+              logger.warn({ csrfNonce: csrfNonce?.slice(0, 20) }, 'Invalid or expired OAuth CSRF nonce (Discord)');
               return res.status(403).send('Authentication failed: CSRF verification failed.');
             }
             platform = stateData.platform || 'web';
           } catch (e) {
+            logger.warn({ err: e }, 'Failed to parse OAuth state param (Discord)');
             return res.status(400).send('Invalid state parameter');
           }
+        } else {
+          logger.warn('Discord OAuth callback arrived with no state parameter');
+          return res.status(400).send('Missing state parameter');
         }
         const { user, token } = await handleDiscordAuth(code as string, origin);
         

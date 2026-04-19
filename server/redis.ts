@@ -14,6 +14,7 @@
  */
 
 import Redis from 'ioredis';
+import { createHmac, timingSafeEqual } from 'crypto';
 import { logger } from './logger';
 
 const REDIS_URL = process.env.REDIS_URL;
@@ -160,23 +161,56 @@ export async function recordRoomDeletion(userId: string): Promise<void> {
   }
 }
 
-/** Redis key for OAuth CSRF nonce */
-export const oauthNonceKey = (nonce: string): string => `auth:nonce:${nonce}`;
-const NONCE_TTL = 300; // 5 minutes
+/**
+ * OAuth CSRF protection — stateless HMAC-signed nonces.
+ *
+ * Instead of storing nonces in Redis (which requires the nonce-generation request
+ * and the OAuth callback to hit the same Redis state, which fails under Cloud Run
+ * multi-instance scaling or any Redis connectivity blip), we sign the nonce with
+ * HMAC-SHA256 using JWT_SECRET + a timestamp. The callback verifies the signature
+ * and enforces a 10-minute expiry window — no shared state required.
+ *
+ * Format: `<nonce>.<timestamp>.<signature>`
+ */
+const NONCE_MAX_AGE_MS = 10 * 60 * 1000; // 10 minutes
 
-export async function setOAuthNonce(nonce: string): Promise<void> {
-  if (!stateClient) return;
-  await stateClient.set(oauthNonceKey(nonce), '1', 'EX', NONCE_TTL);
+function getHmacSecret(): string {
+  return process.env.JWT_SECRET || 'fallback-nonce-secret-please-set-JWT_SECRET';
 }
 
-export async function verifyOAuthNonce(nonce: string): Promise<boolean> {
-  if (!stateClient) return false;
-  const key = oauthNonceKey(nonce);
-  const exists = await stateClient.get(key);
-  if (exists) {
-    await stateClient.del(key);
-    return true;
+/**
+ * Generates a signed nonce token. Returns a string that encodes the nonce,
+ * timestamp, and HMAC signature — safe to embed directly in the OAuth state.
+ */
+export function setOAuthNonce(nonce: string): string {
+  const ts = Date.now().toString();
+  const sig = createHmac('sha256', getHmacSecret())
+    .update(`${nonce}.${ts}`)
+    .digest('hex');
+  return `${nonce}.${ts}.${sig}`;
+}
+
+/**
+ * Verifies a signed nonce token produced by `setOAuthNonce`.
+ * Returns true if the signature is valid and the nonce is within the allowed age.
+ * This function is synchronous and requires no Redis.
+ */
+export function verifyOAuthNonce(signedNonce: string): boolean {
+  try {
+    const parts = signedNonce.split('.');
+    if (parts.length !== 3) return false;
+    const [nonce, ts, sig] = parts;
+    const age = Date.now() - parseInt(ts, 10);
+    if (isNaN(age) || age < 0 || age > NONCE_MAX_AGE_MS) return false;
+    const expected = createHmac('sha256', getHmacSecret())
+      .update(`${nonce}.${ts}`)
+      .digest('hex');
+    const sigBuf = Buffer.from(sig, 'hex');
+    const expBuf = Buffer.from(expected, 'hex');
+    if (sigBuf.length !== expBuf.length) return false;
+    return timingSafeEqual(sigBuf, expBuf);
+  } catch {
+    return false;
   }
-  return false;
 }
 
