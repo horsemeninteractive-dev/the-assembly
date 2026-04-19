@@ -26,16 +26,24 @@ import { oauthSuccessPage } from '../templates/oauthSuccess';
 
 async function handleDiscordAuth(code: string, origin: string) {
   const redirectUri = `${origin}/auth/discord/callback`;
-  const tokenRes = await axios.post(
-    'https://discord.com/api/oauth2/token',
-    new URLSearchParams({
-      client_id: process.env.DISCORD_CLIENT_ID!,
-      client_secret: process.env.DISCORD_CLIENT_SECRET!,
-      grant_type: 'authorization_code',
-      code: code as string,
-      redirect_uri: redirectUri,
-    })
-  );
+  logger.info({ origin, redirectUri }, 'Discord OAuth: attempting token exchange');
+  let tokenRes;
+  try {
+    tokenRes = await axios.post(
+      'https://discord.com/api/oauth2/token',
+      new URLSearchParams({
+        client_id: process.env.DISCORD_CLIENT_ID!,
+        client_secret: process.env.DISCORD_CLIENT_SECRET!,
+        grant_type: 'authorization_code',
+        code: code as string,
+        redirect_uri: redirectUri,
+      })
+    );
+  } catch (err: any) {
+    const detail = err?.response?.data ?? err?.message ?? String(err);
+    logger.error({ detail, status: err?.response?.status, redirectUri }, 'Discord token exchange failed');
+    throw err;
+  }
   const userRes = await axios.get('https://discord.com/api/users/@me', {
     headers: { Authorization: `Bearer ${tokenRes.data.access_token}` },
   });
@@ -150,6 +158,7 @@ export function registerOAuthRoutes({ app }: RouteContext): void {
           return res.status(400).send('Missing state parameter');
         }
         const redirectUri = `${origin}/auth/google/callback`;
+        logger.info({ origin, redirectUri }, 'Google OAuth: attempting token exchange');
         const tokenRes = await axios.post('https://oauth2.googleapis.com/token', {
           code,
           redirect_uri: redirectUri,
@@ -187,7 +196,9 @@ export function registerOAuthRoutes({ app }: RouteContext): void {
 
         res.send(oauthSuccessPage(user, token, platform, (res as any).locals.nonce, exchangeCode));
       } catch (err: unknown) {
-        logger.error({ err: getErrorMessage(err) }, 'Google OAuth Error');
+        const axiosErr = err as any;
+        const detail = axiosErr?.response?.data ?? axiosErr?.message ?? String(err);
+        logger.error({ detail, status: axiosErr?.response?.status }, 'Google OAuth token exchange failed');
         res.status(500).send('Authentication failed');
       }
     }
@@ -262,7 +273,9 @@ export function registerOAuthRoutes({ app }: RouteContext): void {
 
         res.send(oauthSuccessPage(user, token, platform, (res as any).locals.nonce, exchangeCode));
       } catch (err: unknown) {
-        logger.error({ err: getErrorMessage(err) }, 'Discord OAuth Error');
+        const axiosErr = err as any;
+        const detail = axiosErr?.response?.data ?? axiosErr?.message ?? String(err);
+        logger.error({ detail, status: axiosErr?.response?.status, origin }, 'Discord OAuth token exchange failed');
         res.status(500).send('Authentication failed');
       }
     }

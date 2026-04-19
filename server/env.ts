@@ -54,6 +54,9 @@ const envSchema = z.object({
   VAPID_PUBLIC_KEY: z.string().optional(),
   VAPID_PRIVATE_KEY: z.string().optional(),
   VAPID_EMAIL: z.string().email().optional(),
+  
+  // Admin Secret
+  ADMIN_SECRET: z.string().optional(),
 });
 
 const parseResult = envSchema.safeParse(process.env);

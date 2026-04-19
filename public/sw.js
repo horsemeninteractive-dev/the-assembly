@@ -1,4 +1,4 @@
-const CACHE_NAME = 'assembly-v0.10.0'; // Bump version to force update
+const CACHE_NAME = 'assembly-v0.10.3'; // Bumped: bypass /auth/ and /api/ routes
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',
@@ -49,7 +49,19 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 2. Generic Fetch Strategy
+  // 2. ALWAYS bypass cache for auth callbacks and API routes.
+  //    OAuth callback pages contain single-use exchange codes — caching them
+  //    would replay a stale/consumed code on subsequent logins.
+  //    API routes must never be served stale.
+  if (
+    url.pathname.startsWith('/auth/') ||
+    url.pathname.startsWith('/api/')
+  ) {
+    event.respondWith(fetch(event.request));
+    return;
+  }
+
+  // 3. Generic Cache-first Strategy for static assets
   event.respondWith(
     caches.match(event.request).then((cachedResponse) => {
       if (cachedResponse) {
