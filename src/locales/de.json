@@ -254,6 +254,12 @@
       "privacy_private": "Privat",
       "privacy_private_desc": "Einladungscode",
       "invite_code_hint": "Beim Erstellen des Raums wird ein Einladungscode generiert.",
+      "mode_house_desc": "Benutzerdefinierte Regeln. Wählen Sie diese Option aus, um Anweisungen, Titel und mehr zu bearbeiten.",
+      "house_rules": "Hausordnung",
+      "deck_composition": "Deckzusammensetzung",
+      "use_titles": "Titelrollen",
+      "use_agendas": "Tagesordnungen",
+      "use_crisis": "Krisenkarten",
       "btn_create": "Raum erstellen",
       "btn_maintenance": "Wartung"
     },
@@ -295,7 +301,8 @@
       "casual": "Lässig",
       "ranked": "Rangliste",
       "classic": "Klassisch",
-      "crisis": "Krise"
+      "crisis": "Krise",
+      "house": "Haus"
     },
     "phases": {
       "lobby": "Warten auf Spieler ({{current}}/{{max}})...",
@@ -2548,7 +2555,18 @@
         "geometric_grid": "Geometrisches Gitter",
         "purple_rain": "Lila Regen",
         "static_noise": "Statisches Rauschen",
-        "purple_pill": "Lila Pille"
+        "purple_pill": "Lila Pille",
+        "s1_iron_frame": "Obsidian-Eisenrahmen",
+        "s1_halls": "Obsidianhallen",
+        "s1_seal": "Obsidian-Siegel",
+        "s1_executive": "Obsidian-Exekutive",
+        "s1_gilded_accent": "Vergoldeter Akzentrahmen",
+        "s1_requiem": "Obsidian-Requiem",
+        "s1_molten_gold": "Geschmolzener Goldrahmen",
+        "s1_living_obsidian": "Lebender Obsidian",
+        "s1_golden_authority": "Goldene Autorität",
+        "s1_vanguard": "Vorhut des Goldes",
+        "s1_monarch": "Obsidian-Monarch"
       },
       "reward_types": {
         "cp": "Klarheitspunkte",

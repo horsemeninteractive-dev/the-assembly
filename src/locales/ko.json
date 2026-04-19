@@ -254,6 +254,12 @@
       "privacy_private": "비공개",
       "privacy_private_desc": "초대 코드",
       "invite_code_hint": "방이 생성되면 초대코드가 생성됩니다.",
+      "mode_house_desc": "맞춤 규칙. 지시어, 제목 등을 편집하려면 선택하세요.",
+      "house_rules": "내부 규칙",
+      "deck_composition": "덱 구성",
+      "use_titles": "직위 역할",
+      "use_agendas": "의제",
+      "use_crisis": "위기 카드",
       "btn_create": "방 만들기",
       "btn_maintenance": "유지 관리"
     },
@@ -295,7 +301,8 @@
       "casual": "캐주얼",
       "ranked": "순위",
       "classic": "클래식",
-      "crisis": "위기"
+      "crisis": "위기",
+      "house": "집"
     },
     "phases": {
       "lobby": "플레이어를 기다리는 중({{current}}/{{max}})...",
@@ -2548,7 +2555,18 @@
         "geometric_grid": "기하학적 격자",
         "purple_rain": "보라색 비",
         "static_noise": "정적 소음",
-        "purple_pill": "보라색 알약"
+        "purple_pill": "보라색 알약",
+        "s1_iron_frame": "흑요석 철 프레임",
+        "s1_halls": "흑요석 홀",
+        "s1_seal": "흑요석 봉인",
+        "s1_executive": "흑요석 집행관",
+        "s1_gilded_accent": "화려한 액센트 프레임",
+        "s1_requiem": "흑요석 레퀴엠",
+        "s1_molten_gold": "녹은 금 프레임",
+        "s1_living_obsidian": "살아있는 흑요석",
+        "s1_golden_authority": "황금 권위",
+        "s1_vanguard": "황금의 선봉대",
+        "s1_monarch": "흑요석 군주"
       },
       "reward_types": {
         "cp": "명확성 포인트",

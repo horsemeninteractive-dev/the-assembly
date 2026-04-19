@@ -254,6 +254,12 @@
       "privacy_private": "Privado",
       "privacy_private_desc": "Código de convite",
       "invite_code_hint": "Um código de convite será gerado quando a sala for criada.",
+      "mode_house_desc": "Regras personalizadas. Selecione para editar diretivas, títulos e muito mais.",
+      "house_rules": "Regras da Casa",
+      "deck_composition": "Composição do convés",
+      "use_titles": "Funções do título",
+      "use_agendas": "Agendas",
+      "use_crisis": "Cartões de crise",
       "btn_create": "Criar Sala",
       "btn_maintenance": "Manutenção"
     },
@@ -295,7 +301,8 @@
       "casual": "Casual",
       "ranked": "Classificado",
       "classic": "Clássico",
-      "crisis": "Crise"
+      "crisis": "Crise",
+      "house": "Casa"
     },
     "phases": {
       "lobby": "Aguardando jogadores ({{current}}/{{max}})...",
@@ -2548,7 +2555,18 @@
         "geometric_grid": "Grade Geométrica",
         "purple_rain": "Chuva Roxa",
         "static_noise": "Ruído estático",
-        "purple_pill": "Pílula Roxa"
+        "purple_pill": "Pílula Roxa",
+        "s1_iron_frame": "Estrutura de Ferro Obsidiana",
+        "s1_halls": "Salões Obsidianos",
+        "s1_seal": "Selo Obsidiana",
+        "s1_executive": "Executivo Obsidiana",
+        "s1_gilded_accent": "Moldura dourada",
+        "s1_requiem": "Réquiem Obsidiana",
+        "s1_molten_gold": "Moldura de ouro fundido",
+        "s1_living_obsidian": "Obsidiana Viva",
+        "s1_golden_authority": "Autoridade Dourada",
+        "s1_vanguard": "Vanguarda do Ouro",
+        "s1_monarch": "Monarca Obsidiana"
       },
       "reward_types": {
         "cp": "Pontos de clareza",

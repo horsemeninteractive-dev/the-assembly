@@ -69,6 +69,7 @@ export const SupabaseUserSchema = z.object({
   last_login_at: z.string().nullable().optional(),
   login_streak: z.number().nullable().default(0),
   peak_elo: z.number().nullable().default(1000),
+  premium_pass_seasons: z.array(z.number()).nullable().default([]),
 }).catchall(z.any());
 
 export function mapSupabaseToUser(data: any): UserInternal | null {
@@ -118,6 +119,7 @@ export function mapSupabaseToUser(data: any): UserInternal | null {
     referralProcessed: !!validData.referral_processed,
     lastLoginAt: validData.last_login_at ?? undefined,
     loginStreak: validData.login_streak ?? 0,
+    premiumPassSeasons: validData.premium_pass_seasons ?? [],
     // Clan badge — populated when the query joins the clans table via clan_id
     clan: data.clans
       ? ({
@@ -166,6 +168,7 @@ export function mapUserToSupabase(userData: UserInternal): Record<string, unknow
     last_login_at: userData.lastLoginAt,
     login_streak: userData.loginStreak,
     peak_elo: (userData as any).peakElo || userData.stats.peakElo || 1000,
+    premium_pass_seasons: userData.premiumPassSeasons || [],
   };
 }
 
@@ -352,6 +355,7 @@ export function makeNewUser(overrides: Partial<UserInternal> = {}): UserInternal
     referralProcessed: false,
     lastLoginAt: undefined,
     loginStreak: 0,
+    premiumPassSeasons: [],
     ...overrides,
   };
 }

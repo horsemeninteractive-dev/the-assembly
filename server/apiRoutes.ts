@@ -17,6 +17,7 @@ import { registerClanRoutes } from './routes/clanRoutes';
 import { registerPushRoutes } from './routes/pushRoutes';
 import { registerSeasonRoutes } from './routes/seasonRoutes';
 import { registerLeaderboardRoutes } from './routes/leaderboardRoutes';
+import { registerPassRoutes } from './routes/passRoutes';
 
 // Re-export common utilities so other files do not break.
 export { sanitizeUser, validateToken, requireAuth } from './routes/shared';
@@ -61,5 +62,5 @@ export function registerRoutes(
   registerPushRoutes(context);
   registerSeasonRoutes(context);
   registerLeaderboardRoutes(context);
+  registerPassRoutes(context);
 }
-

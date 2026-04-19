@@ -20,8 +20,32 @@
     <meta property="twitter:description" content="A social deduction game of intrigue and politics. Play online with friends in this Secret Hitler alternative." />
     <meta property="twitter:image" content="https://theassembly.web.app/hero.png" />
 
+    <link rel="canonical" href="https://theassembly.web.app/" />
     <link rel="manifest" href="/manifest.json" />
     <meta name="theme-color" content="#07070a" />
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "VideoGame",
+      "name": "The Assembly",
+      "description": "A high-stakes social deduction and political strategy game for 5-10 players. Play online with friends in this modern Secret Hitler alternative.",
+      "genre": ["Social Deduction", "Political Strategy", "Strategy Game"],
+      "gamePlatform": "Web Browser",
+      "applicationCategory": "Game",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "GBP"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "The Assembly Team"
+      }
+    }
+    </script>
+    
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="apple-mobile-web-app-title" content="The Assembly" />
@@ -97,6 +121,13 @@
     }
   </style>
   <body>
+    <noscript>
+      <div style="background: #07070a; color: #fff; padding: 2rem; text-align: center; font-family: sans-serif;">
+        <h1>The Assembly</h1>
+        <p>A high-stakes social deduction and political strategy game for 5-10 players. Join a world of political intrigue and play online with friends in this modern Secret Hitler alternative.</p>
+        <p>This application requires JavaScript to run. Please enable JavaScript in your browser settings to enter The Assembly.</p>
+      </div>
+    </noscript>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

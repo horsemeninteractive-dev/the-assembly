@@ -472,6 +472,25 @@ export const DEFAULT_ITEMS: CosmeticItem[] = [
     description: 'Exclusive Season 0 animated avatar frame.',
     imageUrl: 'https://www.transparenttextures.com/patterns/circles-light.png',
   },
+
+  // --- SEASON 1: OBSIDIAN & GOLD ---
+  // Free Tier Items
+  { id: 'frame-s1-free-10', name: 'Obsidian Iron Frame', price: 0, type: 'frame', description: 'Season 1 Reward: A rugged frame of dark volcanic iron.' },
+  { id: 'bg-s1-free-20', name: 'Obsidian Halls', price: 0, type: 'background', description: 'Season 1 Reward: The cold, dark stone of the lower Assembly.', imageUrl: 'https://www.transparenttextures.com/patterns/dark-matter.png' },
+  { id: 'vote-s1-free-40', name: 'Obsidian Seal', price: 0, type: 'vote', description: 'Season 1 Reward: A heavy stone-carved voting ballot.' },
+  { id: 'policy-s1-free-50', name: 'Obsidian Executive', price: 0, type: 'policy', description: 'Season 1 Reward: Dark, professional policy stationery.' },
+
+  // Premium Tier Items
+  { id: 'frame-s1-prem-5', name: 'Gilded Accent Frame', price: 0, type: 'frame', description: 'Season 1 Premium: Subtle gold filigree on dark iron.' },
+  { id: 'bg-s1-prem-10', name: 'Golden Atrium', price: 0, type: 'background', description: 'Season 1 Premium: The opulent halls of the high council.', imageUrl: 'https://www.transparenttextures.com/patterns/gold-dust.png' },
+  { id: 'music-s1-prem-15', name: 'Obsidian Requiem', price: 0, type: 'music', description: 'Season 1 Premium: A deep, orchestral theme for the ruling class.' },
+  { id: 'frame-s1-prem-20', name: 'Molten Gold Frame', price: 0, type: 'frame', description: 'Season 1 Premium: ANIMATED: Liquid gold flowing through obsidian veins.' },
+  { id: 'policy-s1-prem-25', name: 'Royal Decree', price: 0, type: 'policy', description: 'Season 1 Premium: Policy cards embossed with 24k gold leaf.' },
+  { id: 'bg-s1-prem-30', name: 'Living Obsidian', price: 0, type: 'background', description: 'Season 1 Premium: ANIMATED: Shifting volcanic glass pulsing with heat.', imageUrl: 'https://www.transparenttextures.com/patterns/carbon-fibre.png' },
+  { id: 'vote-s1-prem-35', name: 'Golden Authority', price: 0, type: 'vote', description: 'Season 1 Premium: A pure gold ballot that shines with power.' },
+  { id: 'frame-s1-prem-40', name: 'Vanguard of Gold', price: 0, type: 'frame', description: 'Season 1 Premium: The ultimate symbol of political wealth.' },
+  { id: 'sound-s1-prem-45', name: 'Golden Chime', price: 0, type: 'sound', description: 'Season 1 Premium: Resonant metallic chimes for game actions.' },
+  { id: 'policy-s1-prem-50', name: 'Obsidian Monarch', price: 0, type: 'policy', description: 'Season 1 Premium: LEGENDARY: The final word in political strategy.' },
 ];
 
 export interface PassReward {
@@ -491,12 +510,31 @@ export const SEASON_PASS_CONTENT: Record<number, PassReward[]> = {
     { level: 40, rewardId: 'pass-0-lvl40', labelKey: 'profile.pass.rewards.static_noise', itemId: 'music-pass-0' },
     { level: 50, rewardId: 'pass-0-lvl50', labelKey: 'profile.pass.rewards.purple_pill', itemId: 'frame-pass-0' },
   ],
-  1: [], // Season 1 content — to be populated before rollover
+  1: [
+    // Free Tier (5 slots: 10, 20, 30, 40, 50)
+    { level: 10, rewardId: 'pass-1-free-10', labelKey: 'profile.pass.rewards.s1_iron_frame', itemId: 'frame-s1-free-10' },
+    { level: 20, rewardId: 'pass-1-free-20', labelKey: 'profile.pass.rewards.s1_halls', itemId: 'bg-s1-free-20' },
+    { level: 30, rewardId: 'pass-1-free-30', labelKey: 'profile.pass.reward_types.cp_count', cp: 300 },
+    { level: 40, rewardId: 'pass-1-free-40', labelKey: 'profile.pass.rewards.s1_seal', itemId: 'vote-s1-free-40' },
+    { level: 50, rewardId: 'pass-1-free-50', labelKey: 'profile.pass.rewards.s1_executive', itemId: 'policy-s1-free-50' },
+
+    // Premium Tier (10 slots: Every 5 levels)
+    { level: 5, rewardId: 'pass-1-prem-5', labelKey: 'profile.pass.rewards.s1_gilded_accent', itemId: 'frame-s1-prem-5', isPremium: true },
+    { level: 10, rewardId: 'pass-1-prem-10', labelKey: 'profile.pass.reward_types.cp_count', cp: 300, isPremium: true },
+    { level: 15, rewardId: 'pass-1-prem-15', labelKey: 'profile.pass.rewards.s1_requiem', itemId: 'music-s1-prem-15', isPremium: true },
+    { level: 20, rewardId: 'pass-1-prem-20', labelKey: 'profile.pass.rewards.s1_molten_gold', itemId: 'frame-s1-prem-20', isPremium: true },
+    { level: 25, rewardId: 'pass-1-prem-25', labelKey: 'profile.pass.reward_types.cp_count', cp: 300, isPremium: true },
+    { level: 30, rewardId: 'pass-1-prem-30', labelKey: 'profile.pass.rewards.s1_living_obsidian', itemId: 'bg-s1-prem-30', isPremium: true },
+    { level: 35, rewardId: 'pass-1-prem-35', labelKey: 'profile.pass.rewards.s1_golden_authority', itemId: 'vote-s1-prem-35', isPremium: true },
+    { level: 40, rewardId: 'pass-1-prem-40', labelKey: 'profile.pass.rewards.s1_vanguard', itemId: 'frame-s1-prem-40', isPremium: true },
+    { level: 45, rewardId: 'pass-1-prem-45', labelKey: 'profile.pass.reward_types.cp_count', cp: 300, isPremium: true },
+    { level: 50, rewardId: 'pass-1-prem-50', labelKey: 'profile.pass.rewards.s1_monarch', itemId: 'policy-s1-prem-50', isPremium: true },
+  ],
 };
 
 /** Replaces PASS_ITEM_LEVELS — looks up required level for a cosmetic item in a given season. */
 export function getPassItemLevel(itemId: string, seasonNumber: number): number | undefined {
-  return SEASON_PASS_CONTENT[seasonNumber]?.find(r => r.itemId === itemId)?.level;
+  return SEASON_PASS_CONTENT[seasonNumber]?.find((r) => r.itemId === itemId)?.level;
 }
 
 export const RANK_TIERS = {

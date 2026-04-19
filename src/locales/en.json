@@ -2555,7 +2555,18 @@
         "geometric_grid": "Geometric Grid",
         "purple_rain": "Purple Rain",
         "static_noise": "Static Noise",
-        "purple_pill": "Purple Pill"
+        "purple_pill": "Purple Pill",
+        "s1_iron_frame": "Obsidian Iron Frame",
+        "s1_halls": "Obsidian Halls",
+        "s1_seal": "Obsidian Seal",
+        "s1_executive": "Obsidian Executive",
+        "s1_gilded_accent": "Gilded Accent Frame",
+        "s1_requiem": "Obsidian Requiem",
+        "s1_molten_gold": "Molten Gold Frame",
+        "s1_living_obsidian": "Living Obsidian",
+        "s1_golden_authority": "Golden Authority",
+        "s1_vanguard": "Vanguard of Gold",
+        "s1_monarch": "Obsidian Monarch"
       },
       "reward_types": {
         "cp": "Clarity Points",

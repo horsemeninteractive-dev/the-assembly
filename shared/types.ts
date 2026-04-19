@@ -343,6 +343,7 @@ export interface User {
   lastLoginAt?: string;
   loginStreak?: number;
   peakElo: number;
+  premiumPassSeasons: number[]; // Array of season numbers for which the user has purchased the Premium Pass
 }
 
 export interface UserInternal extends User {

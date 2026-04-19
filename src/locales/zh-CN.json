@@ -254,6 +254,12 @@
       "privacy_private": "私人",
       "privacy_private_desc": "邀请码",
       "invite_code_hint": "创建房间时会生成邀请码。",
+      "mode_house_desc": "自定义规则。选择以编辑指令、标题等。",
+      "house_rules": "入住须知",
+      "deck_composition": "套牌组成",
+      "use_titles": "标题角色",
+      "use_agendas": "议程",
+      "use_crisis": "危机卡",
       "btn_create": "创建房间",
       "btn_maintenance": "维护"
     },
@@ -295,7 +301,8 @@
       "casual": "休闲",
       "ranked": "排名",
       "classic": "经典",
-      "crisis": "危机"
+      "crisis": "危机",
+      "house": "房子"
     },
     "phases": {
       "lobby": "正在等待玩家 ({{current}}/{{max}})...",
@@ -2548,7 +2555,18 @@
         "geometric_grid": "几何网格",
         "purple_rain": "紫雨",
         "static_noise": "静态噪声",
-        "purple_pill": "紫色药丸"
+        "purple_pill": "紫色药丸",
+        "s1_iron_frame": "黑曜石铁架",
+        "s1_halls": "黑曜石大厅",
+        "s1_seal": "黑曜石印记",
+        "s1_executive": "黑曜石执行官",
+        "s1_gilded_accent": "镀金装饰框",
+        "s1_requiem": "黑曜石安魂曲",
+        "s1_molten_gold": "熔金框",
+        "s1_living_obsidian": "活黑曜石",
+        "s1_golden_authority": "黄金权威",
+        "s1_vanguard": "黄金先锋",
+        "s1_monarch": "黑曜石君主"
       },
       "reward_types": {
         "cp": "清晰度点",

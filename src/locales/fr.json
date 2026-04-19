@@ -254,6 +254,12 @@
       "privacy_private": "Privé",
       "privacy_private_desc": "Code d'invitation",
       "invite_code_hint": "Un code d'invitation sera généré lors de la création de la salle.",
+      "mode_house_desc": "Règles personnalisées. Sélectionnez pour modifier les directives, les titres et bien plus encore.",
+      "house_rules": "Règlement intérieur",
+      "deck_composition": "Composition du pont",
+      "use_titles": "Rôles de titre",
+      "use_agendas": "Ordres du jour",
+      "use_crisis": "Cartes de crise",
       "btn_create": "Créer une pièce",
       "btn_maintenance": "Entretien"
     },
@@ -295,7 +301,8 @@
       "casual": "Décontracté",
       "ranked": "Classé",
       "classic": "Classique",
-      "crisis": "Crise"
+      "crisis": "Crise",
+      "house": "Maison"
     },
     "phases": {
       "lobby": "En attente des joueurs ({{current}}/{{max}})...",
@@ -2548,7 +2555,18 @@
         "geometric_grid": "Grille géométrique",
         "purple_rain": "Pluie violette",
         "static_noise": "Bruit statique",
-        "purple_pill": "Pilule violette"
+        "purple_pill": "Pilule violette",
+        "s1_iron_frame": "Cadre en fer obsidienne",
+        "s1_halls": "Salles d'obsidienne",
+        "s1_seal": "Sceau d’obsidienne",
+        "s1_executive": "Exécutif d'obsidienne",
+        "s1_gilded_accent": "Cadre d’accent doré",
+        "s1_requiem": "Requiem d'obsidienne",
+        "s1_molten_gold": "Cadre en or fondu",
+        "s1_living_obsidian": "Obsidienne vivante",
+        "s1_golden_authority": "Autorité dorée",
+        "s1_vanguard": "Avant-garde de l'or",
+        "s1_monarch": "Monarque d'obsidienne"
       },
       "reward_types": {
         "cp": "Points de clarté",

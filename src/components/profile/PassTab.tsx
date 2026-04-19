@@ -158,74 +158,109 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
         </div>
       )}
 
+      {/* Premium Unlock Card (Only show if doesn't have premium and pass exists) */}
+      {hasContent && !user.premiumPassSeasons?.includes(currentSeasonNumber) && (
+        <div className="relative overflow-hidden rounded-2xl border border-purple-500/30 bg-purple-900/10 p-5 group">
+          <div className="absolute top-0 right-0 bg-purple-500 text-black text-[9px] font-bold py-1 px-4 rounded-bl-xl uppercase tracking-tighter">
+            Premium Available
+          </div>
+          <div className="flex flex-col sm:flex-row items-center gap-5 relative z-10">
+            <div className="w-16 h-16 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.2)] shrink-0">
+              <Zap className="w-8 h-8 text-purple-400 animate-pulse" />
+            </div>
+            <div className="flex-1 text-center sm:text-left">
+              <h4 className="text-lg font-thematic text-primary uppercase tracking-wide">
+                Season 1: Premium Pass
+              </h4>
+              <p className="text-[11px] text-muted font-sans leading-relaxed mt-1">
+                Unlock 10 extra cosmetic rewards and earn up to 1,200 CP back throughout the season.
+              </p>
+            </div>
+            <div className="shrink-0">
+              <button
+                onClick={async () => {
+                  if (currentSeasonNumber === 0) return; // Deactivated for S0
+                  setClaimingReward('premium-unlock');
+                  try {
+                    const response = await fetch(apiUrl('/api/pass/unlock-premium'), {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+                      body: JSON.stringify({ season: currentSeasonNumber }),
+                    });
+                    const data = await response.json();
+                    if (!response.ok) throw new Error(data.error);
+                    onUpdateUser(data.user);
+                  } catch (err: any) {
+                    setError(err.message);
+                  } finally {
+                    setClaimingReward(null);
+                  }
+                }}
+                disabled={currentSeasonNumber === 0 || claimingReward === 'premium-unlock'}
+                className={cn(
+                  "px-6 py-3 rounded-xl font-thematic uppercase tracking-widest text-sm transition-all shadow-lg",
+                  currentSeasonNumber === 0
+                    ? "bg-surface-glass border border-subtle text-ghost cursor-not-allowed opacity-50"
+                    : "bg-purple-500 text-black border-purple-400 hover:bg-purple-400 shadow-purple-900/20"
+                )}
+              >
+                {currentSeasonNumber === 0 ? 'Season 1 Only' : claimingReward === 'premium-unlock' ? '...' : 'Unlock 1000 CP'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Reward nodes */}
       {hasContent && (
         <div className="space-y-3">
           {passRewards.map((reward) => {
             const item = reward.itemId ? DEFAULT_ITEMS.find((i) => i.id === reward.itemId) : undefined;
             const isUnlocked = currentLevel >= reward.level;
-            const isClaimed = user.claimedRewards.includes(reward.rewardId);
-            const canClaim = isUnlocked && !isClaimed;
+            const isClaimed = user.claimedRewards?.includes(reward.rewardId);
+            const isPremium = !!reward.isPremium;
+            const hasPremium = user.premiumPassSeasons?.includes(currentSeasonNumber);
+            
+            const canClaim = isUnlocked && !isClaimed && (!isPremium || hasPremium);
             const isClaiming = claimingReward === reward.rewardId;
             const wasJustClaimed = justClaimed === reward.rewardId;
-            const isPremium = !!reward.isPremium;
 
             const totalXpNeeded = getTotalXpForLevel(reward.level);
             const totalXpNow = user.stats.xp;
             const towardReward = Math.min(100, Math.round((totalXpNow / totalXpNeeded) * 100));
-
-            // Premium rewards are scaffolded — greyed out with lock
-            if (isPremium) {
-              return (
-                <div
-                  key={reward.rewardId}
-                  className="rounded-2xl border border-subtle bg-card/60 p-4 opacity-60"
-                >
-                  <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-xl border-2 border-subtle bg-elevated flex flex-col items-center justify-center shrink-0">
-                      <Lock className="w-4 h-4 text-ghost" />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="text-sm font-medium text-muted line-through">
-                        {t(reward.labelKey)}
-                      </div>
-                      <div className="text-[10px] font-mono text-ghost uppercase tracking-widest mt-0.5">
-                        {t('profile.pass.premium_coming_soon')}
-                      </div>
-                    </div>
-                    <span className="shrink-0 text-[10px] font-mono text-ghost uppercase tracking-widest">
-                      {t('profile.pass.premium_label')}
-                    </span>
-                  </div>
-                </div>
-              );
-            }
 
             return (
               <div
                 key={reward.rewardId}
                 className={cn(
                   'rounded-2xl border p-4 transition-all',
+                  isPremium && !hasPremium && 'opacity-60 saturate-[0.8]',
                   isClaimed
                     ? 'border-subtle bg-card opacity-70'
                     : canClaim
                       ? 'border-yellow-500/50 bg-yellow-900/10 shadow-lg shadow-yellow-900/10'
-                      : 'border-subtle bg-card'
+                      : isPremium && hasPremium
+                        ? 'border-purple-500/30 bg-purple-900/5'
+                        : 'border-subtle bg-card'
                 )}
               >
                 <div className="flex items-center gap-4">
-                  {/* Level badge */}
+                  {/* Level badge / Lock */}
                   <div
                     className={cn(
                       'w-12 h-12 rounded-xl border-2 flex flex-col items-center justify-center shrink-0 transition-colors',
-                      isClaimed
-                        ? 'border-emerald-600/50 bg-emerald-900/20'
-                        : canClaim
-                          ? 'border-yellow-500 bg-yellow-900/20 shadow-[0_0_12px_rgba(234,179,8,0.3)]'
-                          : 'border-subtle bg-elevated'
+                      isPremium && !hasPremium
+                        ? 'border-subtle bg-surface-glass'
+                        : isClaimed
+                          ? 'border-emerald-600/50 bg-emerald-900/20'
+                          : canClaim
+                            ? 'border-yellow-500 bg-yellow-900/20 shadow-[0_0_12px_rgba(234,179,8,0.3)]'
+                            : 'border-subtle bg-elevated'
                     )}
                   >
-                    {isClaimed ? (
+                    {isPremium && !hasPremium ? (
+                      <Lock className="w-5 h-5 text-ghost" />
+                    ) : isClaimed ? (
                       <Check className="w-5 h-5 text-emerald-400" />
                     ) : (
                       <>
@@ -251,13 +286,20 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
 
                   {/* Reward info */}
                   <div className="flex-1 min-w-0">
-                    <div
-                      className={cn(
-                        'text-sm font-medium mb-0.5',
-                        isClaimed ? 'text-muted' : 'text-primary'
+                    <div className="flex items-center gap-2 mb-0.5">
+                      <div
+                        className={cn(
+                          'text-sm font-medium truncate',
+                          isClaimed ? 'text-muted' : 'text-primary'
+                        )}
+                      >
+                        {t(reward.labelKey, { count: reward.cp })}
+                      </div>
+                      {isPremium && (
+                        <span className="text-[8px] font-bold bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded uppercase tracking-tighter border border-purple-500/20">
+                          Premium
+                        </span>
                       )}
-                    >
-                      {t(reward.labelKey, { count: reward.cp })}
                     </div>
                     <div className="text-[10px] font-mono text-faint uppercase tracking-widest">
                       {reward.cp
