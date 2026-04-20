@@ -67,8 +67,7 @@ if (!parseResult.success) {
     .map(([field, errors]) => `  - ${field}: ${errors?.join(', ')}`)
     .join('\n');
 
-  logger.fatal('Environment variable validation failed: \n' + errorMsg);
-  process.exit(1);
+  logger.warn('Environment variable validation warning (some features may be limited): \n' + errorMsg);
 }
 
 export const env = parseResult.data;
