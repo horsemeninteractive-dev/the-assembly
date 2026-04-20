@@ -113,7 +113,7 @@ export function registerOAuthRoutes({ app }: RouteContext): void {
     const platform = req.query.platform === 'android' ? 'android' : 'web';
     const nonce = randomUUID();
     const signedNonce = setOAuthNonce(nonce);
-    const state = encodeURIComponent(JSON.stringify({ origin, platform, csrfNonce: signedNonce }));
+    const state = JSON.stringify({ origin, platform, csrfNonce: signedNonce });
     const clientId = process.env.GOOGLE_CLIENT_ID;
     logger.info({ clientId }, 'Google Client ID');
     if (!clientId) {
@@ -210,7 +210,7 @@ export function registerOAuthRoutes({ app }: RouteContext): void {
     const platform = req.query.platform === 'android' ? 'android' : 'web';
     const nonce = randomUUID();
     const signedNonce = setOAuthNonce(nonce);
-    const state = encodeURIComponent(JSON.stringify({ origin, platform, csrfNonce: signedNonce }));
+    const state = JSON.stringify({ origin, platform, csrfNonce: signedNonce });
     const clientId = process.env.DISCORD_CLIENT_ID;
     logger.info({ clientId }, 'Discord Client ID');
     if (!clientId) {
