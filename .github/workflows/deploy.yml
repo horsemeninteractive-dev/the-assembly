@@ -108,61 +108,35 @@ jobs:
         run: echo "VERSION=v$(node -p "require('./package.json').version")" >> $GITHUB_OUTPUT
 
       - name: Deploy to Cloud Run
-        env:
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-          DISCORD_CLIENT_ID: ${{ secrets.DISCORD_CLIENT_ID }}
-          DISCORD_CLIENT_SECRET: ${{ secrets.DISCORD_CLIENT_SECRET }}
-          APP_URL: ${{ secrets.APP_URL }}
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
-          REDIS_URL: ${{ secrets.REDIS_URL }}
-          STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
-          STRIPE_WEBHOOK_SECRET: ${{ secrets.STRIPE_WEBHOOK_SECRET }}
-          EMAIL_USER: ${{ secrets.EMAIL_USER }}
-          EMAIL_PASS: ${{ secrets.EMAIL_PASS }}
-          VAPID_PUBLIC_KEY: ${{ secrets.VAPID_PUBLIC_KEY }}
-          VAPID_PRIVATE_KEY: ${{ secrets.VAPID_PRIVATE_KEY }}
-          VAPID_EMAIL: ${{ secrets.VAPID_EMAIL }}
-          ADMIN_SECRET: ${{ secrets.ADMIN_SECRET }}
         run: |
-          # Join variables into a single comma-separated string for gcloud
-          ENV_VARS="NODE_ENV=production"
-          ENV_VARS="$ENV_VARS,APP_VERSION=${{ steps.pkg-version.outputs.VERSION }}"
-          ENV_VARS="$ENV_VARS,JWT_SECRET=$JWT_SECRET"
-          ENV_VARS="$ENV_VARS,GOOGLE_CLIENT_ID=$GOOGLE_CLIENT_ID"
-          ENV_VARS="$ENV_VARS,GOOGLE_CLIENT_SECRET=$GOOGLE_CLIENT_SECRET"
-          ENV_VARS="$ENV_VARS,DISCORD_CLIENT_ID=$DISCORD_CLIENT_ID"
-          ENV_VARS="$ENV_VARS,DISCORD_CLIENT_SECRET=$DISCORD_CLIENT_SECRET"
-          ENV_VARS="$ENV_VARS,APP_URL=$APP_URL"
-          ENV_VARS="$ENV_VARS,SUPABASE_URL=$SUPABASE_URL"
-          ENV_VARS="$ENV_VARS,SUPABASE_SERVICE_ROLE_KEY=$SUPABASE_SERVICE_ROLE_KEY"
-          ENV_VARS="$ENV_VARS,REDIS_URL=$REDIS_URL"
-          ENV_VARS="$ENV_VARS,STRIPE_SECRET_KEY=$STRIPE_SECRET_KEY"
-          ENV_VARS="$ENV_VARS,STRIPE_WEBHOOK_SECRET=$STRIPE_WEBHOOK_SECRET"
-          ENV_VARS="$ENV_VARS,EMAIL_USER=$EMAIL_USER"
-          ENV_VARS="$ENV_VARS,EMAIL_PASS=$EMAIL_PASS"
-          ENV_VARS="$ENV_VARS,VAPID_PUBLIC_KEY=$VAPID_PUBLIC_KEY"
-          ENV_VARS="$ENV_VARS,VAPID_PRIVATE_KEY=$VAPID_PRIVATE_KEY"
-          ENV_VARS="$ENV_VARS,VAPID_EMAIL=$VAPID_EMAIL"
-          ENV_VARS="$ENV_VARS,ADMIN_SECRET=$ADMIN_SECRET"
-
           gcloud run deploy the-assembly \
             --source . \
-            --project ${{ secrets.GCP_PROJECT_ID }} \
+            --project gen-lang-client-0636418324 \
             --region us-west1 \
             --allow-unauthenticated \
             --min-instances 0 \
             --timeout 3600 \
-            --set-env-vars="$ENV_VARS" \
-            --format="value(status.url)" > service_url.txt
-          
-          URL=$(cat service_url.txt)
+            --set-env-vars "NODE_ENV=production" \
+            --update-env-vars "JWT_SECRET=${{ secrets.JWT_SECRET }}" \
+            --update-env-vars "GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" \
+            --update-env-vars "GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" \
+            --update-env-vars "DISCORD_CLIENT_ID=${{ secrets.DISCORD_CLIENT_ID }}" \
+            --update-env-vars "DISCORD_CLIENT_SECRET=${{ secrets.DISCORD_CLIENT_SECRET }}" \
+            --update-env-vars "APP_URL=${{ secrets.APP_URL }}" \
+            --update-env-vars "SUPABASE_URL=${{ secrets.SUPABASE_URL }}" \
+            --update-env-vars "SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
+            --update-env-vars "REDIS_URL=${{ secrets.REDIS_URL }}" \
+            --update-env-vars "STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}" \
+            --update-env-vars "STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}" \
+            --update-env-vars "EMAIL_USER=${{ secrets.EMAIL_USER }}" \
+            --update-env-vars "EMAIL_PASS=${{ secrets.EMAIL_PASS }}" \
+            --update-env-vars "VAPID_PUBLIC_KEY=${{ secrets.VAPID_PUBLIC_KEY }}" \
+            --update-env-vars "VAPID_PRIVATE_KEY=${{ secrets.VAPID_PRIVATE_KEY }}" \
+            --update-env-vars "VAPID_EMAIL=${{ secrets.VAPID_EMAIL }}" \
+            --update-env-vars "ADMIN_SECRET=${{ secrets.ADMIN_SECRET }}"
           
           echo "### :rocket: Deployment Successful!" >> $GITHUB_STEP_SUMMARY
           echo "Your updated service is live at: **https://the-assembly-874660478794.us-west1.run.app**" >> $GITHUB_STEP_SUMMARY
-          echo "(Internal URL: $URL)" >> $GITHUB_STEP_SUMMARY
 
       - name: Cleanup Old Images
         run: |

@@ -67,7 +67,7 @@ if (!parseResult.success) {
     .map(([field, errors]) => `  - ${field}: ${errors?.join(', ')}`)
     .join('\n');
 
-  logger.fatal(`CRITICAL: Environment variable validation failed!\n${errorMsg}`);
+  logger.fatal('Environment variable validation failed: \n' + errorMsg);
   process.exit(1);
 }
 

@@ -16,19 +16,31 @@ export function isAllowedOrigin(origin: string | undefined): boolean {
 }
 
 export function getAppUrl(req?: Request): string {
+  // 1. Check if the client explicitly sent their origin (common in our API calls)
   const origin = (req?.query?.origin as string) || (req?.body?.origin as string);
-  if (origin && isAllowedOrigin(origin)) return origin;
+  if (origin && isAllowedOrigin(origin)) return origin.replace(/\/$/, '');
 
+  // 2. Check for Proxy headers (Cloud Run sends x-forwarded-host)
+  if (req) {
+    const forwardedHost = req.headers['x-forwarded-host'] as string;
+    const forwardedProto = (req.headers['x-forwarded-proto'] as string) || 'https';
+    if (forwardedHost && isAllowedOrigin(`${forwardedProto}://${forwardedHost}`)) {
+      return `${forwardedProto}://${forwardedHost}`;
+    }
+  }
+
+  // 3. Check the internal state parameter (used in OAuth redirects)
   if (req?.query?.state) {
     try {
       const stateData = JSON.parse(decodeURIComponent(req.query.state as string));
       if (stateData.origin && isAllowedOrigin(stateData.origin)) {
-        return stateData.origin;
+        return stateData.origin.replace(/\/$/, '');
       }
     } catch (_) {}
   }
 
-  return process.env.APP_URL || 'https://theassembly.web.app';
+  // 4. Default to APP_URL or the primary custom domain
+  return (process.env.APP_URL || 'https://theassembly.web.app').replace(/\/$/, '');
 }
 
 export function shuffle<T>(array: T[]): T[] {

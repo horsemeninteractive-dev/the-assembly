@@ -24,6 +24,7 @@ import {
 } from '../redis';
 import { oauthSuccessPage } from '../templates/oauthSuccess';
 
+
 async function handleDiscordAuth(code: string, origin: string) {
   const redirectUri = `${origin}/auth/discord/callback`;
   logger.info({ origin, redirectUri }, 'Discord OAuth: attempting token exchange');
