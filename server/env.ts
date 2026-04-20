@@ -70,7 +70,9 @@ if (!parseResult.success) {
   logger.warn('Environment variable validation warning (some features may be limited): \n' + errorMsg);
 }
 
-export const env = parseResult.data;
+// Even if validation fails, we export the data (allowing for undefined values) 
+// but we type it as the schema's output type to satisfy the compiler.
+export const env = (parseResult.data || process.env) as unknown as z.infer<typeof envSchema>;
 
 // ---------------------------------------------------------------------------
 // Contextual Validation (Production Guardrails)
