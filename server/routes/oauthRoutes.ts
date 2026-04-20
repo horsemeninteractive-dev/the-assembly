@@ -137,8 +137,8 @@ export function registerOAuthRoutes({ app }: RouteContext): void {
     async (req: Request, res: Response) => {
       const { code } = req.query;
       if (!code) return res.status(400).send('No code provided');
+      const origin = getAppUrl(req);
       try {
-        const origin = getAppUrl(req);
         let platform = 'web';
         if (req.query.state) {
           try {
@@ -246,8 +246,8 @@ export function registerOAuthRoutes({ app }: RouteContext): void {
     async (req: Request, res: Response) => {
       const { code } = req.query;
       if (!code) return res.status(400).send('No code provided');
+      const origin = getAppUrl(req);
       try {
-        const origin = getAppUrl(req);
         let platform = 'web';
         if (req.query.state) {
           try {
