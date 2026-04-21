@@ -120,20 +120,20 @@ export const declarePoliciesSchema = z.object({
   type: z.enum(['President', 'Chancellor']),
   civ: z.number().int().min(0).max(3),
   sta: z.number().int().min(0).max(3),
-  drewCiv: z.number().int().min(0).max(3).optional(),
-  drewSta: z.number().int().min(0).max(3).optional(),
-}).refine(data => data.civ + data.sta <= 3, {
-  message: "Declared policies cannot exceed 3",
+  drewCiv: z.number().int().min(0).max(4).optional(),
+  drewSta: z.number().int().min(0).max(4).optional(),
+}).refine(data => data.civ + data.sta === 2, {
+  message: "Must declare exactly 2 policies (passed or received)",
   path: ["civ", "sta"]
 }).refine(data => {
   if (data.type === 'President' && (data.drewCiv !== undefined || data.drewSta !== undefined)) {
     const dc = data.drewCiv ?? 0;
     const ds = data.drewSta ?? 0;
-    return dc + ds === 3;
+    return dc + ds === 3 || dc + ds === 4;
   }
   return true;
 }, {
-  message: "President must declare exactly 3 drawn policies",
+  message: "President must declare 3 or 4 drawn policies",
   path: ["drewCiv", "drewSta"]
 });
 

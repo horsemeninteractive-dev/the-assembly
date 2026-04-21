@@ -666,6 +666,7 @@ export const GameRoom = ({
         setDeclDrawSta={setDeclDrawSta}
         onSubmit={handleSubmitDeclaration}
         playSound={playSound}
+        needsTotalDraw={gameState.isStrategistAction ? 4 : 3}
       />
       <GameReferencePanel
         isOpen={isReferenceOpen}

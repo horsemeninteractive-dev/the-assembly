@@ -16,6 +16,7 @@ interface DeclarationModalProps {
   setDeclDrawSta: (n: number) => void;
   onSubmit: () => void;
   playSound: (key: string) => void;
+  needsTotalDraw?: number;
 }
 
 export const DeclarationModal = ({
@@ -31,6 +32,7 @@ export const DeclarationModal = ({
   setDeclDrawSta,
   onSubmit,
   playSound,
+  needsTotalDraw = 3,
 }: DeclarationModalProps) => {
   const { t } = useTranslation();
 
@@ -167,7 +169,8 @@ export const DeclarationModal = ({
             <button
               onMouseEnter={() => playSound('hover')}
               onClick={onSubmit}
-              className="w-full py-4 btn-primary rounded-xl hover:bg-subtle transition-all font-thematic text-xl uppercase tracking-wide"
+              disabled={declCiv + declSta !== 2 || (declarationType === 'President' && declDrawCiv + declDrawSta !== needsTotalDraw)}
+              className="w-full py-4 btn-primary rounded-xl hover:bg-subtle disabled:opacity-50 disabled:cursor-not-allowed transition-all font-thematic text-xl uppercase tracking-wide"
             >
               {t('game.modals.declaration.submit')}
             </button>
