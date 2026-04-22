@@ -1,4 +1,4 @@
-const CACHE_NAME = 'assembly-v0.10.3'; // Bumped: bypass /auth/ and /api/ routes
+const CACHE_NAME = 'assembly-v0.10.1'; // Bumped: bypass /auth/ and /api/ routes
 const ASSETS_TO_CACHE = [
   '/',
   '/index.html',

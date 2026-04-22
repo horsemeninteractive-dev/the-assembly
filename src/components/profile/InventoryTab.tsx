@@ -28,6 +28,15 @@ export const InventoryTab: React.FC<InventoryProps> = ({
   const [category, setCategory] = useState<
     'frame' | 'badge' | 'policy' | 'vote' | 'music' | 'sound' | 'background'
   >('frame');
+  const [previewToggle, setPreviewToggle] = useState(false);
+
+  // Toggle previews for styles every 2.5s
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setPreviewToggle((prev) => !prev);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleEquip = async (
     type: 'frame' | 'badge' | 'policy' | 'vote' | 'music' | 'sound' | 'background',
@@ -183,21 +192,28 @@ export const InventoryTab: React.FC<InventoryProps> = ({
                 ) : item.type === 'policy' ? (
                   <div
                     className={cn(
-                      'w-full h-full flex flex-col items-center justify-center gap-1',
-                      getPolicyStyles(item.id, 'Civil')
+                      'w-full h-full flex flex-col items-center justify-center gap-1 transition-all duration-500',
+                      getPolicyStyles(item.id, previewToggle ? 'State' : 'Civil')
                     )}
                   >
                     <Scroll className="w-8 h-8" />
+                    <span className="text-[8px] font-mono uppercase transition-all">
+                      {previewToggle ? 'State' : 'Civil'}
+                    </span>
                   </div>
                 ) : item.type === 'vote' ? (
                   <div
                     className={cn(
-                      'w-full h-full flex flex-col items-center justify-center gap-1',
-                      getVoteStyles(item.id, 'Aye')
+                      'w-full h-full flex flex-col items-center justify-center gap-1 transition-all duration-500',
+                      getVoteStyles(item.id, previewToggle ? 'Nay' : 'Aye')
                     )}
                   >
-                    <span className="text-lg font-thematic uppercase">{t('profile.inventory.vote_aye')}</span>
-                    <span className="text-[8px] font-mono uppercase">{t('profile.inventory.vote_yes')}</span>
+                    <span className="text-lg font-thematic uppercase transition-all">
+                      {previewToggle ? (t('profile.inventory.vote_nay') || 'NAY!') : (t('profile.inventory.vote_aye') || 'AYE!')}
+                    </span>
+                    <span className="text-[8px] font-mono uppercase opacity-70 transition-all">
+                      {previewToggle ? (t('profile.inventory.vote_no') || 'NO') : (t('profile.inventory.vote_yes') || 'YES')}
+                    </span>
                   </div>
                 ) : item.id === 'bg-nebula-void' ? (
                   <div className="w-full h-full rounded-2xl bg-nebula-void overflow-hidden scale-[0.25] origin-center" />

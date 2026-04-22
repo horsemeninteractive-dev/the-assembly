@@ -117,12 +117,16 @@ export const resetPasswordSchema = z.object({
 });
 
 export const declarePoliciesSchema = z.object({
-  type: z.enum(['President', 'Chancellor']),
+  type: z.enum(['President', 'Chancellor', 'Peek']),
   civ: z.number().int().min(0).max(3),
   sta: z.number().int().min(0).max(3),
   drewCiv: z.number().int().min(0).max(4).optional(),
   drewSta: z.number().int().min(0).max(4).optional(),
-}).refine(data => data.civ + data.sta === 2, {
+  isRefused: z.boolean().optional(),
+}).refine(data => {
+  if (data.type === 'Peek') return true;
+  return data.civ + data.sta === 2;
+}, {
   message: "Must declare exactly 2 policies (passed or received)",
   path: ["civ", "sta"]
 }).refine(data => {

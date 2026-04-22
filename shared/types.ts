@@ -549,7 +549,7 @@ export interface GameState {
     text: string;
     timestamp: number;
     type?: 'text' | 'declaration' | 'round_separator' | 'failed_election' | 'system';
-    declaration?: { civ: number; sta: number; type: 'President' | 'Chancellor' };
+    declaration?: { civ: number; sta: number; type: 'President' | 'Chancellor' | 'Peek'; isRefused?: boolean };
     round?: number;
   }[];
   investigationResult?: { targetName: string; role: Role };
@@ -580,10 +580,12 @@ export interface GameState {
     sta: number;
     drewCiv?: number; // president only: what they drew (3-card hand)
     drewSta?: number;
-    type: 'President' | 'Chancellor';
+    type: 'President' | 'Chancellor' | 'Peek';
     timestamp: number;
     isBlocked?: boolean;
+    isRefused?: boolean;
   }[];
+  peekDeclarationPending?: boolean;
   isPaused?: boolean;
   pauseReason?: string;
   pauseTimer?: number;
@@ -619,6 +621,7 @@ export interface GameState {
     votes: { playerId: string; playerName: string; vote: 'Aye' | 'Nay' }[];
     presDeclaration?: { civ: number; sta: number; drewCiv: number; drewSta: number };
     chanDeclaration?: { civ: number; sta: number };
+    peekDeclaration?: { civ: number; sta: number; isRefused?: boolean };
     actualDrewCiv?: number;
     actualDrewSta?: number;
     executiveAction?: string;

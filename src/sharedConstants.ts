@@ -18,7 +18,7 @@ const getAppVersion = (): string => {
     }
   } catch {}
 
-  return 'v0.10.0'; // Fallback
+  return 'v0.10.1'; // Fallback
 };
 
 export const CLIENT_VERSION = getAppVersion();
@@ -483,7 +483,7 @@ export const DEFAULT_ITEMS: CosmeticItem[] = [
   // Premium Tier Items
   { id: 'frame-s1-prem-5', name: 'Gilded Accent Frame', price: 0, type: 'frame', description: 'Season 1 Premium: Subtle gold filigree on dark iron.' },
   { id: 'bg-s1-prem-10', name: 'Golden Atrium', price: 0, type: 'background', description: 'Season 1 Premium: The opulent halls of the high council.', imageUrl: 'https://www.transparenttextures.com/patterns/gold-dust.png' },
-  { id: 'music-s1-prem-15', name: 'Obsidian Requiem', price: 0, type: 'music', description: 'Season 1 Premium: A deep, orchestral theme for the ruling class.' },
+  { id: 'music-s1-prem-15', name: 'Obsidian Requiem', price: 0, type: 'music', description: 'Season 1 Premium: A deep, orchestral theme for the ruling class.', imageUrl: 'https://storage.googleapis.com/secretchancellor/Obsidian%20Requiem.mp3' },
   { id: 'frame-s1-prem-20', name: 'Molten Gold Frame', price: 0, type: 'frame', description: 'Season 1 Premium: ANIMATED: Liquid gold flowing through obsidian veins.' },
   { id: 'policy-s1-prem-25', name: 'Royal Decree', price: 0, type: 'policy', description: 'Season 1 Premium: Policy cards embossed with 24k gold leaf.' },
   { id: 'bg-s1-prem-30', name: 'Living Obsidian', price: 0, type: 'background', description: 'Season 1 Premium: ANIMATED: Shifting volcanic glass pulsing with heat.', imageUrl: 'https://www.transparenttextures.com/patterns/carbon-fibre.png' },

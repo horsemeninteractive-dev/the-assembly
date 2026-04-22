@@ -14,7 +14,8 @@ export function useLegislativeHandler({
   socket,
 }: UseLegislativeHandlerProps) {
   const [showDeclarationUI, setShowDeclarationUI] = useState(false);
-  const [declarationType, setDeclarationType] = useState<'President' | 'Chancellor' | null>(null);
+  const [declarationType, setDeclarationType] = useState<'President' | 'Chancellor' | 'Peek' | null>(null);
+  const [isRefused, setIsRefused] = useState(false);
   const [declCiv, setDeclCiv] = useState(0);
   const [declSta, setDeclSta] = useState(2);
   const [declDrawCiv, setDeclDrawCiv] = useState(0);
@@ -114,30 +115,43 @@ export function useLegislativeHandler({
         pendingDeclarationRef.current = needed;
       }
     }
-  }, [me, gameState.declarations, gameState.lastEnactedPolicy, gameState.phase, socket.id]);
-
-  const handleSubmitDeclaration = () => {
-    if (!declarationType) return;
-    // Strict client-side validation before emit
-    if (declCiv + declSta !== 2) {
-      console.error('[Legislative] Invalid declaration: passed/received must total 2');
+    const peekDeclared = gameState.declarations.some((d) => d.playerId === socket.id && d.type === 'Peek');
+    if (gameState.peekDeclarationPending && me.isPresident && !peekDeclared) {
+      setDeclarationType('Peek');
+      setDeclCiv(0);
+      setDeclSta(3);
+      setShowDeclarationUI(true);
       return;
     }
-    
-    if (declarationType === 'President') {
-      const totalDraw = declDrawCiv + declDrawSta;
-      const expectedDraw = gameState.isStrategistAction ? 4 : 3;
-      if (totalDraw !== expectedDraw) {
-        console.error(`[Legislative] Invalid declaration: President draw must total ${expectedDraw}`);
+
+  }, [me, gameState.declarations, gameState.lastEnactedPolicy, gameState.phase, gameState.peekDeclarationPending, socket.id]);
+
+  const handleSubmitDeclaration = (refused = false) => {
+    if (!declarationType) return;
+
+    if (declarationType !== 'Peek') {
+      // Strict client-side validation before emit
+      if (declCiv + declSta !== 2) {
+        console.error('[Legislative] Invalid declaration: passed/received must total 2');
         return;
+      }
+      
+      if (declarationType === 'President') {
+        const totalDraw = declDrawCiv + declDrawSta;
+        const expectedDraw = gameState.isStrategistAction ? 4 : 3;
+        if (totalDraw !== expectedDraw) {
+          console.error(`[Legislative] Invalid declaration: President draw must total ${expectedDraw}`);
+          return;
+        }
       }
     }
 
     socket.emit('declarePolicies', {
-      civ: declCiv,
-      sta: declSta,
+      civ: refused ? 0 : declCiv,
+      sta: refused ? 0 : declSta,
       ...(declarationType === 'President' ? { drewCiv: declDrawCiv, drewSta: declDrawSta } : {}),
       type: declarationType,
+      isRefused: refused,
     });
     setShowDeclarationUI(false);
   };

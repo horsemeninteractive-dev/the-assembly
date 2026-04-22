@@ -9,7 +9,15 @@ export class LegislativeManager {
   constructor(private readonly round: any) {}
 
   checkRoundEnd(s: GameState, roomId: string): void {
-    if (s.phase !== 'Legislative_Chancellor') return;
+    if (s.phase !== 'Legislative_Chancellor' && !s.peekDeclarationPending) return;
+
+    if (s.peekDeclarationPending) {
+      if (s.declarations.some((d) => d.type === 'Peek')) {
+        s.peekDeclarationPending = false;
+        this.round.nextRound(s, roomId, true);
+      }
+      return;
+    }
     
     // If the president is blocked (e.g. Veiled Proceedings), add a dummy 'blocked' declaration
     // so the UI knows to show the grey indicator and that declarations are 'complete'.
@@ -224,36 +232,76 @@ export class LegislativeManager {
   scheduleAutoDeclarations(s: GameState, roomId: string): void {
     setTimeout(() => {
       const st = this.round.engine.rooms.get(roomId);
-      if (!st || st.phase !== 'Legislative_Chancellor' || st.isPaused) return;
+      if (!st || st.isPaused) return;
+      if (st.phase !== 'Legislative_Chancellor' && !st.peekDeclarationPending) return;
       this.autoDeclareMissing(st, roomId);
     }, 1500);
   }
 
   autoDeclareMissing(s: GameState, roomId: string): void {
-    if (s.phase !== 'Legislative_Chancellor') return;
+    if (s.phase === 'Legislative_Chancellor') {
+      const president = s.players.find((p: Player) => p.isPresident);
+      const chancellor = s.players.find((p: Player) => p.isChancellor);
+      if (!president || !chancellor) return;
 
-    const president = s.players.find((p: Player) => p.isPresident);
-    const chancellor = s.players.find((p: Player) => p.isChancellor);
-    if (!president || !chancellor) return;
+      const presDeclared = s.declarations.some((d) => d.type === 'President');
+      const chanDeclared = s.declarations.some((d) => d.type === 'Chancellor');
 
-    const presDeclared = s.declarations.some((d) => d.type === 'President');
-    const chanDeclared = s.declarations.some((d) => d.type === 'Chancellor');
-
-    if (!presDeclared && (president.isAI || s.presidentTimedOut) && !s.presidentDeclarationBlocked)
-      this.generateDeclaration(s, roomId, president, 'President');
-    if (!chanDeclared && (chancellor.isAI || s.chancellorTimedOut))
-      this.generateDeclaration(s, roomId, chancellor, 'Chancellor');
+      if (!presDeclared && (president.isAI || s.presidentTimedOut) && !s.presidentDeclarationBlocked)
+        this.generateDeclaration(s, roomId, president, 'President');
+      if (!chanDeclared && (chancellor.isAI || s.chancellorTimedOut))
+        this.generateDeclaration(s, roomId, chancellor, 'Chancellor');
+    } else if (s.peekDeclarationPending) {
+      const president = s.players.find((p: Player) => p.isPresident);
+      if (president && (president.isAI || s.presidentTimedOut)) {
+        this.generateDeclaration(s, roomId, president, 'Peek');
+      }
+    }
   }
 
   generateDeclaration(
     s: GameState,
     roomId: string,
     player: Player,
-    type: 'President' | 'Chancellor'
+    type: 'President' | 'Chancellor' | 'Peek'
   ): void {
     if (s.declarations.some((d) => d.playerId === player.id && d.type === type)) return;
 
     s.declarations = s.declarations.filter((d) => d.type !== type);
+
+    if (type === 'Peek') {
+      const actualPeek = s.deck.slice(0, 3);
+      let civ = actualPeek.filter((p) => p === 'Civil').length;
+      let sta = actualPeek.filter((p) => p === 'State').length;
+      let isRefused = false;
+
+      if (player.role !== 'Civil') {
+        const roll = Math.random();
+        if (roll < 0.15) {
+          isRefused = true;
+        } else if (roll < 0.4 && civ > 0) {
+          civ--;
+          sta++;
+        }
+      } else {
+        if (Math.random() < 0.05) isRefused = true;
+      }
+
+      s.declarations.push({
+        playerId: player.id,
+        playerName: player.name,
+        civ,
+        sta,
+        type: 'Peek',
+        timestamp: Date.now(),
+        isRefused,
+      });
+
+      addLog(s, `${player.name} declared what they saw during the Peek.`);
+      this.round.engine.broadcastState(roomId);
+      this.checkRoundEnd(s, roomId);
+      return;
+    }
 
     const saw = s.chancellorSaw ?? [];
     const drew = s.presidentSaw ?? [];
@@ -458,6 +506,7 @@ export class LegislativeManager {
 
     const presDecl = s.declarations.find((d) => d.type === 'President');
     const chanDecl = s.declarations.find((d) => d.type === 'Chancellor');
+    const peekDecl = s.declarations.find((d) => d.type === 'Peek');
     const action = getExecutiveAction(s);
 
     const actualDrewCiv = s.presidentSaw?.filter(p => p === 'Civil').length ?? 0;
@@ -478,6 +527,7 @@ export class LegislativeManager {
         ? { civ: presDecl.civ, sta: presDecl.sta, drewCiv: presDecl.drewCiv ?? 0, drewSta: presDecl.drewSta ?? 0 }
         : undefined,
       chanDeclaration: chanDecl ? { civ: chanDecl.civ, sta: chanDecl.sta } : undefined,
+      peekDeclaration: peekDecl ? { civ: peekDecl.civ, sta: peekDecl.sta, isRefused: peekDecl.isRefused } : undefined,
       actualDrewCiv,
       actualDrewSta,
       executiveAction: action !== 'None' ? action : undefined,

@@ -683,3 +683,25 @@
   background-size: 100% 3px, 5px 100%;
   pointer-events: none;
 }
+
+/* ─── Season 1: Obsidian & Gold Animations ──────────────────────────── */
+@keyframes gold-flow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-gold-flow {
+  background: linear-gradient(90deg, #1a1a1a, #ffd700, #1a1a1a);
+  background-size: 200% 100%;
+  animation: gold-flow 4s linear infinite;
+}
+
+@keyframes molten-pulse {
+  0%, 100% { box-shadow: 0 0 10px rgba(234, 179, 8, 0.4); border-color: #b8860b; }
+  50% { box-shadow: 0 0 25px rgba(234, 179, 8, 0.8); border-color: #ffd700; }
+}
+
+.animate-molten {
+  animation: molten-pulse 3s ease-in-out infinite;
+}

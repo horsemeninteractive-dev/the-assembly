@@ -490,7 +490,7 @@
       "categories": {
         "frame": "Borders",
         "badge": "Badges",
-        "policy": "Policies",
+        "policy": "Directives",
         "vote": "Votes",
         "music": "Music",
         "sound": "Sounds",
@@ -498,7 +498,7 @@
       },
       "vote_aye": "Aye Token",
       "vote_yes": "Yes Token",
-      "item_type_policy": "Policy Skin",
+      "item_type_policy": "Directive Style",
       "rarities": {
         "common": "Common",
         "uncommon": "Uncommon",
@@ -681,7 +681,7 @@
       "title": "Cosmetic Requisition",
       "subtitle": "Exchange IP and CP for border frames, badges, and more.",
       "btn_purchase": "Requisition ({{amount}})",
-      "item_type_policy": "Policy Skin",
+      "item_type_policy": "Directive Style",
       "item_style": "{{type}} Style",
       "btn_owned": "Owned",
       "btn_locked_pass": "Pass Reward",
@@ -713,10 +713,11 @@
         "purple_pill": "Purple Pill"
       },
       "reward_types": {
-        "cp": "Clarity Points",
+        "cp": "Cabinet Points",
         "cp_count": "{{count}} CP",
         "background": "Background",
         "vote": "Vote Style",
+        "policy": "Directive Style",
         "music": "Music Track",
         "frame": "Border Frame",
         "reward": "Reward"

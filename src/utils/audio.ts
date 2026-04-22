@@ -20,6 +20,7 @@ export const MUSIC_TRACKS: Record<string, string> = {
   'music-credits':
     'https://storage.googleapis.com/secretchancellor/Shadows%20in%20the%20Marble%20Hall%20(Vocal%20version).mp3',
   'music-pass-0': 'https://storage.googleapis.com/secretchancellor/Static%20Noise.mp3',
+  'music-s1-prem-15': 'https://storage.googleapis.com/secretchancellor/Obsidian%20Requiem.mp3',
 };
 
 export const SOUND_PACKS: Record<string, Record<string, string>> = {

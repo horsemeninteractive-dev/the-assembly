@@ -5,7 +5,7 @@ import { DEFAULT_ITEMS, SEASON_PASS_CONTENT } from '../../sharedConstants';
 import { getLevelFromXp, getXpInCurrentLevel, getXpForNextLevel, getTotalXpForLevel } from '../../utils/xp';
 import { Check, Zap, Play, Pause, User as UserIcon, Lock, Clock, CalendarClock } from 'lucide-react';
 import { cn, getProxiedUrl, apiUrl } from '../../utils/utils';
-import { getVoteStyles, getFrameStyles } from '../../utils/cosmetics';
+import { getVoteStyles, getFrameStyles, getPolicyStyles } from '../../utils/cosmetics';
 import { useGameContext } from '../../contexts/GameContext';
 
 interface PassTabProps {
@@ -37,9 +37,28 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
   const [claimingReward, setClaimingReward] = useState<string | null>(null);
   const [justClaimed, setJustClaimed] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<string>('');
+  const [previewToggle, setPreviewToggle] = useState(false);
+
+  // Toggle previews for styles every 2.5s
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setPreviewToggle((prev) => !prev);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
 
   const currentSeasonNumber = systemConfig.currentSeasonNumber ?? 0;
-  const currentSeasonPeriod = systemConfig.currentSeasonPeriod ?? `Season ${currentSeasonNumber}`;
+  const [viewingSeason, setViewingSeason] = useState<number>(currentSeasonNumber);
+  
+  const seasonNames: Record<number, string> = {
+    0: 'By Royal Decree',
+    1: 'Obsidian Gold',
+  };
+  
+  const currentSeasonPeriod = viewingSeason === currentSeasonNumber 
+    ? (systemConfig.currentSeasonPeriod ?? `Season ${viewingSeason}: ${seasonNames[viewingSeason] || 'Classified'}`)
+    : `Season ${viewingSeason}: ${seasonNames[viewingSeason] || 'Classified'} (Preview)`;
+    
   const currentSeasonEndsAt = systemConfig.currentSeasonEndsAt ?? '2026-05-02T00:00:00.000Z';
 
   // Live countdown ticker
@@ -78,13 +97,59 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
   const xpNeeded = getXpForNextLevel(currentLevel);
   const xpProgress = Math.min(100, Math.round((xpInLevel / xpNeeded) * 100));
 
-  const passRewards = SEASON_PASS_CONTENT[currentSeasonNumber];
+  const passRewards = SEASON_PASS_CONTENT[viewingSeason];
   const hasContent = passRewards && passRewards.length > 0;
+  const availableSeasons = Object.keys(SEASON_PASS_CONTENT).map(Number).sort((a, b) => a - b);
 
   return (
-    <div className="max-w-lg mx-auto space-y-6 pb-4">
+    <div className={cn(
+      "-m-4 sm:-m-8 p-4 sm:p-8 min-h-full transition-colors duration-700 relative overflow-hidden",
+      viewingSeason === 0 ? "bg-purple-900/10" : "bg-yellow-900/10"
+    )}>
+      {/* Animated ambient background layers */}
+      <div 
+        className={cn(
+          "absolute inset-0 transition-opacity duration-1000",
+          viewingSeason === 0 ? "opacity-40 animate-pulse" : "opacity-0 pointer-events-none"
+        )} 
+        style={{ background: 'radial-gradient(circle at 50% 0%, rgba(147,51,234,0.3) 0%, transparent 70%)' }}
+      />
+      <div 
+        className={cn(
+          "absolute inset-0 transition-opacity duration-1000",
+          viewingSeason === 1 ? "opacity-40 animate-pulse" : "opacity-0 pointer-events-none"
+        )} 
+        style={{ background: 'radial-gradient(circle at 50% 0%, rgba(234,179,8,0.25) 0%, transparent 70%)' }}
+      />
+      
+      <div className="max-w-lg mx-auto space-y-6 pb-4 relative z-10">
+        {/* Season Selector (Preview) */}
+        {availableSeasons.length > 1 && (
+        <div className="flex justify-center gap-4 px-2">
+          {availableSeasons.map(sNum => (
+            <button
+              key={sNum}
+              onClick={() => setViewingSeason(sNum)}
+              className={cn(
+                "flex-1 py-2 rounded-xl text-[10px] font-mono uppercase tracking-[0.2em] border transition-all",
+                viewingSeason === sNum 
+                  ? sNum === 0
+                    ? "bg-purple-600 text-white border-white shadow-[0_0_15px_rgba(147,51,234,0.4)]"
+                    : "bg-black text-yellow-500 border-yellow-500 shadow-[0_0_15px_rgba(234,179,8,0.4)]"
+                  : "bg-surface border-subtle text-muted hover:text-primary hover:border-muted"
+              )}
+            >
+              Season {sNum} {sNum > currentSeasonNumber ? 'Preview' : ''}
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Season banner */}
-      <div className="relative overflow-hidden rounded-2xl border border-default bg-elevated p-5">
+      <div className={cn(
+        "relative overflow-hidden rounded-2xl border p-5 transition-colors duration-500",
+        viewingSeason === 0 ? "border-purple-500/30 bg-purple-900/10" : "border-yellow-500/30 bg-yellow-900/10"
+      )}>
         <div
           className="absolute inset-0 opacity-5"
           style={{
@@ -103,7 +168,10 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
               <p className="text-xs text-faint font-mono mt-1">{t('profile.pass.season_desc')}</p>
             </div>
             <div className="text-right shrink-0">
-              <div className="text-3xl font-thematic text-yellow-500 leading-none">
+              <div className={cn(
+                "text-3xl font-thematic leading-none transition-colors duration-500",
+                viewingSeason === 0 ? "text-purple-400" : "text-yellow-500"
+              )}>
                 {currentLevel}
               </div>
               <div className="text-[10px] font-mono text-muted uppercase tracking-widest">
@@ -122,7 +190,10 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
             </div>
             <div className="h-2 bg-card rounded-full overflow-hidden border border-subtle">
               <div
-                className="h-full bg-gradient-to-r from-yellow-600 to-yellow-400 transition-all duration-700 rounded-full"
+                className={cn(
+                  "h-full transition-all duration-700 rounded-full bg-gradient-to-r",
+                  viewingSeason === 0 ? "from-purple-600 to-purple-400" : "from-yellow-600 to-yellow-400"
+                )}
                 style={{ width: `${xpProgress}%` }}
               />
             </div>
@@ -158,28 +229,44 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
         </div>
       )}
 
-      {/* Premium Unlock Card (Only show if doesn't have premium and pass exists) */}
-      {hasContent && !user.premiumPassSeasons?.includes(currentSeasonNumber) && (
-        <div className="relative overflow-hidden rounded-2xl border border-purple-500/30 bg-purple-900/10 p-5 group">
-          <div className="absolute top-0 right-0 bg-purple-500 text-black text-[9px] font-bold py-1 px-4 rounded-bl-xl uppercase tracking-tighter">
+      {/* Premium Unlock Card (Only show if doesn't have premium and pass exists, Season 0 has no premium) */}
+      {hasContent && viewingSeason > 0 && !user.premiumPassSeasons?.includes(viewingSeason) && (
+        <div className={cn(
+          "relative overflow-hidden rounded-2xl border p-5 group",
+          viewingSeason === 1 ? "border-yellow-500/30 bg-yellow-900/5" : "border-purple-500/30 bg-purple-900/10"
+        )}>
+          <div className={cn(
+            "absolute top-0 right-0 text-black text-[9px] font-bold py-1 px-4 rounded-bl-xl uppercase tracking-tighter",
+            viewingSeason === 1 ? "bg-yellow-500" : "bg-purple-500"
+          )}>
             Premium Available
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-5 relative z-10">
-            <div className="w-16 h-16 rounded-2xl bg-purple-500/20 border border-purple-500/40 flex items-center justify-center shadow-[0_0_20px_rgba(168,85,247,0.2)] shrink-0">
-              <Zap className="w-8 h-8 text-purple-400 animate-pulse" />
+            <div className={cn(
+              "w-16 h-16 rounded-2xl border flex items-center justify-center shrink-0",
+              viewingSeason === 1 
+                ? "bg-yellow-500/20 border-yellow-500/40 shadow-[0_0_20px_rgba(234,179,8,0.2)]" 
+                : "bg-purple-500/20 border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.2)]"
+            )}>
+              <Zap className={cn(
+                "w-8 h-8 animate-pulse",
+                viewingSeason === 1 ? "text-yellow-400" : "text-purple-400"
+              )} />
             </div>
             <div className="flex-1 text-center sm:text-left">
               <h4 className="text-lg font-thematic text-primary uppercase tracking-wide">
-                Season 1: Premium Pass
+                Season {viewingSeason}: Premium Pass
               </h4>
               <p className="text-[11px] text-muted font-sans leading-relaxed mt-1">
-                Unlock 10 extra cosmetic rewards and earn up to 1,200 CP back throughout the season.
+                {viewingSeason === 1 
+                  ? "Unlock the Obsidian & Gold collection with 10 extra premium rewards and 1,200 bonus CP."
+                  : "Unlock 10 extra cosmetic rewards and earn up to 1,200 CP back throughout the season."}
               </p>
             </div>
             <div className="shrink-0">
               <button
                 onClick={async () => {
-                  if (currentSeasonNumber === 0) return; // Deactivated for S0
+                  if (viewingSeason !== currentSeasonNumber) return; // Cannot buy from preview
                   setClaimingReward('premium-unlock');
                   try {
                     const response = await fetch(apiUrl('/api/pass/unlock-premium'), {
@@ -196,15 +283,17 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                     setClaimingReward(null);
                   }
                 }}
-                disabled={currentSeasonNumber === 0 || claimingReward === 'premium-unlock'}
+                disabled={viewingSeason !== currentSeasonNumber || claimingReward === 'premium-unlock'}
                 className={cn(
                   "px-6 py-3 rounded-xl font-thematic uppercase tracking-widest text-sm transition-all shadow-lg",
-                  currentSeasonNumber === 0
+                  viewingSeason !== currentSeasonNumber
                     ? "bg-surface-glass border border-subtle text-ghost cursor-not-allowed opacity-50"
-                    : "bg-purple-500 text-black border-purple-400 hover:bg-purple-400 shadow-purple-900/20"
+                    : viewingSeason === 1
+                      ? "bg-yellow-500 text-black border-yellow-400 hover:bg-yellow-400 shadow-yellow-900/20"
+                      : "bg-purple-500 text-black border-purple-400 hover:bg-purple-400 shadow-purple-900/20"
                 )}
               >
-                {currentSeasonNumber === 0 ? 'Season 1 Only' : claimingReward === 'premium-unlock' ? '...' : 'Unlock 1000 CP'}
+                {viewingSeason !== currentSeasonNumber ? 'Preview Only' : claimingReward === 'premium-unlock' ? '...' : 'Unlock 1000 CP'}
               </button>
             </div>
           </div>
@@ -216,12 +305,12 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
         <div className="space-y-3">
           {passRewards.map((reward) => {
             const item = reward.itemId ? DEFAULT_ITEMS.find((i) => i.id === reward.itemId) : undefined;
-            const isUnlocked = currentLevel >= reward.level;
+            const isUnlocked = viewingSeason === currentSeasonNumber ? (currentLevel >= reward.level) : false;
             const isClaimed = user.claimedRewards?.includes(reward.rewardId);
             const isPremium = !!reward.isPremium;
-            const hasPremium = user.premiumPassSeasons?.includes(currentSeasonNumber);
+            const hasPremium = user.premiumPassSeasons?.includes(viewingSeason);
             
-            const canClaim = isUnlocked && !isClaimed && (!isPremium || hasPremium);
+            const canClaim = viewingSeason === currentSeasonNumber && isUnlocked && !isClaimed && (!isPremium || hasPremium);
             const isClaiming = claimingReward === reward.rewardId;
             const wasJustClaimed = justClaimed === reward.rewardId;
 
@@ -236,12 +325,12 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                   'rounded-2xl border p-4 transition-all',
                   isPremium && !hasPremium && 'opacity-60 saturate-[0.8]',
                   isClaimed
-                    ? 'border-subtle bg-card opacity-70'
+                    ? (viewingSeason === 0 ? 'border-purple-500/20 bg-purple-900/10 opacity-70' : 'border-yellow-500/20 bg-yellow-900/10 opacity-70')
                     : canClaim
-                      ? 'border-yellow-500/50 bg-yellow-900/10 shadow-lg shadow-yellow-900/10'
+                      ? (viewingSeason === 0 ? 'border-purple-500/50 bg-purple-900/10 shadow-lg shadow-purple-900/10' : 'border-yellow-500/50 bg-yellow-900/10 shadow-lg shadow-yellow-900/10')
                       : isPremium && hasPremium
-                        ? 'border-purple-500/30 bg-purple-900/5'
-                        : 'border-subtle bg-card'
+                        ? (viewingSeason === 0 ? 'border-purple-500/30 bg-purple-900/5' : 'border-yellow-500/30 bg-yellow-900/5')
+                        : (viewingSeason === 0 ? 'border-purple-500/10 bg-purple-900/5' : 'border-yellow-500/10 bg-yellow-900/5')
                 )}
               >
                 <div className="flex items-center gap-4">
@@ -254,8 +343,8 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                         : isClaimed
                           ? 'border-emerald-600/50 bg-emerald-900/20'
                           : canClaim
-                            ? 'border-yellow-500 bg-yellow-900/20 shadow-[0_0_12px_rgba(234,179,8,0.3)]'
-                            : 'border-subtle bg-elevated'
+                            ? (viewingSeason === 0 ? 'border-purple-500 bg-purple-900/20 shadow-[0_0_12px_rgba(168,85,247,0.3)]' : 'border-yellow-500 bg-yellow-900/20 shadow-[0_0_12px_rgba(234,179,8,0.3)]')
+                            : (viewingSeason === 0 ? 'border-purple-500/20 bg-purple-900/10' : 'border-yellow-500/20 bg-yellow-900/10')
                     )}
                   >
                     {isPremium && !hasPremium ? (
@@ -267,7 +356,7 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                         <span
                           className={cn(
                             'text-sm font-thematic leading-none',
-                            canClaim ? 'text-yellow-400' : 'text-muted'
+                            canClaim ? (viewingSeason === 0 ? 'text-purple-400' : 'text-yellow-400') : 'text-muted'
                           )}
                         >
                           {reward.level}
@@ -275,7 +364,7 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                         <span
                           className={cn(
                             'text-[8px] font-mono uppercase',
-                            canClaim ? 'text-yellow-500/70' : 'text-faint'
+                            canClaim ? (viewingSeason === 0 ? 'text-purple-500/70' : 'text-yellow-500/70') : 'text-faint'
                           )}
                         >
                           {t('common.lvl')}
@@ -296,7 +385,10 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                         {t(reward.labelKey, { count: reward.cp })}
                       </div>
                       {isPremium && (
-                        <span className="text-[8px] font-bold bg-purple-500/20 text-purple-400 px-1.5 py-0.5 rounded uppercase tracking-tighter border border-purple-500/20">
+                        <span className={cn(
+                          "text-[8px] font-bold px-1.5 py-0.5 rounded uppercase tracking-tighter border transition-colors",
+                          viewingSeason === 0 ? "bg-purple-500/20 text-purple-400 border-purple-500/20" : "bg-yellow-500/20 text-yellow-500 border-yellow-500/20"
+                        )}>
                           Premium
                         </span>
                       )}
@@ -312,14 +404,19 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                               ? t('profile.pass.reward_types.music')
                               : item?.type === 'frame'
                                 ? t('profile.pass.reward_types.frame')
-                                : t('profile.pass.reward_types.reward')}
+                                : item?.type === 'policy'
+                                  ? t('profile.pass.reward_types.policy')
+                                  : t('profile.pass.reward_types.reward')}
                     </div>
                     {/* Progress bar for locked rewards */}
                     {!isUnlocked && (
                       <div className="mt-1.5 space-y-0.5">
                         <div className="h-1 bg-elevated rounded-full overflow-hidden">
                           <div
-                            className="h-full bg-yellow-600/50 rounded-full transition-all"
+                            className={cn(
+                              "h-full rounded-full transition-all",
+                              viewingSeason === 0 ? "bg-purple-600/50" : "bg-yellow-600/50"
+                            )}
                             style={{ width: `${towardReward}%` }}
                           />
                         </div>
@@ -335,13 +432,13 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                     <div className="relative w-10 h-10 shrink-0">
                       <div
                         className={cn(
-                          'w-10 h-10 rounded-lg bg-card border overflow-hidden flex items-center justify-center',
-                          isUnlocked ? 'border-default' : 'border-subtle opacity-40 grayscale'
+                          'w-10 h-10 rounded-lg bg-card border overflow-hidden flex items-center justify-center transition-colors',
+                          isUnlocked ? (viewingSeason === 0 ? 'border-purple-500/50' : 'border-yellow-500/50') : 'border-subtle'
                         )}
                       >
                         {item.type === 'music' ? (
                           <button
-                            onClick={() => isUnlocked && playPreview(item!)}
+                            onClick={() => playPreview(item!)}
                             className="w-full h-full flex items-center justify-center"
                           >
                             {playingItemId === item.id ? (
@@ -371,15 +468,26 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                         ) : item.type === 'vote' ? (
                           <div
                             className={cn(
-                              'relative w-full h-full flex items-center justify-center overflow-hidden',
-                              getVoteStyles(item.id, 'Aye')
+                              'relative w-full h-full flex items-center justify-center overflow-hidden transition-colors duration-500',
+                              getVoteStyles(item.id, previewToggle ? 'Nay' : 'Aye')
                             )}
                           >
                             {item.id === 'vote-pass-0' && (
                               <div className="absolute inset-0 animate-purple-rain bg-purple-500/50 pointer-events-none" />
                             )}
-                            <span className="text-[9px] font-thematic uppercase relative z-10">
-                              {t('common.aye') || 'AYE!'}
+                            <span className="text-[9px] font-thematic uppercase relative z-10 transition-all">
+                              {previewToggle ? (t('common.nay') || 'NAY!') : (t('common.aye') || 'AYE!')}
+                            </span>
+                          </div>
+                        ) : item.type === 'policy' ? (
+                          <div
+                            className={cn(
+                              'relative w-full h-full flex items-center justify-center overflow-hidden border rounded-md transition-all duration-500',
+                              getPolicyStyles(item.id, previewToggle ? 'State' : 'Civil')
+                            )}
+                          >
+                            <span className="text-[6px] font-mono uppercase font-bold leading-none text-center transition-all">
+                              {previewToggle ? 'STATE' : 'CIVIL'}
                             </span>
                           </div>
                         ) : item.type === 'background' ? (
@@ -401,13 +509,13 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                   {reward.cp && (
                     <div
                       className={cn(
-                        'w-10 h-10 rounded-lg border flex items-center justify-center shrink-0',
+                        'w-10 h-10 rounded-lg border flex items-center justify-center shrink-0 transition-colors',
                         isUnlocked
-                          ? 'bg-purple-900/20 border-purple-700/40'
+                          ? (viewingSeason === 0 ? 'bg-purple-900/20 border-purple-700/40' : 'bg-yellow-900/20 border-yellow-700/40')
                           : 'bg-card border-subtle opacity-40 grayscale'
                       )}
                     >
-                      <Zap className="w-5 h-5 text-purple-400" />
+                      <Zap className={cn("w-5 h-5 transition-colors", viewingSeason === 0 ? "text-purple-400" : "text-yellow-400")} />
                     </div>
                   )}
 
@@ -425,7 +533,9 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
                           'px-3 py-1.5 rounded-lg text-[10px] font-mono uppercase tracking-widest transition-all border',
                           wasJustClaimed
                             ? 'bg-emerald-900/30 border-emerald-600/50 text-emerald-400'
-                            : 'bg-yellow-500 border-yellow-400 text-black hover:bg-yellow-400 font-bold shadow-md shadow-yellow-900/20'
+                            : viewingSeason === 0
+                              ? 'bg-purple-500 border-purple-400 text-white hover:bg-purple-400 font-bold shadow-md shadow-purple-900/20'
+                              : 'bg-yellow-500 border-yellow-400 text-black hover:bg-yellow-400 font-bold shadow-md shadow-yellow-900/20'
                         )}
                       >
                         {isClaiming ? '...' : wasJustClaimed ? '✓' : t('profile.pass.btn_claim')}
@@ -451,6 +561,7 @@ export function PassTab({ user, token, onUpdateUser, playPreview, playingItemId,
         <p className="text-[9px] font-mono text-whisper">
           {t('profile.pass.footer_premium_hint')}
         </p>
+      </div>
       </div>
     </div>
   );

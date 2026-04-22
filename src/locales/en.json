@@ -20,6 +20,7 @@
     "searching": "Searching...",
     "error_invalid_email": "Invalid email address",
     "aye": "AYE",
+    "nay": "NAY",
     "civil_short": "Civ",
     "invite": "Invite",
     "lvl": "Lvl",
@@ -1189,6 +1190,9 @@
         "specialelection": "Special Election",
         "policypeek": "Directive Peek"
       },
+      "peek_declaration": "Peek Declaration",
+      "refused_to_declare": "Refused to declare",
+      "saw": "Saw",
       "list_view": "List View",
       "heatmap_view": "Heatmap",
       "heatmap_player": "Player",
@@ -1261,7 +1265,11 @@
         "result_drew": "Drew: <1>{{civ}} Civil</1> / <3>{{sta}} State</3>",
         "result_passed": "Passed: <1>{{civ}} Civil</1> / <3>{{sta}} State</3>",
         "result_received": "Received: <1>{{civ}} Civil</1> / <3>{{sta}} State</3>",
-        "submit": "Submit Declaration"
+        "submit": "Submit Declaration",
+        "peek_label": "Declare what you saw during the Peek",
+        "result_peek": "You are declaring you saw <1>{{civ}} Civil</1> and <3>{{sta}} State</3>.",
+        "refuse_label": "Refuse to declare",
+        "refuse_hint": "Refusing to declare is often seen as suspicious."
       },
       "player_profile": {
         "loading": "Loading profile...",
@@ -2327,15 +2335,17 @@
       "categories": {
         "frame": "Borders",
         "badge": "Badges",
-        "policy": "Policies",
+        "policy": "Directives",
         "vote": "Votes",
         "music": "Music",
         "sound": "Sounds",
         "background": "Backdrops"
       },
-      "vote_aye": "Aye Token",
-      "vote_yes": "Yes Token",
-      "item_type_policy": "Policy Skin",
+      "vote_aye": "AYE",
+      "vote_yes": "YES",
+      "vote_nay": "NAY",
+      "vote_no": "NO",
+      "item_type_policy": "Directive Style",
       "rarities": {
         "common": "Common",
         "uncommon": "Uncommon",
@@ -2521,7 +2531,7 @@
       "title": "Cosmetic Requisition",
       "subtitle": "Exchange IP and CP for border frames, badges, and more.",
       "btn_purchase": "Requisition ({{amount}})",
-      "item_type_policy": "Policy Skin",
+      "item_type_policy": "Directive Style",
       "item_style": "{{type}} Style",
       "btn_owned": "Owned",
       "btn_locked_pass": "Pass Reward",
@@ -2569,10 +2579,11 @@
         "s1_monarch": "Obsidian Monarch"
       },
       "reward_types": {
-        "cp": "Clarity Points",
+        "cp": "Cabinet Points",
         "cp_count": "{{count}} CP",
         "background": "Background",
         "vote": "Vote Style",
+        "policy": "Directive Style",
         "music": "Music Track",
         "frame": "Border Frame",
         "reward": "Reward"

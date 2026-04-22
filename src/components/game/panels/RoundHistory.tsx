@@ -278,55 +278,81 @@ export const RoundHistory = ({ gameState, isOpen, onClose }: RoundHistoryProps) 
                           </div>
 
                           {/* Declarations */}
-                          {!isFailed && (entry.presDeclaration || entry.chanDeclaration) && (
-                            <div className="flex gap-2">
-                              {entry.presDeclaration && (
-                                <div className="flex-1 p-2 rounded-lg bg-surface border border-subtle text-[9px] font-mono space-y-1">
-                                  <div className="text-yellow-500 uppercase tracking-widest">
-                                    {t('game.round_history.president')}
-                                  </div>
-                                  <div>
-                                    <span className="text-faint">{t('game.round_history.drew')} </span>
-                                    <span className="text-blue-400">
-                                      {entry.presDeclaration.drewCiv}{t('common.civil_short')}
-                                    </span>
-                                    <span className="text-ghost mx-0.5">/</span>
-                                    <span className="text-red-500">{entry.presDeclaration.drewSta}{t('common.state_short')}</span>
-                                  </div>
-                                  <div>
-                                    <span className="text-faint">{t('game.round_history.passed')} </span>
-                                    <span className="text-blue-400">{entry.presDeclaration.civ}{t('common.civil_short')}</span>
-                                    <span className="text-ghost mx-0.5">/</span>
-                                    <span className="text-red-500">{entry.presDeclaration.sta}{t('common.state_short')}</span>
-                                  </div>
+                            <div className="flex flex-col gap-2">
+                              {(entry.presDeclaration || entry.chanDeclaration) && (
+                                <div className="flex gap-2">
+                                  {entry.presDeclaration && (
+                                    <div className="flex-1 p-2 rounded-lg bg-surface border border-subtle text-[9px] font-mono space-y-1">
+                                      <div className="text-yellow-500 uppercase tracking-widest">
+                                        {t('game.round_history.president')}
+                                      </div>
+                                      <div>
+                                        <span className="text-faint">{t('game.round_history.drew')} </span>
+                                        <span className="text-blue-400">
+                                          {entry.presDeclaration.drewCiv}{t('common.civil_short')}
+                                        </span>
+                                        <span className="text-ghost mx-0.5">/</span>
+                                        <span className="text-red-500">{entry.presDeclaration.drewSta}{t('common.state_short')}</span>
+                                      </div>
+                                      <div>
+                                        <span className="text-faint">{t('game.round_history.passed')} </span>
+                                        <span className="text-blue-400">{entry.presDeclaration.civ}{t('common.civil_short')}</span>
+                                        <span className="text-ghost mx-0.5">/</span>
+                                        <span className="text-red-500">{entry.presDeclaration.sta}{t('common.state_short')}</span>
+                                      </div>
+                                    </div>
+                                  )}
+                                  {entry.chanDeclaration && (
+                                    <div className="flex-1 p-2 rounded-lg bg-surface border border-subtle text-[9px] font-mono space-y-1">
+                                      <div className="text-blue-400 uppercase tracking-widest">
+                                        {t('game.round_history.chancellor')}
+                                      </div>
+                                      <div className="text-faint text-[8px]">&nbsp;</div>
+                                      <div>
+                                        <span className="text-faint">{t('game.round_history.received')} </span>
+                                        <span className="text-blue-400">{entry.chanDeclaration.civ}{t('common.civil_short')}</span>
+                                        <span className="text-ghost mx-0.5">/</span>
+                                        <span className="text-red-500">{entry.chanDeclaration.sta}{t('common.state_short')}</span>
+                                        {entry.presDeclaration &&
+                                          entry.chanDeclaration &&
+                                          entry.presDeclaration.sta !== entry.chanDeclaration.sta && (
+                                            <span
+                                              className="ml-1.5 text-orange-400 font-bold"
+                                              title="Stories don't match"
+                                            >
+                                              ⚠
+                                            </span>
+                                          )}
+                                      </div>
+                                    </div>
+                                  )}
                                 </div>
                               )}
-                              {entry.chanDeclaration && (
-                                <div className="flex-1 p-2 rounded-lg bg-surface border border-subtle text-[9px] font-mono space-y-1">
-                                  <div className="text-blue-400 uppercase tracking-widest">
-                                    {t('game.round_history.chancellor')}
+
+                              {entry.peekDeclaration && (
+                                <div className="p-2 rounded-lg bg-surface border border-subtle text-[9px] font-mono space-y-1">
+                                  <div className="text-orange-400 uppercase tracking-widest flex items-center gap-1.5">
+                                    <Eye className="w-3 h-3" />
+                                    {t('game.round_history.peek_declaration')}
                                   </div>
-                                  <div className="text-faint text-[8px]">&nbsp;</div>
-                                  <div>
-                                    <span className="text-faint">{t('game.round_history.received')} </span>
-                                    <span className="text-blue-400">{entry.chanDeclaration.civ}{t('common.civil_short')}</span>
-                                    <span className="text-ghost mx-0.5">/</span>
-                                    <span className="text-red-500">{entry.chanDeclaration.sta}{t('common.state_short')}</span>
-                                    {entry.presDeclaration &&
-                                      entry.chanDeclaration &&
-                                      entry.presDeclaration.sta !== entry.chanDeclaration.sta && (
-                                        <span
-                                          className="ml-1.5 text-orange-400 font-bold"
-                                          title="Stories don't match"
-                                        >
-                                          ⚠
-                                        </span>
-                                      )}
-                                  </div>
+                                  {entry.peekDeclaration.isRefused ? (
+                                    <div className="text-red-500 italic flex items-center gap-1.5">
+                                      <X className="w-2.5 h-2.5" />
+                                      {t('game.round_history.refused_to_declare')}
+                                    </div>
+                                  ) : (
+                                    <div>
+                                      <span className="text-faint">{t('game.round_history.saw')} </span>
+                                      <span className="text-blue-400">
+                                        {entry.peekDeclaration.civ}{t('common.civil_short')}
+                                      </span>
+                                      <span className="text-ghost mx-0.5">/</span>
+                                      <span className="text-red-500">{entry.peekDeclaration.sta}{t('common.state_short')}</span>
+                                    </div>
+                                  )}
                                 </div>
                               )}
                             </div>
-                          )}
 
                           {/* Votes */}
                           {entry.votes.length > 0 && (

@@ -5,6 +5,7 @@ import { DEFAULT_ITEMS } from '../../sharedConstants';
 import { Coins, User as UserIcon, Scroll, Pause, Play } from 'lucide-react';
 import { cn, getProxiedUrl, apiUrl } from '../../utils/utils';
 import { getPolicyStyles, getVoteStyles, getFrameStyles, getRarity } from '../../utils/cosmetics';
+import { useGameContext } from '../../contexts/GameContext';
 
 interface ShopTabProps {
   user: User;
@@ -17,11 +18,21 @@ interface ShopTabProps {
 
 export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, playingItemId }: ShopTabProps) {
   const { t } = useTranslation();
+  const { systemConfig } = useGameContext();
   const [shopCategory, setShopCategory] = useState<
     'frame' | 'policy' | 'vote' | 'music' | 'sound' | 'background'
   >('frame');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [previewToggle, setPreviewToggle] = useState(false);
+
+  // Toggle previews for styles every 2.5s
+  React.useEffect(() => {
+    const interval = setInterval(() => {
+      setPreviewToggle((prev) => !prev);
+    }, 2500);
+    return () => clearInterval(interval);
+  }, []);
 
   const handleBuy = async (item: CosmeticItem) => {
     setIsLoading(true);
@@ -45,10 +56,24 @@ export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, pla
     }
   };
 
-  const filteredItems = DEFAULT_ITEMS.filter(
-    (item) =>
-      item.type === shopCategory && !item.id.includes('-pass-') && !item.id.endsWith('-default')
-  );
+  const currentSeason = systemConfig?.currentSeasonNumber ?? 0;
+
+  const filteredItems = DEFAULT_ITEMS.filter((item) => {
+    if (item.type !== shopCategory) return false;
+    if (item.id.includes('-pass-')) return false;
+    if (item.id.endsWith('-default')) return false;
+
+    // Filter out items from future seasons
+    const seasonMatch = item.id.match(/-s(\d+)-/);
+    if (seasonMatch) {
+      const itemSeason = parseInt(seasonMatch[1], 10);
+      if (itemSeason > currentSeason) {
+        return false;
+      }
+    }
+
+    return true;
+  });
 
   return (
     <div className="space-y-8">
@@ -145,22 +170,28 @@ export function ShopTab({ user, token, onUpdateUser, playSound, playPreview, pla
                   ) : item.type === 'policy' ? (
                     <div
                       className={cn(
-                        'w-full h-full flex flex-col items-center justify-center gap-1',
-                        getPolicyStyles(item.id, 'Civil')
+                        'w-full h-full flex flex-col items-center justify-center gap-1 transition-all duration-500',
+                        getPolicyStyles(item.id, previewToggle ? 'State' : 'Civil')
                       )}
                     >
                       <Scroll className="w-8 h-8" />
-                      <span className="text-[8px] font-mono uppercase">Civil</span>
+                      <span className="text-[8px] font-mono uppercase transition-all">
+                        {previewToggle ? 'State' : 'Civil'}
+                      </span>
                     </div>
                   ) : item.type === 'vote' ? (
                     <div
                       className={cn(
-                        'w-full h-full flex flex-col items-center justify-center gap-1',
-                        getVoteStyles(item.id, 'Aye')
+                        'w-full h-full flex flex-col items-center justify-center gap-1 transition-all duration-500',
+                        getVoteStyles(item.id, previewToggle ? 'Nay' : 'Aye')
                       )}
                     >
-                      <span className="text-lg font-thematic uppercase">AYE!</span>
-                      <span className="text-[8px] font-mono uppercase">YES</span>
+                      <span className="text-lg font-thematic uppercase transition-all">
+                        {previewToggle ? (t('common.nay') || 'NAY!') : (t('common.aye') || 'AYE!')}
+                      </span>
+                      <span className="text-[8px] font-mono uppercase opacity-70">
+                        {previewToggle ? (t('profile.inventory.vote_no') || 'NO') : (t('profile.inventory.vote_yes') || 'YES')}
+                      </span>
                     </div>
                   ) : item.type === 'background' ? (
                     <div className="w-full h-full bg-elevated flex items-center justify-center overflow-hidden">

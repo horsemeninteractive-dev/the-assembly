@@ -249,22 +249,31 @@ export class AIEngine {
   private choosePolicyToDiscard(player: Player, hand: Policy[], stateDir: number): number {
     let idx = -1;
 
+    // 1. Force state victory if possible
     if (player.role !== 'Civil' && stateDir >= 4) {
       const civIdx = hand.findIndex((p) => p === 'Civil');
       if (civIdx !== -1) return civIdx;
     }
 
-    if (player.personality === 'Aggressive' && player.role !== 'Civil') {
-      idx = hand.findIndex((p) => p === 'Civil');
-    } else if (player.personality === 'Strategic' && player.role !== 'Civil') {
-      idx =
-        stateDir < AI_WEIGHTS.legislative.STRATEGIC_PASS_THRESHOLD
-          ? hand.findIndex((p) => p === 'State')
-          : hand.findIndex((p) => p === 'Civil');
-    } else if (player.personality === 'Honest' || player.role === 'Civil') {
-      if (Math.random() < AI_WEIGHTS.legislative.CIVIL_MISTAKE_CHANCE) {
+    // 2. Normal selection logic
+    if (player.role === 'Civil') {
+      // Civil players ALWAYS discard State
+      idx = hand.findIndex((p) => p === 'State');
+    } else {
+      if (player.personality === 'Aggressive' || player.personality === 'Deceptive') {
+        // Aggressive/Deceptive State players discard Civil
         idx = hand.findIndex((p) => p === 'Civil');
+      } else if (player.personality === 'Strategic') {
+        // Strategic State players pass Civil early to build trust
+        idx =
+          stateDir < AI_WEIGHTS.legislative.STRATEGIC_PASS_THRESHOLD
+            ? hand.findIndex((p) => p === 'State')
+            : hand.findIndex((p) => p === 'Civil');
+      } else if (player.personality === 'Chaotic') {
+        // Chaotic players randomly discard
+        idx = Math.random() > 0.5 ? hand.findIndex((p) => p === 'Civil') : hand.findIndex((p) => p === 'State');
       } else {
+        // Default / Honest State agent discards State to build trust
         idx = hand.findIndex((p) => p === 'State');
       }
     }
@@ -338,38 +347,39 @@ export class AIEngine {
     const hasState = hand.includes('State');
 
     // ── Winning plays ─────────────────────────────────────────────────────────
-    // Civil chancellor secures an immediate Civil win
     if (player.role === 'Civil' && civilDir === 4 && hasCivil)
       return hand.findIndex((p) => p === 'Civil');
 
-    // State/Overseer chancellor secures an immediate State win
-    if ((player.role === 'State' || player.role === 'Overseer') && stateDir === 5 && hasState)
+    if (player.role !== 'Civil' && stateDir === 5 && hasState)
       return hand.findIndex((p) => p === 'State');
 
     // ── Game-ending loss prevention ───────────────────────────────────────────
-    // Civil chancellor must NOT hand State a win by playing State when stateDir === 5
     if (player.role === 'Civil' && stateDir === 5 && hasCivil)
       return hand.findIndex((p) => p === 'Civil');
 
-    // State/Overseer chancellor must NOT hand Civil a win by playing Civil when civilDir === 4
-    if ((player.role === 'State' || player.role === 'Overseer') && civilDir === 4 && hasState)
+    if (player.role !== 'Civil' && civilDir === 4 && hasState)
       return hand.findIndex((p) => p === 'State');
 
     // ── Personality-weighted selection ────────────────────────────────────────
     let idx = -1;
-    if (player.personality === 'Aggressive' && player.role !== 'Civil') {
-      // Aggressive State players always push State enactments
-      idx = hasState ? hand.findIndex((p) => p === 'State') : hand.findIndex((p) => p === 'Civil');
-    } else if (player.personality === 'Strategic' && player.role !== 'Civil') {
-      // Strategic State players play Civil to blend in while stateDir is low,
-      // switching to State once close to the winning threshold
-      idx =
-        stateDir < AI_WEIGHTS.legislative.STRATEGIC_PLAY_THRESHOLD
-          ? hand.findIndex((p) => p === 'Civil')
-          : hand.findIndex((p) => p === 'State');
-    } else if (player.personality === 'Honest' || player.role === 'Civil') {
+    if (player.role === 'Civil') {
       idx = hasCivil ? hand.findIndex((p) => p === 'Civil') : hand.findIndex((p) => p === 'State');
+    } else {
+      if (player.personality === 'Aggressive' || player.personality === 'Deceptive') {
+        idx = hasState ? hand.findIndex((p) => p === 'State') : hand.findIndex((p) => p === 'Civil');
+      } else if (player.personality === 'Strategic') {
+        idx =
+          stateDir < AI_WEIGHTS.legislative.STRATEGIC_PLAY_THRESHOLD
+            ? hand.findIndex((p) => p === 'Civil')
+            : hand.findIndex((p) => p === 'State');
+      } else if (player.personality === 'Chaotic') {
+        idx = Math.random() > 0.5 ? hand.findIndex((p) => p === 'State') : hand.findIndex((p) => p === 'Civil');
+      } else {
+        // Honest State agent
+        idx = hasCivil ? hand.findIndex((p) => p === 'Civil') : hand.findIndex((p) => p === 'State');
+      }
     }
+    
     return idx === -1 ? 0 : idx;
   }
 

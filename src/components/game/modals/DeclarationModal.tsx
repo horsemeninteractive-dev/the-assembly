@@ -5,7 +5,7 @@ import { useTranslation, Trans } from '../../../contexts/I18nContext';
 
 interface DeclarationModalProps {
   show: boolean;
-  declarationType: 'President' | 'Chancellor' | null;
+  declarationType: 'President' | 'Chancellor' | 'Peek' | null;
   declCiv: number;
   declSta: number;
   declDrawCiv: number;
@@ -14,7 +14,7 @@ interface DeclarationModalProps {
   setDeclSta: (n: number) => void;
   setDeclDrawCiv: (n: number) => void;
   setDeclDrawSta: (n: number) => void;
-  onSubmit: () => void;
+  onSubmit: (refused?: boolean) => void;
   playSound: (key: string) => void;
   needsTotalDraw?: number;
 }
@@ -107,73 +107,138 @@ export const DeclarationModal = ({
                 </div>
               )}
 
+              {/* Peek (executive action) — 3 cards */}
+              {declarationType === 'Peek' && (
+                <div className="space-y-2">
+                  <div className="text-[10px] uppercase tracking-widest text-muted font-mono ml-1">
+                    <Trans
+                      i18nKey="game.modals.declaration.peek_label"
+                      components={{ 1: <span className="normal-case text-ghost" /> }}
+                    />
+                  </div>
+                  <div className="flex gap-2">
+                    {[0, 1, 2, 3].map((n) => (
+                      <button
+                        key={n}
+                        onMouseEnter={() => playSound('hover')}
+                        onClick={() => {
+                          setDeclCiv(n);
+                          setDeclSta(3 - n);
+                        }}
+                        className={cn(
+                          'flex-1 py-3 rounded-xl border transition-all font-mono text-sm',
+                          declCiv === n
+                            ? 'bg-blue-900/40 border-blue-500 text-blue-400'
+                            : 'bg-surface-glass/40 border-subtle text-ghost backdrop-blur-sm'
+                        )}
+                      >
+                        {n}C
+                      </button>
+                    ))}
+                  </div>
+                  <div className="text-[9px] text-center text-faint font-mono">
+                    <Trans
+                      i18nKey="game.modals.declaration.result_peek"
+                      values={{ civ: declCiv, sta: declSta }}
+                      components={{
+                        1: <span className="text-blue-400" />,
+                        3: <span className="text-red-500" />
+                      }}
+                    />
+                  </div>
+                </div>
+              )}
+
               {/* Passed (president) or Received (chancellor) — 2 cards */}
-              <div className="space-y-2">
-                <div className="text-[10px] uppercase tracking-widest text-muted font-mono ml-1">
-                  {declarationType === 'President' ? (
-                    <Trans
-                      i18nKey="game.modals.declaration.passed_label"
-                      components={{ 1: <span className="normal-case text-ghost" /> }}
-                    />
-                  ) : (
-                    <Trans
-                      i18nKey="game.modals.declaration.received_label"
-                      components={{ 1: <span className="normal-case text-ghost" /> }}
-                    />
-                  )}
+              {declarationType !== 'Peek' && (
+                <div className="space-y-2">
+                  <div className="text-[10px] uppercase tracking-widest text-muted font-mono ml-1">
+                    {declarationType === 'President' ? (
+                      <Trans
+                        i18nKey="game.modals.declaration.passed_label"
+                        components={{ 1: <span className="normal-case text-ghost" /> }}
+                      />
+                    ) : (
+                      <Trans
+                        i18nKey="game.modals.declaration.received_label"
+                        components={{ 1: <span className="normal-case text-ghost" /> }}
+                      />
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    {[0, 1, 2].map((n) => (
+                      <button
+                        key={n}
+                        onMouseEnter={() => playSound('hover')}
+                        onClick={() => {
+                          setDeclCiv(n);
+                          setDeclSta(2 - n);
+                        }}
+                        className={cn(
+                          'flex-1 py-3 rounded-xl border transition-all font-mono text-sm',
+                          declCiv === n
+                            ? 'bg-blue-900/40 border-blue-500 text-blue-400'
+                            : 'bg-surface-glass/40 border-subtle text-ghost backdrop-blur-sm'
+                        )}
+                      >
+                        {n}C
+                      </button>
+                    ))}
+                  </div>
+                  <div className="text-[9px] text-center text-faint font-mono">
+                    {declarationType === 'President' ? (
+                      <Trans
+                        i18nKey="game.modals.declaration.result_passed"
+                        values={{ civ: declCiv, sta: declSta }}
+                        components={{
+                          1: <span className="text-blue-400" />,
+                          3: <span className="text-red-500" />
+                        }}
+                      />
+                    ) : (
+                      <Trans
+                        i18nKey="game.modals.declaration.result_received"
+                        values={{ civ: declCiv, sta: declSta }}
+                        components={{
+                          1: <span className="text-blue-400" />,
+                          3: <span className="text-red-500" />
+                        }}
+                      />
+                    )}
+                  </div>
                 </div>
-                <div className="flex gap-2">
-                  {[0, 1, 2].map((n) => (
-                    <button
-                      key={n}
-                      onMouseEnter={() => playSound('hover')}
-                      onClick={() => {
-                        setDeclCiv(n);
-                        setDeclSta(2 - n);
-                      }}
-                      className={cn(
-                        'flex-1 py-3 rounded-xl border transition-all font-mono text-sm',
-                        declCiv === n
-                          ? 'bg-blue-900/40 border-blue-500 text-blue-400'
-                          : 'bg-surface-glass/40 border-subtle text-ghost backdrop-blur-sm'
-                      )}
-                    >
-                      {n}C
-                    </button>
-                  ))}
-                </div>
-                <div className="text-[9px] text-center text-faint font-mono">
-                  {declarationType === 'President' ? (
-                    <Trans
-                      i18nKey="game.modals.declaration.result_passed"
-                      values={{ civ: declCiv, sta: declSta }}
-                      components={{
-                        1: <span className="text-blue-400" />,
-                        3: <span className="text-red-500" />
-                      }}
-                    />
-                  ) : (
-                    <Trans
-                      i18nKey="game.modals.declaration.result_received"
-                      values={{ civ: declCiv, sta: declSta }}
-                      components={{
-                        1: <span className="text-blue-400" />,
-                        3: <span className="text-red-500" />
-                      }}
-                    />
-                  )}
-                </div>
-              </div>
+              )}
             </div>
 
-            <button
-              onMouseEnter={() => playSound('hover')}
-              onClick={onSubmit}
-              disabled={declCiv + declSta !== 2 || (declarationType === 'President' && declDrawCiv + declDrawSta !== needsTotalDraw)}
-              className="w-full py-4 btn-primary rounded-xl hover:bg-subtle disabled:opacity-50 disabled:cursor-not-allowed transition-all font-thematic text-xl uppercase tracking-wide"
-            >
-              {t('game.modals.declaration.submit')}
-            </button>
+            <div className="space-y-3">
+              <button
+                onMouseEnter={() => playSound('hover')}
+                onClick={() => onSubmit(false)}
+                disabled={
+                  (declarationType !== 'Peek' && declCiv + declSta !== 2) || 
+                  (declarationType === 'Peek' && declCiv + declSta !== 3) ||
+                  (declarationType === 'President' && declDrawCiv + declDrawSta !== needsTotalDraw)
+                }
+                className="w-full py-4 btn-primary rounded-xl hover:bg-subtle disabled:opacity-50 disabled:cursor-not-allowed transition-all font-thematic text-xl uppercase tracking-wide"
+              >
+                {t('game.modals.declaration.submit')}
+              </button>
+
+              {declarationType === 'Peek' && (
+                <div className="space-y-2 pt-2">
+                  <button
+                    onMouseEnter={() => playSound('hover')}
+                    onClick={() => onSubmit(true)}
+                    className="w-full py-3 border border-red-500/30 bg-red-950/10 hover:bg-red-950/20 text-red-400/80 rounded-xl transition-all font-mono text-[10px] uppercase tracking-widest"
+                  >
+                    {t('game.modals.declaration.refuse_label')}
+                  </button>
+                  <p className="text-[9px] text-center text-red-500/40 italic">
+                    {t('game.modals.declaration.refuse_hint')}
+                  </p>
+                </div>
+              )}
+            </div>
           </motion.div>
         </motion.div>
       )}

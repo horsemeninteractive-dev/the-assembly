@@ -26,6 +26,14 @@ export const getFrameStyles = (id: string) => {
       return "shadow-[0_0_15px_rgba(129,140,248,0.4)] before:content-[''] before:absolute before:top-[-8px] before:left-1/2 before:-translate-x-1/2 before:w-4 before:h-4 before:bg-indigo-400 before:rotate-45";
     case 'frame-pass-0':
       return 'shadow-[0_0_20px_rgba(168,85,247,0.6)] animate-spin-slow animate-pulse';
+    case 'frame-s1-free-10':
+      return 'shadow-[inset_0_0_10px_rgba(0,0,0,0.8)] border-2 border-neutral-700';
+    case 'frame-s1-prem-5':
+      return 'shadow-[inset_0_0_10px_rgba(234,179,8,0.3)] border-2 border-neutral-800 border-t-yellow-600/50 border-l-yellow-600/50';
+    case 'frame-s1-prem-20':
+      return 'animate-molten border-2';
+    case 'frame-s1-prem-40':
+      return 'shadow-[0_0_20px_rgba(234,179,8,0.8)] border-2 border-yellow-400 bg-gradient-to-br from-yellow-500/20 to-transparent';
     case 'frame-common-basic':
       return 'border-2 border-gray-400';
     case 'frame-uncommon-bronze':
@@ -72,6 +80,18 @@ export const getPolicyStyles = (styleId: string | undefined, type: Policy) => {
       return isCivil
         ? 'bg-indigo-900/60 border-indigo-400 text-indigo-200 shadow-[0_0_25px_rgba(129,140,248,0.6)] animate-pulse'
         : 'bg-purple-900/60 border-purple-400 text-purple-200 shadow-[0_0_25px_rgba(168,85,247,0.6)] animate-pulse';
+    case 'policy-s1-free-50':
+      return isCivil
+        ? 'bg-neutral-800 border-neutral-600 text-neutral-400'
+        : 'bg-neutral-950 border-neutral-800 text-neutral-500';
+    case 'policy-s1-prem-25':
+      return isCivil
+        ? 'bg-[#fdfcf0] border-[#d4af37] text-[#d4af37] shadow-[0_0_10px_rgba(212,175,55,0.4)]'
+        : 'bg-[#fdfcf0] border-[#b8860b] text-[#b8860b] shadow-[0_0_10px_rgba(184,134,11,0.5)]';
+    case 'policy-s1-prem-50':
+      return isCivil
+        ? 'animate-gold-flow border-yellow-600 text-yellow-500 shadow-[0_0_20px_rgba(234,179,8,0.6)]'
+        : 'animate-gold-flow border-yellow-700 text-yellow-600 shadow-[0_0_25px_rgba(234,179,8,0.7)]';
     default:
       return isCivil
         ? 'bg-blue-900 border-blue-500/50 text-blue-400'
@@ -111,6 +131,14 @@ export const getVoteStyles = (styleId: string | undefined, type: 'Aye' | 'Nay' |
       return isAye
         ? 'bg-purple-900 border-purple-500 text-purple-50 shadow-[0_0_15px_rgba(168,85,247,0.4)] animate-pulse'
         : 'bg-gray-800 border-gray-400 text-gray-200 shadow-[0_0_15px_rgba(107,114,128,0.4)]';
+    case 'vote-s1-free-40':
+      return isAye
+        ? 'bg-neutral-800 border-neutral-600 text-neutral-200 shadow-[inset_0_0_10px_rgba(0,0,0,0.5)]'
+        : 'bg-neutral-900 border-neutral-800 text-neutral-500';
+    case 'vote-s1-prem-35':
+      return isAye
+        ? 'bg-yellow-500 border-yellow-300 text-yellow-950 shadow-[0_0_15px_rgba(234,179,8,0.5)]'
+        : 'bg-neutral-950 border-yellow-600/50 text-yellow-600/50';
     default:
       return isAye ? 'bg-white border-white text-black' : 'bg-black border-neutral-700 text-white';
   }
@@ -128,6 +156,9 @@ export const getBackgroundTexture = (id: string | undefined, isLightMode?: boole
     'bg-paper': 'https://www.transparenttextures.com/patterns/old-mathematics.png',
     'bg-concrete': 'https://www.transparenttextures.com/patterns/concrete-wall.png',
     'bg-pass-0': 'https://www.transparenttextures.com/patterns/gplay.png',
+    'bg-s1-free-20': 'https://www.transparenttextures.com/patterns/dark-matter.png',
+    'bg-s1-prem-10': 'https://www.transparenttextures.com/patterns/gold-dust.png',
+    'bg-s1-prem-30': 'https://www.transparenttextures.com/patterns/carbon-fibre.png',
     default: 'https://www.transparenttextures.com/patterns/carbon-fibre.png',
   };
 
@@ -139,6 +170,9 @@ export const getBackgroundTexture = (id: string | undefined, isLightMode?: boole
     'bg-paper': 'https://storage.googleapis.com/secretchancellor/old-mathematics%20(1).png',
     'bg-concrete': 'https://storage.googleapis.com/secretchancellor/concrete-wall%20(1).png',
     'bg-pass-0': 'https://storage.googleapis.com/secretchancellor/gplay%20(1).png',
+    'bg-s1-free-20': 'https://www.transparenttextures.com/patterns/dark-matter.png',
+    'bg-s1-prem-10': 'https://www.transparenttextures.com/patterns/gold-dust.png',
+    'bg-s1-prem-30': 'https://www.transparenttextures.com/patterns/carbon-fibre.png',
     default: 'https://storage.googleapis.com/secretchancellor/carbon-fibre%20(1).png',
   };
 

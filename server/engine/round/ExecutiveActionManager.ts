@@ -52,11 +52,19 @@ export class ExecutiveActionManager {
           this.round.engine.io.to(president.socketId).emit('policyPeekResult', top3);
         }
         addLog(s, `${president.name} peeked at the top directives.`);
+        s.peekDeclarationPending = true;
+        
+        if (president.isAI) {
+          // AI generates declaration immediately
+          this.round.legislative.scheduleAutoDeclarations(s, roomId);
+        }
         break;
       }
-    }
 
-    this.round.nextRound(s, roomId, true, action === 'SpecialElection');
+      default:
+        // For other actions, advance immediately
+        this.round.nextRound(s, roomId, true, action === 'SpecialElection');
+    }
   }
 }
 
