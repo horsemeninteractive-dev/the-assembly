@@ -3,6 +3,9 @@ import { motion, AnimatePresence } from 'motion/react';
 import { X, Zap, Loader2, CreditCard, ChevronRight, ShoppingBag } from 'lucide-react';
 import { cn, apiUrl, debugError } from '../utils/utils';
 import { CP_PACKAGES } from '../sharedConstants';
+import { Capacitor } from '@capacitor/core';
+import { Browser } from '@capacitor/browser';
+import { discordSdk } from '../services/discord';
 
 interface PurchaseCPModalProps {
   isOpen: boolean;
@@ -45,7 +48,33 @@ export const PurchaseCPModal: React.FC<PurchaseCPModalProps> = ({
 
       // Redirect to Stripe Checkout
       if (data.url) {
-        window.location.href = data.url;
+        const url = data.url;
+        
+        // 1. Discord Activity
+        if (discordSdk && (window.self !== window.top)) {
+          try {
+            await discordSdk.commands.openExternalLink({ url });
+            setIsLoading(null);
+            return;
+          } catch (err) {
+            debugError('Discord openExternalLink failed:', err);
+          }
+        }
+
+        // 2. Capacitor Native
+        if (Capacitor.isNativePlatform()) {
+          try {
+            await Browser.open({ url });
+            setIsLoading(null);
+            return;
+          } catch (err) {
+            debugError('Capacitor Browser.open failed:', err);
+          }
+        }
+
+        // 3. Web (Open in new tab to avoid losing SPA state)
+        window.open(url, '_blank');
+        setIsLoading(null);
       } else {
         throw new Error('No checkout URL received');
       }
