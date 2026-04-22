@@ -29,12 +29,14 @@ export class ExecutiveActionManager {
             role: result 
           });
         }
+        this.round.nextRound(s, roomId, true);
         break;
       }
       case 'SpecialElection': if (target) {
         addLog(s, `${president.name} called a Special Election for ${target.name}.`);
         s.lastPresidentIdx = s.presidentIdx;
         s.presidentIdx = s.players.findIndex((p) => p.id === target.id);
+        this.round.nextRound(s, roomId, true, true);
         break;
       }
       case 'Execution': if (target) {
@@ -44,6 +46,7 @@ export class ExecutiveActionManager {
           await this.round.engine.matchCloser.endGame(s, roomId, 'Civil', 'THE OVERSEER HAS BEEN EXECUTED');
           return;
         }
+        this.round.nextRound(s, roomId, true);
         break;
       }
       case 'PolicyPeek': {
@@ -60,10 +63,8 @@ export class ExecutiveActionManager {
         }
         break;
       }
-
       default:
-        // For other actions, advance immediately
-        this.round.nextRound(s, roomId, true, action === 'SpecialElection');
+        this.round.nextRound(s, roomId, true);
     }
   }
 }

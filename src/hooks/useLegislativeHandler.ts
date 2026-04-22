@@ -67,7 +67,7 @@ export function useLegislativeHandler({
 
   useEffect(() => {
     if (!me) return;
-    const alreadyDeclared = gameState.declarations.some((d) => d.playerId === socket.id);
+    const alreadyDeclared = gameState.declarations.some((d) => d.playerId === me.id);
     if (alreadyDeclared || gameState.phase === 'GameOver') {
       pendingDeclarationRef.current = null;
       setShowDeclarationUI(false);
@@ -115,7 +115,7 @@ export function useLegislativeHandler({
         pendingDeclarationRef.current = needed;
       }
     }
-    const peekDeclared = gameState.declarations.some((d) => d.playerId === socket.id && d.type === 'Peek');
+    const peekDeclared = gameState.declarations.some((d) => d.playerId === me.id && d.type === 'Peek');
     if (gameState.peekDeclarationPending && me.isPresident && !peekDeclared) {
       setDeclarationType('Peek');
       setDeclCiv(0);

@@ -159,13 +159,21 @@ export function registerGameActionHandlers(
       timestamp: Date.now(),
     });
 
-    const passedOrReceived = data.type === 'President' ? 'passed' : 'received';
-    const drewStr = data.type === 'President' && data.drewCiv !== undefined
-      ? ` (drew ${data.drewCiv}C/${data.drewSta}S)`
-      : '';
-    state.log.push(
-      `${player.name} (${data.type}) declared ${passedOrReceived} ${data.civ} Civil and ${data.sta} State directives.${drewStr}`
-    );
+    if (data.type === 'Peek') {
+      if (data.isRefused) {
+        state.log.push(`${player.name} refused to declare what they saw during the Peek.`);
+      } else {
+        state.log.push(`${player.name} declared they saw ${data.civ} Civil and ${data.sta} State directives.`);
+      }
+    } else {
+      const passedOrReceived = data.type === 'President' ? 'passed' : 'received';
+      const drewStr = data.type === 'President' && data.drewCiv !== undefined
+        ? ` (drew ${data.drewCiv}C/${data.drewSta}S)`
+        : '';
+      state.log.push(
+        `${player.name} (${data.type}) declared ${passedOrReceived} ${data.civ} Civil and ${data.sta} State directives.${drewStr}`
+      );
+    }
 
     engine.broadcastState(roomId);
     engine.checkRoundEnd(state, roomId);
