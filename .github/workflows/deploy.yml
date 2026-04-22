@@ -114,6 +114,7 @@ jobs:
             --project gen-lang-client-0636418324 \
             --region us-west1 \
             --allow-unauthenticated \
+            --update-env-vars APP_VERSION=${{ steps.pkg-version.outputs.VERSION }} \
             --quiet
           
           echo "### :rocket: Deployment Successful!" >> $GITHUB_STEP_SUMMARY
