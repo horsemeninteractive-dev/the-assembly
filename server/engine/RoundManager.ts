@@ -135,6 +135,13 @@ export class RoundManager {
         break;
       }
       case 'Executive_Action': {
+        // If we're waiting for a peek declaration, auto-declare instead of
+        // picking a random execution target.
+        if (s.peekDeclarationPending) {
+          s.presidentTimedOut = true;
+          this.legislative.autoDeclareMissing(s, roomId);
+          break;
+        }
         const president = s.players.find((p) => p.isPresident);
         if (president) {
           const eligible = s.players.filter((p) => p.isAlive && p.id !== president.id);

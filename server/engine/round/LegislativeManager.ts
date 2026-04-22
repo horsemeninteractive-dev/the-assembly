@@ -392,12 +392,16 @@ export class LegislativeManager {
   onBothDeclared(s: GameState, roomId: string): void {
     if (s.phase !== 'Legislative_Chancellor') return;
     if (!s.lastEnactedPolicy) return;
+    if (s.declarationsLogged) return; // prevent double-logging
+    s.declarationsLogged = true;
 
     updateSuspicionFromDeclarations(s);
 
     const presFull = s.declarations.find((d) => d.type === 'President');
-    if (presFull) {
-      const drewStr = ` (drew ${presFull.drewCiv}C/${presFull.drewSta}S)`;
+    if (presFull && !presFull.isBlocked) {
+      const drewCiv = presFull.drewCiv ?? 0;
+      const drewSta = presFull.drewSta ?? 0;
+      const drewStr = (drewCiv + drewSta) > 0 ? ` (drew ${drewCiv}C/${drewSta}S)` : '';
       addLog(s, `${presFull.playerName} (President) declared passed ${presFull.civ}C/${presFull.sta}S.${drewStr}`);
     }
 

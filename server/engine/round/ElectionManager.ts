@@ -170,6 +170,7 @@ export class ElectionManager {
 
     s.actionTimerEnd = Date.now() + 6000; // Longer for Defector window
     s.declarations = [];
+    s.declarationsLogged = false;
     this.round.enterPhase(s, roomId, 'Voting_Reveal');
 
     // Check for Defector
@@ -329,4 +330,5 @@ export class ElectionManager {
     this.round.startNomination(s, roomId);
   }
 }
+
 

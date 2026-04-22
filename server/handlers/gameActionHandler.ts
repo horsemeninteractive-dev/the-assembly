@@ -165,15 +165,9 @@ export function registerGameActionHandlers(
       } else {
         state.log.push(`${player.name} declared they saw ${data.civ} Civil and ${data.sta} State directives.`);
       }
-    } else {
-      const passedOrReceived = data.type === 'President' ? 'passed' : 'received';
-      const drewStr = data.type === 'President' && data.drewCiv !== undefined
-        ? ` (drew ${data.drewCiv}C/${data.drewSta}S)`
-        : '';
-      state.log.push(
-        `${player.name} (${data.type}) declared ${passedOrReceived} ${data.civ} Civil and ${data.sta} State directives.${drewStr}`
-      );
     }
+    // President/Chancellor declaration logs are written by onBothDeclared
+    // once both sides have declared, to avoid duplicate entries.
 
     engine.broadcastState(roomId);
     engine.checkRoundEnd(state, roomId);

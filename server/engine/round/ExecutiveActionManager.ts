@@ -56,11 +56,11 @@ export class ExecutiveActionManager {
         }
         addLog(s, `${president.name} peeked at the top directives.`);
         s.peekDeclarationPending = true;
-        
-        if (president.isAI) {
-          // AI generates declaration immediately
-          this.round.legislative.scheduleAutoDeclarations(s, roomId);
-        }
+        // Broadcast so clients see the pending declaration, then schedule
+        // auto-declaration (handles both AI presidents and human timer expiry).
+        this.round.engine.broadcastState(roomId);
+        this.round.startActionTimer(roomId);
+        this.round.legislative.scheduleAutoDeclarations(s, roomId);
         break;
       }
       default:

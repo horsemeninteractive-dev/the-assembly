@@ -638,6 +638,7 @@ export interface GameState {
   electionTrackerFrozen?: boolean;
   openSession?: boolean;
   presidentDeclarationBlocked?: boolean;
+  declarationsLogged?: boolean;
   censureMotionActive?: boolean;
   censuredPlayerId?: string;
   ghostVoterId?: string;
