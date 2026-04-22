@@ -20,6 +20,7 @@
     "searching": "Suche...",
     "error_invalid_email": "Ungültige E-Mail-Adresse",
     "aye": "JA",
+    "nay": "NEIN",
     "civil_short": "Zivilisation",
     "invite": "Einladen",
     "lvl": "Level",
@@ -230,7 +231,17 @@
     "footer": {
       "published_by": "Veröffentlicht von",
       "credits": "Credits",
-      "legal": "Rechtliche Informationen"
+      "legal": "Rechtliche Informationen",
+      "changelog": "Änderungsprotokoll"
+    },
+    "modals": {
+      "changelog": {
+        "title": "Änderungsprotokoll",
+        "subtitle": "Neueste Updates und Korrekturen",
+        "join_community": "Treten Sie dem Sekretariat bei",
+        "discord_cta": "Treten Sie unserem Discord bei, um weitere Updates und Community-Diskussionen zu erhalten!",
+        "join_discord": "Treten Sie Discord bei"
+      }
     },
     "creator": {
       "title": "Gründung einer neuen Versammlung",
@@ -1189,6 +1200,9 @@
         "specialelection": "Sonderwahl",
         "policypeek": "Direktive Peek"
       },
+      "peek_declaration": "Peek-Erklärung",
+      "refused_to_declare": "Weigerte sich,",
+      "saw": "zu deklarieren Säge",
       "list_view": "Listenansicht",
       "heatmap_view": "Heatmap",
       "heatmap_player": "Spieler",
@@ -1261,7 +1275,11 @@
         "result_drew": "Drew: <1>{{civ}} Zivil</1> / <3>{{sta}} Staat</3>",
         "result_passed": "Bestanden: <1>{{civ}} Zivil</1> / <3>{{sta}} Staat</3>",
         "result_received": "Eingegangen: <1>{{civ}} Zivil</1> / <3>{{sta}} Staat</3>",
-        "submit": "Erklärung abgeben"
+        "submit": "Erklärung abgeben",
+        "peek_label": "Erklären Sie, was Sie während des Peek gesehen haben",
+        "result_peek": "Sie geben an, dass Sie <1>{{civ}} Civil</1> und <3>{{sta}} State</3> gesehen haben.",
+        "refuse_label": "Weigere dich,",
+        "refuse_hint": "zu deklarieren Die Verweigerung der Meldung wird oft als verdächtig empfunden."
       },
       "player_profile": {
         "loading": "Profil wird geladen...",
@@ -2335,6 +2353,8 @@
       },
       "vote_aye": "Ja-Token",
       "vote_yes": "Ja Token",
+      "vote_nay": "NEIN",
+      "vote_no": "NEIN",
       "item_type_policy": "Richtlinien-Skin",
       "rarities": {
         "common": "Gewöhnlich",
@@ -2573,6 +2593,7 @@
         "cp_count": "{{count}} CP",
         "background": "Hintergrund",
         "vote": "Abstimmungsstil",
+        "policy": "Richtlinienstil",
         "music": "Musiktitel",
         "frame": "Rahmen",
         "reward": "Belohnung"

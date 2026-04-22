@@ -20,6 +20,7 @@
     "searching": "正在搜索...",
     "error_invalid_email": "无效的电子邮件地址",
     "aye": "是的",
+    "nay": "不",
     "civil_short": "文明",
     "invite": "邀请",
     "lvl": "等级",
@@ -230,7 +231,17 @@
     "footer": {
       "published_by": "发布者",
       "credits": "学分",
-      "legal": "法律信息"
+      "legal": "法律信息",
+      "changelog": "变更日志"
+    },
+    "modals": {
+      "changelog": {
+        "title": "变更日志",
+        "subtitle": "最新更新和修复",
+        "join_community": "加入秘书处",
+        "discord_cta": "加入我们的 Discord 以获取更多更新和社区讨论！",
+        "join_discord": "加入不和谐"
+      }
     },
     "creator": {
       "title": "建立新程序集",
@@ -1189,6 +1200,9 @@
         "specialelection": "特别选举",
         "policypeek": "指令窥视"
       },
+      "peek_declaration": "窥视声明",
+      "refused_to_declare": "拒绝申报",
+      "saw": "看到",
       "list_view": "列表视图",
       "heatmap_view": "热图",
       "heatmap_player": "玩家",
@@ -1261,7 +1275,11 @@
         "result_drew": "德鲁：<1>{{civ}}民事</1> / <3>{{sta}}国家</3>",
         "result_passed": "通过：<1>{{civ}}民事</1> / <3>{{sta}}州</3>",
         "result_received": "收到：<1>{{civ}}民事</1>/<3>{{sta}}国家</3>",
-        "submit": "提交声明"
+        "submit": "提交声明",
+        "peek_label": "声明您在窥视期间看到的内容",
+        "result_peek": "您声明您看到了 <1>{{civ}} Civil</1> 和 <3>{{sta}} State</3>。",
+        "refuse_label": "拒绝申报",
+        "refuse_hint": "拒绝申报通常会被视为可疑。"
       },
       "player_profile": {
         "loading": "正在加载个人资料...",
@@ -2335,6 +2353,8 @@
       },
       "vote_aye": "是的令牌",
       "vote_yes": "是的令牌",
+      "vote_nay": "不",
+      "vote_no": "没有",
       "item_type_policy": "政策皮肤",
       "rarities": {
         "common": "常见",
@@ -2573,6 +2593,7 @@
         "cp_count": "{{count}} CP",
         "background": "背景",
         "vote": "投票风格",
+        "policy": "指令风格",
         "music": "音乐曲目",
         "frame": "边框",
         "reward": "奖励"

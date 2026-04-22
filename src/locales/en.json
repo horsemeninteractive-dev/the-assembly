@@ -231,7 +231,17 @@
     "footer": {
       "published_by": "Published by",
       "credits": "Credits",
-      "legal": "Legal Info"
+      "legal": "Legal Info",
+      "changelog": "Changelog"
+    },
+    "modals": {
+      "changelog": {
+        "title": "Changelog",
+        "subtitle": "Latest Updates & Fixes",
+        "join_community": "Join the Secretariat",
+        "discord_cta": "Join our Discord for more updates and community discussion!",
+        "join_discord": "Join Discord"
+      }
     },
     "creator": {
       "title": "Establish New Assembly",

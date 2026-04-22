@@ -20,6 +20,7 @@
     "searching": "Recherche...",
     "error_invalid_email": "Adresse e-mail invalide",
     "aye": "OUI",
+    "nay": "NON",
     "civil_short": "Civ",
     "invite": "Inviter",
     "lvl": "Niveau",
@@ -230,7 +231,17 @@
     "footer": {
       "published_by": "Publié par",
       "credits": "Crédits",
-      "legal": "Informations légales"
+      "legal": "Informations légales",
+      "changelog": "Journal des modifications"
+    },
+    "modals": {
+      "changelog": {
+        "title": "Journal des modifications",
+        "subtitle": "Dernières mises à jour et correctifs",
+        "join_community": "Rejoignez le Secrétariat",
+        "discord_cta": "Rejoignez notre Discord pour plus de mises à jour et de discussions communautaires !",
+        "join_discord": "Rejoignez Discord"
+      }
     },
     "creator": {
       "title": "Établir une nouvelle assemblée",
@@ -1189,6 +1200,9 @@
         "specialelection": "Élection spéciale",
         "policypeek": "Aperçu de la directive"
       },
+      "peek_declaration": "Déclaration de Peek",
+      "refused_to_declare": "A refusé de déclarer",
+      "saw": "Scie",
       "list_view": "Vue en liste",
       "heatmap_view": "Carte thermique",
       "heatmap_player": "Joueur",
@@ -1261,7 +1275,11 @@
         "result_drew": "Drew : <1>{{civ}} Civil</1> / <3>{{sta}} État</3>",
         "result_passed": "Passé : <1>{{civ}} Civil</1> / <3>{{sta}} État</3>",
         "result_received": "Reçu : <1>{{civ}} Civil</1> / <3>{{sta}} État</3>",
-        "submit": "Soumettre la déclaration"
+        "submit": "Soumettre la déclaration",
+        "peek_label": "Déclarez ce que vous avez vu lors du Peek",
+        "result_peek": "Vous déclarez avoir vu <1>{{civ}} Civil</1> et <3>{{sta}} Etat</3>.",
+        "refuse_label": "Refuser de déclarer",
+        "refuse_hint": "Refuser de déclarer est souvent considéré comme suspect."
       },
       "player_profile": {
         "loading": "Chargement du profil...",
@@ -2335,6 +2353,8 @@
       },
       "vote_aye": "Oui jeton",
       "vote_yes": "Oui Jeton",
+      "vote_nay": "NON",
+      "vote_no": "NON",
       "item_type_policy": "Peau de politique",
       "rarities": {
         "common": "Commun",
@@ -2573,6 +2593,7 @@
         "cp_count": "{{count}} PC",
         "background": "Contexte",
         "vote": "Style de vote",
+        "policy": "Style directif",
         "music": "Piste musicale",
         "frame": "Cadre de bordure",
         "reward": "Récompense"

@@ -20,6 +20,7 @@
     "searching": "Buscando...",
     "error_invalid_email": "Dirección de correo electrónico no válida",
     "aye": "SÍ",
+    "nay": "NO",
     "civil_short": "Civilización",
     "invite": "Invitar",
     "lvl": "Nivel",
@@ -230,7 +231,17 @@
     "footer": {
       "published_by": "Publicado por",
       "credits": "Créditos",
-      "legal": "Información legal"
+      "legal": "Información legal",
+      "changelog": "Registro de cambios"
+    },
+    "modals": {
+      "changelog": {
+        "title": "Registro de cambios",
+        "subtitle": "Últimas actualizaciones y correcciones",
+        "join_community": "Únase a la Secretaría",
+        "discord_cta": "¡Únase a nuestro Discord para obtener más actualizaciones y debates comunitarios!",
+        "join_discord": "Únete a Discord"
+      }
     },
     "creator": {
       "title": "Establecer una nueva asamblea",
@@ -1189,6 +1200,9 @@
         "specialelection": "Elección Especial",
         "policypeek": "Vistazo directivo"
       },
+      "peek_declaration": "Declaración de vistazo",
+      "refused_to_declare": "Se negó a declarar",
+      "saw": "Sierra",
       "list_view": "Vista de lista",
       "heatmap_view": "Mapa de calor",
       "heatmap_player": "Jugador",
@@ -1261,7 +1275,11 @@
         "result_drew": "Drew: <1>{{civ}} Civil</1> / <3>{{sta}} Estado</3>",
         "result_passed": "Aprobado: <1>{{civ}} Civil</1> / <3>{{sta}} Estatal</3>",
         "result_received": "Recibido: <1>{{civ}} Civil</1> / <3>{{sta}} Estado</3>",
-        "submit": "Presentar Declaración"
+        "submit": "Presentar Declaración",
+        "peek_label": "Declara lo que viste durante el Peek",
+        "result_peek": "Usted declara que vio <1>{{civ}} Civil</1> y <3>{{sta}} Estatal</3>.",
+        "refuse_label": "Negarse a declarar",
+        "refuse_hint": "Negarse a declarar a menudo se considera sospechoso."
       },
       "player_profile": {
         "loading": "Cargando perfil...",
@@ -2335,6 +2353,8 @@
       },
       "vote_aye": "Sí Token",
       "vote_yes": "Sí Token",
+      "vote_nay": "NO",
+      "vote_no": "NO",
       "item_type_policy": "Aspecto de política",
       "rarities": {
         "common": "Común",
@@ -2573,6 +2593,7 @@
         "cp_count": "{{count}} PC",
         "background": "Antecedentes",
         "vote": "Estilo de votación",
+        "policy": "Estilo directivo",
         "music": "Pista de música",
         "frame": "Marco de borde",
         "reward": "Recompensa"

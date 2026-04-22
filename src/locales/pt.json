@@ -20,6 +20,7 @@
     "searching": "Procurando...",
     "error_invalid_email": "Endereço de e-mail inválido",
     "aye": "SIM",
+    "nay": "NÃO",
     "civil_short": "Cidadania",
     "invite": "Convidar",
     "lvl": "Nível",
@@ -230,7 +231,17 @@
     "footer": {
       "published_by": "Publicado por",
       "credits": "Créditos",
-      "legal": "Informações Legais"
+      "legal": "Informações Legais",
+      "changelog": "Registro de alterações"
+    },
+    "modals": {
+      "changelog": {
+        "title": "Registro de alterações",
+        "subtitle": "Últimas atualizações e correções",
+        "join_community": "Junte-se à Secretaria",
+        "discord_cta": "Junte-se ao nosso Discord para mais atualizações e discussões na comunidade!",
+        "join_discord": "Junte-se ao Discord"
+      }
     },
     "creator": {
       "title": "Estabelecer Nova Assembleia",
@@ -1189,6 +1200,9 @@
         "specialelection": "Eleição Especial",
         "policypeek": "Espiada da Diretiva"
       },
+      "peek_declaration": "Declaração de espiada",
+      "refused_to_declare": "Recusou-se a declarar",
+      "saw": "Vi",
       "list_view": "Visualização de lista",
       "heatmap_view": "Mapa de calor",
       "heatmap_player": "Jogador",
@@ -1261,7 +1275,11 @@
         "result_drew": "Drew: <1>{{civ}} Civil</1> / <3>{{sta}} Estadual</3>",
         "result_passed": "Aprovado: <1>{{civ}} Civil</1> / <3>{{sta}} Estadual</3>",
         "result_received": "Recebido: <1>{{civ}} Civil</1> / <3>{{sta}} Estadual</3>",
-        "submit": "Enviar declaração"
+        "submit": "Enviar declaração",
+        "peek_label": "Declare o que você viu durante o Peek",
+        "result_peek": "Você está declarando que viu <1>{{civ}} Civil</1> e <3>{{sta}} Estadual</3>.",
+        "refuse_label": "Recuse-se a declarar",
+        "refuse_hint": "Recusar-se a declarar é muitas vezes visto como suspeito."
       },
       "player_profile": {
         "loading": "Carregando perfil...",
@@ -2335,6 +2353,8 @@
       },
       "vote_aye": "Sim, Token",
       "vote_yes": "Sim Token",
+      "vote_nay": "NÃO",
+      "vote_no": "NÃO",
       "item_type_policy": "Skin da política",
       "rarities": {
         "common": "Comum",
@@ -2573,6 +2593,7 @@
         "cp_count": "{{count}} CP",
         "background": "Antecedentes",
         "vote": "Estilo de votação",
+        "policy": "Estilo Diretivo",
         "music": "Faixa musical",
         "frame": "Quadro de borda",
         "reward": "Recompensa"
