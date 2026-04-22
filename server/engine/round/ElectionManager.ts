@@ -34,6 +34,8 @@ export class ElectionManager {
     s.isStrategistAction = undefined;
     s.quorumRevotePending = undefined;
     s.isRevote = undefined;
+    s.declarationsLogged = false;
+    s.presidentDeclarationBlocked = false;
 
     // Identify the Presidential Candidate immediately so they are visible during Crisis phases
     const candidate = s.players[s.presidentIdx];

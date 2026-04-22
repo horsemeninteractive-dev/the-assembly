@@ -159,13 +159,8 @@ export function registerGameActionHandlers(
       timestamp: Date.now(),
     });
 
-    if (data.type === 'Peek') {
-      if (data.isRefused) {
-        state.log.push(`${player.name} refused to declare what they saw during the Peek.`);
-      } else {
-        state.log.push(`${player.name} declared they saw ${data.civ} Civil and ${data.sta} State directives.`);
-      }
-    }
+    // President/Chancellor/Peek declaration logs are written by LegislativeManager
+    // to avoid duplicate entries and ensure AI consistency.
     // President/Chancellor declaration logs are written by onBothDeclared
     // once both sides have declared, to avoid duplicate entries.
 

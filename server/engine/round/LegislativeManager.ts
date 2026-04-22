@@ -39,7 +39,15 @@ export class LegislativeManager {
 
     const presDecl = s.declarations.some((d) => d.type === 'President');
     const chanDecl = s.declarations.some((d) => d.type === 'Chancellor');
-    if (presDecl && chanDecl) this.onBothDeclared(s, roomId);
+    if (presDecl && chanDecl) {
+      this.onBothDeclared(s, roomId);
+      return;
+    }
+
+    if (s.peekDeclarationPending && s.declarations.some((d) => d.type === 'Peek')) {
+      s.peekDeclarationPending = false;
+      this.round.nextRound(s, roomId, true);
+    }
   }
 
   runExecutiveAction(s: GameState, roomId: string): void {
@@ -198,6 +206,12 @@ export class LegislativeManager {
         this.captureRoundHistory(st, policy, true);
         this.round.nextRound(st, roomId, false);
       } else {
+        // Generate AI declarations immediately
+        this.autoDeclareMissing(st, roomId, true); // true = AI only
+        
+        // The transition to next round/executive action will now be triggered
+        // by onBothDeclared once all declarations (AI or Human) are in.
+        // We still schedule a fallback for unresponsive humans.
         this.scheduleAutoDeclarations(st, roomId);
       }
     }, 5000);
@@ -235,10 +249,10 @@ export class LegislativeManager {
       if (!st || st.isPaused) return;
       if (st.phase !== 'Legislative_Chancellor' && !st.peekDeclarationPending) return;
       this.autoDeclareMissing(st, roomId);
-    }, 1500);
+    }, 10000);
   }
 
-  autoDeclareMissing(s: GameState, roomId: string): void {
+  autoDeclareMissing(s: GameState, roomId: string, aiOnly = false): void {
     if (s.phase === 'Legislative_Chancellor') {
       const president = s.players.find((p: Player) => p.isPresident);
       const chancellor = s.players.find((p: Player) => p.isChancellor);
@@ -247,13 +261,19 @@ export class LegislativeManager {
       const presDeclared = s.declarations.some((d) => d.type === 'President');
       const chanDeclared = s.declarations.some((d) => d.type === 'Chancellor');
 
-      if (!presDeclared && (president.isAI || s.presidentTimedOut) && !s.presidentDeclarationBlocked)
-        this.generateDeclaration(s, roomId, president, 'President');
-      if (!chanDeclared && (chancellor.isAI || s.chancellorTimedOut))
-        this.generateDeclaration(s, roomId, chancellor, 'Chancellor');
+      if (!presDeclared && !s.presidentDeclarationBlocked) {
+        if (president.isAI || !aiOnly) {
+          this.generateDeclaration(s, roomId, president, 'President');
+        }
+      }
+      if (!chanDeclared) {
+        if (chancellor.isAI || !aiOnly) {
+          this.generateDeclaration(s, roomId, chancellor, 'Chancellor');
+        }
+      }
     } else if (s.peekDeclarationPending) {
       const president = s.players.find((p: Player) => p.isPresident);
-      if (president && (president.isAI || s.presidentTimedOut)) {
+      if (president && (president.isAI || !aiOnly)) {
         this.generateDeclaration(s, roomId, president, 'Peek');
       }
     }
@@ -297,14 +317,28 @@ export class LegislativeManager {
         isRefused,
       });
 
-      addLog(s, `${player.name} declared what they saw during the Peek.`);
+      if (isRefused) {
+        addLog(s, `${player.name} refused to declare what they saw during the Peek.`);
+      } else {
+        addLog(s, `${player.name} declared they saw ${civ} Civil and ${sta} State directives.`);
+      }
       this.round.engine.broadcastState(roomId);
       this.checkRoundEnd(s, roomId);
       return;
     }
 
-    const saw = s.chancellorSaw ?? [];
-    const drew = s.presidentSaw ?? [];
+    // Fallback logic: if state was cleared too early, try to recover from lastEnactedPolicy
+    let saw = s.chancellorSaw ?? [];
+    if (saw.length === 0 && s.lastEnactedPolicy && !s.lastEnactedPolicy.isChaos) {
+      saw = s.lastEnactedPolicy.type === 'Civil' ? ['Civil', 'Civil'] : ['State', 'State'];
+    }
+    
+    let drew = s.presidentSaw ?? [];
+    if (drew.length === 0 && s.lastEnactedPolicy && !s.lastEnactedPolicy.isChaos) {
+      // Best guess for draw: 1 Civil, 2 State (most common)
+      drew = ['Civil', 'State', 'State'];
+    }
+
     let civ = saw.filter((p) => p === 'Civil').length;
     let sta = saw.filter((p) => p === 'State').length;
     let drewCiv = drew.filter((p) => p === 'Civil').length;
@@ -402,12 +436,19 @@ export class LegislativeManager {
       const drewCiv = presFull.drewCiv ?? 0;
       const drewSta = presFull.drewSta ?? 0;
       const drewStr = (drewCiv + drewSta) > 0 ? ` (drew ${drewCiv}C/${drewSta}S)` : '';
-      addLog(s, `${presFull.playerName} (President) declared passed ${presFull.civ}C/${presFull.sta}S.${drewStr}`);
+      addLog(s, `${presFull.playerName} (President) claimed passing ${presFull.civ}C/${presFull.sta}S.${drewStr}`);
     }
 
     const chanFull = s.declarations.find((d) => d.type === 'Chancellor');
     if (chanFull) {
-      addLog(s, `${chanFull.playerName} (Chancellor) declared received ${chanFull.civ}C/${chanFull.sta}S.`);
+      addLog(s, `${chanFull.playerName} (Chancellor) claimed receiving ${chanFull.civ}C/${chanFull.sta}S.`);
+    }
+
+    // Capture history BEFORE transition, because transition (beginNomination) clears lastEnactedPolicy
+    if (s.lastEnactedPolicy && !s.lastEnactedPolicy.historyCaptured) {
+      this.captureRoundHistory(s, s.lastEnactedPolicy.type, false);
+      s.lastEnactedPolicy.historyCaptured = true;
+      s.lastGovernmentVotes = undefined;
     }
 
     const bothAI =
@@ -436,12 +477,9 @@ export class LegislativeManager {
       }
     }
 
-    if (!s.lastEnactedPolicy.historyCaptured) {
-      this.captureRoundHistory(s, s.lastEnactedPolicy.type, false);
-      s.lastEnactedPolicy.historyCaptured = true;
-      s.lastGovernmentVotes = undefined;
-    }
-
+    // Now safe to transition phase. Clear temporary declarations buffer
+    // so that subsequent executive actions (like Peeks) start fresh.
+    s.declarations = [];
     this.round.engine.titleRoleResolver.runPostRoundTitleAbilities(s, roomId);
   }
 

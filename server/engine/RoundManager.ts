@@ -450,8 +450,8 @@ export class RoundManager {
     this.legislative.enactPolicy(s, roomId, policy, isChaos, playerId);
   }
 
-  autoDeclareMissing(s: GameState, roomId: string): void {
-    this.legislative.autoDeclareMissing(s, roomId);
+  autoDeclareMissing(s: GameState, roomId: string, aiOnly?: boolean): void {
+    this.legislative.autoDeclareMissing(s, roomId, aiOnly);
   }
 
   onBothDeclared(s: GameState, roomId: string): void {

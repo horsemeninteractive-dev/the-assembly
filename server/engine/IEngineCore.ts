@@ -48,7 +48,7 @@ export interface IRoundManager {
   handlePresidentDiscard(s: GameState, roomId: string, presidentId: string, idx: number): void;
   handleChancellorPlay(s: GameState, roomId: string, chancellorId: string, idx: number): void;
   enactPolicy(s: GameState, roomId: string, policy: Policy, isChaos: boolean, playerId?: string): void;
-  autoDeclareMissing(s: GameState, roomId: string): void;
+  autoDeclareMissing(s: GameState, roomId: string, aiOnly?: boolean): void;
   onBothDeclared(s: GameState, roomId: string): void;
   checkRoundEnd(s: GameState, roomId: string): void;
   runExecutiveAction(s: GameState, roomId: string): void;
